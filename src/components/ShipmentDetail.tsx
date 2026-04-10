@@ -8,11 +8,13 @@ import {
   ChevronDown,
   Plus,
   UserCheck,
+  FileText,
   Check,
   Boxes,
   AlertCircle,
 } from "lucide-react";
 import Badge from "./Badge";
+import InvoiceGenerator from "./InvoiceGenerator";
 
 // Types
 interface OrderLine {
@@ -83,6 +85,7 @@ export default function ShipmentDetail({
   onUpdate,
 }: ShipmentDetailProps) {
   const [showAddGroup, setShowAddGroup] = useState(false);
+  const [showInvoice, setShowInvoice] = useState(false);
   const [selectedBoxes, setSelectedBoxes] = useState<Set<string>>(new Set());
   const [assignWorker, setAssignWorker] = useState("");
 
@@ -199,7 +202,31 @@ export default function ShipmentDetail({
             {shipment.orderNumber} — {shipment.date} — {shipment.carrier}{shipment.awb ? ` (${shipment.awb})` : ""}
           </p>
         </div>
+        {shipment.boxes.length > 0 && (
+          <button
+            onClick={() => setShowInvoice(true)}
+            className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-navy-900
+                       bg-lime-400 rounded-lg hover:bg-lime-300 transition-colors cursor-pointer shadow-sm shrink-0"
+          >
+            <FileText className="w-4 h-4" />
+            Generate Invoice
+          </button>
+        )}
       </div>
+
+      {/* Invoice Generator Modal */}
+      <AnimatePresence>
+        {showInvoice && (
+          <InvoiceGenerator
+            shipment={shipment}
+            onClose={() => setShowInvoice(false)}
+            onGenerate={(invoice) => {
+              console.log("Invoice generated:", invoice);
+              setShowInvoice(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Fulfillment progress */}
       <div className="bg-white rounded-xl border border-sand-200 p-5">

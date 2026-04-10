@@ -88,6 +88,14 @@
         "PlantPrice": {
           "entitySetName": "inv_plantprices",
           "logicalName": "inv_plantprice"
+        },
+        "CAINumber": {
+          "entitySetName": "inv_cainumbers",
+          "logicalName": "inv_cainumber"
+        },
+        "Expense": {
+          "entitySetName": "inv_expenses",
+          "logicalName": "inv_expense"
         }
       }
     }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, Warehouse, Layers, CalendarDays, Shield } from "lucide-react";
+import { BarChart3, Warehouse, Layers, CalendarDays, Shield, Receipt, Camera } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
@@ -17,6 +17,7 @@ const tabs = [
   { id: "seasons", label: "Seasons" },
   { id: "tasks", label: "Tasks" },
   { id: "fiscal", label: "Fiscal (CAI)" },
+  { id: "expenses", label: "Expenses" },
 ];
 
 const initShadehouses = [
@@ -45,6 +46,12 @@ const initTasks = [
 ];
 const initFiscal = [
   { name: "CAI 2026", cai: "4ED113-4AB1C5-B6B9E0-63BE03-090919-95", rtn: "05019011379855", rangeStart: "000-001-01-00001461", rangeEnd: "000-001-01-00001530", expiry: "2027-04-06", total: 70, next: 1462, requestDate: "2026-04-06", active: true },
+];
+const initExpenses = [
+  { name: "Neem Oil — 5L", date: "2026-04-05", category: "Chemicals / Inputs", amount: 45.00, currency: "USD", vendor: "AgroSupply HN", status: "Approved", receiptUrl: "", aiExtracted: false, notes: "" },
+  { name: "DHL Shipment SHP-015", date: "2026-04-08", category: "Shipping / Freight", amount: 320.00, currency: "USD", vendor: "DHL Express", status: "Paid", receiptUrl: "", aiExtracted: false, notes: "38 boxes to TPC" },
+  { name: "Irrigation pump repair", date: "2026-04-02", category: "Maintenance", amount: 2500.00, currency: "HNL", vendor: "TecniAgua", status: "Pending", receiptUrl: "", aiExtracted: false, notes: "" },
+  { name: "Monthly electricity", date: "2026-04-01", category: "Utilities", amount: 8500.00, currency: "HNL", vendor: "ENEE", status: "Paid", receiptUrl: "", aiExtracted: false, notes: "Shadehouse North + South" },
 ];
 
 const shOptions = initShadehouses.map((s) => ({ value: s.name, label: s.name }));
@@ -135,6 +142,27 @@ const fiscalFormGroups = [
     { key: "active", label: "Active", type: "boolean" as const },
   ]},
 ];
+const expenseFormGroups = [
+  { title: "Expense Details", columns: 2 as const, fields: [
+    { key: "name", label: "Description", type: "text" as const, required: true, span: 2 as const },
+    { key: "date", label: "Date", type: "date" as const, required: true },
+    { key: "category", label: "Category", type: "select" as const, options: [
+      { value: "Supplies", label: "Supplies" }, { value: "Equipment", label: "Equipment" },
+      { value: "Labor", label: "Labor" }, { value: "Transportation", label: "Transportation" },
+      { value: "Utilities", label: "Utilities" }, { value: "Chemicals / Inputs", label: "Chemicals / Inputs" },
+      { value: "Shipping / Freight", label: "Shipping / Freight" }, { value: "Maintenance", label: "Maintenance" },
+      { value: "Office", label: "Office" }, { value: "Other", label: "Other" },
+    ], required: true },
+    { key: "amount", label: "Amount", type: "number" as const, min: 0, required: true },
+    { key: "currency", label: "Currency", type: "toggle" as const, options: [{ value: "HNL", label: "HNL" }, { value: "USD", label: "USD" }] },
+    { key: "vendor", label: "Vendor / Supplier", type: "text" as const },
+    { key: "status", label: "Status", type: "select" as const, options: [
+      { value: "Pending", label: "Pending" }, { value: "Approved", label: "Approved" },
+      { value: "Rejected", label: "Rejected" }, { value: "Paid", label: "Paid" },
+    ]},
+    { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const },
+  ]},
+];
 
 const priorityBadge = (p: string) => {
   const v = p === "Urgent" ? "red" : p === "High" ? "amber" : p === "Normal" ? "blue" : "gray";
@@ -153,6 +181,7 @@ export default function ManagementPage() {
   const [seasons, setSeasons] = useState(initSeasons);
   const [tasks, setTasks] = useState(initTasks);
   const [fiscal, setFiscal] = useState(initFiscal);
+  const [expenses, setExpenses] = useState(initExpenses);
 
   const shForm = useFormModal(initShadehouses[0]);
   const batchForm = useFormModal(initBatches[0]);
@@ -160,6 +189,7 @@ export default function ManagementPage() {
   const seasonForm = useFormModal(initSeasons[0]);
   const taskForm = useFormModal(initTasks[0]);
   const fiscalForm = useFormModal(initFiscal[0]);
+  const expenseForm = useFormModal(initExpenses[0]);
   const confirm = useConfirmDialog();
 
   const save = (data: any[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
@@ -246,6 +276,25 @@ export default function ManagementPage() {
             ]} data={fiscal} onAdd={fiscalForm.openCreate} onEdit={(r, i) => fiscalForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add CAI" />
             <FormModal open={fiscalForm.open} onClose={fiscalForm.close} title={fiscalForm.isEdit ? "Edit Fiscal Authorization" : "Add Fiscal Authorization"} subtitle="Honduras SAR CAI management" groups={fiscalFormGroups} values={fiscalForm.values} onChange={fiscalForm.onChange} isEdit={fiscalForm.isEdit} onSubmit={(v) => save(fiscal, setFiscal, fiscalForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete CAI" message="Delete this fiscal authorization?" onConfirm={() => del(fiscal, setFiscal)} />
+          </>
+        );
+      case "expenses":
+        return (
+          <>
+            <DataTable columns={[
+              { key: "name", label: "Description" },
+              { key: "date", label: "Date" },
+              { key: "category", label: "Category", render: (r) => <Badge variant="blue">{r.category as string}</Badge> },
+              { key: "amount", label: "Amount", render: (r) => `${r.currency === "USD" ? "$" : "L "}${(r.amount as number).toLocaleString(undefined, { minimumFractionDigits: 2 })}` },
+              { key: "vendor", label: "Vendor" },
+              { key: "status", label: "Status", render: (r) => {
+                const s = r.status as string;
+                const v = s === "Paid" ? "green" : s === "Approved" ? "blue" : s === "Rejected" ? "red" : "amber";
+                return <Badge variant={v}>{s}</Badge>;
+              }},
+            ]} data={expenses} onAdd={expenseForm.openCreate} onEdit={(r, i) => expenseForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Expense" searchPlaceholder="Search expenses..." />
+            <FormModal open={expenseForm.open} onClose={expenseForm.close} title={expenseForm.isEdit ? "Edit Expense" : "Add Expense"} groups={expenseFormGroups} values={expenseForm.values} onChange={expenseForm.onChange} isEdit={expenseForm.isEdit} onSubmit={(v) => save(expenses, setExpenses, expenseForm, v)} />
+            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Expense" message="Delete this expense record?" onConfirm={() => del(expenses, setExpenses)} />
           </>
         );
     }
