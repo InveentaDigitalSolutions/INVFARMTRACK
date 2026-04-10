@@ -1,0 +1,95 @@
+{
+  "version": "1.0",
+  "appId": "",
+  "appDisplayName": "INV-FarmTrack",
+  "region": "prod",
+  "environmentId": "",
+  "description": "Ornamental Plant Nursery Management App",
+  "buildPath": "./dist",
+  "buildEntryPoint": "index.html",
+  "localAppUrl": "http://localhost:5173",
+  "logoPath": "Default",
+  "connectionReferences": {},
+  "databaseReferences": {
+    "default.cds": {
+      "dataSources": {
+        "Shadehouse": {
+          "entitySetName": "inv_shadehouses",
+          "logicalName": "inv_shadehouse"
+        },
+        "Bed": {
+          "entitySetName": "inv_beds",
+          "logicalName": "inv_bed"
+        },
+        "Plant": {
+          "entitySetName": "inv_plants",
+          "logicalName": "inv_plant"
+        },
+        "Season": {
+          "entitySetName": "inv_seasons",
+          "logicalName": "inv_season"
+        },
+        "Batch": {
+          "entitySetName": "inv_batches",
+          "logicalName": "inv_batch"
+        },
+        "Planting": {
+          "entitySetName": "inv_plantings",
+          "logicalName": "inv_planting"
+        },
+        "Input": {
+          "entitySetName": "inv_inputs",
+          "logicalName": "inv_input"
+        },
+        "Treatment": {
+          "entitySetName": "inv_treatments",
+          "logicalName": "inv_treatment"
+        },
+        "Irrigation": {
+          "entitySetName": "inv_irrigations",
+          "logicalName": "inv_irrigation"
+        },
+        "Harvest": {
+          "entitySetName": "inv_harvests",
+          "logicalName": "inv_harvest"
+        },
+        "Calendar": {
+          "entitySetName": "inv_calendars",
+          "logicalName": "inv_calendar"
+        },
+        "Task": {
+          "entitySetName": "inv_tasks",
+          "logicalName": "inv_task"
+        },
+        "Customer": {
+          "entitySetName": "inv_customers",
+          "logicalName": "inv_customer"
+        },
+        "Order": {
+          "entitySetName": "inv_orders",
+          "logicalName": "inv_order"
+        },
+        "OrderItem": {
+          "entitySetName": "inv_orderitems",
+          "logicalName": "inv_orderitem"
+        },
+        "Packing": {
+          "entitySetName": "inv_packings",
+          "logicalName": "inv_packing"
+        },
+        "FiscalAuthorization": {
+          "entitySetName": "inv_fiscalauthorizations",
+          "logicalName": "inv_fiscalauthorization"
+        },
+        "Invoice": {
+          "entitySetName": "inv_invoices",
+          "logicalName": "inv_invoice"
+        },
+        "PlantPrice": {
+          "entitySetName": "inv_plantprices",
+          "logicalName": "inv_plantprice"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1879 @@
+{
+  "publisherPrefix": "inv",
+  "solutionName": "DigitalFarmTracking",
+  "version": "2.0.0.0",
+  "tables": [
+    {
+      "schemaName": "inv_Shadehouse",
+      "displayName": "Shadehouse",
+      "displayCollectionName": "Shadehouses",
+      "description": "Physical growing structures in the nursery",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_ShadehouseName",
+          "displayName": "Shadehouse Name",
+          "type": "string",
+          "maxLength": 100,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_Code",
+          "displayName": "Code",
+          "type": "string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "schemaName": "inv_Location",
+          "displayName": "Location",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Coordinates",
+          "displayName": "Coordinates",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Length",
+          "displayName": "Length (m)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Width",
+          "displayName": "Width (m)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Capacity",
+          "displayName": "Capacity (beds)",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_IsActive",
+          "displayName": "Is Active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Bed",
+      "displayName": "Bed",
+      "displayCollectionName": "Beds",
+      "description": "Growing beds within batches (Shadehouse > Batch > Bed)",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_BedName",
+          "displayName": "Bed Name",
+          "type": "string",
+          "maxLength": 100,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_BatchId",
+          "displayName": "Batch",
+          "type": "lookup",
+          "relatedTable": "inv_Batch",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Type",
+          "displayName": "Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Air" },
+            { "value": 681340001, "label": "Ground" }
+          ]
+        },
+        {
+          "schemaName": "inv_Level",
+          "displayName": "Level",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "0" },
+            { "value": 681340001, "label": "1" },
+            { "value": 681340002, "label": "2" },
+            { "value": 681340003, "label": "3" }
+          ]
+        },
+        {
+          "schemaName": "inv_Capacity",
+          "displayName": "Capacity",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_BedMaterial",
+          "displayName": "Bed Material",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Wood" },
+            { "value": 681340001, "label": "Concrete" },
+            { "value": 681340002, "label": "Plastic" },
+            { "value": 681340003, "label": "Metal" }
+          ]
+        },
+        {
+          "schemaName": "inv_SoilType",
+          "displayName": "Soil Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Sandy" },
+            { "value": 681340001, "label": "Loamy" },
+            { "value": 681340002, "label": "Clay" },
+            { "value": 681340003, "label": "Peaty" },
+            { "value": 681340004, "label": "Chalky" },
+            { "value": 681340005, "label": "Silty" }
+          ]
+        },
+        {
+          "schemaName": "inv_Drainage",
+          "displayName": "Drainage",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Excellent" },
+            { "value": 681340001, "label": "Good" },
+            { "value": 681340002, "label": "Moderate" },
+            { "value": 681340003, "label": "Poor" }
+          ]
+        },
+        {
+          "schemaName": "inv_IrrigationType",
+          "displayName": "Irrigation Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Drip" },
+            { "value": 681340001, "label": "Sprinkler" },
+            { "value": 681340002, "label": "Manual" },
+            { "value": 681340003, "label": "None" }
+          ]
+        },
+        {
+          "schemaName": "inv_Location",
+          "displayName": "Location",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_IsActive",
+          "displayName": "Is Active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Plant",
+      "displayName": "Plant",
+      "displayCollectionName": "Plants",
+      "description": "Plant species, varieties, and patent catalog",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_PlantName",
+          "displayName": "Plant Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_InvoiceName",
+          "displayName": "Invoice Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": false,
+          "description": "Auto-composed: {Name} / {Variety} — used on invoices and packing lists"
+        },
+        {
+          "schemaName": "inv_PlantCode",
+          "displayName": "Plant Code",
+          "type": "string",
+          "maxLength": 30,
+          "required": true
+        },
+        {
+          "schemaName": "inv_LatinName",
+          "displayName": "Latin Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Species",
+          "displayName": "Species",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Variety",
+          "displayName": "Variety",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Origin",
+          "displayName": "Origin",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_PatentNumber",
+          "displayName": "Patent Number",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "inv_PatentHolder",
+          "displayName": "Patent Holder",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_PatentExpiry",
+          "displayName": "Patent Expiry Date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_IsPatented",
+          "displayName": "Is Patented",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": false
+        },
+        {
+          "schemaName": "inv_GrowthHabit",
+          "displayName": "Growth Habit",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Upright" },
+            { "value": 681340001, "label": "Spreading" },
+            { "value": 681340002, "label": "Climbing" },
+            { "value": 681340003, "label": "Trailing" }
+          ]
+        },
+        {
+          "schemaName": "inv_PropagationMethod",
+          "displayName": "Propagation Method",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Seed" },
+            { "value": 681340001, "label": "Cutting" },
+            { "value": 681340002, "label": "Division" },
+            { "value": 681340003, "label": "Grafting" },
+            { "value": 681340004, "label": "Tissue Culture" }
+          ]
+        },
+        {
+          "schemaName": "inv_SunlightRequirement",
+          "displayName": "Sunlight Requirement",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Full Sun" },
+            { "value": 681340001, "label": "Partial Shade" },
+            { "value": 681340002, "label": "Full Shade" }
+          ]
+        },
+        {
+          "schemaName": "inv_WaterRequirement",
+          "displayName": "Water Requirement",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Low" },
+            { "value": 681340001, "label": "Medium" },
+            { "value": 681340002, "label": "High" }
+          ]
+        },
+        {
+          "schemaName": "inv_SoilType",
+          "displayName": "Soil Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 681340000, "label": "Sandy" },
+            { "value": 681340001, "label": "Loamy" },
+            { "value": 681340002, "label": "Clay" },
+            { "value": 681340003, "label": "Peaty" },
+            { "value": 681340004, "label": "Chalky" },
+            { "value": 681340005, "label": "Silty" }
+          ]
+        },
+        {
+          "schemaName": "inv_BloomPeriod",
+          "displayName": "Bloom Period",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "inv_DefaultUnitPrice",
+          "displayName": "Default Unit Price",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Characteristics",
+          "displayName": "Characteristics",
+          "type": "memo",
+          "maxLength": 4000,
+          "required": false
+        },
+        {
+          "schemaName": "inv_ImageUrl",
+          "displayName": "Image URL",
+          "type": "string",
+          "maxLength": 500,
+          "required": false
+        },
+        {
+          "schemaName": "inv_IsActive",
+          "displayName": "Is Active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Season",
+      "displayName": "Season",
+      "displayCollectionName": "Seasons",
+      "description": "Growing seasons for tracking performance over time",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_SeasonName",
+          "displayName": "Season Name",
+          "type": "string",
+          "maxLength": 100,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_StartDate",
+          "displayName": "Start Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_EndDate",
+          "displayName": "End Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Description",
+          "displayName": "Description",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        },
+        {
+          "schemaName": "inv_IsActive",
+          "displayName": "Is Active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Batch",
+      "displayName": "Batch",
+      "displayCollectionName": "Batches",
+      "description": "Production batches of plants within a shadehouse",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_BatchCode",
+          "displayName": "Batch Code",
+          "type": "string",
+          "maxLength": 50,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_ShadehouseId",
+          "displayName": "Shadehouse",
+          "type": "lookup",
+          "relatedTable": "inv_Shadehouse",
+          "required": true
+        },
+        {
+          "schemaName": "inv_SeasonId",
+          "displayName": "Season",
+          "type": "lookup",
+          "relatedTable": "inv_Season",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Position",
+          "displayName": "Position",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Planting",
+      "displayName": "Planting",
+      "displayCollectionName": "Plantings",
+      "description": "Records of plants placed in beds — central activity hub",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_PlantingDescription",
+          "displayName": "Planting Description",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "inv_Plant",
+          "required": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": true
+        },
+        {
+          "schemaName": "inv_SeasonId",
+          "displayName": "Season",
+          "type": "lookup",
+          "relatedTable": "inv_Season",
+          "required": true
+        },
+        {
+          "schemaName": "inv_PlantingDate",
+          "displayName": "Planting Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Quantity",
+          "displayName": "Quantity",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CurrentPlanting",
+          "displayName": "Current Planting",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Input",
+      "displayName": "Input",
+      "displayCollectionName": "Inputs",
+      "description": "Catalog of fertilizers, pesticides, and other inputs",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_InputName",
+          "displayName": "Input Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_InputCategory",
+          "displayName": "Input Category",
+          "type": "choice",
+          "required": true,
+          "options": [
+            { "value": 747480000, "label": "Fertilizer" },
+            { "value": 747480001, "label": "Pesticide" },
+            { "value": 747480002, "label": "Fungicide" },
+            { "value": 747480003, "label": "Herbicide" },
+            { "value": 747480004, "label": "Growth Regulator" },
+            { "value": 747480005, "label": "Other" }
+          ]
+        },
+        {
+          "schemaName": "inv_InputSubtype",
+          "displayName": "Input Subtype",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Brand",
+          "displayName": "Brand",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Composition",
+          "displayName": "Composition",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        },
+        {
+          "schemaName": "inv_ApplicationMethod",
+          "displayName": "Application Method",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Foliar Spray" },
+            { "value": 747480001, "label": "Soil Drench" },
+            { "value": 747480002, "label": "Granular" },
+            { "value": 747480003, "label": "Drip" },
+            { "value": 747480004, "label": "Broadcast" },
+            { "value": 747480005, "label": "Other" }
+          ]
+        },
+        {
+          "schemaName": "inv_SafetyIntervalDays",
+          "displayName": "Safety Interval (days)",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_StorageInstructions",
+          "displayName": "Storage Instructions",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        },
+        {
+          "schemaName": "inv_EnvironmentalImpact",
+          "displayName": "Environmental Impact",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        },
+        {
+          "schemaName": "inv_ManufacturerContact",
+          "displayName": "Manufacturer Contact",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Treatment",
+      "displayName": "Treatment",
+      "displayCollectionName": "Treatments",
+      "description": "Treatment/fumigation applications to plantings",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_TreatmentName",
+          "displayName": "Treatment Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": true,
+          "description": "Which bed was treated"
+        },
+        {
+          "schemaName": "inv_InputId",
+          "displayName": "Input",
+          "type": "lookup",
+          "relatedTable": "inv_Input",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Type",
+          "displayName": "Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Insecticide" },
+            { "value": 747480001, "label": "Fungicide" },
+            { "value": 747480002, "label": "Herbicide" },
+            { "value": 747480003, "label": "Regulator" }
+          ]
+        },
+        {
+          "schemaName": "inv_TemperatureC",
+          "displayName": "Temperature (C)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Humidity",
+          "displayName": "Humidity (%)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_PH",
+          "displayName": "pH",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Worker",
+          "displayName": "Worker",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Irrigation",
+      "displayName": "Irrigation",
+      "displayCollectionName": "Irrigations",
+      "description": "Watering events for plantings",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_IrrigationName",
+          "displayName": "Irrigation Event Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": true,
+          "description": "Which bed was irrigated"
+        },
+        {
+          "schemaName": "inv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_AmountLiters",
+          "displayName": "Amount (Liters)",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Method",
+          "displayName": "Method",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Drip" },
+            { "value": 747480001, "label": "Sprinkler" },
+            { "value": 747480002, "label": "Manual" },
+            { "value": 747480003, "label": "Flood" }
+          ]
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Harvest",
+      "displayName": "Harvest",
+      "displayCollectionName": "Harvests",
+      "description": "Harvest events tracking yield and quality per bed",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_HarvestName",
+          "displayName": "Harvest Event Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": true,
+          "description": "Which bed was harvested"
+        },
+        {
+          "schemaName": "inv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_YieldKg",
+          "displayName": "Yield (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_QuantityHarvested",
+          "displayName": "Quantity Harvested",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Quality",
+          "displayName": "Quality",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Excellent" },
+            { "value": 747480001, "label": "Good" },
+            { "value": 747480002, "label": "Average" },
+            { "value": 747480003, "label": "Poor" }
+          ]
+        },
+        {
+          "schemaName": "inv_Worker",
+          "displayName": "Harvested By",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Calendar",
+      "displayName": "Calendar",
+      "displayCollectionName": "Calendar",
+      "description": "Date dimension table for scheduling and reporting",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_DateLabel",
+          "displayName": "Date Label",
+          "type": "string",
+          "maxLength": 50,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_ISODateID",
+          "displayName": "ISO Date ID",
+          "type": "string",
+          "maxLength": 10,
+          "required": true
+        },
+        {
+          "schemaName": "inv_Year",
+          "displayName": "Year",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Quarter",
+          "displayName": "Quarter",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_MonthNumber",
+          "displayName": "Month Number",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_MonthLongName",
+          "displayName": "Month Long Name",
+          "type": "string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "schemaName": "inv_MonthShortName",
+          "displayName": "Month Short Name",
+          "type": "string",
+          "maxLength": 3,
+          "required": true
+        },
+        {
+          "schemaName": "inv_WeekNumber",
+          "displayName": "Week Number",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_DayOfMonth",
+          "displayName": "Day of Month",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_DayOfYear",
+          "displayName": "Day of Year",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_WeekdayNumber",
+          "displayName": "Weekday Number",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_WeekdayLongName",
+          "displayName": "Weekday Long Name",
+          "type": "string",
+          "maxLength": 10,
+          "required": true
+        },
+        {
+          "schemaName": "inv_WeekdayShortName",
+          "displayName": "Weekday Short Name",
+          "type": "string",
+          "maxLength": 3,
+          "required": true
+        },
+        {
+          "schemaName": "inv_QuarterYear",
+          "displayName": "Quarter Year",
+          "type": "string",
+          "maxLength": 10,
+          "required": true
+        },
+        {
+          "schemaName": "inv_IsWeekend",
+          "displayName": "Is Weekend",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Task",
+      "displayName": "Task",
+      "displayCollectionName": "Tasks",
+      "description": "Scheduled and assigned nursery tasks",
+      "ownershipType": "UserOwned",
+      "columns": [
+        {
+          "schemaName": "inv_TaskTitle",
+          "displayName": "Task Title",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_TaskType",
+          "displayName": "Task Type",
+          "type": "choice",
+          "required": true,
+          "options": [
+            { "value": 747480000, "label": "Watering" },
+            { "value": 747480001, "label": "Fertilizing" },
+            { "value": 747480002, "label": "Pruning" },
+            { "value": 747480003, "label": "Repotting" },
+            { "value": 747480004, "label": "Pest Control" },
+            { "value": 747480005, "label": "Disease Treatment" },
+            { "value": 747480006, "label": "Harvesting" },
+            { "value": 747480007, "label": "Seeding" },
+            { "value": 747480008, "label": "Packing" },
+            { "value": 747480009, "label": "Inspection" },
+            { "value": 747480010, "label": "General Maintenance" }
+          ]
+        },
+        {
+          "schemaName": "inv_PlantingId",
+          "displayName": "Related Planting",
+          "type": "lookup",
+          "relatedTable": "inv_Planting",
+          "required": false
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Related Bed",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": false
+        },
+        {
+          "schemaName": "inv_DueDate",
+          "displayName": "Due Date",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "schemaName": "inv_CompletedDate",
+          "displayName": "Completed Date",
+          "type": "datetime",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Status",
+          "displayName": "Status",
+          "type": "choice",
+          "required": true,
+          "options": [
+            { "value": 747480000, "label": "Pending" },
+            { "value": 747480001, "label": "In Progress" },
+            { "value": 747480002, "label": "Done" },
+            { "value": 747480003, "label": "Skipped" }
+          ]
+        },
+        {
+          "schemaName": "inv_Priority",
+          "displayName": "Priority",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Low" },
+            { "value": 747480001, "label": "Normal" },
+            { "value": 747480002, "label": "High" },
+            { "value": 747480003, "label": "Urgent" }
+          ]
+        },
+        {
+          "schemaName": "inv_AssignedTo",
+          "displayName": "Assigned To",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Customer",
+      "displayName": "Customer",
+      "displayCollectionName": "Customers",
+      "description": "Nursery customers for orders and invoicing",
+      "ownershipType": "UserOwned",
+      "columns": [
+        {
+          "schemaName": "inv_CustomerName",
+          "displayName": "Customer Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_CustomerCode",
+          "displayName": "Customer Code",
+          "type": "string",
+          "maxLength": 30,
+          "required": true
+        },
+        {
+          "schemaName": "inv_Email",
+          "displayName": "Email",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Phone",
+          "displayName": "Phone",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Address",
+          "displayName": "Address",
+          "type": "memo",
+          "maxLength": 500,
+          "required": false
+        },
+        {
+          "schemaName": "inv_TaxId",
+          "displayName": "Tax ID",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_ContactName",
+          "displayName": "Contact Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_ContactEmail",
+          "displayName": "Contact Email",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_DeliverToName",
+          "displayName": "Deliver To (Name)",
+          "type": "string",
+          "maxLength": 200,
+          "required": false,
+          "description": "If different from sold-to customer"
+        },
+        {
+          "schemaName": "inv_DeliverToAddress",
+          "displayName": "Deliver To (Address)",
+          "type": "memo",
+          "maxLength": 500,
+          "required": false
+        },
+        {
+          "schemaName": "inv_PaymentTerms",
+          "displayName": "Payment Terms",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "CIF" },
+            { "value": 747480001, "label": "FOB" },
+            { "value": 747480002, "label": "EXW" },
+            { "value": 747480003, "label": "DDP" },
+            { "value": 747480004, "label": "Net 30" }
+          ]
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        },
+        {
+          "schemaName": "inv_IsActive",
+          "displayName": "Is Active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Order",
+      "displayName": "Order",
+      "displayCollectionName": "Orders",
+      "description": "Customer orders",
+      "ownershipType": "UserOwned",
+      "columns": [
+        {
+          "schemaName": "inv_OrderNumber",
+          "displayName": "Order Number",
+          "type": "string",
+          "maxLength": 30,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_CustomerId",
+          "displayName": "Customer",
+          "type": "lookup",
+          "relatedTable": "inv_Customer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_OrderDate",
+          "displayName": "Order Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_RequestedDeliveryDate",
+          "displayName": "Requested Delivery Date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Status",
+          "displayName": "Status",
+          "type": "choice",
+          "required": true,
+          "options": [
+            { "value": 747480000, "label": "Draft" },
+            { "value": 747480001, "label": "Confirmed" },
+            { "value": 747480002, "label": "In Packing" },
+            { "value": 747480003, "label": "Ready for Pickup" },
+            { "value": 747480004, "label": "Delivered" },
+            { "value": 747480005, "label": "Cancelled" }
+          ]
+        },
+        {
+          "schemaName": "inv_TotalAmount",
+          "displayName": "Total Amount",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_OrderItem",
+      "displayName": "Order Item",
+      "displayCollectionName": "Order Items",
+      "description": "Line items within an order",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_OrderItemName",
+          "displayName": "Order Item Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_OrderId",
+          "displayName": "Order",
+          "type": "lookup",
+          "relatedTable": "inv_Order",
+          "required": true
+        },
+        {
+          "schemaName": "inv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "inv_Plant",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Quantity",
+          "displayName": "Quantity",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_UnitPrice",
+          "displayName": "Unit Price",
+          "type": "currency",
+          "required": true
+        },
+        {
+          "schemaName": "inv_LineTotal",
+          "displayName": "Line Total",
+          "type": "currency",
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Packing",
+      "displayName": "Packing",
+      "displayCollectionName": "Packing",
+      "description": "Per-box packing records — each record is one box with full traceability",
+      "ownershipType": "UserOwned",
+      "columns": [
+        {
+          "schemaName": "inv_PackingId",
+          "displayName": "ID",
+          "type": "string",
+          "maxLength": 50,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_Barcode",
+          "displayName": "Barcode",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "inv_BoxNumber",
+          "displayName": "Box Number",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_PlantId",
+          "displayName": "Product (Plant)",
+          "type": "lookup",
+          "relatedTable": "inv_Plant",
+          "required": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed (source)",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": false
+        },
+        {
+          "schemaName": "inv_ShadehouseId",
+          "displayName": "Shadehouse",
+          "type": "lookup",
+          "relatedTable": "inv_Shadehouse",
+          "required": false
+        },
+        {
+          "schemaName": "inv_OrderId",
+          "displayName": "Order",
+          "type": "lookup",
+          "relatedTable": "inv_Order",
+          "required": false
+        },
+        {
+          "schemaName": "inv_InvoiceId",
+          "displayName": "Invoice",
+          "type": "lookup",
+          "relatedTable": "inv_Invoice",
+          "required": false
+        },
+        {
+          "schemaName": "inv_PackingType",
+          "displayName": "Packing Type",
+          "type": "choice",
+          "required": false,
+          "globalChoiceName": "PackingTypeChoice",
+          "options": [
+            { "value": 685710000, "label": "BNDL" },
+            { "value": 685710001, "label": "IND" }
+          ]
+        },
+        {
+          "schemaName": "inv_BundleSize",
+          "displayName": "Bundle Size",
+          "type": "integer",
+          "required": false,
+          "description": "3 or 5 — only applicable when PackingType = BNDL"
+        },
+        {
+          "schemaName": "inv_Quantity",
+          "displayName": "Quantity",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_GrossWeight",
+          "displayName": "Gross Weight",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_NetWeight",
+          "displayName": "Net Weight",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_TotalWeight",
+          "displayName": "Total Weight",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_UnitPrice",
+          "displayName": "Unit Price",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_LineTotal",
+          "displayName": "Line Total",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_PackedBy",
+          "displayName": "Packed By",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_WorkerId",
+          "displayName": "Worker ID",
+          "type": "string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "schemaName": "inv_ProductType",
+          "displayName": "Product Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "URC" }
+          ],
+          "description": "URC = Unrooted Cutting"
+        },
+        {
+          "schemaName": "inv_CuttingType",
+          "displayName": "Cutting Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "L/E" }
+          ],
+          "description": "L/E = Leaf & Eye (point of growth)"
+        },
+        {
+          "schemaName": "inv_Size",
+          "displayName": "Size",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Petit" },
+            { "value": 747480001, "label": "Mini Petit" },
+            { "value": 747480002, "label": "Small" },
+            { "value": 747480003, "label": "Medium" },
+            { "value": 747480004, "label": "California" },
+            { "value": 747480005, "label": "Large" },
+            { "value": 747480006, "label": "Extra Large" }
+          ]
+        },
+        {
+          "schemaName": "inv_PackingCompleted",
+          "displayName": "Packing Completed",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": false
+        },
+        {
+          "schemaName": "inv_PackingDate",
+          "displayName": "Packing Date",
+          "type": "date",
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_FiscalAuthorization",
+      "displayName": "Fiscal Authorization",
+      "displayCollectionName": "Fiscal Authorizations",
+      "description": "Honduras SAR CAI authorizations — invoice number ranges and expiration dates",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_FiscalAuthName",
+          "displayName": "Fiscal Authorization Name",
+          "type": "string",
+          "maxLength": 100,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_CAI",
+          "displayName": "CAI",
+          "type": "string",
+          "maxLength": 50,
+          "required": true,
+          "description": "Clave de Autorización de Impresión from SAR"
+        },
+        {
+          "schemaName": "inv_RTN",
+          "displayName": "RTN",
+          "type": "string",
+          "maxLength": 20,
+          "required": true,
+          "description": "Registro Tributario Nacional"
+        },
+        {
+          "schemaName": "inv_RangeStart",
+          "displayName": "Range Start",
+          "type": "string",
+          "maxLength": 30,
+          "required": true,
+          "description": "e.g. 000-001-01-00001461"
+        },
+        {
+          "schemaName": "inv_RangeEnd",
+          "displayName": "Range End",
+          "type": "string",
+          "maxLength": 30,
+          "required": true,
+          "description": "e.g. 000-001-01-00001530"
+        },
+        {
+          "schemaName": "inv_ExpirationDate",
+          "displayName": "Expiration Date",
+          "type": "date",
+          "required": true,
+          "description": "Fecha límite de emisión"
+        },
+        {
+          "schemaName": "inv_TotalAuthorized",
+          "displayName": "Total Authorized",
+          "type": "integer",
+          "required": false,
+          "description": "Number of invoices authorized in this range (e.g. 70)"
+        },
+        {
+          "schemaName": "inv_NextNumber",
+          "displayName": "Next Available Number",
+          "type": "integer",
+          "required": false,
+          "description": "Auto-incremented counter for next invoice in range"
+        },
+        {
+          "schemaName": "inv_RequestDate",
+          "displayName": "Request Date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_IsActive",
+          "displayName": "Is Active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Invoice",
+      "displayName": "Invoice",
+      "displayCollectionName": "Invoices",
+      "description": "Export invoices with shipping, fiscal, and payment tracking",
+      "ownershipType": "UserOwned",
+      "columns": [
+        {
+          "schemaName": "inv_InvoiceNumber",
+          "displayName": "Invoice Number",
+          "type": "string",
+          "maxLength": 30,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Fiscal invoice number from CAI range (e.g. 000-001-01-00001461)"
+        },
+        {
+          "schemaName": "inv_FiscalAuthId",
+          "displayName": "Fiscal Authorization",
+          "type": "lookup",
+          "relatedTable": "inv_FiscalAuthorization",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CustomerId",
+          "displayName": "Customer",
+          "type": "lookup",
+          "relatedTable": "inv_Customer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_InvoiceDate",
+          "displayName": "Invoice Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_WeekNumber",
+          "displayName": "Week Number",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_ETD",
+          "displayName": "ETD",
+          "type": "date",
+          "required": false,
+          "description": "Estimated Time of Departure"
+        },
+        {
+          "schemaName": "inv_ETA",
+          "displayName": "ETA",
+          "type": "date",
+          "required": false,
+          "description": "Estimated Time of Arrival"
+        },
+        {
+          "schemaName": "inv_ShippedVia",
+          "displayName": "Shipped Via",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Air" },
+            { "value": 747480001, "label": "Sea" },
+            { "value": 747480002, "label": "Land" }
+          ]
+        },
+        {
+          "schemaName": "inv_Carrier",
+          "displayName": "Vessel / Carrier",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_AWBNumber",
+          "displayName": "BL / AWB Number",
+          "type": "string",
+          "maxLength": 50,
+          "required": false,
+          "description": "Bill of Lading or Air Waybill number"
+        },
+        {
+          "schemaName": "inv_ContainerNumber",
+          "displayName": "Container / Flight Number",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_SealNumber",
+          "displayName": "Seal Number",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_TempRecord",
+          "displayName": "Temperature Record",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Terms",
+          "displayName": "Terms",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "CIF" },
+            { "value": 747480001, "label": "FOB" },
+            { "value": 747480002, "label": "EXW" },
+            { "value": 747480003, "label": "DDP" }
+          ]
+        },
+        {
+          "schemaName": "inv_PortOfEntry",
+          "displayName": "Port of Entry",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "inv_PhytoNumber",
+          "displayName": "Phytosanitary Certificate",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_NotifyPartyName",
+          "displayName": "Notify Party (Name)",
+          "type": "string",
+          "maxLength": 200,
+          "required": false,
+          "description": "Freight forwarder or notify on arrival"
+        },
+        {
+          "schemaName": "inv_NotifyPartyAddress",
+          "displayName": "Notify Party (Address)",
+          "type": "memo",
+          "maxLength": 500,
+          "required": false
+        },
+        {
+          "schemaName": "inv_NotifyPartyContact",
+          "displayName": "Notify Party (Contact)",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Subtotal",
+          "displayName": "Subtotal",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_ISV15",
+          "displayName": "ISV 15%",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_ISV18",
+          "displayName": "ISV 18%",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_SubtotalExonerated",
+          "displayName": "Subtotal Exonerated",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Discounts",
+          "displayName": "Discounts",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_AirFreight",
+          "displayName": "Air Freight",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_TotalAmount",
+          "displayName": "Total Amount (USD)",
+          "type": "currency",
+          "required": true
+        },
+        {
+          "schemaName": "inv_ExchangeRate",
+          "displayName": "Exchange Rate (HNL/USD)",
+          "type": "decimal",
+          "required": false,
+          "description": "Honduras central bank exchange rate at invoice time"
+        },
+        {
+          "schemaName": "inv_TotalAmountHNL",
+          "displayName": "Total Amount (HNL)",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_PaidAmount",
+          "displayName": "Paid Amount",
+          "type": "currency",
+          "required": false,
+          "defaultValue": 0
+        },
+        {
+          "schemaName": "inv_Balance",
+          "displayName": "Balance",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Status",
+          "displayName": "Status",
+          "type": "choice",
+          "required": true,
+          "options": [
+            { "value": 747480000, "label": "Draft" },
+            { "value": 747480001, "label": "Sent" },
+            { "value": 747480002, "label": "Partially Paid" },
+            { "value": 747480003, "label": "Paid" },
+            { "value": 747480004, "label": "Overdue" },
+            { "value": 747480005, "label": "Cancelled" }
+          ]
+        },
+        {
+          "schemaName": "inv_DueDate",
+          "displayName": "Due Date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_SharePointUrl",
+          "displayName": "SharePoint PDF URL",
+          "type": "string",
+          "maxLength": 500,
+          "required": false,
+          "description": "Link to generated PDF stored in SharePoint"
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_PlantPrice",
+      "displayName": "Plant Price",
+      "displayCollectionName": "Plant Prices",
+      "description": "Price history per plant — export and internal prices, with optional customer-specific overrides",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_PlantPriceName",
+          "displayName": "Plant Price Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-composed: {Plant} / {Customer or 'Base'} / {EffectiveFrom}"
+        },
+        {
+          "schemaName": "inv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "inv_Plant",
+          "required": true
+        },
+        {
+          "schemaName": "inv_SeasonId",
+          "displayName": "Season",
+          "type": "lookup",
+          "relatedTable": "inv_Season",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CustomerId",
+          "displayName": "Customer",
+          "type": "lookup",
+          "relatedTable": "inv_Customer",
+          "required": false,
+          "description": "If set, this price applies only to this customer. If null, it is the base/default price."
+        },
+        {
+          "schemaName": "inv_EffectiveFrom",
+          "displayName": "Effective From",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_EffectiveTo",
+          "displayName": "Effective To",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_PriceEXT",
+          "displayName": "Export Price (USD)",
+          "type": "currency",
+          "required": true,
+          "description": "Price per unit for export shipments"
+        },
+        {
+          "schemaName": "inv_PriceINT",
+          "displayName": "Internal Price (HNL)",
+          "type": "currency",
+          "required": false,
+          "description": "Price per unit for domestic/internal sales"
+        },
+        {
+          "schemaName": "inv_IsActive",
+          "displayName": "Is Active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    }
+  ]
+}
