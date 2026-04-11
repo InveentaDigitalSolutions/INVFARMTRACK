@@ -2054,6 +2054,371 @@
           "required": false
         }
       ]
+    },
+
+    {
+      "schemaName": "inv_Supplier",
+      "displayName": "Supplier",
+      "displayCollectionName": "Suppliers",
+      "description": "Vendors and suppliers for inputs, materials, and services",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_SupplierName",
+          "displayName": "Supplier Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_SupplierCode",
+          "displayName": "Supplier Code",
+          "type": "string",
+          "maxLength": 30,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Category",
+          "displayName": "Category",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Chemicals / Inputs" },
+            { "value": 747480001, "label": "Packaging" },
+            { "value": 747480002, "label": "Equipment" },
+            { "value": 747480003, "label": "Substrates" },
+            { "value": 747480004, "label": "Logistics / Freight" },
+            { "value": 747480005, "label": "Maintenance" },
+            { "value": 747480006, "label": "Utilities" },
+            { "value": 747480007, "label": "Professional Services" },
+            { "value": 747480008, "label": "Other" }
+          ]
+        },
+        {
+          "schemaName": "inv_ContactName",
+          "displayName": "Contact Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Phone",
+          "displayName": "Phone",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Email",
+          "displayName": "Email",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Address",
+          "displayName": "Address",
+          "type": "memo",
+          "maxLength": 500,
+          "required": false
+        },
+        {
+          "schemaName": "inv_TaxId",
+          "displayName": "Tax ID / RTN",
+          "type": "string",
+          "maxLength": 30,
+          "required": false
+        },
+        {
+          "schemaName": "inv_PaymentTerms",
+          "displayName": "Payment Terms",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Cash" },
+            { "value": 747480001, "label": "Net 15" },
+            { "value": 747480002, "label": "Net 30" },
+            { "value": 747480003, "label": "Net 60" },
+            { "value": 747480004, "label": "Credit" }
+          ]
+        },
+        {
+          "schemaName": "inv_IsActive",
+          "displayName": "Is Active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_PurchaseOrder",
+      "displayName": "Purchase Order",
+      "displayCollectionName": "Purchase Orders",
+      "description": "Orders placed to suppliers for inputs, materials, and services",
+      "ownershipType": "UserOwned",
+      "columns": [
+        {
+          "schemaName": "inv_PONumber",
+          "displayName": "PO Number",
+          "type": "string",
+          "maxLength": 30,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_SupplierId",
+          "displayName": "Supplier",
+          "type": "lookup",
+          "relatedTable": "inv_Supplier",
+          "required": true
+        },
+        {
+          "schemaName": "inv_OrderDate",
+          "displayName": "Order Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_ExpectedDelivery",
+          "displayName": "Expected Delivery",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Description",
+          "displayName": "Description",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Amount",
+          "displayName": "Amount",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Currency",
+          "displayName": "Currency",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "HNL" },
+            { "value": 747480001, "label": "USD" }
+          ]
+        },
+        {
+          "schemaName": "inv_Status",
+          "displayName": "Status",
+          "type": "choice",
+          "required": true,
+          "options": [
+            { "value": 747480000, "label": "Draft" },
+            { "value": 747480001, "label": "Sent" },
+            { "value": 747480002, "label": "Confirmed" },
+            { "value": 747480003, "label": "Received" },
+            { "value": 747480004, "label": "Cancelled" }
+          ]
+        },
+        {
+          "schemaName": "inv_ReceivedDate",
+          "displayName": "Received Date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Worker",
+      "displayName": "Worker",
+      "displayCollectionName": "Workers",
+      "description": "Nursery workers and field staff for labor tracking and performance measurement",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_WorkerName",
+          "displayName": "Full Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_WorkerCode",
+          "displayName": "Worker ID",
+          "type": "string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "schemaName": "inv_Role",
+          "displayName": "Role",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Field Worker" },
+            { "value": 747480001, "label": "Packer" },
+            { "value": 747480002, "label": "Harvester" },
+            { "value": 747480003, "label": "Irrigator" },
+            { "value": 747480004, "label": "Supervisor" },
+            { "value": 747480005, "label": "Driver" },
+            { "value": 747480006, "label": "General" }
+          ]
+        },
+        {
+          "schemaName": "inv_Phone",
+          "displayName": "Phone",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_IdentityNumber",
+          "displayName": "Identity Number",
+          "type": "string",
+          "maxLength": 30,
+          "required": false,
+          "description": "Honduras national ID"
+        },
+        {
+          "schemaName": "inv_HireDate",
+          "displayName": "Hire Date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_HourlyRate",
+          "displayName": "Hourly Rate (HNL)",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "inv_PieceRate",
+          "displayName": "Piece Rate (per 1000 cuttings)",
+          "type": "currency",
+          "required": false,
+          "description": "Rate per 1000 cuttings harvested/packed"
+        },
+        {
+          "schemaName": "inv_IsActive",
+          "displayName": "Is Active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": true
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Timesheet",
+      "displayName": "Timesheet",
+      "displayCollectionName": "Timesheets",
+      "description": "Daily labor records — hours, tasks, piece count, and cost allocation",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_TimesheetName",
+          "displayName": "Timesheet Entry",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_WorkerId",
+          "displayName": "Worker",
+          "type": "lookup",
+          "relatedTable": "inv_Worker",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_ActivityType",
+          "displayName": "Activity Type",
+          "type": "choice",
+          "required": true,
+          "options": [
+            { "value": 747480000, "label": "Planting" },
+            { "value": 747480001, "label": "Harvesting" },
+            { "value": 747480002, "label": "Packing" },
+            { "value": 747480003, "label": "Treatment" },
+            { "value": 747480004, "label": "Irrigation" },
+            { "value": 747480005, "label": "Maintenance" },
+            { "value": 747480006, "label": "General" }
+          ]
+        },
+        {
+          "schemaName": "inv_HoursWorked",
+          "displayName": "Hours Worked",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_PieceCount",
+          "displayName": "Piece Count",
+          "type": "integer",
+          "required": false,
+          "description": "Number of cuttings harvested/packed (for piece-rate pay)"
+        },
+        {
+          "schemaName": "inv_BoxesPacked",
+          "displayName": "Boxes Packed",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": false,
+          "description": "Which bed was worked on"
+        },
+        {
+          "schemaName": "inv_LaborCost",
+          "displayName": "Labor Cost (HNL)",
+          "type": "currency",
+          "required": false,
+          "description": "Calculated: hours x hourly rate, or pieces x piece rate"
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
     }
   ]
 }

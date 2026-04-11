@@ -9,6 +9,8 @@ import InventoryPage from "./pages/InventoryPage";
 import InfrastructurePage from "./pages/InfrastructurePage";
 import SalesPage from "./pages/SalesPage";
 import FinancePage from "./pages/FinancePage";
+import SuppliersPage from "./pages/SuppliersPage";
+import LaborPage from "./pages/LaborPage";
 import SettingsPage from "./pages/SettingsPage";
 
 export type PageId =
@@ -18,6 +20,8 @@ export type PageId =
   | "infrastructure"
   | "sales"
   | "finance"
+  | "suppliers"
+  | "labor"
   | "settings";
 
 function useIsMobile() {
@@ -57,6 +61,10 @@ export default function App() {
         return <SalesPage />;
       case "finance":
         return <FinancePage />;
+      case "suppliers":
+        return <SuppliersPage />;
+      case "labor":
+        return <LaborPage />;
       case "settings":
         return <SettingsPage />;
     }

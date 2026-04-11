@@ -7,6 +7,8 @@ import {
   Warehouse,
   ShoppingCart,
   Receipt,
+  Truck,
+  HardHat,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -51,6 +53,13 @@ const navSections: NavSection[] = [
     items: [
       { id: "sales", label: "Sales & Shipping", icon: ShoppingCart },
       { id: "finance", label: "Finance", icon: Receipt },
+      { id: "suppliers", label: "Suppliers", icon: Truck },
+    ],
+  },
+  {
+    label: "People",
+    items: [
+      { id: "labor", label: "Labor", icon: HardHat },
     ],
   },
   {

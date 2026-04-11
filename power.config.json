@@ -96,6 +96,22 @@
         "Expense": {
           "entitySetName": "inv_expenses",
           "logicalName": "inv_expense"
+        },
+        "Supplier": {
+          "entitySetName": "inv_suppliers",
+          "logicalName": "inv_supplier"
+        },
+        "PurchaseOrder": {
+          "entitySetName": "inv_purchaseorders",
+          "logicalName": "inv_purchaseorder"
+        },
+        "Worker": {
+          "entitySetName": "inv_workers",
+          "logicalName": "inv_worker"
+        },
+        "Timesheet": {
+          "entitySetName": "inv_timesheets",
+          "logicalName": "inv_timesheet"
         }
       }
     }
