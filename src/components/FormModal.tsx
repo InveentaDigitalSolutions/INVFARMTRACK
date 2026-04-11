@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronDown } from "lucide-react";
+import BedSelector from "./BedSelector";
 
 // Field definition types
 interface BaseField {
@@ -47,6 +48,11 @@ interface MultiSelectField extends BaseField {
   options: { value: string; label: string }[];
 }
 
+interface BedSelectorField extends BaseField {
+  type: "bedselector";
+  multiSelect?: boolean;
+}
+
 export type FieldDef =
   | TextField
   | NumberInputField
@@ -54,7 +60,8 @@ export type FieldDef =
   | ToggleField
   | TextareaField
   | BooleanField
-  | MultiSelectField;
+  | MultiSelectField
+  | BedSelectorField;
 
 interface FieldGroupDef {
   title: string;
@@ -174,6 +181,16 @@ function renderField(
           className="w-full px-3 py-2.5 text-[13px] rounded-lg border border-sand-200 bg-white
                      text-navy-900 placeholder:text-navy-300 resize-none
                      focus:outline-none focus:ring-2 focus:ring-lime-400/30 focus:border-lime-400 transition-all"
+        />
+      );
+
+    case "bedselector":
+      return (
+        <BedSelector
+          selected={Array.isArray(v) ? (v as string[]) : v ? [String(v)] : []}
+          onChange={(beds) => onChange(field.key, beds)}
+          multiSelect={field.multiSelect !== false}
+          label=""
         />
       );
 

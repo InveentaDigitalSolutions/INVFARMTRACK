@@ -21,6 +21,7 @@ import {
 import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
 import NurseryMap from "../components/NurseryMap";
+import WeatherWidget from "../components/WeatherWidget";
 
 const container = {
   hidden: {},
@@ -185,6 +186,11 @@ export default function DashboardPage() {
         <StatCard label="Boxes This Week" value="38" icon={Boxes} color="amber" />
         <StatCard label="Harvest (season)" value="76K" icon={Scissors} color="green" trend={{ value: "+23%", positive: true }} />
         <StatCard label="Open Invoices" value="$1,520" icon={BarChart3} color="blue" />
+      </motion.div>
+
+      {/* Weather */}
+      <motion.div variants={item} className="mb-5">
+        <WeatherWidget />
       </motion.div>
 
       {/* Main grid: charts + map */}

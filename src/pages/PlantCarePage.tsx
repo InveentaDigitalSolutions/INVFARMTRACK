@@ -54,12 +54,7 @@ const initInputs = [
 ];
 
 const plantOptions = initPlants.map((p) => ({ value: p.name, label: p.name }));
-const bedOptions = [
-  { value: "Bed 3-A", label: "Bed 3-A (SH North)" },
-  { value: "Bed 1-B", label: "Bed 1-B (SH North)" },
-  { value: "Bed 5-C", label: "Bed 5-C (SH South)" },
-  { value: "Bed 2-A", label: "Bed 2-A (SH South)" },
-];
+
 const seasonOptions = [
   { value: "2026-S1", label: "2026-S1" },
   { value: "2025-S2", label: "2025-S2" },
@@ -76,7 +71,7 @@ const workerOptions = [
 const plantingFields = [
   { title: "Planting Details", columns: 2 as const, fields: [
     { key: "plant", label: "Plant", type: "select" as const, options: plantOptions, required: true },
-    { key: "bed", label: "Bed", type: "select" as const, options: bedOptions, required: true },
+    { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
     { key: "season", label: "Season", type: "select" as const, options: seasonOptions, required: true },
     { key: "date", label: "Planting Date", type: "date" as const, required: true },
     { key: "qty", label: "Quantity", type: "number" as const, min: 1 },
@@ -86,7 +81,7 @@ const plantingFields = [
 
 const treatmentFields = [
   { title: "Treatment Details", columns: 2 as const, fields: [
-    { key: "bed", label: "Beds (select multiple)", type: "multiselect" as const, options: bedOptions, required: true, span: 2 as const },
+    { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
     { key: "input", label: "Input (Chemical)", type: "select" as const, options: inputOptions, required: true },
     { key: "type", label: "Type", type: "select" as const, options: [
       { value: "Insecticide", label: "Insecticide" }, { value: "Fungicide", label: "Fungicide" },
@@ -102,7 +97,7 @@ const treatmentFields = [
 
 const irrigationFields = [
   { title: "Irrigation Event", columns: 2 as const, fields: [
-    { key: "bed", label: "Beds (select multiple)", type: "multiselect" as const, options: bedOptions, required: true, span: 2 as const },
+    { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "liters", label: "Amount", type: "number" as const, min: 0, suffix: "L", required: true },
     { key: "method", label: "Method", type: "select" as const, options: [
@@ -114,7 +109,7 @@ const irrigationFields = [
 
 const harvestFields = [
   { title: "Harvest Event", columns: 2 as const, fields: [
-    { key: "bed", label: "Beds (select multiple)", type: "multiselect" as const, options: bedOptions, required: true, span: 2 as const },
+    { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "qty", label: "Quantity", type: "number" as const, min: 0, required: true },
     { key: "quality", label: "Quality", type: "select" as const, options: [

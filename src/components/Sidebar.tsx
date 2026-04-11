@@ -10,7 +10,9 @@ import {
   Sun,
   Moon,
   User,
+  Thermometer,
 } from "lucide-react";
+import WeatherWidget from "./WeatherWidget";
 import type { PageId } from "../App";
 
 interface SidebarProps {
@@ -113,6 +115,11 @@ export default function Sidebar({
 
       {/* Bottom section */}
       <div className="px-3 pb-3 space-y-2">
+        {/* Weather */}
+        {open && (
+          <WeatherWidget compact className="w-full" />
+        )}
+
         {/* Dark mode toggle */}
         <button
           onClick={onToggleDark}
