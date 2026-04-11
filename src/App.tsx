@@ -4,11 +4,21 @@ import { Menu } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import LoadingScreen from "./components/LoadingScreen";
 import DashboardPage from "./pages/DashboardPage";
-import PlantCarePage from "./pages/PlantCarePage";
-import PackingPage from "./pages/PackingPage";
-import ManagementPage from "./pages/ManagementPage";
+import ProductionPage from "./pages/ProductionPage";
+import InventoryPage from "./pages/InventoryPage";
+import InfrastructurePage from "./pages/InfrastructurePage";
+import SalesPage from "./pages/SalesPage";
+import FinancePage from "./pages/FinancePage";
+import SettingsPage from "./pages/SettingsPage";
 
-export type PageId = "home" | "packing" | "plant-care" | "management";
+export type PageId =
+  | "dashboard"
+  | "production"
+  | "inventory"
+  | "infrastructure"
+  | "sales"
+  | "finance"
+  | "settings";
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -23,12 +33,11 @@ function useIsMobile() {
 
 export default function App() {
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState<PageId>("home");
+  const [currentPage, setCurrentPage] = useState<PageId>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const isMobile = useIsMobile();
 
-  // Close sidebar on mobile when navigating
   const handleNavigate = (page: PageId) => {
     setCurrentPage(page);
     if (isMobile) setSidebarOpen(false);
@@ -36,14 +45,20 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case "home":
+      case "dashboard":
         return <DashboardPage />;
-      case "packing":
-        return <PackingPage />;
-      case "plant-care":
-        return <PlantCarePage />;
-      case "management":
-        return <ManagementPage />;
+      case "production":
+        return <ProductionPage />;
+      case "inventory":
+        return <InventoryPage />;
+      case "infrastructure":
+        return <InfrastructurePage />;
+      case "sales":
+        return <SalesPage />;
+      case "finance":
+        return <FinancePage />;
+      case "settings":
+        return <SettingsPage />;
     }
   };
 
@@ -55,7 +70,6 @@ export default function App() {
 
       {!loading && (
         <div className={`flex h-screen overflow-hidden ${darkMode ? "dark" : ""}`}>
-          {/* Mobile sidebar overlay */}
           {isMobile && (
             <>
               <AnimatePresence>
@@ -82,7 +96,6 @@ export default function App() {
             </>
           )}
 
-          {/* Desktop sidebar */}
           {!isMobile && (
             <Sidebar
               currentPage={currentPage}
@@ -94,8 +107,7 @@ export default function App() {
             />
           )}
 
-          <main className="flex-1 overflow-hidden bg-navy-900 p-2 pl-0 md:pl-0 relative">
-            {/* Mobile header with menu button */}
+          <main className="flex-1 overflow-hidden bg-navy-900 p-2 pl-0 relative">
             {isMobile && (
               <div className="absolute top-4 left-4 z-30">
                 <button
@@ -106,10 +118,9 @@ export default function App() {
                 </button>
               </div>
             )}
-
             <div className={`h-full overflow-auto rounded-2xl main-content ${
               darkMode ? "bg-navy-900" : "bg-surface"
-            } ${isMobile ? "rounded-none p-0" : ""}`}>
+            } ${isMobile ? "rounded-none" : ""}`}>
               <AnimatePresence mode="wait">{renderPage()}</AnimatePresence>
             </div>
           </main>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sprout, Leaf, Bug, Droplets, Scissors } from "lucide-react";
+import { Sprout, Leaf, Bug, Droplets, Scissors, ClipboardList } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
@@ -15,8 +15,7 @@ const tabs = [
   { id: "treatments", label: "Treatments" },
   { id: "irrigation", label: "Irrigation" },
   { id: "harvest", label: "Harvest" },
-  { id: "plants", label: "Plant Catalog" },
-  { id: "inputs", label: "Inputs" },
+  { id: "tasks", label: "Tasks" },
 ];
 
 // Initial data
@@ -38,28 +37,28 @@ const initHarvest = [
   { date: "2026-04-07", bed: "Bed 3-A", qty: 4200, quality: "Excellent", worker: "Juan P." },
   { date: "2026-04-05", bed: "Bed 1-B", qty: 2800, quality: "Good", worker: "Carlos M." },
 ];
-const initPlants = [
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Hawaiian", invoiceName: "Pothos / Hawaiian", patent: "Yes", patentNum: "PP32456", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "High Color", invoiceName: "Pothos / High Color", patent: "No", patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "N'Joy", invoiceName: "Pothos / N'Joy", patent: "Yes", patentNum: "PP33012", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Neon", invoiceName: "Pothos / Neon", patent: "No", patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Jade", invoiceName: "Pothos / Jade", patent: "No", patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Marble Queen", invoiceName: "Pothos / Marble Queen", patent: "No", patentNum: "", active: true },
-  { code: "SNS", name: "Sansevieria", latin: "Dracaena trifasciata", variety: "Sansevieria", invoiceName: "Sansevieria / Sansevieria", patent: "No", patentNum: "", active: true },
-];
-const initInputs = [
-  { name: "Neem Oil", category: "Pesticide", method: "Foliar Spray", safety: "7", brand: "BioGrow", composition: "Azadirachtin 0.3%" },
-  { name: "Copper Fungicide", category: "Fungicide", method: "Soil Drench", safety: "14", brand: "CupraSol", composition: "Copper hydroxide 77%" },
-  { name: "NPK 20-20-20", category: "Fertilizer", method: "Drip", safety: "", brand: "NutriMax", composition: "N-P-K balanced" },
+const initTasks = [
+  { title: "Water Shadehouse North", type: "Watering", due: "2026-04-10", assigned: "Carlos M.", priority: "High", status: "Pending", notes: "" },
+  { title: "Apply Neem Oil Bed 3-A", type: "Pest Control", due: "2026-04-11", assigned: "Maria L.", priority: "Normal", status: "Pending", notes: "" },
+  { title: "Harvest Epipremnum Hawaiian", type: "Harvesting", due: "2026-04-10", assigned: "Juan P.", priority: "Urgent", status: "In Progress", notes: "" },
 ];
 
-const plantOptions = initPlants.map((p) => ({ value: p.name, label: p.name }));
-
+const plantOptions = [
+  { value: "Pothos / Hawaiian", label: "Pothos / Hawaiian" },
+  { value: "Pothos / Marble Queen", label: "Pothos / Marble Queen" },
+  { value: "Pothos / Jade", label: "Pothos / Jade" },
+  { value: "Pothos / N'Joy", label: "Pothos / N'Joy" },
+  { value: "Pothos / Neon", label: "Pothos / Neon" },
+];
 const seasonOptions = [
   { value: "2026-S1", label: "2026-S1" },
   { value: "2025-S2", label: "2025-S2" },
 ];
-const inputOptions = initInputs.map((i) => ({ value: i.name, label: i.name }));
+const inputOptions = [
+  { value: "Neem Oil", label: "Neem Oil" },
+  { value: "Copper Fungicide", label: "Copper Fungicide" },
+  { value: "NPK 20-20-20", label: "NPK 20-20-20" },
+];
 const workerOptions = [
   { value: "Carlos M.", label: "Carlos M. (W001)" },
   { value: "Maria L.", label: "Maria L. (W002)" },
@@ -120,36 +119,26 @@ const harvestFields = [
   ]},
 ];
 
-const plantFields = [
-  { title: "Plant Information", columns: 2 as const, fields: [
-    { key: "code", label: "Plant Code", type: "text" as const, required: true },
-    { key: "name", label: "Common Name", type: "text" as const, required: true },
-    { key: "latin", label: "Latin Name", type: "text" as const },
-    { key: "variety", label: "Variety", type: "text" as const },
-  ]},
-  { title: "Patent & Status", columns: 2 as const, fields: [
-    { key: "patent", label: "Patented", type: "toggle" as const, options: [{ value: "Yes", label: "Yes" }, { value: "No", label: "No" }] },
-    { key: "patentNum", label: "Patent Number", type: "text" as const },
-    { key: "active", label: "Active", type: "boolean" as const },
-  ]},
-];
-
-const inputFields = [
-  { title: "Input Details", columns: 2 as const, fields: [
-    { key: "name", label: "Name", type: "text" as const, required: true },
-    { key: "category", label: "Category", type: "select" as const, options: [
-      { value: "Fertilizer", label: "Fertilizer" }, { value: "Pesticide", label: "Pesticide" },
-      { value: "Fungicide", label: "Fungicide" }, { value: "Herbicide", label: "Herbicide" },
-      { value: "Growth Regulator", label: "Growth Regulator" }, { value: "Other", label: "Other" },
+const taskFormGroups = [
+  { title: "Task Details", columns: 2 as const, fields: [
+    { key: "title", label: "Title", type: "text" as const, required: true, span: 2 as const },
+    { key: "type", label: "Type", type: "select" as const, options: [
+      { value: "Watering", label: "Watering" }, { value: "Fertilizing", label: "Fertilizing" },
+      { value: "Pruning", label: "Pruning" }, { value: "Pest Control", label: "Pest Control" },
+      { value: "Harvesting", label: "Harvesting" }, { value: "Seeding", label: "Seeding" },
+      { value: "Packing", label: "Packing" }, { value: "General Maintenance", label: "General Maintenance" },
     ], required: true },
-    { key: "method", label: "Application Method", type: "select" as const, options: [
-      { value: "Foliar Spray", label: "Foliar Spray" }, { value: "Soil Drench", label: "Soil Drench" },
-      { value: "Granular", label: "Granular" }, { value: "Drip", label: "Drip" },
-      { value: "Broadcast", label: "Broadcast" }, { value: "Other", label: "Other" },
+    { key: "due", label: "Due Date", type: "date" as const, required: true },
+    { key: "assigned", label: "Assigned To", type: "select" as const, options: workerOptions },
+    { key: "priority", label: "Priority", type: "select" as const, options: [
+      { value: "Low", label: "Low" }, { value: "Normal", label: "Normal" },
+      { value: "High", label: "High" }, { value: "Urgent", label: "Urgent" },
     ]},
-    { key: "brand", label: "Brand", type: "text" as const },
-    { key: "safety", label: "Safety Interval", type: "number" as const, suffix: "days" },
-    { key: "composition", label: "Composition", type: "text" as const, span: 2 as const },
+    { key: "status", label: "Status", type: "select" as const, options: [
+      { value: "Pending", label: "Pending" }, { value: "In Progress", label: "In Progress" },
+      { value: "Done", label: "Done" }, { value: "Skipped", label: "Skipped" },
+    ]},
+    { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const },
   ]},
 ];
 
@@ -157,28 +146,31 @@ const qualityBadge = (q: string) => {
   const v = q === "Excellent" ? "green" : q === "Good" ? "blue" : q === "Average" ? "amber" : "red";
   return <Badge variant={v}>{q}</Badge>;
 };
+const priorityBadge = (p: string) => {
+  const v = p === "Urgent" ? "red" : p === "High" ? "amber" : p === "Normal" ? "blue" : "gray";
+  return <Badge variant={v}>{p}</Badge>;
+};
+const statusBadge = (s: string) => {
+  const v = s === "Done" ? "green" : s === "In Progress" ? "blue" : s === "Pending" ? "amber" : "gray";
+  return <Badge variant={v}>{s}</Badge>;
+};
 
-export default function PlantCarePage() {
+export default function ProductionPage() {
   const [tab, setTab] = useState("plantings");
 
-  // Data state
   const [plantings, setPlantings] = useState(initPlantings);
   const [treatments, setTreatments] = useState(initTreatments);
   const [irrigation, setIrrigation] = useState(initIrrigation);
   const [harvest, setHarvest] = useState(initHarvest);
-  const [plants, setPlants] = useState(initPlants);
-  const [inputs, setInputs] = useState(initInputs);
+  const [tasks, setTasks] = useState(initTasks);
 
-  // Form hooks for each tab
   const plantingForm = useFormModal(initPlantings[0]);
   const treatmentForm = useFormModal(initTreatments[0]);
   const irrigationForm = useFormModal(initIrrigation[0]);
   const harvestForm = useFormModal(initHarvest[0]);
-  const plantForm = useFormModal(initPlants[0]);
-  const inputForm = useFormModal(initInputs[0]);
+  const taskForm = useFormModal(initTasks[0]);
   const confirm = useConfirmDialog();
 
-  // CRUD handlers
   const handleSave = (data: Record<string, unknown>[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
     if (form.isEdit && form.editIndex !== null) {
       const updated = [...data];
@@ -287,56 +279,34 @@ export default function PlantCarePage() {
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Record" message="Are you sure you want to delete this harvest record?" onConfirm={() => handleDelete(harvest, setHarvest)} />
           </>
         );
-      case "plants":
+      case "tasks":
         return (
           <>
             <DataTable
               columns={[
-                { key: "code", label: "Code" },
-                { key: "name", label: "Name" },
-                { key: "latin", label: "Latin Name" },
-                { key: "variety", label: "Variety" },
-                { key: "invoiceName", label: "Invoice Name" },
-                { key: "patent", label: "Patented", render: (r) => <Badge variant={r.patent === "Yes" ? "amber" : "gray"}>{r.patent as string}</Badge> },
+                { key: "title", label: "Task" },
+                { key: "type", label: "Type" },
+                { key: "due", label: "Due" },
+                { key: "assigned", label: "Assigned" },
+                { key: "priority", label: "Priority", render: (r) => priorityBadge(r.priority as string) },
+                { key: "status", label: "Status", render: (r) => statusBadge(r.status as string) },
               ]}
-              data={plants}
-              onAdd={plantForm.openCreate}
-              onEdit={(row, i) => plantForm.openEdit(row as any, i)}
+              data={tasks}
+              onAdd={taskForm.openCreate}
+              onEdit={(row, i) => taskForm.openEdit(row as any, i)}
               onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="Add Plant"
-              searchPlaceholder="Search plants..."
+              addLabel="Add Task"
+              searchPlaceholder="Search tasks..."
             />
-            <FormModal open={plantForm.open} onClose={plantForm.close} title={plantForm.isEdit ? "Edit Plant" : "Add Plant"} groups={plantFields} values={plantForm.values} onChange={plantForm.onChange} isEdit={plantForm.isEdit} onSubmit={(v) => handleSave(plants, setPlants, plantForm, v)} />
-            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Plant" message="Are you sure you want to delete this plant from the catalog?" onConfirm={() => handleDelete(plants, setPlants)} />
-          </>
-        );
-      case "inputs":
-        return (
-          <>
-            <DataTable
-              columns={[
-                { key: "name", label: "Name" },
-                { key: "category", label: "Category", render: (r) => <Badge variant="blue">{r.category as string}</Badge> },
-                { key: "brand", label: "Brand" },
-                { key: "method", label: "Application Method" },
-                { key: "safety", label: "Safety (days)" },
-              ]}
-              data={inputs}
-              onAdd={inputForm.openCreate}
-              onEdit={(row, i) => inputForm.openEdit(row as any, i)}
-              onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="Add Input"
-              searchPlaceholder="Search inputs..."
-            />
-            <FormModal open={inputForm.open} onClose={inputForm.close} title={inputForm.isEdit ? "Edit Input" : "Add Input"} groups={inputFields} values={inputForm.values} onChange={inputForm.onChange} isEdit={inputForm.isEdit} onSubmit={(v) => handleSave(inputs, setInputs, inputForm, v)} />
-            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Input" message="Are you sure you want to delete this input from the catalog?" onConfirm={() => handleDelete(inputs, setInputs)} />
+            <FormModal open={taskForm.open} onClose={taskForm.close} title={taskForm.isEdit ? "Edit Task" : "Add Task"} groups={taskFormGroups} values={taskForm.values} onChange={taskForm.onChange} isEdit={taskForm.isEdit} onSubmit={(v) => handleSave(tasks, setTasks, taskForm, v)} />
+            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Task" message="Delete this task?" onConfirm={() => handleDelete(tasks, setTasks)} />
           </>
         );
     }
   };
 
   return (
-    <PageShell title="Plant Care" subtitle="Manage plantings, treatments, irrigation and harvest" icon={Sprout}>
+    <PageShell title="Production" subtitle="Plantings, treatments, irrigation and harvest" icon={Sprout}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard label="Active Plantings" value={plantings.filter((p) => p.status === "Active").length} icon={Leaf} color="green" />
         <StatCard label="Treatments (month)" value={treatments.length} icon={Bug} color="amber" />

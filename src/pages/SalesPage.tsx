@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Package,
+  ShoppingCart,
+  Plane,
   Boxes,
   FileText,
   Users,
-  Plane,
   Truck,
   Plus,
   ArrowRight,
@@ -22,12 +22,9 @@ import { useFormModal } from "../hooks/useFormModal";
 const tabs = [
   { id: "shipments", label: "Shipments" },
   { id: "orders", label: "Orders" },
-  { id: "invoices", label: "Invoices" },
   { id: "customers", label: "Customers" },
-  { id: "prices", label: "Price List" },
 ];
 
-// Shipment type
 interface Shipment {
   id: string;
   customer: string;
@@ -97,22 +94,9 @@ const sampleOrders = [
   { number: "ORD-2026-041", customer: "Green Gardens Inc.", date: "2026-04-01", delivery: "2026-04-03", status: "Delivered", items: 2, total: "$600.00" },
 ];
 
-const sampleInvoices = [
-  { number: "000-001-01-00001461", customer: "The Plant Company, LLC", date: "2026-04-08", week: 14, total: "$1,520.00", status: "Sent", balance: "$1,520.00" },
-  { number: "000-001-01-00001460", customer: "Green Gardens Inc.", date: "2026-04-01", week: 13, total: "$600.00", status: "Paid", balance: "$0.00" },
-];
-
 const sampleCustomers = [
   { code: "VA24477", name: "The Plant Company, LLC", contact: "Frank Paul", email: "frank@theplantcompany.com", terms: "CIF" },
   { code: "FL33101", name: "Green Gardens Inc.", contact: "Sarah Kim", email: "sarah@greengardens.com", terms: "FOB" },
-];
-
-const samplePrices = [
-  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "L 5.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { plant: "Pothos / Marble Queen", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "L 5.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { plant: "Pothos / Jade", season: "2026-S1", customer: "Base", priceExt: "$0.018", priceInt: "L 4.50", from: "2026-01-01", to: "2026-12-31", active: true },
-  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "The Plant Company", priceExt: "$0.019", priceInt: "—", from: "2026-04-01", to: "2026-06-30", active: true },
-  { plant: "Sansevieria / Sansevieria", season: "2026-S1", customer: "Base", priceExt: "$0.035", priceInt: "L 8.00", from: "2026-01-01", to: "2026-12-31", active: true },
 ];
 
 const statusBadge = (s: string) => {
@@ -120,7 +104,7 @@ const statusBadge = (s: string) => {
   return <Badge variant={v}>{s}</Badge>;
 };
 
-export default function PackingPage() {
+export default function SalesPage() {
   const [tab, setTab] = useState("shipments");
   const [shipments, setShipments] = useState(initialShipments);
   const [activeShipment, setActiveShipment] = useState<string | null>(null);
@@ -157,7 +141,6 @@ export default function PackingPage() {
     .reduce((sum, s) => sum + s.boxes.length, 0);
 
   const renderTab = () => {
-    // If viewing a shipment detail
     if (activeShipment && currentShipment && tab === "shipments") {
       return (
         <ShipmentDetail
@@ -172,7 +155,6 @@ export default function PackingPage() {
       case "shipments":
         return (
           <div className="space-y-4">
-            {/* Active shipments */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {shipments.map((s) => {
                 const totalOrdered = s.orderLines.reduce((sum, l) => sum + l.qtyOrdered, 0);
@@ -206,7 +188,6 @@ export default function PackingPage() {
                       </div>
                     </div>
 
-                    {/* Fulfillment bar */}
                     <div className="mb-3">
                       <div className="flex justify-between text-xs mb-1">
                         <span className="text-navy-500">Fulfillment</span>
@@ -234,7 +215,6 @@ export default function PackingPage() {
                 );
               })}
 
-              {/* New shipment card */}
               <button
                 onClick={shipmentForm.openCreate}
                 className="flex flex-col items-center justify-center gap-2 py-10 rounded-xl border-2 border-dashed
@@ -289,25 +269,6 @@ export default function PackingPage() {
           />
         );
 
-      case "invoices":
-        return (
-          <DataTable
-            columns={[
-              { key: "number", label: "Invoice #" },
-              { key: "customer", label: "Customer" },
-              { key: "date", label: "Date" },
-              { key: "week", label: "Week" },
-              { key: "total", label: "Total" },
-              { key: "status", label: "Status", render: (r) => statusBadge(r.status as string) },
-              { key: "balance", label: "Balance" },
-            ]}
-            data={sampleInvoices}
-            onAdd={() => {}}
-            addLabel="Generate Invoice"
-            searchPlaceholder="Search invoices..."
-          />
-        );
-
       case "customers":
         return (
           <DataTable
@@ -324,48 +285,17 @@ export default function PackingPage() {
             searchPlaceholder="Search customers..."
           />
         );
-
-      case "prices":
-        return (
-          <DataTable
-            columns={[
-              { key: "plant", label: "Plant" },
-              { key: "season", label: "Season" },
-              { key: "customer", label: "Customer", render: (r) => <Badge variant={r.customer === "Base" ? "gray" : "blue"}>{r.customer as string}</Badge> },
-              { key: "priceExt", label: "EXT (USD)" },
-              { key: "priceInt", label: "INT (HNL)" },
-              { key: "from", label: "From" },
-              { key: "to", label: "To" },
-              { key: "active", label: "Active", render: (r) => (
-                <Badge variant={r.active ? "green" : "gray"}>{r.active ? "Active" : "Expired"}</Badge>
-              )},
-            ]}
-            data={samplePrices}
-            onAdd={() => {}}
-            addLabel="Set Price"
-            searchPlaceholder="Search prices..."
-          />
-        );
     }
   };
 
   return (
-    <PageShell
-      title="Packing"
-      subtitle="Shipments, orders, invoicing and customers"
-      icon={Package}
-    >
+    <PageShell title="Sales & Shipping" subtitle="Customers, orders, shipments and packing" icon={ShoppingCart}>
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
       >
-        <StatCard
-          label="Active Shipments"
-          value={shipments.filter((s) => s.status === "In Progress").length}
-          icon={Plane}
-          color="green"
-        />
+        <StatCard label="Active Shipments" value={shipments.filter((s) => s.status === "In Progress").length} icon={Plane} color="green" />
         <StatCard label="Boxes Today" value={totalBoxesToday} icon={Boxes} color="amber" />
         <StatCard label="Open Orders" value={sampleOrders.filter((o) => o.status !== "Delivered").length} icon={FileText} color="blue" />
         <StatCard label="Active Customers" value={sampleCustomers.length} icon={Users} color="green" />
