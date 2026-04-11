@@ -7,6 +7,7 @@ import {
   Warehouse,
   ShoppingCart,
   Receipt,
+  CalendarCheck,
   Truck,
   HardHat,
   Settings,
@@ -46,6 +47,7 @@ const navSections: NavSection[] = [
       { id: "production", label: "Production", icon: Sprout },
       { id: "inventory", label: "Inventory", icon: PackageSearch },
       { id: "infrastructure", label: "Infrastructure", icon: Warehouse },
+      { id: "availability", label: "Availability", icon: CalendarCheck },
     ],
   },
   {

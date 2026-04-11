@@ -607,6 +607,31 @@
           "required": false
         },
         {
+          "schemaName": "inv_N_pct",
+          "displayName": "Nitrogen (N) %",
+          "type": "decimal",
+          "required": false,
+          "description": "Nutrient composition — for nutrient balance calculations"
+        },
+        {
+          "schemaName": "inv_P_pct",
+          "displayName": "Phosphorus (P) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_K_pct",
+          "displayName": "Potassium (K) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Ca_pct",
+          "displayName": "Calcium (Ca) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
           "schemaName": "inv_ManufacturerContact",
           "displayName": "Manufacturer Contact",
           "type": "string",
@@ -2410,6 +2435,351 @@
           "type": "currency",
           "required": false,
           "description": "Calculated: hours x hourly rate, or pieces x piece rate"
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Pruning",
+      "displayName": "Pruning",
+      "displayCollectionName": "Prunings",
+      "description": "Pruning (poda) events — drives availability projections",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_PruningName",
+          "displayName": "Pruning Event",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": true
+        },
+        {
+          "schemaName": "inv_SeasonId",
+          "displayName": "Season",
+          "type": "lookup",
+          "relatedTable": "inv_Season",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_WeekNumber",
+          "displayName": "Week Number",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_BedsPruned",
+          "displayName": "Beds Pruned",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CuttingsEstimated",
+          "displayName": "Cuttings Estimated",
+          "type": "integer",
+          "required": false,
+          "description": "Estimated cuttings that will be available from this pruning"
+        },
+        {
+          "schemaName": "inv_Worker",
+          "displayName": "Worker",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_PruningCurve",
+      "displayName": "Pruning Curve",
+      "displayCollectionName": "Pruning Curves",
+      "description": "Seasonal pruning plan — planned vs actual beds per week for the whole nursery",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_PruningCurveName",
+          "displayName": "Curve Entry",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_SeasonId",
+          "displayName": "Season",
+          "type": "lookup",
+          "relatedTable": "inv_Season",
+          "required": true
+        },
+        {
+          "schemaName": "inv_WeekNumber",
+          "displayName": "Week Number",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_PlannedBeds",
+          "displayName": "Planned Beds",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_ActualBeds",
+          "displayName": "Actual Beds",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_PlannedCuttings",
+          "displayName": "Planned Cuttings",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_ActualCuttings",
+          "displayName": "Actual Cuttings",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Fertilization",
+      "displayName": "Fertilization",
+      "displayCollectionName": "Fertilizations",
+      "description": "Fertilization events with nutrient quantities (N, P, K, Ca) applied per bed",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_FertilizationName",
+          "displayName": "Fertilization Event",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": true
+        },
+        {
+          "schemaName": "inv_InputId",
+          "displayName": "Input (Fertilizer)",
+          "type": "lookup",
+          "relatedTable": "inv_Input",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Quantity_kg",
+          "displayName": "Quantity (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Method",
+          "displayName": "Method",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Foliar Spray" },
+            { "value": 747480001, "label": "Soil Drench" },
+            { "value": 747480002, "label": "Granular" },
+            { "value": 747480003, "label": "Drip / Fertigation" },
+            { "value": 747480004, "label": "Broadcast" }
+          ]
+        },
+        {
+          "schemaName": "inv_N_kg",
+          "displayName": "Nitrogen (N) kg",
+          "type": "decimal",
+          "required": false,
+          "description": "Auto-calculated from input composition x quantity"
+        },
+        {
+          "schemaName": "inv_P_kg",
+          "displayName": "Phosphorus (P) kg",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_K_kg",
+          "displayName": "Potassium (K) kg",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Ca_kg",
+          "displayName": "Calcium (Ca) kg",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Worker",
+          "displayName": "Worker",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_Availability",
+      "displayName": "Availability",
+      "displayCollectionName": "Availability",
+      "description": "Weekly availability projections — Friday generation, Monday confirmation",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_AvailabilityName",
+          "displayName": "Availability Entry",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_SeasonId",
+          "displayName": "Season",
+          "type": "lookup",
+          "relatedTable": "inv_Season",
+          "required": true
+        },
+        {
+          "schemaName": "inv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "inv_Plant",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Size",
+          "displayName": "Size",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Petit" },
+            { "value": 747480001, "label": "Mini Petit" },
+            { "value": 747480002, "label": "Small" },
+            { "value": 747480003, "label": "Medium" },
+            { "value": 747480004, "label": "California" },
+            { "value": 747480005, "label": "Large" },
+            { "value": 747480006, "label": "Extra Large" }
+          ]
+        },
+        {
+          "schemaName": "inv_ShipmentWeek",
+          "displayName": "Shipment Week",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_GeneratedDate",
+          "displayName": "Generated Date (Friday)",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_ProjectedQty",
+          "displayName": "Projected Quantity",
+          "type": "integer",
+          "required": true,
+          "description": "Available cuttings projected from pruning data"
+        },
+        {
+          "schemaName": "inv_OrderedQty",
+          "displayName": "Ordered Quantity",
+          "type": "integer",
+          "required": false,
+          "description": "What the customer ordered for this week"
+        },
+        {
+          "schemaName": "inv_ConfirmedQty",
+          "displayName": "Confirmed Quantity",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_ConfirmationDate",
+          "displayName": "Confirmation Date (Monday)",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Status",
+          "displayName": "Status",
+          "type": "choice",
+          "required": true,
+          "options": [
+            { "value": 747480000, "label": "Projected" },
+            { "value": 747480001, "label": "Confirmed - Under" },
+            { "value": 747480002, "label": "Confirmed - Equal" },
+            { "value": 747480003, "label": "Confirmed - Over" }
+          ]
+        },
+        {
+          "schemaName": "inv_SurplusQty",
+          "displayName": "Surplus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_ShortfallQty",
+          "displayName": "Shortfall",
+          "type": "integer",
+          "required": false
         },
         {
           "schemaName": "inv_Notes",

@@ -9,6 +9,7 @@ import InventoryPage from "./pages/InventoryPage";
 import InfrastructurePage from "./pages/InfrastructurePage";
 import SalesPage from "./pages/SalesPage";
 import FinancePage from "./pages/FinancePage";
+import AvailabilityPage from "./pages/AvailabilityPage";
 import SuppliersPage from "./pages/SuppliersPage";
 import LaborPage from "./pages/LaborPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -18,6 +19,7 @@ export type PageId =
   | "production"
   | "inventory"
   | "infrastructure"
+  | "availability"
   | "sales"
   | "finance"
   | "suppliers"
@@ -57,6 +59,8 @@ export default function App() {
         return <InventoryPage />;
       case "infrastructure":
         return <InfrastructurePage />;
+      case "availability":
+        return <AvailabilityPage />;
       case "sales":
         return <SalesPage />;
       case "finance":

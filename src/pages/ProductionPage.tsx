@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sprout, Leaf, Bug, Droplets, Scissors, ClipboardList } from "lucide-react";
+import { Sprout, Leaf, Bug, Droplets, Scissors, ClipboardList, FlaskConical } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
@@ -16,6 +16,8 @@ const tabs = [
   { id: "irrigation", label: "Irrigation" },
   { id: "harvest", label: "Harvest" },
   { id: "tasks", label: "Tasks" },
+  { id: "pruning", label: "Pruning" },
+  { id: "fertilization", label: "Fertilization" },
 ];
 
 // Initial data
@@ -41,6 +43,19 @@ const initTasks = [
   { title: "Water Shadehouse North", type: "Watering", due: "2026-04-10", assigned: "Carlos M.", priority: "High", status: "Pending", notes: "" },
   { title: "Apply Neem Oil Bed 3-A", type: "Pest Control", due: "2026-04-11", assigned: "Maria L.", priority: "Normal", status: "Pending", notes: "" },
   { title: "Harvest Epipremnum Hawaiian", type: "Harvesting", due: "2026-04-10", assigned: "Juan P.", priority: "Urgent", status: "In Progress", notes: "" },
+];
+
+const initPruning = [
+  { date: "2026-04-08", bed: "SHN-C1-B5", week: 15, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Carlos M." },
+  { date: "2026-04-06", bed: "SHS-C1-B42", week: 15, bedsPruned: 2, cuttingsEstimated: 1000, worker: "Maria L." },
+  { date: "2026-04-03", bed: "SHN-C2-B16", week: 14, bedsPruned: 4, cuttingsEstimated: 2100, worker: "Juan P." },
+  { date: "2026-04-01", bed: "SHE-C1-B103", week: 14, bedsPruned: 3, cuttingsEstimated: 1400, worker: "Ana R." },
+];
+const initFertilization = [
+  { date: "2026-04-09", bed: "SHN-C1-B3", input: "NPK 20-20-20", qtyKg: 5, method: "Drench", nKg: 1.0, pKg: 1.0, kKg: 1.0, caKg: 0, worker: "Carlos M." },
+  { date: "2026-04-07", bed: "SHS-C1-B45", input: "Calcium Nitrate", qtyKg: 3, method: "Foliar", nKg: 0.5, pKg: 0, kKg: 0, caKg: 0.6, worker: "Maria L." },
+  { date: "2026-04-04", bed: "SHN-C3-B22", input: "NPK 20-20-20", qtyKg: 4, method: "Drench", nKg: 0.8, pKg: 0.8, kKg: 0.8, caKg: 0, worker: "Juan P." },
+  { date: "2026-04-01", bed: "SHE-C1-B108", input: "MKP (0-52-34)", qtyKg: 2, method: "Foliar", nKg: 0, pKg: 1.04, kKg: 0.68, caKg: 0, worker: "Ana R." },
 ];
 
 const plantOptions = [
@@ -142,6 +157,43 @@ const taskFormGroups = [
   ]},
 ];
 
+const fertilizerInputOptions = [
+  { value: "NPK 20-20-20", label: "NPK 20-20-20" },
+  { value: "Calcium Nitrate", label: "Calcium Nitrate" },
+  { value: "MKP (0-52-34)", label: "MKP (0-52-34)" },
+  { value: "Potassium Sulfate", label: "Potassium Sulfate" },
+  { value: "Magnesium Sulfate", label: "Magnesium Sulfate" },
+];
+
+const pruningFields = [
+  { title: "Pruning Event", columns: 2 as const, fields: [
+    { key: "date", label: "Date", type: "date" as const, required: true },
+    { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
+    { key: "week", label: "Week", type: "number" as const, min: 1, max: 52, required: true },
+    { key: "bedsPruned", label: "Beds Pruned", type: "number" as const, min: 1, required: true },
+    { key: "cuttingsEstimated", label: "Cuttings Estimated", type: "number" as const, min: 0 },
+    { key: "worker", label: "Worker", type: "select" as const, options: workerOptions },
+  ]},
+];
+
+const fertilizationFields = [
+  { title: "Fertilization Event", columns: 2 as const, fields: [
+    { key: "date", label: "Date", type: "date" as const, required: true },
+    { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
+    { key: "input", label: "Fertilizer", type: "select" as const, options: fertilizerInputOptions, required: true },
+    { key: "qtyKg", label: "Qty (kg)", type: "number" as const, min: 0, required: true },
+    { key: "method", label: "Method", type: "select" as const, options: [
+      { value: "Drench", label: "Drench" }, { value: "Foliar", label: "Foliar" },
+      { value: "Granular", label: "Granular" }, { value: "Fertigation", label: "Fertigation" },
+    ]},
+    { key: "nKg", label: "N (kg)", type: "number" as const, min: 0 },
+    { key: "pKg", label: "P (kg)", type: "number" as const, min: 0 },
+    { key: "kKg", label: "K (kg)", type: "number" as const, min: 0 },
+    { key: "caKg", label: "Ca (kg)", type: "number" as const, min: 0 },
+    { key: "worker", label: "Worker", type: "select" as const, options: workerOptions },
+  ]},
+];
+
 const qualityBadge = (q: string) => {
   const v = q === "Excellent" ? "green" : q === "Good" ? "blue" : q === "Average" ? "amber" : "red";
   return <Badge variant={v}>{q}</Badge>;
@@ -163,12 +215,16 @@ export default function ProductionPage() {
   const [irrigation, setIrrigation] = useState(initIrrigation);
   const [harvest, setHarvest] = useState(initHarvest);
   const [tasks, setTasks] = useState(initTasks);
+  const [pruning, setPruning] = useState(initPruning);
+  const [fertilization, setFertilization] = useState(initFertilization);
 
   const plantingForm = useFormModal(initPlantings[0]);
   const treatmentForm = useFormModal(initTreatments[0]);
   const irrigationForm = useFormModal(initIrrigation[0]);
   const harvestForm = useFormModal(initHarvest[0]);
   const taskForm = useFormModal(initTasks[0]);
+  const pruningForm = useFormModal(initPruning[0]);
+  const fertilizationForm = useFormModal(initFertilization[0]);
   const confirm = useConfirmDialog();
 
   const handleSave = (data: Record<string, unknown>[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
@@ -300,6 +356,56 @@ export default function ProductionPage() {
             />
             <FormModal open={taskForm.open} onClose={taskForm.close} title={taskForm.isEdit ? "Edit Task" : "Add Task"} groups={taskFormGroups} values={taskForm.values} onChange={taskForm.onChange} isEdit={taskForm.isEdit} onSubmit={(v) => handleSave(tasks, setTasks, taskForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Task" message="Delete this task?" onConfirm={() => handleDelete(tasks, setTasks)} />
+          </>
+        );
+      case "pruning":
+        return (
+          <>
+            <DataTable
+              columns={[
+                { key: "date", label: "Date" },
+                { key: "bed", label: "Bed" },
+                { key: "week", label: "Week" },
+                { key: "bedsPruned", label: "Beds Pruned" },
+                { key: "cuttingsEstimated", label: "Cuttings Est." },
+                { key: "worker", label: "Worker" },
+              ]}
+              data={pruning}
+              onAdd={pruningForm.openCreate}
+              onEdit={(row, i) => pruningForm.openEdit(row as any, i)}
+              onDelete={(row, i) => confirm.requestDelete(row, i)}
+              addLabel="Log Pruning"
+              searchPlaceholder="Search pruning..."
+            />
+            <FormModal open={pruningForm.open} onClose={pruningForm.close} title={pruningForm.isEdit ? "Edit Pruning" : "Log Pruning"} groups={pruningFields} values={pruningForm.values} onChange={pruningForm.onChange} isEdit={pruningForm.isEdit} onSubmit={(v) => handleSave(pruning, setPruning, pruningForm, v)} />
+            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Pruning" message="Delete this pruning record?" onConfirm={() => handleDelete(pruning, setPruning)} />
+          </>
+        );
+      case "fertilization":
+        return (
+          <>
+            <DataTable
+              columns={[
+                { key: "date", label: "Date" },
+                { key: "bed", label: "Bed" },
+                { key: "input", label: "Fertilizer" },
+                { key: "qtyKg", label: "Qty (kg)" },
+                { key: "method", label: "Method", render: (r) => <Badge variant="blue">{r.method as string}</Badge> },
+                { key: "nKg", label: "N" },
+                { key: "pKg", label: "P" },
+                { key: "kKg", label: "K" },
+                { key: "caKg", label: "Ca" },
+                { key: "worker", label: "Worker" },
+              ]}
+              data={fertilization}
+              onAdd={fertilizationForm.openCreate}
+              onEdit={(row, i) => fertilizationForm.openEdit(row as any, i)}
+              onDelete={(row, i) => confirm.requestDelete(row, i)}
+              addLabel="Log Fertilization"
+              searchPlaceholder="Search fertilization..."
+            />
+            <FormModal open={fertilizationForm.open} onClose={fertilizationForm.close} title={fertilizationForm.isEdit ? "Edit Fertilization" : "Log Fertilization"} subtitle="Record a fertilization event" groups={fertilizationFields} values={fertilizationForm.values} onChange={fertilizationForm.onChange} isEdit={fertilizationForm.isEdit} onSubmit={(v) => handleSave(fertilization, setFertilization, fertilizationForm, v)} />
+            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Record" message="Delete this fertilization record?" onConfirm={() => handleDelete(fertilization, setFertilization)} />
           </>
         );
     }

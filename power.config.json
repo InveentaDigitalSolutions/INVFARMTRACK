@@ -112,6 +112,22 @@
         "Timesheet": {
           "entitySetName": "inv_timesheets",
           "logicalName": "inv_timesheet"
+        },
+        "Pruning": {
+          "entitySetName": "inv_prunings",
+          "logicalName": "inv_pruning"
+        },
+        "PruningCurve": {
+          "entitySetName": "inv_pruningcurves",
+          "logicalName": "inv_pruningcurve"
+        },
+        "Fertilization": {
+          "entitySetName": "inv_fertilizations",
+          "logicalName": "inv_fertilization"
+        },
+        "Availability": {
+          "entitySetName": "inv_availabilities",
+          "logicalName": "inv_availability"
         }
       }
     }
