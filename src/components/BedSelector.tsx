@@ -137,13 +137,13 @@ export default function BedSelector({ selected, onChange, multiSelect = true, la
             const all = ids.every((id) => selected.includes(id));
             const some = ids.some((id) => selected.includes(id));
             return (
-              <button key={f.id} onClick={() => selectField(f.id)}
+              <button type="button" key={f.id} onClick={() => selectField(f.id)}
                 className={`px-3 py-1.5 text-[11px] font-medium rounded-lg border transition-colors cursor-pointer ${all ? "bg-navy-700 text-white border-navy-700" : some ? "bg-lime-50 text-navy-700 border-lime-300" : "bg-white text-navy-600 border-sand-200 hover:border-lime-300"}`}>
                 {f.name} ({f.bedCount}){all && " ✓"}
               </button>
             );
           })}
-          <button onClick={selectAllVisible} className="px-3 py-1.5 text-[11px] font-semibold rounded-lg border border-lime-300 text-lime-700 bg-lime-50 hover:bg-lime-100 cursor-pointer">
+          <button type="button" onClick={selectAllVisible} className="px-3 py-1.5 text-[11px] font-semibold rounded-lg border border-lime-300 text-lime-700 bg-lime-50 hover:bg-lime-100 cursor-pointer">
             {availableBeds.every((b) => selected.includes(b.id)) ? "Deselect All" : "Select All"}
           </button>
         </div>
@@ -155,7 +155,7 @@ export default function BedSelector({ selected, onChange, multiSelect = true, la
               const isSelected = selected.includes(bed.id);
               const hasPlant = !!bed.plant;
               return (
-                <motion.button key={bed.id} whileTap={{ scale: 0.95 }} onClick={() => toggleBed(bed.id)}
+                <motion.button type="button" key={bed.id} whileTap={{ scale: 0.95 }} onClick={() => toggleBed(bed.id)}
                   title={`${bed.id} (${bed.type})${bed.plant ? ` — ${bed.plant}` : " — Empty"}`}
                   className={`relative p-1.5 rounded-md text-[9px] font-mono font-medium border transition-all cursor-pointer ${
                     isSelected ? "bg-navy-700 text-white border-navy-700 shadow-sm"
