@@ -9,7 +9,7 @@ const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || "";
 // Real nursery center — El Olvido, Santa Cruz de Yojoa, Cortés, Honduras
 const NURSERY_CENTER: [number, number] = [-87.8500, 14.9700];
 
-// --- Shadehouse data with 4 batches (quadrants) each, containing beds ---
+// --- Shadehouse data with 4 fields (quadrants) each, containing beds ---
 interface BedData {
   id: string;
   name: string;
@@ -20,7 +20,7 @@ interface BedData {
   utilization: number;
 }
 
-interface BatchData {
+interface FieldData {
   id: string;
   name: string;
   quadrant: "NW" | "NE" | "SW" | "SE";
@@ -34,29 +34,29 @@ interface ShadehouseData {
   width: number;
   length: number;
   rotation: number;
-  batches: BatchData[];
+  fields: FieldData[];
 }
 
 const shadehouses: ShadehouseData[] = [
   {
     id: "SH-N", name: "Shadehouse North",
     coordinates: [-87.8505, 14.9705], width: 40, length: 70, rotation: 15,
-    batches: [
-      { id: "B-N1", name: "Batch N1", quadrant: "NW", beds: [
+    fields: [
+      { id: "B-N1", name: "Field N1", quadrant: "NW", beds: [
         { id: "B3A", name: "Bed 3-A", type: "Air", level: 1, plant: "Pothos / Hawaiian", status: "active", utilization: 95 },
         { id: "B3B", name: "Bed 3-B", type: "Air", level: 2, plant: "Pothos / Hawaiian", status: "irrigating", utilization: 90 },
         { id: "B3C", name: "Bed 3-C", type: "Ground", level: 0, plant: "Pothos / Neon", status: "active", utilization: 80 },
       ]},
-      { id: "B-N2", name: "Batch N2", quadrant: "NE", beds: [
+      { id: "B-N2", name: "Field N2", quadrant: "NE", beds: [
         { id: "B1A", name: "Bed 1-A", type: "Air", level: 1, plant: "Pothos / Marble Queen", status: "treating", utilization: 85 },
         { id: "B1B", name: "Bed 1-B", type: "Ground", level: 0, plant: "Pothos / Jade", status: "active", utilization: 70 },
       ]},
-      { id: "B-N3", name: "Batch N3", quadrant: "SW", beds: [
+      { id: "B-N3", name: "Field N3", quadrant: "SW", beds: [
         { id: "B4A", name: "Bed 4-A", type: "Air", level: 1, plant: "Pothos / N'Joy", status: "harvesting", utilization: 100 },
         { id: "B4B", name: "Bed 4-B", type: "Air", level: 2, plant: "Pothos / High Color", status: "active", utilization: 60 },
         { id: "B4C", name: "Bed 4-C", type: "Ground", level: 0, plant: "", status: "empty", utilization: 0 },
       ]},
-      { id: "B-N4", name: "Batch N4", quadrant: "SE", beds: [
+      { id: "B-N4", name: "Field N4", quadrant: "SE", beds: [
         { id: "B2A", name: "Bed 2-A", type: "Air", level: 1, plant: "Pothos / Golden Glen", status: "active", utilization: 75 },
         { id: "B2B", name: "Bed 2-B", type: "Ground", level: 0, plant: "Sansevieria / Sansevieria", status: "active", utilization: 50 },
       ]},
@@ -65,18 +65,18 @@ const shadehouses: ShadehouseData[] = [
   {
     id: "SH-S", name: "Shadehouse South",
     coordinates: [-87.8493, 14.9693], width: 35, length: 60, rotation: 15,
-    batches: [
-      { id: "B-S1", name: "Batch S1", quadrant: "NW", beds: [
+    fields: [
+      { id: "B-S1", name: "Field S1", quadrant: "NW", beds: [
         { id: "B5A", name: "Bed 5-A", type: "Air", level: 1, plant: "Pothos / Hawaiian", status: "active", utilization: 90 },
         { id: "B5B", name: "Bed 5-B", type: "Air", level: 2, plant: "Pothos / Marble Queen", status: "active", utilization: 85 },
       ]},
-      { id: "B-S2", name: "Batch S2", quadrant: "NE", beds: [
+      { id: "B-S2", name: "Field S2", quadrant: "NE", beds: [
         { id: "B5C", name: "Bed 5-C", type: "Ground", level: 0, plant: "Pothos / Jade", status: "irrigating", utilization: 70 },
       ]},
-      { id: "B-S3", name: "Batch S3", quadrant: "SW", beds: [
+      { id: "B-S3", name: "Field S3", quadrant: "SW", beds: [
         { id: "B6A", name: "Bed 6-A", type: "Air", level: 1, plant: "Pothos / Neon", status: "active", utilization: 65 },
       ]},
-      { id: "B-S4", name: "Batch S4", quadrant: "SE", beds: [
+      { id: "B-S4", name: "Field S4", quadrant: "SE", beds: [
         { id: "B6B", name: "Bed 6-B", type: "Ground", level: 0, plant: "", status: "empty", utilization: 0 },
       ]},
     ],
@@ -84,17 +84,17 @@ const shadehouses: ShadehouseData[] = [
   {
     id: "SH-E", name: "Shadehouse East",
     coordinates: [-87.8486, 14.9701], width: 35, length: 55, rotation: 15,
-    batches: [
-      { id: "B-E1", name: "Batch E1", quadrant: "NW", beds: [
+    fields: [
+      { id: "B-E1", name: "Field E1", quadrant: "NW", beds: [
         { id: "B7A", name: "Bed 7-A", type: "Air", level: 1, plant: "Pothos / Hawaiian", status: "active", utilization: 50 },
       ]},
-      { id: "B-E2", name: "Batch E2", quadrant: "NE", beds: [
+      { id: "B-E2", name: "Field E2", quadrant: "NE", beds: [
         { id: "B7B", name: "Bed 7-B", type: "Ground", level: 0, plant: "", status: "empty", utilization: 0 },
       ]},
-      { id: "B-E3", name: "Batch E3", quadrant: "SW", beds: [
+      { id: "B-E3", name: "Field E3", quadrant: "SW", beds: [
         { id: "B8A", name: "Bed 8-A", type: "Air", level: 1, plant: "Pothos / High Color", status: "active", utilization: 40 },
       ]},
-      { id: "B-E4", name: "Batch E4", quadrant: "SE", beds: [
+      { id: "B-E4", name: "Field E4", quadrant: "SE", beds: [
         { id: "B8B", name: "Bed 8-B", type: "Ground", level: 0, plant: "", status: "empty", utilization: 0 },
       ]},
     ],
@@ -281,48 +281,48 @@ export default function NurseryMap({
           paint: { "line-color": "#c4d93e", "line-width": 2, "line-opacity": 0.8 },
         });
 
-        // --- Batch quadrants with beds ---
-        const batchFeatures: GeoJSON.Feature[] = [];
+        // --- Field quadrants with beds ---
+        const fieldFeatures: GeoJSON.Feature[] = [];
         shadehouses.forEach((sh) => {
-          sh.batches.forEach((batch) => {
-            const avgUtil = batch.beds.length > 0
-              ? Math.round(batch.beds.reduce((s, b) => s + b.utilization, 0) / batch.beds.length)
+          sh.fields.forEach((field) => {
+            const avgUtil = field.beds.length > 0
+              ? Math.round(field.beds.reduce((s, b) => s + b.utilization, 0) / field.beds.length)
               : 0;
-            const primaryStatus = batch.beds.find((b) => b.status !== "empty" && b.status !== "active")?.status ||
-                                  (batch.beds.some((b) => b.status === "active") ? "active" : "empty");
-            const primaryPlant = batch.beds.find((b) => b.plant)?.plant || "Empty";
+            const primaryStatus = field.beds.find((b) => b.status !== "empty" && b.status !== "active")?.status ||
+                                  (field.beds.some((b) => b.status === "active") ? "active" : "empty");
+            const primaryPlant = field.beds.find((b) => b.plant)?.plant || "Empty";
 
-            batchFeatures.push({
+            fieldFeatures.push({
               type: "Feature",
               properties: {
-                id: batch.id,
-                name: batch.name,
+                id: field.id,
+                name: field.name,
                 shadehouse: sh.name,
-                quadrant: batch.quadrant,
-                bedCount: batch.beds.length,
+                quadrant: field.quadrant,
+                bedCount: field.beds.length,
                 avgUtil,
                 primaryStatus,
                 primaryPlant,
-                color: batch.beds.length > 0 ? getBedColor(batch.beds[0]) : "#566d8a",
+                color: field.beds.length > 0 ? getBedColor(field.beds[0]) : "#566d8a",
               },
               geometry: {
                 type: "Polygon",
-                coordinates: [createQuadrantPolygon(sh.coordinates, sh.width, sh.length, sh.rotation, batch.quadrant)],
+                coordinates: [createQuadrantPolygon(sh.coordinates, sh.width, sh.length, sh.rotation, field.quadrant)],
               },
             });
           });
         });
 
-        m.addSource("batches", {
+        m.addSource("fields", {
           type: "geojson",
-          data: { type: "FeatureCollection", features: batchFeatures },
+          data: { type: "FeatureCollection", features: fieldFeatures },
         });
 
-        // Extruded batch quadrants
+        // Extruded field quadrants
         m.addLayer({
-          id: "batches-3d",
+          id: "fields-3d",
           type: "fill-extrusion",
-          source: "batches",
+          source: "fields",
           paint: {
             "fill-extrusion-color": ["get", "color"],
             "fill-extrusion-height": 4,
@@ -331,11 +331,11 @@ export default function NurseryMap({
           },
         });
 
-        // Batch outlines
+        // Field outlines
         m.addLayer({
-          id: "batches-outline",
+          id: "fields-outline",
           type: "line",
-          source: "batches",
+          source: "fields",
           paint: { "line-color": "#ffffff", "line-width": 1, "line-opacity": 0.5 },
         });
 
@@ -345,9 +345,9 @@ export default function NurseryMap({
           data: {
             type: "FeatureCollection",
             features: shadehouses.map((sh) => {
-              const totalBeds = sh.batches.reduce((s, b) => s + b.beds.length, 0);
+              const totalBeds = sh.fields.reduce((s, b) => s + b.beds.length, 0);
               const avgUtil = totalBeds > 0
-                ? Math.round(sh.batches.reduce((s, b) => s + b.beds.reduce((ss, bb) => ss + bb.utilization, 0), 0) / totalBeds)
+                ? Math.round(sh.fields.reduce((s, b) => s + b.beds.reduce((ss, bb) => ss + bb.utilization, 0), 0) / totalBeds)
                 : 0;
               return {
                 type: "Feature" as const,
@@ -376,22 +376,22 @@ export default function NurseryMap({
           },
         });
 
-        // --- Click handler for batches ---
-        m.on("click", "batches-3d", (e) => {
+        // --- Click handler for fields ---
+        m.on("click", "fields-3d", (e) => {
           if (!e.features?.[0]) return;
           const props = e.features[0].properties!;
           const shId = shadehouses.find((sh) =>
-            sh.batches.some((b) => b.id === props.id)
+            sh.fields.some((b) => b.id === props.id)
           )?.id;
 
-          // Find all beds in this batch
-          const batch = shadehouses
-            .flatMap((sh) => sh.batches)
+          // Find all beds in this field
+          const field = shadehouses
+            .flatMap((sh) => sh.fields)
             .find((b) => b.id === props.id);
 
-          if (!batch) return;
+          if (!field) return;
 
-          const bedsHtml = batch.beds.map((bed) => `
+          const bedsHtml = field.beds.map((bed) => `
             <div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid #eae8e3;">
               <div style="width:8px;height:8px;border-radius:2px;background:${getBedColor(bed)};"></div>
               <span style="font-size:11px;color:#1b2838;flex:1;">${bed.name}</span>
@@ -414,8 +414,8 @@ export default function NurseryMap({
           if (shId) onShadehouseClick?.(shId);
         });
 
-        m.on("mouseenter", "batches-3d", () => { m.getCanvas().style.cursor = "pointer"; });
-        m.on("mouseleave", "batches-3d", () => { m.getCanvas().style.cursor = ""; });
+        m.on("mouseenter", "fields-3d", () => { m.getCanvas().style.cursor = "pointer"; });
+        m.on("mouseleave", "fields-3d", () => { m.getCanvas().style.cursor = ""; });
       });
 
       m.addControl(new mapboxgl.NavigationControl(), "top-right");
@@ -427,36 +427,36 @@ export default function NurseryMap({
     return () => { map.current?.remove(); map.current = null; };
   }, []);
 
-  // Update batch colors when layers change
+  // Update field colors when layers change
   useEffect(() => {
     if (!map.current?.isStyleLoaded()) return;
 
-    const batchFeatures: GeoJSON.Feature[] = [];
+    const fieldFeatures: GeoJSON.Feature[] = [];
     shadehouses.forEach((sh) => {
-      sh.batches.forEach((batch) => {
-        const avgUtil = batch.beds.length > 0
-          ? Math.round(batch.beds.reduce((s, b) => s + b.utilization, 0) / batch.beds.length)
+      sh.fields.forEach((field) => {
+        const avgUtil = field.beds.length > 0
+          ? Math.round(field.beds.reduce((s, b) => s + b.utilization, 0) / field.beds.length)
           : 0;
-        batchFeatures.push({
+        fieldFeatures.push({
           type: "Feature",
           properties: {
-            id: batch.id, name: batch.name, shadehouse: sh.name, quadrant: batch.quadrant,
-            bedCount: batch.beds.length, avgUtil,
-            primaryStatus: batch.beds[0]?.status || "empty",
-            primaryPlant: batch.beds[0]?.plant || "Empty",
-            color: batch.beds.length > 0 ? getBedColor(batch.beds[0]) : "#566d8a",
+            id: field.id, name: field.name, shadehouse: sh.name, quadrant: field.quadrant,
+            bedCount: field.beds.length, avgUtil,
+            primaryStatus: field.beds[0]?.status || "empty",
+            primaryPlant: field.beds[0]?.plant || "Empty",
+            color: field.beds.length > 0 ? getBedColor(field.beds[0]) : "#566d8a",
           },
           geometry: {
             type: "Polygon",
-            coordinates: [createQuadrantPolygon(sh.coordinates, sh.width, sh.length, sh.rotation, batch.quadrant)],
+            coordinates: [createQuadrantPolygon(sh.coordinates, sh.width, sh.length, sh.rotation, field.quadrant)],
           },
         });
       });
     });
 
-    const source = map.current.getSource("batches") as mapboxgl.GeoJSONSource;
+    const source = map.current.getSource("fields") as mapboxgl.GeoJSONSource;
     if (source) {
-      source.setData({ type: "FeatureCollection", features: batchFeatures });
+      source.setData({ type: "FeatureCollection", features: fieldFeatures });
     }
   }, [activeLayers, getBedColor]);
 
@@ -488,18 +488,18 @@ export default function NurseryMap({
                 { left: "20%", top: "55%", w: "30%", h: "35%" },
               ];
               const pos = positions[i] || positions[0];
-              const totalBeds = sh.batches.reduce((s, b) => s + b.beds.length, 0);
+              const totalBeds = sh.fields.reduce((s, b) => s + b.beds.length, 0);
               return (
                 <div key={sh.id} className="absolute rounded-lg border border-lime-400/30 overflow-hidden" style={{ left: pos.left, top: pos.top, width: pos.w, height: pos.h }}>
                   {/* 4 quadrants */}
                   <div className="grid grid-cols-2 grid-rows-2 w-full h-full gap-px bg-navy-700/50">
-                    {sh.batches.map((batch) => (
-                      <div key={batch.id}
+                    {sh.fields.map((field) => (
+                      <div key={field.id}
                         className="bg-navy-600/40 flex flex-col items-center justify-center p-1 hover:bg-navy-500/40 transition-colors cursor-pointer"
-                        title={`${batch.name}: ${batch.beds.length} beds`}
+                        title={`${field.name}: ${field.beds.length} beds`}
                       >
-                        <p className="text-[8px] text-lime-400/80 font-medium">{batch.quadrant}</p>
-                        <p className="text-[7px] text-navy-300">{batch.beds.length}b</p>
+                        <p className="text-[8px] text-lime-400/80 font-medium">{field.quadrant}</p>
+                        <p className="text-[7px] text-navy-300">{field.beds.length}b</p>
                       </div>
                     ))}
                   </div>

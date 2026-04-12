@@ -11,7 +11,7 @@ export const seedShadehouses = [
   { id: "sh-3", name: "Shadehouse East", code: "SH-E", location: "Zone C — East boundary", coordinates: "14.9701, -87.8486", length: 55, width: 35, capacity: 30, active: true },
 ];
 
-export const seedBatches = [
+export const seedFields = [
   { id: "ba-1", code: "N-C1", shadehouse: "Shadehouse North", season: "2026-S1", position: "Quadrant NW", notes: "" },
   { id: "ba-2", code: "N-C2", shadehouse: "Shadehouse North", season: "2026-S1", position: "Quadrant NE", notes: "" },
   { id: "ba-3", code: "N-C3", shadehouse: "Shadehouse North", season: "2026-S1", position: "Quadrant SW", notes: "" },

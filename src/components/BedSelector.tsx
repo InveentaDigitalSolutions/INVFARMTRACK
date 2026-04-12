@@ -6,8 +6,8 @@ import { ChevronDown, Warehouse, Layers, BedDouble, CheckSquare, Square } from "
 export interface BedOption {
   id: string;
   name: string;
-  batchId: string;
-  batchName: string;
+  fieldId: string;
+  fieldName: string;
   shadehouseId: string;
   shadehouseName: string;
   type: "Air" | "Ground";
@@ -17,53 +17,53 @@ export interface BedOption {
 
 // Full nursery structure with realistic bed numbering
 const nurseryData: BedOption[] = [
-  // Shadehouse North — Batch N-C1 (Beds 1-10), Batch N-C2 (Beds 11-20), Batch N-C3 (21-30), Batch N-C4 (31-40)
+  // Shadehouse North — Field C1 (Beds 1-10), Field C2 (Beds 11-20), Field C3 (21-30), Field C4 (31-40)
   ...Array.from({ length: 10 }, (_, i) => ({
-    id: `SHN-C1-B${i + 1}`, name: `Bed ${i + 1}`, batchId: "N-C1", batchName: "Batch C1",
+    id: `SHN-C1-B${i + 1}`, name: `Bed ${i + 1}`, fieldId: "N-C1", fieldName: "Field C1",
     shadehouseId: "SH-N", shadehouseName: "Shadehouse North", type: (i % 3 === 0 ? "Ground" : "Air") as "Air" | "Ground",
     level: i % 3 === 0 ? 0 : (i % 2 === 0 ? 2 : 1),
     plant: i < 5 ? "Pothos / Hawaiian" : i < 8 ? "Pothos / Marble Queen" : "",
   })),
   ...Array.from({ length: 10 }, (_, i) => ({
-    id: `SHN-C2-B${i + 11}`, name: `Bed ${i + 11}`, batchId: "N-C2", batchName: "Batch C2",
+    id: `SHN-C2-B${i + 11}`, name: `Bed ${i + 11}`, fieldId: "N-C2", fieldName: "Field C2",
     shadehouseId: "SH-N", shadehouseName: "Shadehouse North", type: (i % 3 === 0 ? "Ground" : "Air") as "Air" | "Ground",
     level: i % 3 === 0 ? 0 : (i % 2 === 0 ? 2 : 1),
     plant: i < 4 ? "Pothos / Jade" : i < 7 ? "Pothos / N'Joy" : "",
   })),
   ...Array.from({ length: 10 }, (_, i) => ({
-    id: `SHN-C3-B${i + 21}`, name: `Bed ${i + 21}`, batchId: "N-C3", batchName: "Batch C3",
+    id: `SHN-C3-B${i + 21}`, name: `Bed ${i + 21}`, fieldId: "N-C3", fieldName: "Field C3",
     shadehouseId: "SH-N", shadehouseName: "Shadehouse North", type: (i % 3 === 0 ? "Ground" : "Air") as "Air" | "Ground",
     level: i % 3 === 0 ? 0 : (i % 2 === 0 ? 2 : 1),
     plant: i < 6 ? "Pothos / High Color" : "",
   })),
   ...Array.from({ length: 10 }, (_, i) => ({
-    id: `SHN-C4-B${i + 31}`, name: `Bed ${i + 31}`, batchId: "N-C4", batchName: "Batch C4",
+    id: `SHN-C4-B${i + 31}`, name: `Bed ${i + 31}`, fieldId: "N-C4", fieldName: "Field C4",
     shadehouseId: "SH-N", shadehouseName: "Shadehouse North", type: (i % 3 === 0 ? "Ground" : "Air") as "Air" | "Ground",
     level: i % 3 === 0 ? 0 : 1,
     plant: i < 3 ? "Pothos / Golden Glen" : i < 6 ? "Sansevieria / Sansevieria" : "",
   })),
-  // Shadehouse South — Batch S-C1 (41-55), S-C2 (56-70), S-C3 (71-85), S-C4 (86-100)
+  // Shadehouse South — Field C1 (41-55), S-C2 (56-70), S-C3 (71-85), S-C4 (86-100)
   ...Array.from({ length: 15 }, (_, i) => ({
-    id: `SHS-C1-B${i + 41}`, name: `Bed ${i + 41}`, batchId: "S-C1", batchName: "Batch C1",
+    id: `SHS-C1-B${i + 41}`, name: `Bed ${i + 41}`, fieldId: "S-C1", fieldName: "Field C1",
     shadehouseId: "SH-S", shadehouseName: "Shadehouse South", type: (i % 3 === 0 ? "Ground" : "Air") as "Air" | "Ground",
     level: i % 3 === 0 ? 0 : 1,
     plant: i < 8 ? "Pothos / Hawaiian" : i < 12 ? "Pothos / Neon" : "",
   })),
   ...Array.from({ length: 15 }, (_, i) => ({
-    id: `SHS-C2-B${i + 56}`, name: `Bed ${i + 56}`, batchId: "S-C2", batchName: "Batch C2",
+    id: `SHS-C2-B${i + 56}`, name: `Bed ${i + 56}`, fieldId: "S-C2", fieldName: "Field C2",
     shadehouseId: "SH-S", shadehouseName: "Shadehouse South", type: "Air" as const,
     level: i % 2 === 0 ? 1 : 2,
     plant: i < 10 ? "Pothos / Marble Queen" : "",
   })),
-  // Shadehouse East — Batch E-C1 (101-115), E-C2 (116-130)
+  // Shadehouse East — Field C1 (101-115), E-C2 (116-130)
   ...Array.from({ length: 15 }, (_, i) => ({
-    id: `SHE-C1-B${i + 101}`, name: `Bed ${i + 101}`, batchId: "E-C1", batchName: "Batch C1",
+    id: `SHE-C1-B${i + 101}`, name: `Bed ${i + 101}`, fieldId: "E-C1", fieldName: "Field C1",
     shadehouseId: "SH-E", shadehouseName: "Shadehouse East", type: "Air" as const,
     level: i % 2 === 0 ? 1 : 2,
     plant: i < 5 ? "Pothos / Hawaiian" : "",
   })),
   ...Array.from({ length: 15 }, (_, i) => ({
-    id: `SHE-C2-B${i + 116}`, name: `Bed ${i + 116}`, batchId: "E-C2", batchName: "Batch C2",
+    id: `SHE-C2-B${i + 116}`, name: `Bed ${i + 116}`, fieldId: "E-C2", fieldName: "Field C2",
     shadehouseId: "SH-E", shadehouseName: "Shadehouse East", type: "Ground" as const,
     level: 0,
     plant: "",
@@ -88,7 +88,7 @@ export default function BedSelector({
   label = "Select Beds",
 }: BedSelectorProps) {
   const [shadehouse, setShadehouse] = useState<string>("");
-  const [batch, setBatch] = useState<string>("");
+  const [field, setField] = useState<string>("");
 
   // Unique shadehouses
   const shadehouses = useMemo(() => {
@@ -97,18 +97,18 @@ export default function BedSelector({
     return Array.from(map, ([id, name]) => ({ id, name }));
   }, []);
 
-  // Batches for selected shadehouse
-  const batches = useMemo(() => {
+  // fields for selected shadehouse
+  const fields = useMemo(() => {
     if (!shadehouse) return [];
     const map = new Map<string, { name: string; bedCount: number; bedRange: string }>();
     const beds = nurseryData.filter((b) => b.shadehouseId === shadehouse);
     beds.forEach((b) => {
-      if (!map.has(b.batchId)) {
-        const batchBeds = beds.filter((bb) => bb.batchId === b.batchId);
-        const nums = batchBeds.map((bb) => parseInt(bb.name.replace("Bed ", "")));
-        map.set(b.batchId, {
-          name: b.batchName,
-          bedCount: batchBeds.length,
+      if (!map.has(b.fieldId)) {
+        const fieldBeds = beds.filter((bb) => bb.fieldId === b.fieldId);
+        const nums = fieldBeds.map((bb) => parseInt(bb.name.replace("Bed ", "")));
+        map.set(b.fieldId, {
+          name: b.fieldName,
+          bedCount: fieldBeds.length,
           bedRange: `${Math.min(...nums)}-${Math.max(...nums)}`,
         });
       }
@@ -116,16 +116,16 @@ export default function BedSelector({
     return Array.from(map, ([id, data]) => ({ id, ...data }));
   }, [shadehouse]);
 
-  // Beds for selected batch (or all in shadehouse if no batch)
+  // Beds for selected field (or all in shadehouse if no field)
   const availableBeds = useMemo(() => {
     if (!shadehouse) return [];
     let beds = nurseryData.filter((b) => b.shadehouseId === shadehouse);
-    if (batch) beds = beds.filter((b) => b.batchId === batch);
+    if (field) beds = beds.filter((b) => b.fieldId === field);
     return beds;
-  }, [shadehouse, batch]);
+  }, [shadehouse, field]);
 
-  // Reset batch when shadehouse changes
-  useEffect(() => { setBatch(""); }, [shadehouse]);
+  // Reset field when shadehouse changes
+  useEffect(() => { setField(""); }, [shadehouse]);
 
   const toggleBed = (bedId: string) => {
     if (multiSelect) {
@@ -148,8 +148,8 @@ export default function BedSelector({
     }
   };
 
-  const selectBatch = (batchId: string) => {
-    const ids = nurseryData.filter((b) => b.batchId === batchId && b.shadehouseId === shadehouse).map((b) => b.id);
+  const selectField = (fieldId: string) => {
+    const ids = nurseryData.filter((b) => b.fieldId === fieldId && b.shadehouseId === shadehouse).map((b) => b.id);
     const allSelected = ids.every((id) => selected.includes(id));
     if (allSelected) {
       onChange(selected.filter((s) => !ids.includes(s)));
@@ -171,7 +171,7 @@ export default function BedSelector({
         )}
       </div>
 
-      {/* Shadehouse → Batch cascade */}
+      {/* Shadehouse → Field cascade */}
       <div className="grid grid-cols-2 gap-2">
         {/* Shadehouse dropdown */}
         <div className="relative">
@@ -190,19 +190,19 @@ export default function BedSelector({
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-navy-300 pointer-events-none" />
         </div>
 
-        {/* Batch dropdown */}
+        {/* Field dropdown */}
         <div className="relative">
           <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-navy-400 pointer-events-none" />
           <select
-            value={batch}
-            onChange={(e) => setBatch(e.target.value)}
+            value={field}
+            onChange={(e) => setField(e.target.value)}
             disabled={!shadehouse}
             className="w-full pl-9 pr-8 py-2.5 text-[13px] rounded-lg border border-sand-200 bg-white text-navy-900
                        appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-lime-400/30 focus:border-lime-400
                        disabled:bg-sand-50 disabled:text-navy-300"
           >
-            <option value="">All Batches</option>
-            {batches.map((b) => (
+            <option value="">All fields</option>
+            {fields.map((b) => (
               <option key={b.id} value={b.id}>{b.name} (Beds {b.bedRange})</option>
             ))}
           </select>
@@ -210,27 +210,27 @@ export default function BedSelector({
         </div>
       </div>
 
-      {/* Quick batch select buttons */}
+      {/* Quick field select buttons */}
       {shadehouse && multiSelect && (
         <div className="flex flex-wrap gap-1.5">
-          {batches.map((b) => {
-            const batchBedIds = nurseryData.filter((bed) => bed.batchId === b.id && bed.shadehouseId === shadehouse).map((bed) => bed.id);
-            const allInBatch = batchBedIds.every((id) => selected.includes(id));
-            const someInBatch = batchBedIds.some((id) => selected.includes(id));
+          {fields.map((b) => {
+            const fieldBedIds = nurseryData.filter((bed) => bed.fieldId === b.id && bed.shadehouseId === shadehouse).map((bed) => bed.id);
+            const allInField = fieldBedIds.every((id) => selected.includes(id));
+            const someInField = fieldBedIds.some((id) => selected.includes(id));
             return (
               <button
                 key={b.id}
-                onClick={() => selectBatch(b.id)}
+                onClick={() => selectField(b.id)}
                 className={`px-3 py-1.5 text-[11px] font-medium rounded-lg border transition-colors cursor-pointer ${
-                  allInBatch
+                  allInField
                     ? "bg-navy-700 text-white border-navy-700"
-                    : someInBatch
+                    : someInField
                     ? "bg-lime-50 text-navy-700 border-lime-300"
                     : "bg-white text-navy-600 border-sand-200 hover:border-lime-300"
                 }`}
               >
                 {b.name} ({b.bedRange})
-                {allInBatch && " ✓"}
+                {allInField && " ✓"}
               </button>
             );
           })}

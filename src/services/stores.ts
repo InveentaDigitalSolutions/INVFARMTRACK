@@ -5,14 +5,14 @@
 
 import { LocalStore } from "./DataService";
 import {
-  seedShadehouses, seedBatches, seedPlants, seedSeasons, seedInputs,
+  seedShadehouses, seedFields, seedPlants, seedSeasons, seedInputs,
   seedPrices, seedCustomers, seedWorkers, seedSuppliers, seedFiscalAuth,
 } from "./seedData";
 
 // Create singleton stores — initialized once with seed data
 export const stores = {
   shadehouses: new LocalStore("shadehouses", seedShadehouses),
-  batches: new LocalStore("batches", seedBatches),
+  fields: new LocalStore("fields", seedFields),
   plants: new LocalStore("plants", seedPlants),
   seasons: new LocalStore("seasons", seedSeasons),
   inputs: new LocalStore("inputs", seedInputs),

@@ -83,10 +83,10 @@
           "isPrimaryName": true
         },
         {
-          "schemaName": "inv_BatchId",
-          "displayName": "Batch",
+          "schemaName": "inv_FieldId",
+          "displayName": "Field",
           "type": "lookup",
-          "relatedTable": "inv_Batch",
+          "relatedTable": "inv_Field",
           "required": true
         },
         {
@@ -412,15 +412,15 @@
     },
 
     {
-      "schemaName": "inv_Batch",
-      "displayName": "Batch",
-      "displayCollectionName": "Batches",
-      "description": "Production batches of plants within a shadehouse",
+      "schemaName": "inv_Field",
+      "displayName": "Field",
+      "displayCollectionName": "Fields",
+      "description": "Production fields of plants within a shadehouse",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_BatchCode",
-          "displayName": "Batch Code",
+          "schemaName": "inv_FieldCode",
+          "displayName": "Field Code",
           "type": "string",
           "maxLength": 50,
           "required": true,

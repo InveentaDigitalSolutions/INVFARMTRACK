@@ -29,9 +29,9 @@
           "entitySetName": "inv_seasons",
           "logicalName": "inv_season"
         },
-        "Batch": {
-          "entitySetName": "inv_batches",
-          "logicalName": "inv_batch"
+        "Field": {
+          "entitySetName": "inv_fields",
+          "logicalName": "inv_field"
         },
         "Planting": {
           "entitySetName": "inv_plantings",
