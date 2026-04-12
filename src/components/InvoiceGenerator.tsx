@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { downloadInvoicePDFs, type InvoiceData } from "../services/InvoicePDF";
 import {
   FileText,
   Check,
+  Download,
   ChevronDown,
   DollarSign,
   Calculator,
@@ -198,6 +200,54 @@ export default function InvoiceGenerator({
         exchangeRate,
         totalHNL,
       };
+
+      // Generate actual PDFs
+      const activeCai = caiNumbers.find((c) => !c.used);
+      const pdfData: InvoiceData = {
+        invoiceNumber: selectedCAI,
+        cai: activeCai ? "4ED113-4AB1C5-B6B9E0-63BE03-090919-95" : "",
+        caiExpiry: "06-04-2027",
+        caiRange: "000-001-01-00001461 hasta 000-001-01-00001530",
+        rtn: "05019011379855",
+        customerName: shipment.customer,
+        customerAddress: "3038 Stuarts Draft Highway\nStuarts Draft, VA 24477, USA",
+        customerTaxId: "85-1008901",
+        customerContact: "Frank Paul",
+        customerPhone: "+1(440) 458 0177",
+        customerEmail: "invoices@theplantcompany.com",
+        invoiceDate: shipment.date,
+        weekNumber: getWeekNumber(shipment.date),
+        etd: shipment.date,
+        eta: addDays(shipment.date, 2),
+        shippedVia: "Air",
+        carrier: shipment.carrier,
+        awbNumber: shipment.awb || "TBD",
+        terms: "CIF",
+        portOfEntry: "Miami (MIA), FL, USA",
+        tempRecord: "15 C° /59°F",
+        notifyPartyName: "MH Logistics, LTD",
+        notifyPartyAddress: "2020 S. Stiles St Unit B\nLinden, NJ 07036 USA",
+        notifyPartyContact: "+1-908-965-3191",
+        lines: invoiceLines,
+        subtotal,
+        isv15: 0,
+        isv18: isvAmount,
+        subtotalExonerated: 0,
+        discounts: 0,
+        airFreight: 0,
+        totalInvoice: total,
+        paid: 0,
+        balance: total,
+        exchangeRate,
+        totalHNL,
+        totalBoxes,
+        totalGrossWeight: totalGW,
+        totalNetWeight: totalNW,
+        totalStems,
+      };
+
+      downloadInvoicePDFs(pdfData);
+
       onGenerate(invoice);
       setStep("done");
     }, 2000);
