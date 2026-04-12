@@ -11,8 +11,8 @@ export const seedShadehouses = [
 
 export const seedFields = [
   { id: "fl-E3", code: "E3", shadehouse: "Shadehouse 1", season: "2026-S1", position: "NW — 33 beds × 1.20m", notes: "" },
-  { id: "fl-E1", code: "E1", shadehouse: "Shadehouse 1", season: "2026-S1", position: "NE — 33 beds × 1.20m", notes: "" },
-  { id: "fl-C3", code: "C3", shadehouse: "Shadehouse 1", season: "2026-S1", position: "SW — 27 beds × 1.80m", notes: "" },
+  { id: "fl-C3", code: "C3", shadehouse: "Shadehouse 1", season: "2026-S1", position: "NE — 27 beds × 1.80m", notes: "" },
+  { id: "fl-E1", code: "E1", shadehouse: "Shadehouse 1", season: "2026-S1", position: "SW — 33 beds × 1.20m", notes: "" },
   { id: "fl-C1", code: "C1", shadehouse: "Shadehouse 1", season: "2026-S1", position: "SE — 27 beds × 1.80m", notes: "" },
 ];
 

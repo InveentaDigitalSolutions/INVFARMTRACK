@@ -40,8 +40,8 @@ const stateColors: Record<string, { fill: string; label: string }> = {
 // Real shadehouse config — 1 shadehouse with 4 plots
 const plotConfigs: PlotConfig[] = [
   { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Plot E3" },
-  { id: "E1", position: "NE", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Plot E1" },
-  { id: "C3", position: "SW", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Plot C3" },
+  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Plot C3" },
+  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Plot E1" },
   { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Plot C1" },
 ];
 

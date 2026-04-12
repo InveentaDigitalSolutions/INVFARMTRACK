@@ -17,8 +17,8 @@ export interface BedOption {
 // Real structure: 1 shadehouse, 4 plots (E3, E1, C3, C1), 120 beds
 const plotConfigs = [
   { id: "E3", name: "Plot E3", bedCount: 33, shadehouseId: "SH-1", shadehouseName: "Shadehouse 1" },
-  { id: "E1", name: "Plot E1", bedCount: 33, shadehouseId: "SH-1", shadehouseName: "Shadehouse 1" },
   { id: "C3", name: "Plot C3", bedCount: 27, shadehouseId: "SH-1", shadehouseName: "Shadehouse 1" },
+  { id: "E1", name: "Plot E1", bedCount: 33, shadehouseId: "SH-1", shadehouseName: "Shadehouse 1" },
   { id: "C1", name: "Plot C1", bedCount: 27, shadehouseId: "SH-1", shadehouseName: "Shadehouse 1" },
 ];
 
