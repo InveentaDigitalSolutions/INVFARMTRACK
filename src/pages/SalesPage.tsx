@@ -76,7 +76,7 @@ const initialShipments: Shipment[] = [
       barcode: `HN260403${String(i + 1).padStart(3, "0")}`,
       boxNumber: i + 1,
       plant: i < 10 ? "Pothos / Hawaiian" : "Pothos / Marble Queen",
-      bed: i < 10 ? "Bed 3-A" : "Bed 1-B",
+      bed: i < 10 ? "E3-01" : "E1-05",
       size: "California",
       packingType: "BNDL",
       bundleSize: 3,

@@ -45,11 +45,11 @@ const plants = [
 ];
 
 const beds = [
-  { id: "bed-3a", label: "Bed 3-A", batch: "B-2026-N1", shadehouse: "Shadehouse North" },
-  { id: "bed-1b", label: "Bed 1-B", batch: "B-2026-N2", shadehouse: "Shadehouse North" },
-  { id: "bed-5c", label: "Bed 5-C", batch: "B-2026-S1", shadehouse: "Shadehouse South" },
-  { id: "bed-2a", label: "Bed 2-A", batch: "B-2026-S1", shadehouse: "Shadehouse South" },
-  { id: "bed-4b", label: "Bed 4-B", batch: "B-2026-E1", shadehouse: "Shadehouse East" },
+  { id: "bed-3a", label: "E3-01", batch: "Plot E3", shadehouse: "Shadehouse 1" },
+  { id: "bed-1b", label: "E1-05", batch: "Plot E1", shadehouse: "Shadehouse 1" },
+  { id: "bed-5c", label: "C3-12", batch: "Plot C3", shadehouse: "Shadehouse 1" },
+  { id: "bed-2a", label: "E3-15", batch: "Plot C3", shadehouse: "Shadehouse 1" },
+  { id: "bed-4b", label: "C1-10", batch: "Plot C1", shadehouse: "Shadehouse 1" },
 ];
 
 const sizes = ["Petit", "Mini Petit", "Small", "Medium", "California", "Large", "Extra Large"];

@@ -27,7 +27,7 @@ const initPOs = [
   { number: "PO-2026-001", supplier: "AgroSupply HN", date: "2026-04-01", delivery: "2026-04-08", description: "Neem Oil 20L + Copper Fungicide 10L", amount: 320.00, currency: "USD", status: "Received", notes: "" },
   { number: "PO-2026-002", supplier: "PackBox Central", date: "2026-04-05", delivery: "2026-04-12", description: "Export boxes (200 units) + foam inserts", amount: 15000.00, currency: "HNL", status: "Confirmed", notes: "" },
   { number: "PO-2026-003", supplier: "NutriMax Honduras", date: "2026-04-08", delivery: "2026-04-15", description: "NPK 20-20-20 (50kg bags x 10)", amount: 8500.00, currency: "HNL", status: "Sent", notes: "Monthly fertilizer order" },
-  { number: "PO-2026-004", supplier: "TecniAgua", date: "2026-04-10", delivery: "2026-04-20", description: "Drip line replacement — Shadehouse North C2", amount: 4200.00, currency: "HNL", status: "Draft", notes: "" },
+  { number: "PO-2026-004", supplier: "TecniAgua", date: "2026-04-10", delivery: "2026-04-20", description: "Drip line replacement — Shadehouse 1 C2", amount: 4200.00, currency: "HNL", status: "Draft", notes: "" },
 ];
 
 const supplierOptions = initSuppliers.map((s) => ({ value: s.name, label: s.name }));

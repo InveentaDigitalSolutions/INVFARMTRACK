@@ -22,26 +22,26 @@ const tabs = [
 
 // Initial data
 const initPlantings = [
-  { plant: "Pothos / Hawaiian", bed: "Bed 3-A", season: "2026-S1", date: "2026-03-15", qty: 5000, status: "Active" },
-  { plant: "Pothos / Marble Queen", bed: "Bed 1-B", season: "2026-S1", date: "2026-03-10", qty: 3000, status: "Active" },
-  { plant: "Pothos / Jade", bed: "Bed 5-C", season: "2026-S1", date: "2026-02-28", qty: 2000, status: "Active" },
+  { plant: "Pothos / Hawaiian", bed: "E3-01", season: "2026-S1", date: "2026-03-15", qty: 5000, status: "Active" },
+  { plant: "Pothos / Marble Queen", bed: "E1-05", season: "2026-S1", date: "2026-03-10", qty: 3000, status: "Active" },
+  { plant: "Pothos / Jade", bed: "C3-12", season: "2026-S1", date: "2026-02-28", qty: 2000, status: "Active" },
 ];
 const initTreatments = [
-  { date: "2026-04-08", bed: "Bed 3-A", input: "Neem Oil", type: "Insecticide", worker: "Carlos M.", temp: "28", humidity: "75", ph: "6.5" },
-  { date: "2026-04-05", bed: "Bed 1-B", input: "Copper Fungicide", type: "Fungicide", worker: "Maria L.", temp: "26", humidity: "80", ph: "6.2" },
+  { date: "2026-04-08", bed: "E3-01", input: "Neem Oil", type: "Insecticide", worker: "Carlos M.", temp: "28", humidity: "75", ph: "6.5" },
+  { date: "2026-04-05", bed: "E1-05", input: "Copper Fungicide", type: "Fungicide", worker: "Maria L.", temp: "26", humidity: "80", ph: "6.2" },
 ];
 const initIrrigation = [
-  { date: "2026-04-09", bed: "Bed 3-A", liters: 450, method: "Drip" },
-  { date: "2026-04-09", bed: "Bed 1-B", liters: 320, method: "Sprinkler" },
-  { date: "2026-04-08", bed: "Bed 5-C", liters: 200, method: "Manual" },
+  { date: "2026-04-09", bed: "E3-01", liters: 450, method: "Drip" },
+  { date: "2026-04-09", bed: "E1-05", liters: 320, method: "Sprinkler" },
+  { date: "2026-04-08", bed: "C3-12", liters: 200, method: "Manual" },
 ];
 const initHarvest = [
-  { date: "2026-04-07", bed: "Bed 3-A", qty: 4200, quality: "Excellent", worker: "Juan P." },
-  { date: "2026-04-05", bed: "Bed 1-B", qty: 2800, quality: "Good", worker: "Carlos M." },
+  { date: "2026-04-07", bed: "E3-01", qty: 4200, quality: "Excellent", worker: "Juan P." },
+  { date: "2026-04-05", bed: "E1-05", qty: 2800, quality: "Good", worker: "Carlos M." },
 ];
 const initTasks = [
-  { title: "Water Shadehouse North", type: "Watering", due: "2026-04-10", assigned: "Carlos M.", priority: "High", status: "Pending", notes: "" },
-  { title: "Apply Neem Oil Bed 3-A", type: "Pest Control", due: "2026-04-11", assigned: "Maria L.", priority: "Normal", status: "Pending", notes: "" },
+  { title: "Water Shadehouse 1", type: "Watering", due: "2026-04-10", assigned: "Carlos M.", priority: "High", status: "Pending", notes: "" },
+  { title: "Apply Neem Oil E3-01", type: "Pest Control", due: "2026-04-11", assigned: "Maria L.", priority: "Normal", status: "Pending", notes: "" },
   { title: "Harvest Epipremnum Hawaiian", type: "Harvesting", due: "2026-04-10", assigned: "Juan P.", priority: "Urgent", status: "In Progress", notes: "" },
 ];
 

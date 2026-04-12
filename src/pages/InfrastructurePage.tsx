@@ -19,19 +19,20 @@ const tabs = [
 ];
 
 const initShadehouses = [
-  { name: "Shadehouse North", code: "SH-N", location: "Zone A", coordinates: "", length: 60, width: 30, capacity: 12, active: true },
-  { name: "Shadehouse South", code: "SH-S", location: "Zone B", coordinates: "", length: 50, width: 25, capacity: 8, active: true },
-  { name: "Shadehouse East", code: "SH-E", location: "Zone C", coordinates: "", length: 55, width: 28, capacity: 10, active: true },
+  { name: "Shadehouse 1", code: "SH-1", location: "El Olvido, Santa Cruz de Yojoa", coordinates: "14.9700, -87.8500", length: 80, width: 80, capacity: 120, active: true },
 ];
 const initFieldes = [
-  { code: "B-2026-N1", shadehouse: "Shadehouse North", season: "2026-S1", position: "Row 1-4", notes: "" },
-  { code: "B-2026-N2", shadehouse: "Shadehouse North", season: "2026-S1", position: "Row 5-8", notes: "" },
-  { code: "B-2026-S1", shadehouse: "Shadehouse South", season: "2026-S1", position: "Row 1-6", notes: "" },
+  { code: "E3", shadehouse: "Shadehouse 1", season: "2026-S1", position: "NW — 33 beds × 1.20m", notes: "" },
+  { code: "E1", shadehouse: "Shadehouse 1", season: "2026-S1", position: "NE — 33 beds × 1.20m", notes: "" },
+  { code: "C3", shadehouse: "Shadehouse 1", season: "2026-S1", position: "SW — 27 beds × 1.80m", notes: "" },
+  { code: "C1", shadehouse: "Shadehouse 1", season: "2026-S1", position: "SE — 27 beds × 1.80m", notes: "" },
 ];
 const initBeds = [
-  { name: "Bed 3-A", field: "B-2026-N1", type: "Air", level: "1", capacity: 500, material: "Metal", soilType: "Loamy", drainage: "Excellent", irrigation: "Drip", active: true },
-  { name: "Bed 1-B", field: "B-2026-N2", type: "Ground", level: "0", capacity: 400, material: "Wood", soilType: "Sandy", drainage: "Good", irrigation: "Sprinkler", active: true },
-  { name: "Bed 5-C", field: "B-2026-S1", type: "Air", level: "2", capacity: 300, material: "Plastic", soilType: "Loamy", drainage: "Good", irrigation: "Drip", active: true },
+  { name: "E3-01", field: "E3", type: "Air", level: "1", capacity: 500, material: "Metal", soilType: "Loamy", drainage: "Excellent", irrigation: "Drip", active: true },
+  { name: "E3-02", field: "E3", type: "Air", level: "2", capacity: 500, material: "Metal", soilType: "Loamy", drainage: "Excellent", irrigation: "Drip", active: true },
+  { name: "E1-01", field: "E1", type: "Air", level: "1", capacity: 500, material: "Metal", soilType: "Loamy", drainage: "Good", irrigation: "Drip", active: true },
+  { name: "C3-01", field: "C3", type: "Ground", level: "0", capacity: 400, material: "Concrete", soilType: "Loamy", drainage: "Good", irrigation: "Sprinkler", active: true },
+  { name: "C1-01", field: "C1", type: "Ground", level: "0", capacity: 400, material: "Concrete", soilType: "Sandy", drainage: "Moderate", irrigation: "Manual", active: true },
 ];
 
 const shOptions = initShadehouses.map((s) => ({ value: s.name, label: s.name }));

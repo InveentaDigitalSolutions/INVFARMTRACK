@@ -6,24 +6,14 @@
 // ===================== INFRASTRUCTURE =====================
 
 export const seedShadehouses = [
-  { id: "sh-1", name: "Shadehouse North", code: "SH-N", location: "Zone A — Main entrance", coordinates: "14.9705, -87.8505", length: 70, width: 40, capacity: 40, active: true },
-  { id: "sh-2", name: "Shadehouse South", code: "SH-S", location: "Zone B — South road", coordinates: "14.9693, -87.8493", length: 60, width: 35, capacity: 30, active: true },
-  { id: "sh-3", name: "Shadehouse East", code: "SH-E", location: "Zone C — East boundary", coordinates: "14.9701, -87.8486", length: 55, width: 35, capacity: 30, active: true },
+  { id: "sh-1", name: "Shadehouse 1", code: "SH-1", location: "El Olvido, Santa Cruz de Yojoa", coordinates: "14.9700, -87.8500", length: 80, width: 80, capacity: 120, active: true },
 ];
 
 export const seedFields = [
-  { id: "ba-1", code: "N-C1", shadehouse: "Shadehouse North", season: "2026-S1", position: "Quadrant NW", notes: "" },
-  { id: "ba-2", code: "N-C2", shadehouse: "Shadehouse North", season: "2026-S1", position: "Quadrant NE", notes: "" },
-  { id: "ba-3", code: "N-C3", shadehouse: "Shadehouse North", season: "2026-S1", position: "Quadrant SW", notes: "" },
-  { id: "ba-4", code: "N-C4", shadehouse: "Shadehouse North", season: "2026-S1", position: "Quadrant SE", notes: "" },
-  { id: "ba-5", code: "S-C1", shadehouse: "Shadehouse South", season: "2026-S1", position: "Quadrant NW", notes: "" },
-  { id: "ba-6", code: "S-C2", shadehouse: "Shadehouse South", season: "2026-S1", position: "Quadrant NE", notes: "" },
-  { id: "ba-7", code: "S-C3", shadehouse: "Shadehouse South", season: "2026-S1", position: "Quadrant SW", notes: "" },
-  { id: "ba-8", code: "S-C4", shadehouse: "Shadehouse South", season: "2026-S1", position: "Quadrant SE", notes: "" },
-  { id: "ba-9", code: "E-C1", shadehouse: "Shadehouse East", season: "2026-S1", position: "Quadrant NW", notes: "" },
-  { id: "ba-10", code: "E-C2", shadehouse: "Shadehouse East", season: "2026-S1", position: "Quadrant NE", notes: "" },
-  { id: "ba-11", code: "E-C3", shadehouse: "Shadehouse East", season: "2026-S1", position: "Quadrant SW", notes: "" },
-  { id: "ba-12", code: "E-C4", shadehouse: "Shadehouse East", season: "2026-S1", position: "Quadrant SE", notes: "" },
+  { id: "fl-E3", code: "E3", shadehouse: "Shadehouse 1", season: "2026-S1", position: "NW — 33 beds × 1.20m", notes: "" },
+  { id: "fl-E1", code: "E1", shadehouse: "Shadehouse 1", season: "2026-S1", position: "NE — 33 beds × 1.20m", notes: "" },
+  { id: "fl-C3", code: "C3", shadehouse: "Shadehouse 1", season: "2026-S1", position: "SW — 27 beds × 1.80m", notes: "" },
+  { id: "fl-C1", code: "C1", shadehouse: "Shadehouse 1", season: "2026-S1", position: "SE — 27 beds × 1.80m", notes: "" },
 ];
 
 // ===================== PLANT CATALOG =====================

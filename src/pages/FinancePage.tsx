@@ -27,7 +27,7 @@ const initExpenses = [
   { name: "Neem Oil \u2014 5L", date: "2026-04-05", category: "Chemicals / Inputs", amount: 45.00, currency: "USD", vendor: "AgroSupply HN", status: "Approved", receiptUrl: "", aiExtracted: false, notes: "" },
   { name: "DHL Shipment SHP-015", date: "2026-04-08", category: "Shipping / Freight", amount: 320.00, currency: "USD", vendor: "DHL Express", status: "Paid", receiptUrl: "", aiExtracted: false, notes: "38 boxes to TPC" },
   { name: "Irrigation pump repair", date: "2026-04-02", category: "Maintenance", amount: 2500.00, currency: "HNL", vendor: "TecniAgua", status: "Pending", receiptUrl: "", aiExtracted: false, notes: "" },
-  { name: "Monthly electricity", date: "2026-04-01", category: "Utilities", amount: 8500.00, currency: "HNL", vendor: "ENEE", status: "Paid", receiptUrl: "", aiExtracted: false, notes: "Shadehouse North + South" },
+  { name: "Monthly electricity", date: "2026-04-01", category: "Utilities", amount: 8500.00, currency: "HNL", vendor: "ENEE", status: "Paid", receiptUrl: "", aiExtracted: false, notes: "Shadehouse 1 + South" },
 ];
 
 const customerOptions = [

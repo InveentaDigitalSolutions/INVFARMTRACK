@@ -61,9 +61,9 @@ const plants = [
   "Pothos / Golden Glen",
 ];
 const beds = [
-  { id: "bed-3a", label: "Bed 3-A", shadehouse: "SH North" },
-  { id: "bed-1b", label: "Bed 1-B", shadehouse: "SH North" },
-  { id: "bed-5c", label: "Bed 5-C", shadehouse: "SH South" },
+  { id: "bed-3a", label: "E3-01", shadehouse: "Shadehouse 1" },
+  { id: "bed-1b", label: "E1-05", shadehouse: "Shadehouse 1" },
+  { id: "bed-5c", label: "C3-12", shadehouse: "Shadehouse 1" },
 ];
 const sizes = ["Petit", "Mini Petit", "Small", "Medium", "California", "Large", "Extra Large"];
 const workers = [

@@ -50,9 +50,9 @@ const harvestByVariety = [
 const totalHarvest = harvestByVariety.reduce((s, h) => s + h.value, 0);
 
 const bedUtilization = [
-  { name: "SH North", used: 10, total: 12 },
-  { name: "SH South", used: 5, total: 8 },
-  { name: "SH East", used: 3, total: 10 },
+  { name: "Shadehouse 1", used: 10, total: 12 },
+  { name: "Shadehouse 1", used: 5, total: 8 },
+  { name: "Shadehouse 1", used: 3, total: 10 },
 ];
 
 const recentShipments = [
@@ -68,14 +68,14 @@ const workerPerformance = [
 ];
 
 const upcomingTasks = [
-  { title: "Water Shadehouse North", due: "Today", priority: "High" },
-  { title: "Apply Neem Oil — Bed 3-A", due: "Today", priority: "Normal" },
-  { title: "Harvest Hawaiian — SH East", due: "Tomorrow", priority: "Urgent" },
+  { title: "Water Shadehouse 1 — Plot E3", due: "Today", priority: "High" },
+  { title: "Apply Neem Oil — E3-01", due: "Today", priority: "Normal" },
+  { title: "Harvest Hawaiian — Plot C1", due: "Tomorrow", priority: "Urgent" },
 ];
 
 const alerts = [
   { text: "CAI expiry in 362 days — 69 invoices remaining", type: "info" },
-  { text: "Bed 4-C empty — no planting assigned", type: "warning" },
+  { text: "C1-20 empty — no planting assigned", type: "warning" },
 ];
 
 function MiniBarChart({ data, max }: { data: { month: string; value: number }[]; max: number }) {

@@ -25,12 +25,12 @@ const initWorkers = [
 ];
 
 const initTimesheets = [
-  { entry: "Carlos — Harvest SH-N", workerId: "W001", worker: "Carlos Martinez", date: "2026-04-10", activity: "Harvesting", hours: 8, pieces: 4200, boxes: 0, bed: "Bed 3-A", cost: 360, notes: "" },
+  { entry: "Carlos — Harvest SH-1", workerId: "W001", worker: "Carlos Martinez", date: "2026-04-10", activity: "Harvesting", hours: 8, pieces: 4200, boxes: 0, bed: "E3-01", cost: 360, notes: "" },
   { entry: "Maria — Packing TPC", workerId: "W002", worker: "Maria Lopez", date: "2026-04-10", activity: "Packing", hours: 7, pieces: 0, boxes: 17, bed: "", cost: 294, notes: "Hawaiian for TPC shipment" },
-  { entry: "Juan — Treatment SH-S", workerId: "W003", worker: "Juan Perez", date: "2026-04-10", activity: "Treatment", hours: 4, pieces: 0, boxes: 0, bed: "Bed 41-55", cost: 160, notes: "Neem oil application" },
+  { entry: "Juan — Treatment SH-1", workerId: "W003", worker: "Juan Perez", date: "2026-04-10", activity: "Treatment", hours: 4, pieces: 0, boxes: 0, bed: "Plot C3", cost: 160, notes: "Neem oil application" },
   { entry: "Ana — Packing TPC", workerId: "W004", worker: "Ana Rodriguez", date: "2026-04-10", activity: "Packing", hours: 7, pieces: 0, boxes: 13, bed: "", cost: 294, notes: "Marble Queen for TPC" },
-  { entry: "Pedro — Irrigation SH-N", workerId: "W005", worker: "Pedro Hernandez", date: "2026-04-10", activity: "Irrigation", hours: 6, pieces: 0, boxes: 0, bed: "Field C1-C2", cost: 258, notes: "" },
-  { entry: "Carlos — Harvest SH-S", workerId: "W001", worker: "Carlos Martinez", date: "2026-04-09", activity: "Harvesting", hours: 8, pieces: 3800, boxes: 0, bed: "Bed 5-C", cost: 360, notes: "" },
+  { entry: "Pedro — Irrigation SH-1", workerId: "W005", worker: "Pedro Hernandez", date: "2026-04-10", activity: "Irrigation", hours: 6, pieces: 0, boxes: 0, bed: "Field C1-C2", cost: 258, notes: "" },
+  { entry: "Carlos — Harvest SH-1", workerId: "W001", worker: "Carlos Martinez", date: "2026-04-09", activity: "Harvesting", hours: 8, pieces: 3800, boxes: 0, bed: "C3-12", cost: 360, notes: "" },
   { entry: "Maria — Packing GG", workerId: "W002", worker: "Maria Lopez", date: "2026-04-09", activity: "Packing", hours: 6, pieces: 0, boxes: 10, bed: "", cost: 252, notes: "Green Gardens shipment" },
 ];
 
