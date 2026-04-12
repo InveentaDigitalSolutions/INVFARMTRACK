@@ -1,6 +1,9 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Compass, Filter, Eye, EyeOff } from "lucide-react";
+import {
+  X, Droplets, Bug, Scissors, Sprout, Leaf, FlaskConical,
+  Calendar, ChevronDown, Clock,
+} from "lucide-react";
 
 // Bed data model
 export interface ShadehouseBed {
@@ -77,6 +80,86 @@ function generateBeds(): ShadehouseBed[] {
   return beds;
 }
 
+// Activity history types
+interface BedActivity {
+  id: string;
+  type: "planting" | "treatment" | "irrigation" | "harvest" | "fertilization" | "pruning";
+  date: string;
+  description: string;
+  worker: string;
+  details: string;
+}
+
+const activityIcons: Record<string, { icon: typeof Sprout; color: string; bg: string }> = {
+  planting: { icon: Sprout, color: "text-green-600", bg: "bg-green-50" },
+  treatment: { icon: Bug, color: "text-red-500", bg: "bg-red-50" },
+  irrigation: { icon: Droplets, color: "text-blue-500", bg: "bg-blue-50" },
+  harvest: { icon: Scissors, color: "text-amber-500", bg: "bg-amber-50" },
+  fertilization: { icon: FlaskConical, color: "text-lime-600", bg: "bg-lime-50" },
+  pruning: { icon: Leaf, color: "text-green-500", bg: "bg-green-50" },
+};
+
+// Generate sample activity history for a bed
+function generateBedHistory(bedId: string): BedActivity[] {
+  const seed = bedId.charCodeAt(0) * 100 + bedId.charCodeAt(bedId.length - 1);
+  const activities: BedActivity[] = [];
+  const types: BedActivity["type"][] = ["planting", "treatment", "irrigation", "harvest", "fertilization", "pruning"];
+  const workers = ["Carlos M.", "Maria L.", "Juan P.", "Ana R.", "Pedro H."];
+
+  // Generate 15-25 activities over the past 90 days
+  const count = 15 + (seed % 11);
+  for (let i = 0; i < count; i++) {
+    const daysAgo = Math.floor(i * (90 / count)) + (seed + i) % 3;
+    const d = new Date();
+    d.setDate(d.getDate() - daysAgo);
+    const date = d.toISOString().slice(0, 10);
+    const type = types[(seed + i * 3) % types.length];
+    const worker = workers[(seed + i) % workers.length];
+
+    let description = "";
+    let details = "";
+    switch (type) {
+      case "planting":
+        description = "New planting established";
+        details = `Planted ${500 + (i * 37) % 500} cuttings`;
+        break;
+      case "treatment":
+        description = i % 2 === 0 ? "Neem Oil applied" : "Copper Fungicide applied";
+        details = `${(1 + (i % 3)).toFixed(1)}L · Temp ${25 + (i % 8)}°C · pH ${(6 + (i % 10) / 10).toFixed(1)}`;
+        break;
+      case "irrigation":
+        description = i % 3 === 0 ? "Drip irrigation" : i % 3 === 1 ? "Sprinkler cycle" : "Manual watering";
+        details = `${200 + (i * 23) % 400}L`;
+        break;
+      case "harvest":
+        description = "Cuttings harvested";
+        details = `${1000 + (i * 137) % 4000} stems · Quality: ${["Excellent", "Good", "Average"][(seed + i) % 3]}`;
+        break;
+      case "fertilization":
+        description = i % 2 === 0 ? "NPK 20-20-20 applied" : "Calcium Nitrate applied";
+        details = `${(2 + (i % 4)).toFixed(1)} kg · N:${(0.4 + i * 0.1).toFixed(1)} P:${(0.3 + i * 0.08).toFixed(1)} K:${(0.4 + i * 0.1).toFixed(1)}`;
+        break;
+      case "pruning":
+        description = "Beds pruned";
+        details = `Est. ${800 + (i * 97) % 2000} cuttings in 6-8 weeks`;
+        break;
+    }
+
+    activities.push({ id: `act-${bedId}-${i}`, type, date, description, worker, details });
+  }
+
+  return activities.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+const timeRanges = [
+  { value: "7", label: "Last 7 days" },
+  { value: "14", label: "Last 14 days" },
+  { value: "30", label: "Last 30 days" },
+  { value: "60", label: "Last 60 days" },
+  { value: "90", label: "Last 90 days" },
+  { value: "all", label: "All time" },
+];
+
 interface ShadehouseViewProps {
   className?: string;
   onBedClick?: (bed: ShadehouseBed) => void;
@@ -89,6 +172,24 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
   const [filterState, setFilterState] = useState<string | null>(null);
   const [filterVariety, setFilterVariety] = useState<string | null>(null);
   const [selectedBeds, setSelectedBeds] = useState<Set<string>>(new Set());
+  const [timeRange, setTimeRange] = useState("30");
+  const [activityFilter, setActivityFilter] = useState<string | null>(null);
+
+  // Activity history for selected bed
+  const bedHistory = useMemo(() => {
+    if (!selectedBed) return [];
+    const all = generateBedHistory(selectedBed.bedId);
+    const cutoff = new Date();
+    if (timeRange !== "all") {
+      cutoff.setDate(cutoff.getDate() - parseInt(timeRange));
+      return all.filter((a) => {
+        if (activityFilter && a.type !== activityFilter) return false;
+        return a.date >= cutoff.toISOString().slice(0, 10);
+      });
+    }
+    if (activityFilter) return all.filter((a) => a.type === activityFilter);
+    return all;
+  }, [selectedBed, timeRange, activityFilter]);
 
   const varieties = useMemo(() => {
     const set = new Set<string>();
@@ -354,7 +455,7 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
         <span className="text-[10px] text-navy-400">Total: {beds.length} beds</span>
       </div>
 
-      {/* Bed detail panel */}
+      {/* Bed detail + history panel */}
       <AnimatePresence>
         {selectedBed && (
           <motion.div
@@ -363,46 +464,141 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
             exit={{ height: 0, opacity: 0 }}
             className="border-t border-sand-100 overflow-hidden"
           >
-            <div className="px-4 py-3 bg-sand-50/50">
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <h4 className="text-[13px] font-bold text-navy-900">
-                    {selectedBed.bedId}
-                  </h4>
-                  <p className="text-[11px] text-navy-400">
-                    Plot {selectedBed.plotId} · Bed #{selectedBed.bedNumber} · {selectedBed.widthM}m × {selectedBed.lengthM}m
-                  </p>
+            <div className="bg-sand-50/50">
+              {/* Bed info header */}
+              <div className="px-4 py-3 border-b border-sand-100">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h4 className="text-[14px] font-bold text-navy-900">
+                      {selectedBed.bedId}
+                    </h4>
+                    <p className="text-[11px] text-navy-400">
+                      Plot {selectedBed.plotId} · Bed #{selectedBed.bedNumber} · {selectedBed.widthM}m × {selectedBed.lengthM}m
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => { setSelectedBed(null); setActivityFilter(null); }}
+                    className="p-1.5 rounded-lg text-navy-400 hover:text-navy-700 hover:bg-sand-100 cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setSelectedBed(null)}
-                  className="p-1 rounded-md text-navy-400 hover:text-navy-700 hover:bg-sand-100 cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-[12px]">
-                <div>
-                  <p className="text-navy-400 text-[10px]">State</p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: stateColors[selectedBed.state].fill }} />
-                    <span className="font-medium text-navy-800">{stateColors[selectedBed.state].label}</span>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-[12px]">
+                  <div>
+                    <p className="text-navy-400 text-[10px] uppercase tracking-wider">State</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: stateColors[selectedBed.state].fill }} />
+                      <span className="font-semibold text-navy-800">{stateColors[selectedBed.state].label}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-navy-400 text-[10px] uppercase tracking-wider">Variety</p>
+                    <p className="font-semibold text-navy-800 mt-1">{selectedBed.variety || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-navy-400 text-[10px] uppercase tracking-wider">Planted</p>
+                    <p className="font-semibold text-navy-800 mt-1">{selectedBed.plantedDate || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-navy-400 text-[10px] uppercase tracking-wider">Expected Harvest</p>
+                    <p className="font-semibold text-navy-800 mt-1">{selectedBed.expectedHarvest || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-navy-400 text-[10px] uppercase tracking-wider">Notes</p>
+                    <p className="font-semibold text-navy-800 mt-1">{selectedBed.notes || "—"}</p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-navy-400 text-[10px]">Variety</p>
-                  <p className="font-medium text-navy-800 mt-0.5">{selectedBed.variety || "—"}</p>
+              </div>
+
+              {/* Activity history */}
+              <div className="px-4 py-3">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-navy-400" />
+                    <h5 className="text-[12px] font-semibold text-navy-800">Activity History</h5>
+                    <span className="text-[10px] text-navy-400 bg-sand-100 px-1.5 py-0.5 rounded-full">
+                      {bedHistory.length} events
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/* Activity type filter */}
+                    <div className="flex gap-1">
+                      {Object.entries(activityIcons).map(([type, config]) => {
+                        const Icon = config.icon;
+                        const isActive = activityFilter === type;
+                        return (
+                          <button
+                            key={type}
+                            onClick={() => setActivityFilter(isActive ? null : type)}
+                            title={type}
+                            className={`p-1 rounded-md transition-colors cursor-pointer ${
+                              isActive
+                                ? `${config.bg} ${config.color}`
+                                : activityFilter
+                                ? "text-navy-300 hover:text-navy-500"
+                                : "text-navy-400 hover:text-navy-600 hover:bg-sand-100"
+                            }`}
+                          >
+                            <Icon className="w-3 h-3" />
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {/* Time range */}
+                    <div className="relative">
+                      <select
+                        value={timeRange}
+                        onChange={(e) => setTimeRange(e.target.value)}
+                        className="text-[10px] pl-2 pr-6 py-1 rounded-lg border border-sand-200 bg-white text-navy-700
+                                   appearance-none cursor-pointer focus:outline-none"
+                      >
+                        {timeRanges.map((r) => (
+                          <option key={r.value} value={r.value}>{r.label}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-navy-300 pointer-events-none" />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-navy-400 text-[10px]">Planted</p>
-                  <p className="font-medium text-navy-800 mt-0.5">{selectedBed.plantedDate || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-navy-400 text-[10px]">Expected Harvest</p>
-                  <p className="font-medium text-navy-800 mt-0.5">{selectedBed.expectedHarvest || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-navy-400 text-[10px]">Notes</p>
-                  <p className="font-medium text-navy-800 mt-0.5">{selectedBed.notes || "—"}</p>
+
+                {/* Activity timeline */}
+                <div className="max-h-52 overflow-y-auto space-y-0.5 pr-1">
+                  {bedHistory.length > 0 ? (
+                    bedHistory.map((activity, i) => {
+                      const config = activityIcons[activity.type];
+                      const Icon = config.icon;
+                      return (
+                        <motion.div
+                          key={activity.id}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.02 }}
+                          className="flex items-start gap-2.5 py-2 px-2 rounded-lg hover:bg-white transition-colors group"
+                        >
+                          {/* Timeline dot */}
+                          <div className={`flex items-center justify-center w-6 h-6 rounded-lg ${config.bg} shrink-0 mt-0.5`}>
+                            <Icon className={`w-3 h-3 ${config.color}`} />
+                          </div>
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-[12px] font-medium text-navy-800">{activity.description}</p>
+                              <span className="text-[9px] text-navy-300 font-mono">{activity.date}</span>
+                            </div>
+                            <p className="text-[11px] text-navy-500 mt-0.5">{activity.details}</p>
+                          </div>
+                          {/* Worker */}
+                          <span className="text-[10px] text-navy-400 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {activity.worker}
+                          </span>
+                        </motion.div>
+                      );
+                    })
+                  ) : (
+                    <div className="flex items-center justify-center py-8 text-[12px] text-navy-400">
+                      No activities in this time range
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
