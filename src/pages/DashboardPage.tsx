@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
-import NurseryMap from "../components/NurseryMap";
+import ShadehouseView from "../components/ShadehouseView";
 import WeatherWidget from "../components/WeatherWidget";
 
 const container = {
@@ -283,11 +283,9 @@ export default function DashboardPage() {
 
       {/* Second row: map + side panels */}
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-5 mb-5">
-        {/* Map */}
+        {/* Shadehouse Layout */}
         <motion.div variants={item} className="xl:col-span-3">
-          <div className="bg-white rounded-xl border border-sand-200/80 p-1 shadow-sm">
-            <NurseryMap className="h-72 xl:h-80 w-full rounded-lg" />
-          </div>
+          <ShadehouseView />
         </motion.div>
 
         {/* Side panels */}
