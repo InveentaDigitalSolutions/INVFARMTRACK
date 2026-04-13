@@ -21,7 +21,7 @@ interface UseExchangeRateResult {
 // Fallback rate (updated manually when API unavailable)
 const FALLBACK_RATE: ExchangeRate = {
   date: new Date(),
-  value: 24.6746,
+  value: 26.5543,
   dateISO: new Date().toISOString().slice(0, 10),
 };
 

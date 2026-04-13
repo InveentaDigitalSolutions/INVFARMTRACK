@@ -22,6 +22,7 @@ import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
 import ShadehouseView from "../components/ShadehouseView";
 import WeatherWidget from "../components/WeatherWidget";
+import { useExchangeRate } from "../hooks/useExchangeRate";
 
 const container = {
   hidden: {},
@@ -137,6 +138,7 @@ function DonutChart({ segments, total, label }: { segments: { value: number; col
 }
 
 export default function DashboardPage() {
+  const { rate: exchangeRate, loading: fxLoading, isLive: fxLive } = useExchangeRate();
   return (
     <motion.div
       initial="hidden"
@@ -160,24 +162,39 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* Alerts */}
-      {alerts.length > 0 && (
-        <motion.div variants={item} className="flex gap-3 mb-5">
-          {alerts.map((alert, i) => (
-            <div
-              key={i}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ${
-                alert.type === "warning"
-                  ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200/50"
-                  : "bg-blue-50 text-blue-700 ring-1 ring-blue-200/50"
-              }`}
-            >
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-              {alert.text}
-            </div>
-          ))}
-        </motion.div>
-      )}
+      {/* Alerts + Exchange Rate */}
+      <motion.div variants={item} className="flex flex-wrap gap-3 mb-5">
+        {/* BCH Exchange Rate */}
+        <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-navy-800 text-white ring-1 ring-navy-700/50">
+          <DollarSign className="w-4 h-4 text-lime-400" />
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[11px] text-navy-400">USD/HNL</span>
+            <span className="text-[15px] font-bold text-white">
+              {fxLoading ? "..." : exchangeRate ? `L ${exchangeRate.value.toFixed(4)}` : "—"}
+            </span>
+          </div>
+          {exchangeRate && (
+            <span className="text-[9px] text-navy-500 ml-1">
+              {fxLive ? "BCH Live" : "Manual"} · {exchangeRate.dateISO}
+            </span>
+          )}
+        </div>
+
+        {/* Alerts */}
+        {alerts.map((alert, i) => (
+          <div
+            key={i}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ${
+              alert.type === "warning"
+                ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200/50"
+                : "bg-blue-50 text-blue-700 ring-1 ring-blue-200/50"
+            }`}
+          >
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+            {alert.text}
+          </div>
+        ))}
+      </motion.div>
 
       {/* Top stats row */}
       <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-5">

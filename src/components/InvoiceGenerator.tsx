@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { downloadInvoicePDFs, type InvoiceData } from "../services/InvoicePDF";
+import { useExchangeRate } from "../hooks/useExchangeRate";
 import {
   FileText,
   Check,
@@ -121,7 +122,13 @@ export default function InvoiceGenerator({
   onClose,
   onGenerate,
 }: InvoiceGeneratorProps) {
-  const [exchangeRate, setExchangeRate] = useState(26.5455);
+  const { rate: bchRate, isLive: bchLive } = useExchangeRate();
+  const [exchangeRate, setExchangeRate] = useState(24.6746);
+
+  // Auto-fill from BCH API when available
+  useEffect(() => {
+    if (bchRate) setExchangeRate(bchRate.value);
+  }, [bchRate]);
   const [step, setStep] = useState<"review" | "generating" | "done">("review");
   const [selectedCAI, setSelectedCAI] = useState(() => {
     const next = caiNumbers.find((c) => !c.used);
@@ -327,7 +334,12 @@ export default function InvoiceGenerator({
                                focus:outline-none focus:ring-2 focus:ring-lime-400/30
                                [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
-                  <span className="text-[11px] text-navy-400">Source: Honduras Central Bank</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className={`w-1.5 h-1.5 rounded-full ${bchLive ? "bg-green-500" : "bg-amber-400"}`} />
+                    <span className="text-[11px] text-navy-400">
+                      {bchLive ? "BCH Live" : "Manual"}{bchRate ? ` · ${bchRate.dateISO}` : ""}
+                    </span>
+                  </div>
                 </div>
               </div>
 
