@@ -283,18 +283,18 @@ export default function SalesPage() {
 
             {/* Forecast grid */}
             <div className="bg-white rounded-xl border border-sand-200/80 shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-[12px]">
+              <div className="overflow-x-auto" style={{ scrollbarGutter: "stable" }}>
+                <table className="text-[12px]" style={{ minWidth: "max-content" }}>
                   <thead>
                     <tr className="bg-sand-50/50 border-b border-sand-100">
                       <th className="px-4 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase sticky left-0 bg-sand-50/50 z-10">Variety</th>
                       <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase">Size</th>
                       <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase">Type</th>
-                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 14</th>
-                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 15</th>
-                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 16</th>
-                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 17</th>
-                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 18</th>
+                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 14</th>
+                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 15</th>
+                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 16</th>
+                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 17</th>
+                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 18</th>
                       <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-lime-600 uppercase bg-lime-50/50">Total</th>
                     </tr>
                   </thead>
