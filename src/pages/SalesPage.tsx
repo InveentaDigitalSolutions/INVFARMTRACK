@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart,
   Plane,
@@ -18,9 +18,12 @@ import StatCard from "../components/StatCard";
 import ShipmentDetail from "../components/ShipmentDetail";
 import FormModal from "../components/FormModal";
 import { useFormModal } from "../hooks/useFormModal";
+import ExcelImport from "../components/ExcelImport";
+import { CalendarRange, Upload } from "lucide-react";
 
 const tabs = [
   { id: "shipments", label: "Shipments" },
+  { id: "forecast", label: "Demand Forecast" },
   { id: "orders", label: "Orders" },
   { id: "customers", label: "Customers" },
 ];
@@ -108,6 +111,15 @@ export default function SalesPage() {
   const [tab, setTab] = useState("shipments");
   const [shipments, setShipments] = useState(initialShipments);
   const [activeShipment, setActiveShipment] = useState<string | null>(null);
+  const [showImport, setShowImport] = useState(false);
+  const [forecastData, setForecastData] = useState<Record<string, unknown>[]>([
+    { variety: "Pothos / Hawaiian", size: "9cm HQD Bowls", type: "Current Order", wk14: 10725, wk15: 7000, wk16: 11500, wk17: 12500, wk18: 11800, total: 53525 },
+    { variety: "Pothos / Hawaiian", size: "9cm HQD Specialty", type: "Current Order", wk14: 0, wk15: 0, wk16: 0, wk17: 0, wk18: 1300, total: 1300 },
+    { variety: "Pothos / Jade", size: "9cm HQD Bowls", type: "Current Order", wk14: 12000, wk15: 0, wk16: 14750, wk17: 12500, wk18: 0, total: 39250 },
+    { variety: "Pothos / Marble Queen", size: "9cm HQD Bowls", type: "Current Order", wk14: 4000, wk15: 0, wk16: 21500, wk17: 52000, wk18: 25000, total: 102500 },
+    { variety: "Pothos / N'Joy", size: "12cm Canopy", type: "Current Order", wk14: 0, wk15: 0, wk16: 2526, wk17: 0, wk18: 0, total: 2526 },
+    { variety: "Pothos / Golden Glen", size: "17cm", type: "Current Order", wk14: 0, wk15: 2715, wk16: 0, wk17: 2650, wk18: 1000, total: 6365 },
+  ]);
   const shipmentForm = useFormModal({ customer: "", orderNumber: "", carrier: "DHL", awb: "", date: new Date().toISOString().slice(0, 10) });
 
   const currentShipment = shipments.find((s) => s.id === activeShipment);
@@ -247,6 +259,112 @@ export default function SalesPage() {
               submitLabel="Create Shipment"
               onSubmit={handleCreateShipment}
             />
+          </div>
+        );
+
+      case "forecast":
+        return (
+          <div className="space-y-4">
+            {/* Import button + summary */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-[14px] font-semibold text-navy-900">Q2 2026 — The Plant Company</h3>
+                <p className="text-[12px] text-navy-400">{forecastData.length} order lines · Weeks 14–18</p>
+              </div>
+              <button
+                onClick={() => setShowImport(true)}
+                className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-navy-900
+                           bg-lime-400 rounded-lg hover:bg-lime-300 cursor-pointer shadow-sm"
+              >
+                <Upload className="w-4 h-4" />
+                Import Excel
+              </button>
+            </div>
+
+            {/* Forecast grid */}
+            <div className="bg-white rounded-xl border border-sand-200/80 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-[12px]">
+                  <thead>
+                    <tr className="bg-sand-50/50 border-b border-sand-100">
+                      <th className="px-4 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase sticky left-0 bg-sand-50/50 z-10">Variety</th>
+                      <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase">Size</th>
+                      <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase">Type</th>
+                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 14</th>
+                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 15</th>
+                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 16</th>
+                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 17</th>
+                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase">Wk 18</th>
+                      <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-lime-600 uppercase bg-lime-50/50">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-sand-100/80">
+                    {forecastData.map((row, i) => (
+                      <tr key={i} className="hover:bg-sand-50/50">
+                        <td className="px-4 py-2 font-medium text-navy-800 sticky left-0 bg-white z-10">{row.variety as string}</td>
+                        <td className="px-3 py-2 text-navy-600">{row.size as string}</td>
+                        <td className="px-3 py-2">
+                          <Badge variant={(row.type as string) === "Current Order" ? "green" : "amber"}>{row.type as string}</Badge>
+                        </td>
+                        {["wk14", "wk15", "wk16", "wk17", "wk18"].map((wk) => (
+                          <td key={wk} className={`px-3 py-2 text-center font-mono ${
+                            (row[wk] as number) > 0 ? "text-navy-800 font-medium" : "text-navy-200"
+                          }`}>
+                            {(row[wk] as number) > 0 ? (row[wk] as number).toLocaleString() : "—"}
+                          </td>
+                        ))}
+                        <td className="px-3 py-2 text-center font-mono font-bold text-navy-900 bg-lime-50/30">
+                          {((row.total as number) || 0).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-navy-50/50 border-t-2 border-navy-200">
+                      <td colSpan={3} className="px-4 py-2 font-bold text-navy-900 sticky left-0 bg-navy-50/50 z-10">Total</td>
+                      {["wk14", "wk15", "wk16", "wk17", "wk18"].map((wk) => (
+                        <td key={wk} className="px-3 py-2 text-center font-mono font-bold text-navy-900">
+                          {forecastData.reduce((s, r) => s + ((r[wk] as number) || 0), 0).toLocaleString()}
+                        </td>
+                      ))}
+                      <td className="px-3 py-2 text-center font-mono font-bold text-lime-700 bg-lime-50/50">
+                        {forecastData.reduce((s, r) => s + ((r.total as number) || 0), 0).toLocaleString()}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            {/* Excel import modal */}
+            <AnimatePresence>
+              {showImport && (
+                <ExcelImport
+                  customer="The Plant Company, LLC"
+                  year={2026}
+                  onImport={(result) => {
+                    // Convert imported rows to flat forecast data
+                    const newData = result.rows.map((row) => {
+                      const weekData: Record<string, unknown> = {};
+                      let total = 0;
+                      result.weekNumbers.forEach((wk) => {
+                        weekData[`wk${wk}`] = row.weeks[wk] || 0;
+                        total += row.weeks[wk] || 0;
+                      });
+                      return {
+                        variety: row.variety,
+                        size: row.size,
+                        type: row.requestType,
+                        ...weekData,
+                        total,
+                      };
+                    });
+                    setForecastData(newData);
+                  }}
+                  onClose={() => setShowImport(false)}
+                />
+              )}
+            </AnimatePresence>
           </div>
         );
 

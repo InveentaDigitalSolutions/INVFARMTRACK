@@ -3360,6 +3360,116 @@
           "required": false
         }
       ]
+    },
+
+    {
+      "schemaName": "inv_DemandForecast",
+      "displayName": "Demand Forecast",
+      "displayCollectionName": "Demand Forecasts",
+      "description": "Quarterly demand forecast from customers — per variety × size × week",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_DemandForecastName",
+          "displayName": "Forecast Entry",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_CustomerId",
+          "displayName": "Customer",
+          "type": "lookup",
+          "relatedTable": "inv_Customer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_PlantId",
+          "displayName": "Plant / Variety",
+          "type": "lookup",
+          "relatedTable": "inv_Plant",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Size",
+          "displayName": "Size / Pot Type",
+          "type": "string",
+          "maxLength": 100,
+          "required": false,
+          "description": "e.g. 9cm HQD Bowls, 12cm Canopy, 17cm"
+        },
+        {
+          "schemaName": "inv_RequestType",
+          "displayName": "Request Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Current Order" },
+            { "value": 747480001, "label": "Additional Request" },
+            { "value": 747480002, "label": "Additional Order" }
+          ]
+        },
+        {
+          "schemaName": "inv_WeekNumber",
+          "displayName": "Week Number",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Year",
+          "displayName": "Year",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schemaName": "inv_RequestedQty",
+          "displayName": "Requested Quantity",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_ConfirmedQty",
+          "displayName": "Confirmed Quantity",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Status",
+          "displayName": "Status",
+          "type": "choice",
+          "required": false,
+          "options": [
+            { "value": 747480000, "label": "Pending" },
+            { "value": 747480001, "label": "Confirmed" },
+            { "value": 747480002, "label": "Adjusted" },
+            { "value": 747480003, "label": "Cancelled" }
+          ]
+        },
+        {
+          "schemaName": "inv_Quarter",
+          "displayName": "Quarter",
+          "type": "string",
+          "maxLength": 10,
+          "required": false,
+          "description": "e.g. Q2-2026"
+        },
+        {
+          "schemaName": "inv_ImportBatch",
+          "displayName": "Import Batch",
+          "type": "string",
+          "maxLength": 50,
+          "required": false,
+          "description": "Groups rows from the same Excel import"
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
     }
   ]
 }

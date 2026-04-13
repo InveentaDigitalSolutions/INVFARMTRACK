@@ -144,6 +144,10 @@
         "FoliarAnalysis": {
           "entitySetName": "inv_foliaranalyses",
           "logicalName": "inv_foliaranalysis"
+        },
+        "DemandForecast": {
+          "entitySetName": "inv_demandforecasts",
+          "logicalName": "inv_demandforecast"
         }
       }
     }
