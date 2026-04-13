@@ -2789,6 +2789,577 @@
           "required": false
         }
       ]
+    },
+
+    {
+      "schemaName": "inv_BoxWeight",
+      "displayName": "Box Weight",
+      "displayCollectionName": "Box Weights",
+      "description": "Per-box weight details linked to AWB — avg leaf weight, net weight, gross weight",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_BoxWeightName",
+          "displayName": "Box Weight Entry",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_PackingId",
+          "displayName": "Packing Box",
+          "type": "lookup",
+          "relatedTable": "inv_Packing",
+          "required": true
+        },
+        {
+          "schemaName": "inv_AWBNumber",
+          "displayName": "AWB Number",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_AvgLeafWeight_g",
+          "displayName": "Avg Leaf Weight (g)",
+          "type": "decimal",
+          "required": false,
+          "description": "Average weight per leaf/cutting, sampled at farm"
+        },
+        {
+          "schemaName": "inv_NetWeight_kg",
+          "displayName": "Net Weight (kg)",
+          "type": "decimal",
+          "required": false,
+          "description": "Leaves/cuttings only, inside the box"
+        },
+        {
+          "schemaName": "inv_GrossWeight_kg",
+          "displayName": "Gross Weight (kg)",
+          "type": "decimal",
+          "required": false,
+          "description": "Total packed box weight"
+        },
+        {
+          "schemaName": "inv_DryMatterPct",
+          "displayName": "Dry Matter %",
+          "type": "decimal",
+          "required": false,
+          "description": "Configurable default 20-30%. Fresh matter × DM% = dry matter extracted"
+        },
+        {
+          "schemaName": "inv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_NutrientBalance",
+      "displayName": "Nutrient Balance",
+      "displayCollectionName": "Nutrient Balances",
+      "description": "Running nutrient balance per bed per season — applied (fertilization) vs extracted (harvest)",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_NutrientBalanceName",
+          "displayName": "Balance Entry",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": true
+        },
+        {
+          "schemaName": "inv_SeasonId",
+          "displayName": "Season",
+          "type": "lookup",
+          "relatedTable": "inv_Season",
+          "required": false
+        },
+        {
+          "schemaName": "inv_WeekNumber",
+          "displayName": "Week Number",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "schemaName": "inv_N_Applied",
+          "displayName": "N Applied (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_P_Applied",
+          "displayName": "P Applied (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_K_Applied",
+          "displayName": "K Applied (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Ca_Applied",
+          "displayName": "Ca Applied (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_N_Extracted",
+          "displayName": "N Extracted (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_P_Extracted",
+          "displayName": "P Extracted (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_K_Extracted",
+          "displayName": "K Extracted (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Ca_Extracted",
+          "displayName": "Ca Extracted (kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_DryMatterPct",
+          "displayName": "Dry Matter %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_SoilAnalysis",
+      "displayName": "Soil Analysis",
+      "displayCollectionName": "Soil Analyses",
+      "description": "Lab soil analysis results — Zamorano format with full chemical and physical parameters",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_SoilAnalysisName",
+          "displayName": "Analysis Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed / Location",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": false
+        },
+        {
+          "schemaName": "inv_SampleDate",
+          "displayName": "Sample Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_ReportDate",
+          "displayName": "Report Date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Lab",
+          "displayName": "Laboratory",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_LabCode",
+          "displayName": "Lab Sample Code",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_ReportNumber",
+          "displayName": "Report Number",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Crop",
+          "displayName": "Crop",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Texture",
+          "displayName": "Texture",
+          "type": "string",
+          "maxLength": 100,
+          "required": false,
+          "description": "e.g. Franco Arcillo Arenoso"
+        },
+        {
+          "schemaName": "inv_Sand_pct",
+          "displayName": "Sand %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Silt_pct",
+          "displayName": "Silt %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Clay_pct",
+          "displayName": "Clay %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_pH",
+          "displayName": "pH (H₂O)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_OrganicCarbon_pct",
+          "displayName": "Organic Carbon (C.O.) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_OrganicMatter_pct",
+          "displayName": "Organic Matter (M.O.) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_N_total_pct",
+          "displayName": "N Total %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Al_cmol",
+          "displayName": "Aluminum (cmol(+)/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Al_Saturation_pct",
+          "displayName": "Al Saturation %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CE_dS",
+          "displayName": "CE (dS/m)",
+          "type": "decimal",
+          "required": false,
+          "description": "Electrical Conductivity"
+        },
+        {
+          "schemaName": "inv_Cl_mg",
+          "displayName": "Chloride (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CIC",
+          "displayName": "CIC (cmol(+)/kg)",
+          "type": "decimal",
+          "required": false,
+          "description": "Cation Exchange Capacity"
+        },
+        {
+          "schemaName": "inv_Ca_mg",
+          "displayName": "Ca (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Mg_mg",
+          "displayName": "Mg (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_K_mg",
+          "displayName": "K (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Na_mg",
+          "displayName": "Na (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CICE",
+          "displayName": "CICE (cmol(+)/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Ca_Sat_pct",
+          "displayName": "Ca Saturation %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Mg_Sat_pct",
+          "displayName": "Mg Saturation %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_K_Sat_pct",
+          "displayName": "K Saturation %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CaMg_ratio",
+          "displayName": "Ca/Mg Ratio",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_MgK_ratio",
+          "displayName": "Mg/K Ratio",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CaK_ratio",
+          "displayName": "Ca/K Ratio",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_CaMgK_ratio",
+          "displayName": "Ca+Mg/K Ratio",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Cu_mg",
+          "displayName": "Cu (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Fe_mg",
+          "displayName": "Fe (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Mn_mg",
+          "displayName": "Mn (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Zn_mg",
+          "displayName": "Zn (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_B_mg",
+          "displayName": "B (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_S_mg",
+          "displayName": "S (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_P_mg",
+          "displayName": "P (mg/kg)",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+
+    {
+      "schemaName": "inv_FoliarAnalysis",
+      "displayName": "Foliar Analysis",
+      "displayCollectionName": "Foliar Analyses",
+      "description": "Lab foliar/tissue analysis results for nutrient content in plant tissue",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_FoliarAnalysisName",
+          "displayName": "Analysis Name",
+          "type": "string",
+          "maxLength": 200,
+          "required": true,
+          "isPrimaryName": true
+        },
+        {
+          "schemaName": "inv_BedId",
+          "displayName": "Bed / Location",
+          "type": "lookup",
+          "relatedTable": "inv_Bed",
+          "required": false
+        },
+        {
+          "schemaName": "inv_SampleDate",
+          "displayName": "Sample Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "inv_ReportDate",
+          "displayName": "Report Date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Lab",
+          "displayName": "Laboratory",
+          "type": "string",
+          "maxLength": 200,
+          "required": false
+        },
+        {
+          "schemaName": "inv_LabCode",
+          "displayName": "Lab Sample Code",
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "schemaName": "inv_Crop",
+          "displayName": "Crop / Variety",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "inv_N_pct",
+          "displayName": "Nitrogen (N) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_P_pct",
+          "displayName": "Phosphorus (P) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_K_pct",
+          "displayName": "Potassium (K) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Ca_pct",
+          "displayName": "Calcium (Ca) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Mg_pct",
+          "displayName": "Magnesium (Mg) %",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Fe_ppm",
+          "displayName": "Iron (Fe) ppm",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Zn_ppm",
+          "displayName": "Zinc (Zn) ppm",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Mn_ppm",
+          "displayName": "Manganese (Mn) ppm",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Cu_ppm",
+          "displayName": "Copper (Cu) ppm",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_B_ppm",
+          "displayName": "Boron (B) ppm",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_S_ppm",
+          "displayName": "Sulfur (S) ppm",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
     }
   ]
 }

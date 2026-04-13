@@ -8,6 +8,7 @@ import {
   ShoppingCart,
   Receipt,
   CalendarCheck,
+  FlaskConical,
   Truck,
   HardHat,
   Settings,
@@ -48,6 +49,7 @@ const navSections: NavSection[] = [
       { id: "inventory", label: "Inventory", icon: PackageSearch },
       { id: "infrastructure", label: "Infrastructure", icon: Warehouse },
       { id: "availability", label: "Availability", icon: CalendarCheck },
+      { id: "nutrition", label: "Nutrition", icon: FlaskConical },
     ],
   },
   {

@@ -128,6 +128,22 @@
         "Availability": {
           "entitySetName": "inv_availabilities",
           "logicalName": "inv_availability"
+        },
+        "BoxWeight": {
+          "entitySetName": "inv_boxweights",
+          "logicalName": "inv_boxweight"
+        },
+        "NutrientBalance": {
+          "entitySetName": "inv_nutrientbalances",
+          "logicalName": "inv_nutrientbalance"
+        },
+        "SoilAnalysis": {
+          "entitySetName": "inv_soilanalyses",
+          "logicalName": "inv_soilanalysis"
+        },
+        "FoliarAnalysis": {
+          "entitySetName": "inv_foliaranalyses",
+          "logicalName": "inv_foliaranalysis"
         }
       }
     }

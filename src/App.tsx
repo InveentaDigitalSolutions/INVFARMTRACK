@@ -10,6 +10,7 @@ import InfrastructurePage from "./pages/InfrastructurePage";
 import SalesPage from "./pages/SalesPage";
 import FinancePage from "./pages/FinancePage";
 import AvailabilityPage from "./pages/AvailabilityPage";
+import NutritionPage from "./pages/NutritionPage";
 import SuppliersPage from "./pages/SuppliersPage";
 import LaborPage from "./pages/LaborPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -20,6 +21,7 @@ export type PageId =
   | "inventory"
   | "infrastructure"
   | "availability"
+  | "nutrition"
   | "sales"
   | "finance"
   | "suppliers"
@@ -61,6 +63,8 @@ export default function App() {
         return <InfrastructurePage />;
       case "availability":
         return <AvailabilityPage />;
+      case "nutrition":
+        return <NutritionPage />;
       case "sales":
         return <SalesPage />;
       case "finance":
