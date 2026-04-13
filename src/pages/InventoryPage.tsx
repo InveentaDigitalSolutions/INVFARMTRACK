@@ -32,11 +32,11 @@ const initInputs = [
   { name: "NPK 20-20-20", category: "Fertilizer", method: "Drip", safety: "", brand: "NutriMax", composition: "N-P-K balanced" },
 ];
 const initPrices = [
-  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "L 5.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { plant: "Pothos / Marble Queen", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "L 5.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { plant: "Pothos / Jade", season: "2026-S1", customer: "Base", priceExt: "$0.018", priceInt: "L 4.50", from: "2026-01-01", to: "2026-12-31", active: true },
-  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "The Plant Company", priceExt: "$0.019", priceInt: "\u2014", from: "2026-04-01", to: "2026-06-30", active: true },
-  { plant: "Sansevieria / Sansevieria", season: "2026-S1", customer: "Base", priceExt: "$0.035", priceInt: "L 8.00", from: "2026-01-01", to: "2026-12-31", active: true },
+  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "$0.015", from: "2026-01-01", to: "2026-12-31", active: true },
+  { plant: "Pothos / Marble Queen", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "$0.015", from: "2026-01-01", to: "2026-12-31", active: true },
+  { plant: "Pothos / Jade", season: "2026-S1", customer: "Base", priceExt: "$0.018", priceInt: "$0.013", from: "2026-01-01", to: "2026-12-31", active: true },
+  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "The Plant Company", priceExt: "$0.019", priceInt: "—", from: "2026-04-01", to: "2026-06-30", active: true },
+  { plant: "Sansevieria / Sansevieria", season: "2026-S1", customer: "Base", priceExt: "$0.035", priceInt: "$0.028", from: "2026-01-01", to: "2026-12-31", active: true },
 ];
 const initSeasons = [
   { name: "2026-S1", start: "2026-01-01", end: "2026-06-30", description: "First season 2026", active: true },
@@ -198,8 +198,8 @@ export default function InventoryPage() {
                 { key: "plant", label: "Plant" },
                 { key: "season", label: "Season" },
                 { key: "customer", label: "Customer", render: (r) => <Badge variant={r.customer === "Base" ? "gray" : "blue"}>{r.customer as string}</Badge> },
-                { key: "priceExt", label: "EXT (USD)" },
-                { key: "priceInt", label: "INT (HNL)" },
+                { key: "priceExt", label: "Export (USD)" },
+                { key: "priceInt", label: "Internal (USD)" },
                 { key: "from", label: "From" },
                 { key: "to", label: "To" },
                 { key: "active", label: "Active", render: (r) => (

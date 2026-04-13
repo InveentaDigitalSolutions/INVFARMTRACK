@@ -1879,10 +1879,10 @@
         },
         {
           "schemaName": "inv_PriceINT",
-          "displayName": "Internal Price (HNL)",
+          "displayName": "Internal Price (USD)",
           "type": "currency",
           "required": false,
-          "description": "Price per unit for domestic/internal sales"
+          "description": "Price per unit for internal/domestic sales (in USD — HNL conversion at invoice time via BCH exchange rate)"
         },
         {
           "schemaName": "inv_IsActive",

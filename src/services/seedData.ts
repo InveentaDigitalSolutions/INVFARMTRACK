@@ -43,14 +43,14 @@ export const seedInputs = [
 ];
 
 export const seedPrices = [
-  { id: "pr-1", plant: "Pothos / Hawaiian", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "5.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { id: "pr-2", plant: "Pothos / High Color", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "5.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { id: "pr-3", plant: "Pothos / N'Joy", season: "2026-S1", customer: "Base", priceExt: "0.022", priceInt: "6.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { id: "pr-4", plant: "Pothos / Neon", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "5.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { id: "pr-5", plant: "Pothos / Jade", season: "2026-S1", customer: "Base", priceExt: "0.018", priceInt: "4.50", from: "2026-01-01", to: "2026-12-31", active: true },
-  { id: "pr-6", plant: "Pothos / Marble Queen", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "5.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { id: "pr-7", plant: "Pothos / Golden Glen", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "5.00", from: "2026-01-01", to: "2026-12-31", active: true },
-  { id: "pr-8", plant: "Sansevieria / Sansevieria", season: "2026-S1", customer: "Base", priceExt: "0.035", priceInt: "8.00", from: "2026-01-01", to: "2026-12-31", active: true },
+  { id: "pr-1", plant: "Pothos / Hawaiian", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "0.015", from: "2026-01-01", to: "2026-12-31", active: true },
+  { id: "pr-2", plant: "Pothos / High Color", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "0.015", from: "2026-01-01", to: "2026-12-31", active: true },
+  { id: "pr-3", plant: "Pothos / N'Joy", season: "2026-S1", customer: "Base", priceExt: "0.022", priceInt: "0.017", from: "2026-01-01", to: "2026-12-31", active: true },
+  { id: "pr-4", plant: "Pothos / Neon", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "0.015", from: "2026-01-01", to: "2026-12-31", active: true },
+  { id: "pr-5", plant: "Pothos / Jade", season: "2026-S1", customer: "Base", priceExt: "0.018", priceInt: "0.013", from: "2026-01-01", to: "2026-12-31", active: true },
+  { id: "pr-6", plant: "Pothos / Marble Queen", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "0.015", from: "2026-01-01", to: "2026-12-31", active: true },
+  { id: "pr-7", plant: "Pothos / Golden Glen", season: "2026-S1", customer: "Base", priceExt: "0.020", priceInt: "0.015", from: "2026-01-01", to: "2026-12-31", active: true },
+  { id: "pr-8", plant: "Sansevieria / Sansevieria", season: "2026-S1", customer: "Base", priceExt: "0.035", priceInt: "0.028", from: "2026-01-01", to: "2026-12-31", active: true },
   { id: "pr-9", plant: "Pothos / Hawaiian", season: "2026-S1", customer: "The Plant Company", priceExt: "0.019", priceInt: "—", from: "2026-04-01", to: "2026-06-30", active: true },
 ];
 
