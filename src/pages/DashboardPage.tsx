@@ -158,7 +158,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-2 text-[12px]">
           <CalendarDays className="w-4 h-4 text-navy-400" />
-          <span className="text-navy-500">April 10, 2026</span>
+          <span className="text-navy-500">{new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
         </div>
       </motion.div>
 
@@ -184,10 +184,10 @@ export default function DashboardPage() {
         {alerts.map((alert, i) => (
           <div
             key={i}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ${
+            className={`alert-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ${
               alert.type === "warning"
-                ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200/50"
-                : "bg-blue-50 text-blue-700 ring-1 ring-blue-200/50"
+                ? "alert-warning bg-amber-50 text-amber-700 ring-1 ring-amber-200/50"
+                : "alert-info bg-blue-50 text-blue-700 ring-1 ring-blue-200/50"
             }`}
           >
             <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
@@ -316,8 +316,8 @@ export default function DashboardPage() {
             <div className="space-y-2">
               {recentShipments.map((s) => (
                 <div key={s.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-sand-50/80 hover:bg-sand-100 transition-colors cursor-pointer">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-navy-50">
-                    <Package className="w-4 h-4 text-navy-500" />
+                  <div className="shipment-icon flex items-center justify-center w-8 h-8 rounded-lg bg-navy-50">
+                    <Package className="shipment-icon-svg w-4 h-4 text-navy-500" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-medium text-navy-800 truncate">{s.customer}</p>

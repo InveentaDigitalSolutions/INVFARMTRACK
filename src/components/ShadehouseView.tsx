@@ -289,14 +289,14 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
 
       {/* SVG Layout */}
       <div className="p-3 overflow-x-auto">
-        <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full max-w-3xl mx-auto" style={{ minWidth: 500 }}>
+        <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="shadehouse-svg w-full max-w-3xl mx-auto" style={{ minWidth: 500 }}>
           {/* Background */}
-          <rect x="0" y="0" width={svgWidth} height={svgHeight} fill="#f9fafb" rx="8" />
+          <rect x="0" y="0" width={svgWidth} height={svgHeight} className="sh-bg" fill="#f9fafb" rx="8" />
 
           {/* Compass */}
           <g transform={`translate(${svgWidth - 40}, 30)`}>
-            <text x="0" y="-8" textAnchor="middle" fill="#7e92ab" fontSize="8" fontWeight="bold">N</text>
-            <polygon points="0,-5 3,5 -3,5" fill="#7e92ab" />
+            <text x="0" y="-8" textAnchor="middle" className="sh-label" fill="#7e92ab" fontSize="8" fontWeight="bold">N</text>
+            <polygon points="0,-5 3,5 -3,5" className="sh-label" fill="#7e92ab" />
           </g>
 
           {/* Roads */}
@@ -306,11 +306,12 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
             y={padding + 15}
             width={roadWidth}
             height={svgHeight - padding * 2 - 15}
+            className="sh-road"
             fill="#e5e7eb"
             rx="2"
           />
           <line x1={padding + halfW + roadWidth / 2} y1={padding + 20} x2={padding + halfW + roadWidth / 2} y2={svgHeight - padding}
-            stroke="#d1d5db" strokeWidth="1" strokeDasharray="4 3" />
+            className="sh-road-line" stroke="#d1d5db" strokeWidth="1" strokeDasharray="4 3" />
 
           {/* Horizontal road */}
           <rect
@@ -318,14 +319,15 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
             y={padding + 20 + halfH}
             width={svgWidth - padding * 2 + 10}
             height={roadWidth}
+            className="sh-road"
             fill="#e5e7eb"
             rx="2"
           />
           <line x1={padding} y1={padding + 20 + halfH + roadWidth / 2} x2={svgWidth - padding} y2={padding + 20 + halfH + roadWidth / 2}
-            stroke="#d1d5db" strokeWidth="1" strokeDasharray="4 3" />
+            className="sh-road-line" stroke="#d1d5db" strokeWidth="1" strokeDasharray="4 3" />
 
           {/* Road labels */}
-          <text x={padding + halfW + roadWidth / 2} y={svgHeight - padding + 12} textAnchor="middle" fill="#9ca3af" fontSize="7">Logistics Road</text>
+          <text x={padding + halfW + roadWidth / 2} y={svgHeight - padding + 12} textAnchor="middle" className="sh-label" fill="#9ca3af" fontSize="7">Logistics Road</text>
 
           {/* Plots and beds */}
           {plotConfigs.map((plot) => {
@@ -339,13 +341,14 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
                 {/* Plot outline */}
                 <rect
                   x={area.x} y={area.y} width={area.w} height={area.h}
-                  fill="none" stroke="#cbd5e1" strokeWidth="1" rx="4"
+                  className="sh-plot-outline" fill="none" stroke="#cbd5e1" strokeWidth="1" rx="4"
                 />
                 {/* Plot label */}
                 <text
                   x={area.x + area.w / 2}
                   y={area.y + 10}
                   textAnchor="middle"
+                  className="sh-plot-label"
                   fill="#3a506b"
                   fontSize="9"
                   fontWeight="600"
