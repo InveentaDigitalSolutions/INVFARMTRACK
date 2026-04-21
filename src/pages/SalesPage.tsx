@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart,
@@ -20,6 +20,7 @@ import FormModal from "../components/FormModal";
 import { useFormModal } from "../hooks/useFormModal";
 import ExcelImport from "../components/ExcelImport";
 import { CalendarRange, Upload } from "lucide-react";
+import { getNextInvoiceNumber, allocateInvoiceNumber } from "../services/invoiceNumberService";
 
 const tabs = [
   { id: "shipments", label: "Shipments" },
@@ -120,16 +121,44 @@ export default function SalesPage() {
     { variety: "Pothos / N'Joy", size: "12cm Canopy", type: "Current Order", wk14: 0, wk15: 0, wk16: 2526, wk17: 0, wk18: 0, total: 2526 },
     { variety: "Pothos / Golden Glen", size: "17cm", type: "Current Order", wk14: 0, wk15: 2715, wk16: 0, wk17: 2650, wk18: 1000, total: 6365 },
   ]);
-  const shipmentForm = useFormModal({ customer: "", orderNumber: "", carrier: "DHL", awb: "", date: new Date().toISOString().slice(0, 10) });
+  const nextInvoice = getNextInvoiceNumber();
+  const shipmentForm = useFormModal({
+    customer: "",
+    invoiceNumber: nextInvoice?.invoiceNumber || "",
+    carrier: "DHL",
+    awb: "",
+    date: new Date().toISOString().slice(0, 10),
+  });
+
+  // Refresh invoice number when form opens
+  useEffect(() => {
+    if (shipmentForm.open && !shipmentForm.isEdit) {
+      const next = getNextInvoiceNumber();
+      if (next) {
+        shipmentForm.onChange("invoiceNumber", next.invoiceNumber);
+      }
+    }
+  }, [shipmentForm.open]);
 
   const currentShipment = shipments.find((s) => s.id === activeShipment);
 
   const handleCreateShipment = (values: Record<string, unknown>) => {
+    const invoiceNum = values.invoiceNumber as string;
+
+    // Allocate the invoice number from the CAI range
+    if (invoiceNum) {
+      const allocated = allocateInvoiceNumber(invoiceNum);
+      if (!allocated) {
+        alert(`Invoice number ${invoiceNum} has already been used. Please use a different number.`);
+        return;
+      }
+    }
+
     const num = shipments.length + 1;
     const newShipment: Shipment = {
       id: `SHP-2026-${String(num).padStart(3, "0")}`,
       customer: values.customer as string,
-      orderNumber: values.orderNumber as string || `ORD-2026-${String(50 + num).padStart(3, "0")}`,
+      orderNumber: invoiceNum || `ORD-2026-${String(50 + num).padStart(3, "0")}`,
       date: values.date as string,
       carrier: values.carrier as string,
       awb: values.awb as string,
@@ -241,11 +270,11 @@ export default function SalesPage() {
               open={shipmentForm.open}
               onClose={shipmentForm.close}
               title="New Shipment"
-              subtitle="Create a shipment for a customer"
+              subtitle={nextInvoice ? `CAI: ${nextInvoice.cai.slice(0, 14)}… · ${nextInvoice.remaining} invoices remaining · Exp. ${nextInvoice.expiry}` : "Create a shipment for a customer"}
               groups={[{
                 title: "Shipment Details", columns: 2 as const, fields: [
                   { key: "customer", label: "Customer", type: "select" as const, options: sampleCustomers.map((c) => ({ value: c.name, label: c.name })), required: true },
-                  { key: "orderNumber", label: "Order Number", type: "text" as const, placeholder: "Auto-generated if blank" },
+                  { key: "invoiceNumber", label: "Invoice Number (CAI)", type: "text" as const, placeholder: "Auto-assigned from CAI range", required: true },
                   { key: "date", label: "Ship Date", type: "date" as const, required: true },
                   { key: "carrier", label: "Carrier", type: "select" as const, options: [
                     { value: "DHL", label: "DHL" }, { value: "FedEx", label: "FedEx" },

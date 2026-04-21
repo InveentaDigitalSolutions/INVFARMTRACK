@@ -273,6 +273,63 @@
   color: #d8dfe8 !important;
 }
 
+/* Dark mode modals (FormModal + ConfirmDialog) */
+.dark .fixed form,
+.dark .fixed > div:not(.backdrop-blur-sm) > div {
+  background-color: #1b2838 !important;
+  border-color: #2c3e55 !important;
+}
+.dark .fixed form .border-sand-100,
+.dark .fixed form .border-sand-200\/80 {
+  border-color: #2c3e55 !important;
+}
+.dark .fixed form .bg-sand-50\/50 {
+  background-color: rgba(21, 31, 45, 0.6) !important;
+}
+.dark .fixed form .text-navy-900,
+.dark .fixed > div > div .text-navy-900 {
+  color: #f0f3f7 !important;
+}
+.dark .fixed form .text-navy-600 {
+  color: #b0becf !important;
+}
+.dark .fixed form .text-navy-400,
+.dark .fixed > div > div .text-navy-500 {
+  color: #7e92ab !important;
+}
+.dark .fixed form .text-navy-500 {
+  color: #7e92ab !important;
+}
+.dark .fixed form input,
+.dark .fixed form select,
+.dark .fixed form textarea {
+  background-color: #1f2f42 !important;
+  border-color: #2c3e55 !important;
+  color: #f0f3f7 !important;
+}
+.dark .fixed form input::placeholder,
+.dark .fixed form textarea::placeholder {
+  color: #566d8a !important;
+}
+.dark .fixed form select option {
+  background-color: #1b2838;
+  color: #f0f3f7;
+}
+/* Toggle/multiselect unselected buttons in modal */
+.dark .fixed form button.bg-white,
+.dark .fixed form button[class*="bg-white"] {
+  background-color: #1f2f42 !important;
+  border-color: #2c3e55 !important;
+  color: #b0becf !important;
+}
+/* Confirm dialog icon backgrounds */
+.dark .fixed .bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.3) !important;
+}
+.dark .fixed .bg-amber-50 {
+  background-color: rgba(120, 53, 15, 0.3) !important;
+}
+
 /* Premium scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
