@@ -17,9 +17,10 @@ import Badge from "../components/Badge";
 import StatCard from "../components/StatCard";
 import ShipmentDetail from "../components/ShipmentDetail";
 import FormModal from "../components/FormModal";
-import { useFormModal } from "../hooks/useFormModal";
+import ConfirmDialog from "../components/ConfirmDialog";
+import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import ExcelImport from "../components/ExcelImport";
-import { CalendarRange, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { getNextInvoiceNumber, allocateInvoiceNumber } from "../services/invoiceNumberService";
 
 const tabs = [
@@ -27,6 +28,7 @@ const tabs = [
   { id: "forecast", label: "Demand Forecast" },
   { id: "orders", label: "Orders" },
   { id: "customers", label: "Customers" },
+  { id: "prices", label: "Price List" },
 ];
 
 interface Shipment {
@@ -93,14 +95,86 @@ const initialShipments: Shipment[] = [
   },
 ];
 
-const sampleOrders = [
+const initialOrders = [
   { number: "ORD-2026-042", customer: "The Plant Company, LLC", date: "2026-04-08", delivery: "2026-04-10", status: "In Packing", items: 5, total: "$1,520.00" },
   { number: "ORD-2026-041", customer: "Green Gardens Inc.", date: "2026-04-01", delivery: "2026-04-03", status: "Delivered", items: 2, total: "$600.00" },
 ];
 
-const sampleCustomers = [
+const initialCustomers = [
   { code: "VA24477", name: "The Plant Company, LLC", contact: "Frank Paul", email: "frank@theplantcompany.com", terms: "CIF" },
   { code: "FL33101", name: "Green Gardens Inc.", contact: "Sarah Kim", email: "sarah@greengardens.com", terms: "FOB" },
+];
+
+const orderStatusOptions = [
+  { value: "Draft", label: "Draft" },
+  { value: "In Packing", label: "In Packing" },
+  { value: "Shipped", label: "Shipped" },
+  { value: "Delivered", label: "Delivered" },
+  { value: "Cancelled", label: "Cancelled" },
+];
+
+const orderFields = [
+  { title: "Order Details", columns: 2 as const, fields: [
+    { key: "number", label: "Order Number", type: "text" as const, required: true, placeholder: "ORD-2026-…" },
+    { key: "customer", label: "Customer", type: "text" as const, required: true },
+    { key: "date", label: "Order Date", type: "date" as const, required: true },
+    { key: "delivery", label: "Delivery Date", type: "date" as const, required: true },
+    { key: "items", label: "# Items", type: "number" as const, min: 1, required: true },
+    { key: "total", label: "Total (USD)", type: "text" as const, placeholder: "$0.00" },
+    { key: "status", label: "Status", type: "select" as const, options: orderStatusOptions, required: true },
+  ]},
+];
+
+const termsOptions = [
+  { value: "CIF", label: "CIF" }, { value: "FOB", label: "FOB" },
+  { value: "EXW", label: "EXW" }, { value: "DDP", label: "DDP" }, { value: "DAP", label: "DAP" },
+];
+
+const customerFields = [
+  { title: "Customer Details", columns: 2 as const, fields: [
+    { key: "code", label: "Customer Code", type: "text" as const, required: true, placeholder: "e.g. VA24477" },
+    { key: "name", label: "Company Name", type: "text" as const, required: true, span: 2 as const },
+    { key: "contact", label: "Contact Person", type: "text" as const },
+    { key: "email", label: "Email", type: "text" as const, placeholder: "name@company.com" },
+    { key: "terms", label: "Incoterms", type: "select" as const, options: termsOptions },
+  ]},
+];
+
+const initPrices = [
+  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "$0.015", from: "2026-01-01", to: "2026-12-31", active: true },
+  { plant: "Pothos / Marble Queen", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "$0.015", from: "2026-01-01", to: "2026-12-31", active: true },
+  { plant: "Pothos / Jade", season: "2026-S1", customer: "Base", priceExt: "$0.018", priceInt: "$0.013", from: "2026-01-01", to: "2026-12-31", active: true },
+  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "The Plant Company", priceExt: "$0.019", priceInt: "—", from: "2026-04-01", to: "2026-06-30", active: true },
+  { plant: "Sansevieria / Sansevieria", season: "2026-S1", customer: "Base", priceExt: "$0.035", priceInt: "$0.028", from: "2026-01-01", to: "2026-12-31", active: true },
+];
+
+const plantNameOptions = [
+  { value: "Pothos / Hawaiian", label: "Pothos / Hawaiian" },
+  { value: "Pothos / Marble Queen", label: "Pothos / Marble Queen" },
+  { value: "Pothos / Jade", label: "Pothos / Jade" },
+  { value: "Pothos / N'Joy", label: "Pothos / N'Joy" },
+  { value: "Pothos / Neon", label: "Pothos / Neon" },
+  { value: "Pothos / High Color", label: "Pothos / High Color" },
+  { value: "Sansevieria / Sansevieria", label: "Sansevieria / Sansevieria" },
+];
+const priceSeasonOptions = [{ value: "2026-S1", label: "2026-S1" }, { value: "2025-S2", label: "2025-S2" }];
+const priceCustomerOptions = [
+  { value: "Base", label: "Base (default)" },
+  { value: "The Plant Company", label: "The Plant Company" },
+  { value: "Green Gardens", label: "Green Gardens" },
+];
+
+const priceFields = [
+  { title: "Price Details", columns: 2 as const, fields: [
+    { key: "plant", label: "Plant", type: "select" as const, options: plantNameOptions, required: true },
+    { key: "season", label: "Season", type: "select" as const, options: priceSeasonOptions, required: true },
+    { key: "customer", label: "Customer", type: "select" as const, options: priceCustomerOptions },
+    { key: "priceExt", label: "Price (USD)", type: "text" as const, required: true },
+    { key: "priceInt", label: "Price (HNL)", type: "text" as const },
+    { key: "from", label: "Valid From", type: "date" as const, required: true },
+    { key: "to", label: "Valid To", type: "date" as const, required: true },
+    { key: "active", label: "Active", type: "boolean" as const },
+  ]},
 ];
 
 const statusBadge = (s: string) => {
@@ -113,6 +187,56 @@ export default function SalesPage() {
   const [shipments, setShipments] = useState(initialShipments);
   const [activeShipment, setActiveShipment] = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
+  const [prices, setPrices] = useState(initPrices);
+  const priceForm = useFormModal(initPrices[0]);
+  const priceConfirm = useConfirmDialog();
+
+  const [orders, setOrders] = useState(initialOrders);
+  const [customers, setCustomers] = useState(initialCustomers);
+  const orderForm = useFormModal({
+    number: "",
+    customer: "",
+    date: new Date().toISOString().slice(0, 10),
+    delivery: new Date().toISOString().slice(0, 10),
+    items: 1,
+    total: "",
+    status: "Draft",
+  });
+  const customerForm = useFormModal({
+    code: "",
+    name: "",
+    contact: "",
+    email: "",
+    terms: "CIF",
+  });
+
+  const handleOrderSave = (values: Record<string, unknown>) => {
+    setOrders((prev) => [values as typeof initialOrders[0], ...prev]);
+    orderForm.close();
+  };
+
+  const handleCustomerSave = (values: Record<string, unknown>) => {
+    setCustomers((prev) => [values as typeof initialCustomers[0], ...prev]);
+    customerForm.close();
+  };
+
+  const handlePriceSave = (values: Record<string, unknown>) => {
+    if (priceForm.isEdit && priceForm.editIndex !== null) {
+      const updated = [...prices];
+      updated[priceForm.editIndex] = values as any;
+      setPrices(updated);
+    } else {
+      setPrices([...prices, values as any]);
+    }
+    priceForm.close();
+  };
+
+  const handlePriceDelete = () => {
+    if (priceConfirm.pending) {
+      setPrices(prices.filter((_, i) => i !== priceConfirm.pending!.index));
+    }
+  };
+
   const [forecastData, setForecastData] = useState<Record<string, unknown>[]>([
     { variety: "Pothos / Hawaiian", size: "9cm HQD Bowls", type: "Current Order", wk14: 10725, wk15: 7000, wk16: 11500, wk17: 12500, wk18: 11800, total: 53525 },
     { variety: "Pothos / Hawaiian", size: "9cm HQD Specialty", type: "Current Order", wk14: 0, wk15: 0, wk16: 0, wk17: 0, wk18: 1300, total: 1300 },
@@ -273,7 +397,7 @@ export default function SalesPage() {
               subtitle={nextInvoice ? `CAI: ${nextInvoice.cai.slice(0, 14)}… · ${nextInvoice.remaining} invoices remaining · Exp. ${nextInvoice.expiry}` : "Create a shipment for a customer"}
               groups={[{
                 title: "Shipment Details", columns: 2 as const, fields: [
-                  { key: "customer", label: "Customer", type: "select" as const, options: sampleCustomers.map((c) => ({ value: c.name, label: c.name })), required: true },
+                  { key: "customer", label: "Customer", type: "select" as const, options: customers.map((c) => ({ value: c.name, label: c.name })), required: true },
                   { key: "invoiceNumber", label: "Invoice Number (CAI)", type: "text" as const, placeholder: "Auto-assigned from CAI range", required: true },
                   { key: "date", label: "Ship Date", type: "date" as const, required: true },
                   { key: "carrier", label: "Carrier", type: "select" as const, options: [
@@ -310,10 +434,43 @@ export default function SalesPage() {
               </button>
             </div>
 
+            {/* Weekly volume chart */}
+            {(() => {
+              const weeks = ["wk14", "wk15", "wk16", "wk17", "wk18"] as const;
+              const labels = ["Wk 14", "Wk 15", "Wk 16", "Wk 17", "Wk 18"];
+              const totals = weeks.map((w) =>
+                forecastData.reduce((s, r) => s + ((r[w] as number) || 0), 0),
+              );
+              const max = Math.max(1, ...totals);
+              return (
+                <div className="bg-white rounded-xl border border-sand-200/80 shadow-sm p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[12px] font-semibold text-navy-700">Weekly Demand</p>
+                    <p className="text-[11px] text-navy-400">Stems · {totals.reduce((s, v) => s + v, 0).toLocaleString()} total</p>
+                  </div>
+                  <div className="flex items-end justify-between gap-2 h-36">
+                    {totals.map((v, i) => (
+                      <div key={labels[i]} className="flex-1 flex flex-col items-center gap-1.5">
+                        <span className="text-[10px] font-mono font-semibold text-navy-700">
+                          {v > 0 ? v.toLocaleString() : "—"}
+                        </span>
+                        <div
+                          className="w-full bg-gradient-to-t from-lime-500 to-lime-300 rounded-t-md min-h-[2px] transition-all"
+                          style={{ height: `${(v / max) * 100}%` }}
+                          title={`${labels[i]}: ${v.toLocaleString()}`}
+                        />
+                        <span className="text-[10px] font-semibold text-navy-500 uppercase tracking-wide">{labels[i]}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Forecast grid */}
             <div className="bg-white rounded-xl border border-sand-200/80 shadow-sm overflow-hidden">
               <div className="overflow-x-auto" style={{ scrollbarGutter: "stable" }}>
-                <table className="text-[12px]" style={{ minWidth: "max-content" }}>
+                <table className="text-[12px] w-full" style={{ minWidth: "max-content" }}>
                   <thead>
                     <tr className="bg-sand-50/50 border-b border-sand-100">
                       <th className="px-4 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase sticky left-0 bg-sand-50/50 z-10">Variety</th>
@@ -399,38 +556,114 @@ export default function SalesPage() {
 
       case "orders":
         return (
-          <DataTable
-            columns={[
-              { key: "number", label: "Order #" },
-              { key: "customer", label: "Customer" },
-              { key: "date", label: "Date" },
-              { key: "delivery", label: "Delivery" },
-              { key: "items", label: "Items" },
-              { key: "status", label: "Status", render: (r) => statusBadge(r.status as string) },
-              { key: "total", label: "Total" },
-            ]}
-            data={sampleOrders}
-            onAdd={() => {}}
-            addLabel="New Order"
-            searchPlaceholder="Search orders..."
-          />
+          <>
+            <DataTable
+              columns={[
+                { key: "number", label: "Order #" },
+                { key: "customer", label: "Customer" },
+                { key: "date", label: "Date" },
+                { key: "delivery", label: "Delivery" },
+                { key: "items", label: "Items" },
+                { key: "status", label: "Status", render: (r) => statusBadge(r.status as string) },
+                { key: "total", label: "Total" },
+              ]}
+              data={orders}
+              onAdd={orderForm.openCreate}
+              addLabel="New Order"
+              searchPlaceholder="Search orders..."
+            />
+            <FormModal
+              open={orderForm.open}
+              onClose={orderForm.close}
+              title="New Order"
+              subtitle="Create a customer order"
+              groups={[{
+                ...orderFields[0],
+                fields: orderFields[0].fields.map((f) =>
+                  f.key === "customer"
+                    ? { ...f, type: "select" as const, options: customers.map((c) => ({ value: c.name, label: c.name })) }
+                    : f,
+                ),
+              }]}
+              values={orderForm.values}
+              onChange={orderForm.onChange}
+              submitLabel="Create Order"
+              onSubmit={handleOrderSave}
+            />
+          </>
         );
 
       case "customers":
         return (
-          <DataTable
-            columns={[
-              { key: "code", label: "Code" },
-              { key: "name", label: "Company" },
-              { key: "contact", label: "Contact" },
-              { key: "email", label: "Email" },
-              { key: "terms", label: "Terms", render: (r) => <Badge variant="gray">{r.terms as string}</Badge> },
-            ]}
-            data={sampleCustomers}
-            onAdd={() => {}}
-            addLabel="Add Customer"
-            searchPlaceholder="Search customers..."
-          />
+          <>
+            <DataTable
+              columns={[
+                { key: "code", label: "Code" },
+                { key: "name", label: "Company" },
+                { key: "contact", label: "Contact" },
+                { key: "email", label: "Email" },
+                { key: "terms", label: "Terms", render: (r) => <Badge variant="gray">{r.terms as string}</Badge> },
+              ]}
+              data={customers}
+              onAdd={customerForm.openCreate}
+              addLabel="Add Customer"
+              searchPlaceholder="Search customers..."
+            />
+            <FormModal
+              open={customerForm.open}
+              onClose={customerForm.close}
+              title="New Customer"
+              subtitle="Add a new customer to the directory"
+              groups={customerFields}
+              values={customerForm.values}
+              onChange={customerForm.onChange}
+              submitLabel="Create Customer"
+              onSubmit={handleCustomerSave}
+            />
+          </>
+        );
+
+      case "prices":
+        return (
+          <>
+            <DataTable
+              columns={[
+                { key: "plant", label: "Plant" },
+                { key: "season", label: "Season" },
+                { key: "customer", label: "Customer", render: (r) => <Badge variant={r.customer === "Base" ? "gray" : "blue"}>{r.customer as string}</Badge> },
+                { key: "priceExt", label: "Export (USD)" },
+                { key: "priceInt", label: "Internal (USD)" },
+                { key: "from", label: "From" },
+                { key: "to", label: "To" },
+                { key: "active", label: "Active", render: (r) => (
+                  <Badge variant={r.active ? "green" : "gray"}>{r.active ? "Active" : "Expired"}</Badge>
+                )},
+              ]}
+              data={prices}
+              onAdd={priceForm.openCreate}
+              onEdit={(row, i) => priceForm.openEdit(row as any, i)}
+              onDelete={(row, i) => priceConfirm.requestDelete(row, i)}
+              addLabel="Set Price"
+              searchPlaceholder="Search prices..."
+            />
+            <FormModal
+              open={priceForm.open}
+              onClose={priceForm.close}
+              title={priceForm.isEdit ? "Edit Price" : "Set Price"}
+              groups={priceFields}
+              values={priceForm.values}
+              onChange={priceForm.onChange}
+              isEdit={priceForm.isEdit}
+              onSubmit={handlePriceSave}
+            />
+            <ConfirmDialog
+              open={priceConfirm.open}
+              onClose={priceConfirm.close}
+              title="Delete Price"
+              message="Delete this price entry?"
+              onConfirm={handlePriceDelete}
+            />
+          </>
         );
     }
   };
@@ -444,8 +677,8 @@ export default function SalesPage() {
       >
         <StatCard label="Active Shipments" value={shipments.filter((s) => s.status === "In Progress").length} icon={Plane} color="green" />
         <StatCard label="Boxes Today" value={totalBoxesToday} icon={Boxes} color="amber" />
-        <StatCard label="Open Orders" value={sampleOrders.filter((o) => o.status !== "Delivered").length} icon={FileText} color="blue" />
-        <StatCard label="Active Customers" value={sampleCustomers.length} icon={Users} color="green" />
+        <StatCard label="Open Orders" value={orders.filter((o) => o.status !== "Delivered").length} icon={FileText} color="blue" />
+        <StatCard label="Active Customers" value={customers.length} icon={Users} color="green" />
       </motion.div>
 
       <div className="mb-4">

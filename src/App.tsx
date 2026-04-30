@@ -8,7 +8,7 @@ import ProductionPage from "./pages/ProductionPage";
 import InventoryPage from "./pages/InventoryPage";
 import InfrastructurePage from "./pages/InfrastructurePage";
 import SalesPage from "./pages/SalesPage";
-import FinancePage from "./pages/FinancePage";
+import AccountingPage from "./pages/AccountingPage";
 import AvailabilityPage from "./pages/AvailabilityPage";
 import NutritionPage from "./pages/NutritionPage";
 import SuppliersPage from "./pages/SuppliersPage";
@@ -23,7 +23,7 @@ export type PageId =
   | "availability"
   | "nutrition"
   | "sales"
-  | "finance"
+  | "accounting"
   | "suppliers"
   | "labor"
   | "settings";
@@ -76,8 +76,8 @@ export default function App() {
         return <NutritionPage />;
       case "sales":
         return <SalesPage />;
-      case "finance":
-        return <FinancePage />;
+      case "accounting":
+        return <AccountingPage />;
       case "suppliers":
         return <SuppliersPage />;
       case "labor":

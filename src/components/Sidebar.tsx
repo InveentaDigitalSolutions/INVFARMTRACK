@@ -56,7 +56,7 @@ const navSections: NavSection[] = [
     label: "Commercial",
     items: [
       { id: "sales", label: "Sales & Shipping", icon: ShoppingCart },
-      { id: "finance", label: "Finance", icon: Receipt },
+      { id: "accounting", label: "Accounting", icon: Receipt },
       { id: "suppliers", label: "Suppliers", icon: Truck },
     ],
   },
@@ -114,7 +114,7 @@ export default function Sidebar({
         {navSections.map((section) => (
           <div key={section.label}>
             {open && (
-              <p className="text-[9px] text-navy-600 uppercase tracking-[0.15em] font-semibold px-3 mb-1.5">
+              <p className="text-[10px] text-navy-300 uppercase tracking-[0.15em] font-semibold px-3 mb-1.5">
                 {section.label}
               </p>
             )}
@@ -132,7 +132,7 @@ export default function Sidebar({
                       ${
                         isActive
                           ? "bg-gradient-to-r from-lime-400/15 to-lime-400/5 text-lime-400"
-                          : "text-navy-500 hover:text-navy-300 hover:bg-navy-800/50"
+                          : "text-navy-100 hover:text-white hover:bg-navy-800/50"
                       }
                     `}
                   >
@@ -145,11 +145,11 @@ export default function Sidebar({
                     )}
                     <Icon
                       className={`w-[18px] h-[18px] shrink-0 transition-colors ${
-                        isActive ? "text-lime-400" : "text-navy-600 group-hover:text-navy-400"
+                        isActive ? "text-lime-400" : "text-navy-200 group-hover:text-white"
                       }`}
                     />
                     {open && (
-                      <span className="text-[13px] font-medium truncate">
+                      <span className="text-[13px] font-semibold truncate">
                         {item.label}
                       </span>
                     )}
@@ -167,8 +167,8 @@ export default function Sidebar({
 
         <button
           onClick={onToggleDark}
-          className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-navy-500
-                     hover:text-navy-300 hover:bg-navy-800/50 transition-all cursor-pointer"
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-navy-100
+                     hover:text-white hover:bg-navy-800/50 transition-all cursor-pointer"
         >
           {darkMode ? (
             <Sun className="w-[18px] h-[18px] text-amber-400" />
@@ -176,7 +176,7 @@ export default function Sidebar({
             <Moon className="w-[18px] h-[18px]" />
           )}
           {open && (
-            <span className="text-[13px] font-medium">
+            <span className="text-[13px] font-semibold">
               {darkMode ? "Light Mode" : "Dark Mode"}
             </span>
           )}
@@ -189,7 +189,7 @@ export default function Sidebar({
           {open && (
             <div className="flex-1 min-w-0">
               <p className="text-[12px] font-semibold text-white truncate">Santiago G.</p>
-              <p className="text-[10px] text-navy-500 truncate">Admin</p>
+              <p className="text-[10px] text-navy-300 truncate">Admin</p>
             </div>
           )}
         </div>

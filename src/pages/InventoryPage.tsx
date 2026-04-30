@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { PackageSearch, Leaf, FlaskConical, DollarSign, CalendarDays } from "lucide-react";
+import { PackageSearch, Leaf, FlaskConical } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
@@ -13,8 +13,6 @@ import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 const tabs = [
   { id: "plants", label: "Plant Catalog" },
   { id: "inputs", label: "Inputs" },
-  { id: "prices", label: "Price List" },
-  { id: "seasons", label: "Seasons" },
 ];
 
 const initPlants = [
@@ -31,18 +29,6 @@ const initInputs = [
   { name: "Copper Fungicide", category: "Fungicide", method: "Soil Drench", safety: "14", brand: "CupraSol", composition: "Copper hydroxide 77%" },
   { name: "NPK 20-20-20", category: "Fertilizer", method: "Drip", safety: "", brand: "NutriMax", composition: "N-P-K balanced" },
 ];
-const initPrices = [
-  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "$0.015", from: "2026-01-01", to: "2026-12-31", active: true },
-  { plant: "Pothos / Marble Queen", season: "2026-S1", customer: "Base", priceExt: "$0.020", priceInt: "$0.015", from: "2026-01-01", to: "2026-12-31", active: true },
-  { plant: "Pothos / Jade", season: "2026-S1", customer: "Base", priceExt: "$0.018", priceInt: "$0.013", from: "2026-01-01", to: "2026-12-31", active: true },
-  { plant: "Pothos / Hawaiian", season: "2026-S1", customer: "The Plant Company", priceExt: "$0.019", priceInt: "—", from: "2026-04-01", to: "2026-06-30", active: true },
-  { plant: "Sansevieria / Sansevieria", season: "2026-S1", customer: "Base", priceExt: "$0.035", priceInt: "$0.028", from: "2026-01-01", to: "2026-12-31", active: true },
-];
-const initSeasons = [
-  { name: "2026-S1", start: "2026-01-01", end: "2026-06-30", description: "First season 2026", active: true },
-  { name: "2025-S2", start: "2025-07-01", end: "2025-12-31", description: "Second season 2025", active: false },
-];
-
 const plantFields = [
   { title: "Plant Information", columns: 2 as const, fields: [
     { key: "code", label: "Plant Code", type: "text" as const, required: true },
@@ -76,49 +62,14 @@ const inputFields = [
   ]},
 ];
 
-const plantNameOptions = initPlants.map((p) => ({ value: p.invoiceName, label: p.invoiceName }));
-const seasonOptions = [{ value: "2026-S1", label: "2026-S1" }, { value: "2025-S2", label: "2025-S2" }];
-const customerOptions = [
-  { value: "Base", label: "Base (default)" },
-  { value: "The Plant Company", label: "The Plant Company" },
-  { value: "Green Gardens", label: "Green Gardens" },
-];
-
-const priceFields = [
-  { title: "Price Details", columns: 2 as const, fields: [
-    { key: "plant", label: "Plant", type: "select" as const, options: plantNameOptions, required: true },
-    { key: "season", label: "Season", type: "select" as const, options: seasonOptions, required: true },
-    { key: "customer", label: "Customer", type: "select" as const, options: customerOptions },
-    { key: "priceExt", label: "Price (USD)", type: "text" as const, required: true },
-    { key: "priceInt", label: "Price (HNL)", type: "text" as const },
-    { key: "from", label: "Valid From", type: "date" as const, required: true },
-    { key: "to", label: "Valid To", type: "date" as const, required: true },
-    { key: "active", label: "Active", type: "boolean" as const },
-  ]},
-];
-
-const seasonFormGroups = [
-  { title: "Season Details", columns: 2 as const, fields: [
-    { key: "name", label: "Season Name", type: "text" as const, required: true },
-    { key: "start", label: "Start Date", type: "date" as const, required: true },
-    { key: "end", label: "End Date", type: "date" as const, required: true },
-    { key: "description", label: "Description", type: "textarea" as const, span: 2 as const },
-    { key: "active", label: "Active", type: "boolean" as const },
-  ]},
-];
-
 export default function InventoryPage() {
   const [tab, setTab] = useState("plants");
 
   const [plants, setPlants] = useState(initPlants);
   const [inputs, setInputs] = useState(initInputs);
-  const [prices, setPrices] = useState(initPrices);
-  const [seasons, setSeasons] = useState(initSeasons);
 
   const plantForm = useFormModal(initPlants[0]);
   const inputForm = useFormModal(initInputs[0]);
-  const priceForm = useFormModal(initPrices[0]);
-  const seasonForm = useFormModal(initSeasons[0]);
   const confirm = useConfirmDialog();
 
   const handleSave = (data: Record<string, unknown>[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
@@ -138,10 +89,6 @@ export default function InventoryPage() {
       setData(updated);
     }
   };
-
-  const statusBadge = (active: boolean) => (
-    <Badge variant={active ? "green" : "gray"}>{active ? "Active" : "Closed"}</Badge>
-  );
 
   const renderTab = () => {
     switch (tab) {
@@ -190,64 +137,14 @@ export default function InventoryPage() {
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Input" message="Are you sure you want to delete this input from the catalog?" onConfirm={() => handleDelete(inputs, setInputs)} />
           </>
         );
-      case "prices":
-        return (
-          <>
-            <DataTable
-              columns={[
-                { key: "plant", label: "Plant" },
-                { key: "season", label: "Season" },
-                { key: "customer", label: "Customer", render: (r) => <Badge variant={r.customer === "Base" ? "gray" : "blue"}>{r.customer as string}</Badge> },
-                { key: "priceExt", label: "Export (USD)" },
-                { key: "priceInt", label: "Internal (USD)" },
-                { key: "from", label: "From" },
-                { key: "to", label: "To" },
-                { key: "active", label: "Active", render: (r) => (
-                  <Badge variant={r.active ? "green" : "gray"}>{r.active ? "Active" : "Expired"}</Badge>
-                )},
-              ]}
-              data={prices}
-              onAdd={priceForm.openCreate}
-              onEdit={(row, i) => priceForm.openEdit(row as any, i)}
-              onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="Set Price"
-              searchPlaceholder="Search prices..."
-            />
-            <FormModal open={priceForm.open} onClose={priceForm.close} title={priceForm.isEdit ? "Edit Price" : "Set Price"} groups={priceFields} values={priceForm.values} onChange={priceForm.onChange} isEdit={priceForm.isEdit} onSubmit={(v) => handleSave(prices, setPrices, priceForm, v)} />
-            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Price" message="Delete this price entry?" onConfirm={() => handleDelete(prices, setPrices)} />
-          </>
-        );
-      case "seasons":
-        return (
-          <>
-            <DataTable
-              columns={[
-                { key: "name", label: "Season" },
-                { key: "start", label: "Start" },
-                { key: "end", label: "End" },
-                { key: "active", label: "Status", render: (r) => statusBadge(r.active as boolean) },
-              ]}
-              data={seasons}
-              onAdd={seasonForm.openCreate}
-              onEdit={(row, i) => seasonForm.openEdit(row as any, i)}
-              onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="Add Season"
-              searchPlaceholder="Search seasons..."
-            />
-            <FormModal open={seasonForm.open} onClose={seasonForm.close} title={seasonForm.isEdit ? "Edit Season" : "Add Season"} groups={seasonFormGroups} values={seasonForm.values} onChange={seasonForm.onChange} isEdit={seasonForm.isEdit} onSubmit={(v) => handleSave(seasons, setSeasons, seasonForm, v)} />
-            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Season" message="Delete this season?" onConfirm={() => handleDelete(seasons, setSeasons)} />
-          </>
-        );
     }
   };
 
   return (
-    <PageShell title="Inventory" subtitle="Plant catalog, inputs, pricing and seasons" icon={PackageSearch}>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <PageShell title="Inventory" subtitle="Plant catalog and inputs" icon={PackageSearch}>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <StatCard label="Plant Varieties" value={plants.length} icon={Leaf} color="green" />
         <StatCard label="Active Inputs" value={inputs.length} icon={FlaskConical} color="blue" />
-        <StatCard label="Active Prices" value={prices.filter((p) => p.active).length} icon={DollarSign} color="amber" />
-        <StatCard label="Current Season" value={seasons.filter((s) => s.active).length} icon={CalendarDays} color="green" />
       </motion.div>
 
       <div className="mb-4">
