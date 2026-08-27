@@ -16,12 +16,12 @@
 ## App
 - **App ID:** 90ac39b0-04e9-41ef-872e-2718ac678629
 - **Play URL:** https://apps.powerapps.com/play/e/default-47176c00-abb5-4125-8ce3-a795dffd8b87/app/90ac39b0-04e9-41ef-872e-2718ac678629
-- **Last deployed:** 2026-08-27 (logo fix; 9 tables live)
+- **Last deployed:** 2026-08-27 (14 tables live, 318 records seeded)
 
 ## Data
 - 36 Dataverse tables, 466 columns, 46 relationships — see `dataverse/DATA_MODEL.md` (generated; run `npm run dataverse:docs` after any schema change)
 - Every table's primary column is an autonumber: `SH-0001`, `PLT-0001`, …
-- 7 tables read live Dataverse via `src/services/tableMap.ts` → `ENABLED_TABLES`;
+- 14 tables read live Dataverse via `src/services/tableMap.ts` → `ENABLED_TABLES`;
   the rest stay on LocalStore until they have seeded rows
 
 ## Gotchas

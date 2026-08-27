@@ -48,12 +48,32 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
   /** Dataverse record -> app record: rename columns and expose the key as `id`. */
   private toApp(record: Row): T {
     const out: Row = {};
+
     for (const [column, value] of Object.entries(record)) {
-      // Drop OData annotations (@odata.etag, _x_value@…) — they are noise here.
-      if (column.startsWith("@") || column.includes("@odata")) continue;
       if (column === this.primaryKey) continue;
-      out[this.toField[column] ?? column] = value;
+
+      // A lookup arrives as _bv_bedid_value (a GUID) alongside a formatted
+      // annotation carrying the text a person would recognise. Screens show
+      // the text, so the annotation is the useful half — take it and let the
+      // raw GUID through under its own name for writes.
+      const formatted = column.match(
+        /^(_.+_value)@OData\.Community\.Display\.V1\.FormattedValue$/
+      );
+      if (formatted) {
+        const field = this.toField[formatted[1]];
+        if (field) out[field] = value;
+        continue;
+      }
+
+      // Everything else annotation-shaped is noise.
+      if (column.startsWith("@") || column.includes("@odata") || column.includes("@OData")) continue;
+
+      const field = this.toField[column] ?? column;
+      // Do not let a raw GUID overwrite a display value already taken from an
+      // annotation — order of keys in the payload is not guaranteed.
+      if (out[field] === undefined) out[field] = value;
     }
+
     out.id = String(record[this.primaryKey] ?? "");
     return out as unknown as T;
   }

@@ -138,7 +138,141 @@ const SEED_PLAN = [
       }))
     ),
   },
+
+  // ── Operational records ────────────────────────────────────────────────
+  // Enough to exercise every screen and give the 3D view real occupancy,
+  // without pretending to be a data migration.
+  { table: 'bv_planting', nameField: 'bv_plantingdescription', rows: () => {
+      const varieties = ['Hawaiian', 'Marble Queen', 'Jade', "N'Joy", 'Sansevieria']
+      const out = []
+      let n = 0
+      for (const plot of PLOTS) {
+        // Roughly two thirds of each plot planted, as in the layout.
+        const planted = Math.round(plot.beds * 0.66)
+        for (let i = 1; i <= planted; i++) {
+          const bed = `${plot.code}-${String(i).padStart(2, '0')}`
+          const variety = varieties[n % varieties.length]
+          out.push({
+            bv_plantingdescription: `${variety} — ${bed}`,
+            bv_plantingdate: `2026-0${1 + (n % 4)}-${String(3 + (n % 25)).padStart(2, '0')}`,
+            bv_quantity: 800 + (n % 9) * 150,
+            bv_currentplanting: true,
+            _ref: {
+              bv_PlantId: ['bv_plant', variety],
+              bv_BedId: ['bv_bed', bed],
+              bv_SeasonId: ['bv_season', '2026-S1'],
+            },
+          })
+          n++
+        }
+      }
+      return out
+    },
+  },
+
+  { table: 'bv_irrigation', nameField: 'bv_irrigationname', rows: () => {
+      const out = []
+      let n = 0
+      for (const plot of PLOTS) {
+        for (let i = 1; i <= 6; i++) {
+          const bed = `${plot.code}-${String(i).padStart(2, '0')}`
+          const day = String(10 + (n % 15)).padStart(2, '0')
+          out.push({
+            bv_irrigationname: `Irrigation ${bed} 2026-04-${day}`,
+            bv_date: `2026-04-${day}`,
+            bv_amountliters: 120 + (n % 6) * 25,
+            bv_method: 187460000,          // Drip
+            bv_status: 121320101,          // Completed
+            bv_source: 121320111,          // Manual
+            _ref: { bv_BedId: ['bv_bed', bed] },
+          })
+          n++
+        }
+      }
+      return out
+    },
+  },
+
+  { table: 'bv_treatment', nameField: 'bv_treatmentname', rows: () => {
+      const inputs = ['Neem Oil', 'Copper Fungicide']
+      const out = []
+      for (let n = 0; n < 12; n++) {
+        const plot = PLOTS[n % PLOTS.length]
+        const bed = `${plot.code}-${String(1 + (n % 8)).padStart(2, '0')}`
+        out.push({
+          bv_treatmentname: `Treatment ${bed} #${n + 1}`,
+          bv_date: `2026-04-${String(2 + n).padStart(2, '0')}`,
+          bv_type: n % 2 === 0 ? 187460000 : 187460001,   // Insecticide / Fungicide
+          bv_worker: ['Carlos Martinez', 'Maria Lopez', 'Juan Perez'][n % 3],
+          bv_dose: 1.5 + (n % 4) * 0.5,
+          _ref: { bv_BedId: ['bv_bed', bed], bv_InputId: ['bv_input', inputs[n % 2]] },
+        })
+      }
+      return out
+    },
+  },
+
+  { table: 'bv_harvest', nameField: 'bv_harvestname', rows: () => {
+      const out = []
+      for (let n = 0; n < 15; n++) {
+        const plot = PLOTS[n % PLOTS.length]
+        const bed = `${plot.code}-${String(1 + (n % 10)).padStart(2, '0')}`
+        out.push({
+          bv_harvestname: `Harvest ${bed} #${n + 1}`,
+          bv_date: `2026-04-${String(1 + n).padStart(2, '0')}`,
+          bv_quantityharvested: 900 + (n % 7) * 220,
+          bv_worker: ['Carlos Martinez', 'Maria Lopez', 'Ana Rodriguez'][n % 3],
+          _ref: { bv_BedId: ['bv_bed', bed] },
+        })
+      }
+      return out
+    },
+  },
+
+  { table: 'bv_timesheet', nameField: 'bv_timesheetname', rows: () => {
+      const workers = ['Carlos Martinez', 'Maria Lopez', 'Juan Perez', 'Ana Rodriguez', 'Pedro Hernandez']
+      const activities = [187460001, 187460002, 187460003, 187460004]  // Harvest, Pack, Treat, Irrigate
+      const out = []
+      for (let n = 0; n < 20; n++) {
+        const worker = workers[n % workers.length]
+        const day = String(6 + Math.floor(n / 5)).padStart(2, '0')
+        out.push({
+          bv_timesheetname: `${worker} 2026-04-${day}`,
+          bv_date: `2026-04-${day}`,
+          bv_activitytype: activities[n % activities.length],
+          bv_hoursworked: 6 + (n % 3),
+          bv_boxespacked: (n % 4) * 6,
+          bv_laborcost: (6 + (n % 3)) * 42,
+          _ref: { bv_WorkerId: ['bv_worker', worker] },
+        })
+      }
+      return out
+    },
+  },
+
+  { table: 'bv_availability', nameField: 'bv_availabilityname', rows: () => {
+      const varieties = ['Hawaiian', 'Marble Queen', 'Jade', "N'Joy"]
+      const out = []
+      for (let n = 0; n < 16; n++) {
+        const variety = varieties[n % varieties.length]
+        const week = 14 + Math.floor(n / 4)
+        const projected = 800 + (n % 5) * 300
+        out.push({
+          bv_availabilityname: `${variety} W${week}`,
+          bv_shipmentweek: week,
+          bv_generateddate: '2026-04-01',
+          bv_projectedqty: projected,
+          bv_confirmedqty: projected - (n % 3) * 100,
+          bv_status: n % 3 === 0 ? 187460000 : 187460002,
+          bv_size: [187460002, 187460003][n % 2],   // Small / Medium
+          _ref: { bv_PlantId: ['bv_plant', variety], bv_SeasonId: ['bv_season', '2026-S1'] },
+        })
+      }
+      return out
+    },
+  },
 ]
+
 
 /** entitySetName for a table, taken from power.config.json. */
 const entitySets = (() => {

@@ -140,10 +140,41 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       terms: "bv_paymentterms",
     },
   },
-  plantings: { dataSource: "bv_plantings", primaryKey: "bv_plantingid" },
-  treatments: { dataSource: "bv_treatments", primaryKey: "bv_treatmentid" },
-  irrigation: { dataSource: "bv_irrigations", primaryKey: "bv_irrigationid" },
-  harvest: { dataSource: "bv_harvests", primaryKey: "bv_harvestid" },
+  plantings: {
+    dataSource: "bv_plantings",
+    primaryKey: "bv_plantingid",
+    fields: {
+      date: "bv_plantingdate", qty: "bv_quantity",
+      // Lookup display text arrives via the formatted annotation on the
+      // _value column, which DataverseStore unwraps.
+      plant: "_bv_plantid_value", bed: "_bv_bedid_value", season: "_bv_seasonid_value",
+    },
+  },
+  treatments: {
+    dataSource: "bv_treatments",
+    primaryKey: "bv_treatmentid",
+    fields: {
+      date: "bv_date", type: "bv_type", worker: "bv_worker",
+      temp: "bv_temperaturec", humidity: "bv_humidity", ph: "bv_ph",
+      bed: "_bv_bedid_value", input: "_bv_inputid_value",
+    },
+  },
+  irrigation: {
+    dataSource: "bv_irrigations",
+    primaryKey: "bv_irrigationid",
+    fields: {
+      date: "bv_date", liters: "bv_amountliters", method: "bv_method",
+      bed: "_bv_bedid_value",
+    },
+  },
+  harvest: {
+    dataSource: "bv_harvests",
+    primaryKey: "bv_harvestid",
+    fields: {
+      date: "bv_date", qty: "bv_quantityharvested",
+      quality: "bv_quality", worker: "bv_worker", bed: "_bv_bedid_value",
+    },
+  },
   tasks: { dataSource: "bv_tasks", primaryKey: "bv_taskid" },
   pruning: { dataSource: "bv_prunings", primaryKey: "bv_pruningid" },
   curve: { dataSource: "bv_pruningcurves", primaryKey: "bv_pruningcurveid" },
@@ -158,7 +189,15 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
   invoices: { dataSource: "bv_invoices", primaryKey: "bv_invoiceid" },
   expenses: { dataSource: "bv_expenses", primaryKey: "bv_expenseid" },
   purchaseOrders: { dataSource: "bv_purchaseorders", primaryKey: "bv_purchaseorderid" },
-  timesheets: { dataSource: "bv_timesheets", primaryKey: "bv_timesheetid" },
+  timesheets: {
+    dataSource: "bv_timesheets",
+    primaryKey: "bv_timesheetid",
+    fields: {
+      date: "bv_date", activity: "bv_activitytype", hours: "bv_hoursworked",
+      pieces: "bv_piececount", boxes: "bv_boxespacked", cost: "bv_laborcost",
+      notes: "bv_notes", worker: "_bv_workerid_value", bed: "_bv_bedid_value",
+    },
+  },
   fiscal: { dataSource: "bv_fiscalauthorizations", primaryKey: "bv_fiscalauthorizationid" },
 };
 
@@ -177,6 +216,11 @@ export const ENABLED_TABLES = new Set<string>([
   "customers",
   "fields",
   "beds",
+  "plantings",
+  "irrigation",
+  "treatments",
+  "harvest",
+  "timesheets",
 ]);
 
 /** Dataverse is only usable when the app has a session — locally that means dev:dv. */
