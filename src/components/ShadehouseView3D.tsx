@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass } from "lucide-react";
+import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain } from "lucide-react";
 import {
   generateBedStack,
   stateColors,
@@ -13,6 +13,8 @@ import {
 import ShadehouseScene, { placeBeds, type LensMode } from "./ShadehouseScene";
 import { readZone, zoneStatusColors, type ZoneReading } from "../services/irrigation";
 import { buildZones, demoAnomalies, simulateFixes } from "../services/irrigationSim";
+import { useCurrentWeather } from "../hooks/useCurrentWeather";
+import { precipitationKind, windDirectionLabel } from "../services/weather";
 
 const ALL_LEVELS: BedLevel[] = [0, 1, 2, 3];
 const LEVEL_LABELS: Record<BedLevel, string> = {
@@ -66,6 +68,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const [showPlotLabels, setShowPlotLabels] = useState(true);
   const [showBedNumbers, setShowBedNumbers] = useState(false);
   const [showCompass, setShowCompass] = useState(true);
+  const [showWeather, setShowWeather] = useState(true);
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
 
@@ -76,6 +79,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   // Re-read at 1s; the reader itself renders one poll interval behind and
   // interpolates, so this only controls how often we re-sample that curve.
   const now = useNow(1000);
+  const { conditions: weather, loading: weatherLoading } = useCurrentWeather();
 
   const readings = useMemo(() => {
     const zones = simulateFixes(baseZones, now, anomalies);
@@ -191,6 +195,15 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           Plots
         </button>
         <button
+          onClick={() => setShowWeather((v) => !v)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+            showWeather ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+          }`}
+        >
+          <CloudRain className="w-3 h-3" />
+          Weather
+        </button>
+        <button
           onClick={() => setShowCompass((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
             showCompass ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
@@ -273,6 +286,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             showPlotLabels={showPlotLabels}
             showBedNumbers={showBedNumbers}
             showCompass={showCompass}
+            weather={showWeather ? weather : null}
             selectedBedId={selectedBedId}
             onSelect={setSelectedBedId}
           />
@@ -285,6 +299,37 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             target={[0, 0.8, 0]}
           />
         </Canvas>
+
+        {/* Live conditions — provenance stated, like the irrigation feed. */}
+        {showWeather && (
+          <div className="absolute left-4 top-4 px-3 py-2 rounded-lg bg-white/92 backdrop-blur ring-1 ring-sand-200 shadow-sm">
+            {weatherLoading && !weather ? (
+              <p className="text-[11px] text-navy-400">Loading weather…</p>
+            ) : weather ? (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[17px] font-bold text-navy-900 tabular-nums">
+                    {weather.temperature.toFixed(1)}°C
+                  </span>
+                  <span className="text-[11px] text-navy-500">
+                    {weather.windSpeed.toFixed(0)} km/h{" "}
+                    {windDirectionLabel(weather.windDirection)}
+                  </span>
+                </div>
+                <p className="text-[10px] text-navy-400 mt-0.5">
+                  {weather.humidity}% humidity · {weather.cloudCover}% cloud
+                  {precipitationKind(weather.weatherCode) !== "none" &&
+                    ` · ${weather.precipitation.toFixed(1)} mm`}
+                </p>
+                <p className="text-[9px] text-green-600 font-semibold uppercase tracking-wider mt-1">
+                  Live · Open-Meteo
+                </p>
+              </>
+            ) : (
+              <p className="text-[11px] text-amber-600">Weather unavailable</p>
+            )}
+          </div>
+        )}
 
         {/* Selection readout */}
         {selected && (

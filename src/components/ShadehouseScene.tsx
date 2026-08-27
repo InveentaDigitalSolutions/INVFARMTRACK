@@ -10,6 +10,8 @@ import {
   type ShadehouseBed,
 } from "./ShadehouseView";
 import { zoneStatusColors, type ZoneReading } from "../services/irrigation";
+import WeatherLayer from "./WeatherLayer";
+import type { CurrentConditions } from "../services/weather";
 
 /** Rounded-rectangle shape, mirroring the plan's rx on every rect. */
 function roundedRectShape(w: number, h: number, r: number) {
@@ -727,6 +729,7 @@ export default function ShadehouseScene({
   showPlotLabels,
   showBedNumbers,
   showCompass,
+  weather,
   selectedBedId,
   onSelect,
 }: {
@@ -740,6 +743,8 @@ export default function ShadehouseScene({
   showPlotLabels: boolean;
   showBedNumbers: boolean;
   showCompass: boolean;
+  /** Null when the weather layer is off or the feed has not landed. */
+  weather: CurrentConditions | null;
   selectedBedId: string | null;
   onSelect: (bedId: string) => void;
 }) {
@@ -813,6 +818,7 @@ export default function ShadehouseScene({
 
       <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} />
       <Roads />
+      <WeatherLayer conditions={weather} span={span} depth={depth} />
 
       {placements.map((placement) =>
         placement.bed.type === "ground" ? (
