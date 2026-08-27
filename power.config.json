@@ -9,7 +9,20 @@
   "buildEntryPoint": "index.html",
   "localAppUrl": "http://localhost:5173",
   "logoPath": "Default",
-  "connectionReferences": {},
+  "connectionReferences": {
+    "8219e171-5b3f-476b-b063-bc7b5ecefebe": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+      "displayName": "Logic flows",
+      "dataSources": [
+        "farmtrack_getweather"
+      ],
+      "workflowDetails": {
+        "workflowEntityId": "3a7f1e64-9c2b-4d18-b5e3-8f60c1a97d42",
+        "workflowDisplayName": "FarmTrack - Get Weather",
+        "workflowName": "fd2e9070-6e06-5f96-6477-bbde8d0ba51d"
+      }
+    }
+  },
   "databaseReferences": {
     "default.cds": {
       "dataSources": {
