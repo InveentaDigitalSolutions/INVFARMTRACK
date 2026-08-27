@@ -56,24 +56,35 @@ async function api(method, path, body) {
 }
 
 /**
- * Seed rows, keyed by table. Values use Dataverse logical names.
- * Deliberately small: enough to exercise every screen, not a data migration.
+ * Seed plan, in dependency order.
+ *
+ * `rows` may be an array or a function, so the large generated sets (120 beds)
+ * do not have to be written out. A `_ref` entry names a parent by its
+ * descriptive value; the parent's GUID is resolved after that table is seeded
+ * and bound via @odata.bind, which is how Dataverse sets a lookup.
  */
-const SEED = {
-  bv_shadehouse: [
-    { bv_shadehousename: 'Shadehouse 1', bv_location: 'El Olvido, Santa Cruz de Yojoa', bv_length: 80, bv_width: 75, bv_capacity: 120, bv_isactive: true },
-  ],
-  bv_season: [
+const PLOTS = [
+  { code: 'E3', beds: 33, width: 1.2 },
+  { code: 'C3', beds: 27, width: 1.8 },
+  { code: 'E1', beds: 33, width: 1.2 },
+  { code: 'C1', beds: 27, width: 1.8 },
+]
+
+const SEED_PLAN = [
+  { table: 'bv_shadehouse', nameField: 'bv_shadehousename', rows: [
+    { bv_shadehousename: 'Shadehouse 1', bv_location: 'El Olvido, Santa Cruz de Yojoa', bv_coordinates: '14.97,-87.85', bv_length: 80, bv_width: 75, bv_capacity: 120, bv_isactive: true },
+  ]},
+  { table: 'bv_season', nameField: 'bv_seasonname', rows: [
     { bv_seasonname: '2026-S1', bv_startdate: '2026-01-05', bv_enddate: '2026-06-28', bv_isactive: true },
-  ],
-  bv_plant: [
+  ]},
+  { table: 'bv_plant', nameField: 'bv_variety', rows: [
     { bv_plantname: 'Pothos', bv_latinname: 'Epipremnum aureum', bv_variety: 'Hawaiian' },
     { bv_plantname: 'Pothos', bv_latinname: 'Epipremnum aureum', bv_variety: 'Marble Queen' },
     { bv_plantname: 'Pothos', bv_latinname: 'Epipremnum aureum', bv_variety: 'Jade' },
-    { bv_plantname: "Pothos", bv_latinname: 'Epipremnum aureum', bv_variety: "N'Joy" },
+    { bv_plantname: 'Pothos', bv_latinname: 'Epipremnum aureum', bv_variety: "N'Joy" },
     { bv_plantname: 'Sansevieria', bv_latinname: 'Dracaena trifasciata', bv_variety: 'Sansevieria' },
-  ],
-  bv_component: [
+  ]},
+  { table: 'bv_component', nameField: 'bv_componentname', rows: [
     { bv_componentname: 'Nitrogen', bv_symbol: 'N', bv_elementsymbol: 'N', bv_elementalfactor: 1, bv_isnutrient: true },
     { bv_componentname: 'Phosphorus pentoxide', bv_symbol: 'P2O5', bv_elementsymbol: 'P', bv_elementalfactor: 0.4364, bv_isnutrient: true },
     { bv_componentname: 'Potassium oxide', bv_symbol: 'K2O', bv_elementsymbol: 'K', bv_elementalfactor: 0.8301, bv_isnutrient: true },
@@ -81,29 +92,53 @@ const SEED = {
     { bv_componentname: 'Magnesium', bv_symbol: 'Mg', bv_elementsymbol: 'Mg', bv_elementalfactor: 1, bv_isnutrient: true },
     { bv_componentname: 'Iron', bv_symbol: 'Fe', bv_elementsymbol: 'Fe', bv_elementalfactor: 1, bv_isnutrient: true },
     { bv_componentname: 'Azadirachtin', bv_symbol: 'AZA', bv_isnutrient: false },
-  ],
-  bv_input: [
-    { bv_inputname: 'NPK 20-20-20', bv_brand: 'NutriMax' },
-    { bv_inputname: 'Neem Oil', bv_brand: 'BioGrow' },
-    { bv_inputname: 'Copper Fungicide', bv_brand: 'CupraSol' },
-  ],
-  bv_worker: [
-    { bv_workername: 'Carlos Martinez' },
-    { bv_workername: 'Maria Lopez' },
-    { bv_workername: 'Juan Perez' },
-    { bv_workername: 'Ana Rodriguez' },
-    { bv_workername: 'Pedro Hernandez' },
-  ],
-  bv_supplier: [
-    { bv_suppliername: 'AgroSupply HN' },
-    { bv_suppliername: 'DHL Express' },
-    { bv_suppliername: 'TecniAgua' },
-  ],
-  bv_customer: [
+  ]},
+  { table: 'bv_input', nameField: 'bv_inputname', rows: [
+    { bv_inputname: 'NPK 20-20-20', bv_brand: 'NutriMax', bv_composition: '20% N, 20% P2O5, 20% K2O' },
+    { bv_inputname: 'Neem Oil', bv_brand: 'BioGrow', bv_composition: 'Azadirachtin 0.3%' },
+    { bv_inputname: 'Copper Fungicide', bv_brand: 'CupraSol', bv_composition: 'Copper hydroxide 77%' },
+  ]},
+  { table: 'bv_worker', nameField: 'bv_workername', rows: [
+    { bv_workername: 'Carlos Martinez', bv_hourlyrate: 45, bv_isactive: true },
+    { bv_workername: 'Maria Lopez', bv_hourlyrate: 42, bv_isactive: true },
+    { bv_workername: 'Juan Perez', bv_hourlyrate: 40, bv_isactive: true },
+    { bv_workername: 'Ana Rodriguez', bv_hourlyrate: 42, bv_isactive: true },
+    { bv_workername: 'Pedro Hernandez', bv_hourlyrate: 40, bv_isactive: true },
+  ]},
+  { table: 'bv_supplier', nameField: 'bv_suppliername', rows: [
+    { bv_suppliername: 'AgroSupply HN', bv_isactive: true },
+    { bv_suppliername: 'DHL Express', bv_isactive: true },
+    { bv_suppliername: 'TecniAgua', bv_isactive: true },
+  ]},
+  { table: 'bv_customer', nameField: 'bv_customername', rows: [
     { bv_customername: 'The Plant Company' },
     { bv_customername: 'Green Gardens Inc.' },
-  ],
-}
+  ]},
+
+  // Plots. Each belongs to the single shadehouse and the current season.
+  { table: 'bv_field', nameField: 'bv_fieldname', rows: () =>
+    PLOTS.map((p) => ({
+      bv_fieldname: `Plot ${p.code}`,
+      bv_fieldcode: undefined,
+      _ref: {
+        bv_ShadehouseId: ['bv_shadehouse', 'Shadehouse 1'],
+        bv_SeasonId: ['bv_season', '2026-S1'],
+      },
+    })),
+  },
+
+  // 120 ground beds, PLOT-NN, matching the layout and the 3D view.
+  { table: 'bv_bed', nameField: 'bv_bedname', rows: () =>
+    PLOTS.flatMap((p) =>
+      Array.from({ length: p.beds }, (_, i) => ({
+        bv_bedname: `${p.code}-${String(i + 1).padStart(2, '0')}`,
+        bv_capacity: Math.round(37.2 / 0.45),
+        bv_isactive: true,
+        _ref: { bv_FieldId: ['bv_field', `Plot ${p.code}`] },
+      }))
+    ),
+  },
+]
 
 /** entitySetName for a table, taken from power.config.json. */
 const entitySets = (() => {
