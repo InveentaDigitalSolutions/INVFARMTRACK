@@ -16,7 +16,7 @@
 ## App
 - **App ID:** 90ac39b0-04e9-41ef-872e-2718ac678629
 - **Play URL:** https://apps.powerapps.com/play/e/default-47176c00-abb5-4125-8ce3-a795dffd8b87/app/90ac39b0-04e9-41ef-872e-2718ac678629
-- **Last deployed:** 2026-08-27
+- **Last deployed:** 2026-08-27 (logo fix; 9 tables live)
 
 ## Data
 - 36 Dataverse tables, 466 columns, 46 relationships — see `dataverse/DATA_MODEL.md` (generated; run `npm run dataverse:docs` after any schema change)
