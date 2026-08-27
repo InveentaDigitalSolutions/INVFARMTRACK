@@ -1,9 +1,13 @@
 /**
- * dev-token.mjs — mint a Dataverse access token for local development.
+ * dev-token.mjs — mint a Dataverse access token for the node tooling.
  *
- * In the Power Apps host the SDK gets its session from the platform. Running
- * `npm run dev` locally there is no host, so the token is fetched here and
- * written to .env.local for Vite to expose to the app.
+ * NOT for the app. A Power Apps code app gets its Dataverse session from the
+ * host, so @microsoft/power-apps ignores any env token; running the app
+ * against real data locally means opening the Local Play URL that `npm run
+ * dev` prints, which loads localhost inside apps.powerapps.com.
+ *
+ * This exists for the scripts — apply-schema, seed-data — and for ad-hoc
+ * queries against the Web API.
  *
  * Reuses scripts/dataverse/auth.mjs, so it resolves a token the same way the
  * schema tooling does: DATAVERSE_TOKEN, then Azure CLI, then device code.

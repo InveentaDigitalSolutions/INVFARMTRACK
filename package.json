@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:dv": "DATAVERSE_URL=https://enterprisedev.crm16.dynamics.com node scripts/dev-token.mjs && vite",
+    "dev:dv": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -16,7 +16,8 @@
     "deploy:skip-build": "node scripts/deploy.mjs",
     "postinstall": "rm -f node_modules/@microsoft/power-apps-cli/node_modules/@ms/power-platform-api/tsconfig.json",
     "dataverse:docs": "node scripts/dataverse/generate-docs.mjs",
-    "dataverse:seed-reset": "node scripts/dataverse/set-autonumber-seed.mjs"
+    "dataverse:seed-reset": "node scripts/dataverse/set-autonumber-seed.mjs",
+    "dataverse:token": "node scripts/dev-token.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

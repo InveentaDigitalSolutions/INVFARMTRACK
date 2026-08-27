@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { LocalStore, type DataStore, type Identified } from "../services/DataService";
+import { DataverseStore } from "../services/DataverseStore";
+import { DATAVERSE_TABLES, ENABLED_TABLES, dataverseConfigured } from "../services/tableMap";
 
 /**
  * Store-backed replacement for `useState(initialArray)`.
@@ -16,13 +18,27 @@ import { LocalStore, type DataStore, type Identified } from "../services/DataSer
 
 const registry = new Map<string, DataStore<Identified>>();
 
-/** One store per table, shared across mounts so pages agree on the data. */
+/**
+ * One store per table, shared across mounts so pages agree on the data.
+ *
+ * A table backed by Dataverse — mapped, enabled, and with a session available —
+ * gets a DataverseStore. Everything else stays on LocalStore, so the app keeps
+ * working while tables are migrated one at a time and still runs entirely
+ * offline under plain `npm run dev`.
+ */
 function storeFor(table: string, seed: Record<string, unknown>[]): DataStore<Identified> {
   let store = registry.get(table);
-  if (!store) {
+  if (store) return store;
+
+  const binding = DATAVERSE_TABLES[table];
+  if (binding && ENABLED_TABLES.has(table) && dataverseConfigured()) {
+    store = new DataverseStore<Identified>(binding.dataSource, binding.primaryKey);
+    console.info(`[data] ${table} -> Dataverse (${binding.dataSource})`);
+  } else {
     store = new LocalStore<Identified>(table, seed as Identified[]);
-    registry.set(table, store);
   }
+
+  registry.set(table, store);
   return store;
 }
 
@@ -53,9 +69,16 @@ export function useRecords<T>(
   const [rows, setRowsState] = useState<T[]>([]);
 
   const load = useCallback(async () => {
-    const all = await store.getAll();
-    setRowsState(all as unknown as T[]);
-  }, [store]);
+    try {
+      const all = await store.getAll();
+      setRowsState(all as unknown as T[]);
+    } catch (err) {
+      // A silent empty table is the worst failure mode here: it looks like
+      // "no records" rather than "the read failed". Say so loudly.
+      console.error(`[data] failed to load "${table}"`, err);
+      setRowsState([]);
+    }
+  }, [store, table]);
 
   useEffect(() => {
     void load();
