@@ -14,6 +14,7 @@ import ShadehouseScene, { placeBeds, type LensMode } from "./ShadehouseScene";
 import { readZone, zoneStatusColors, type ZoneReading } from "../services/irrigation";
 import { buildZones, demoAnomalies, simulateFixes } from "../services/irrigationSim";
 import { useCurrentWeather } from "../hooks/useCurrentWeather";
+import { SceneErrorBoundary, WebglUnavailable, useWebgl } from "./WebglGuard";
 import { precipitationKind, windDirectionLabel } from "../services/weather";
 
 const ALL_LEVELS: BedLevel[] = [0, 1, 2, 3];
@@ -69,6 +70,12 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const [showBedNumbers, setShowBedNumbers] = useState(false);
   const [showCompass, setShowCompass] = useState(true);
   const [showWeather, setShowWeather] = useState(true);
+  const webgl = useWebgl();
+  useEffect(() => {
+    console.info(
+      webgl.ok ? `[3d] WebGL OK — ${webgl.renderer}` : `[3d] WebGL unavailable — ${webgl.reason}`
+    );
+  }, [webgl]);
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
 
@@ -267,6 +274,10 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
       {/* Scene */}
       <div className="relative h-[460px] bg-gradient-to-b from-sand-50 to-sand-100">
+        {!webgl.ok ? (
+          <WebglUnavailable report={webgl} />
+        ) : (
+        <SceneErrorBoundary>
         <Canvas
           key={resetKey}
           shadows="percentage"
@@ -299,6 +310,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             target={[0, 0.8, 0]}
           />
         </Canvas>
+        </SceneErrorBoundary>
+        )}
 
         {/* Live conditions — provenance stated, like the irrigation feed. */}
         {showWeather && (
