@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { Billboard, Text } from "@react-three/drei";
 import * as THREE from "three";
 import {
   LEVEL_HEIGHTS_M,
@@ -187,8 +188,7 @@ function Bed({
   });
 
   return (
-    <mesh
-      position={[placement.x, placement.y + height / 2, placement.z]}
+    <group
       onClick={(e) => {
         e.stopPropagation();
         onSelect(placement.bed.bedId);
@@ -201,17 +201,85 @@ function Bed({
         document.body.style.cursor = "";
       }}
     >
-      <boxGeometry args={[placement.width, height, placement.length]} />
-      <meshStandardMaterial
-        ref={mat}
-        color={base}
-        emissive={base}
-        transparent
-        opacity={dimmed ? 0.12 : 1}
-        roughness={0.75}
-        metalness={0}
-      />
-    </mesh>
+      {/* Soil bed */}
+      <mesh position={[placement.x, placement.y + 0.09, placement.z]}>
+        <boxGeometry args={[placement.width, 0.18, placement.length]} />
+        <meshStandardMaterial
+          color="#6b5644"
+          transparent
+          opacity={dimmed ? 0.1 : 1}
+          roughness={1}
+        />
+      </mesh>
+
+      {/* Canopy — the planted mass that makes a row read as a row. */}
+      <mesh position={[placement.x, placement.y + 0.18 + height / 2, placement.z]}>
+        <boxGeometry args={[placement.width * 0.96, height, placement.length]} />
+        <meshStandardMaterial
+          ref={mat}
+          color={base}
+          emissive={base}
+          transparent
+          opacity={dimmed ? 0.12 : 1}
+          roughness={0.85}
+          metalness={0}
+        />
+      </mesh>
+
+      {!dimmed && placement.bed.state !== "empty" && (
+        <GroundCanopy placement={placement} color={base} height={height} />
+      )}
+    </group>
+  );
+}
+
+/** Leaf clumps along a ground row, instanced so 120 rows stay cheap. */
+function GroundCanopy({
+  placement,
+  color,
+  height,
+}: {
+  placement: BedPlacement;
+  color: THREE.Color;
+  height: number;
+}) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const matrices = useMemo(() => {
+    const out: THREE.Matrix4[] = [];
+    const dummy = new THREE.Object3D();
+    const step = 1.15;
+    const span = placement.length - step;
+    const count = Math.max(1, Math.floor(span / step));
+    for (let i = 0; i < count; i++) {
+      // Two staggered files per row, as the beds are planted in the photos.
+      for (const lane of [-0.22, 0.22]) {
+        dummy.position.set(
+          placement.x + lane * placement.width,
+          placement.y + 0.18 + height * 0.75,
+          placement.z - span / 2 + i * step + (lane > 0 ? step / 2 : 0)
+        );
+        const sc = 0.85 + ((i * 7 + (lane > 0 ? 3 : 0)) % 5) * 0.07;
+        dummy.scale.set(sc, sc * 0.8, sc);
+        dummy.updateMatrix();
+        out.push(dummy.matrix.clone());
+      }
+    }
+    return out;
+  }, [placement, height]);
+
+  useEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    matrices.forEach((m, i) => mesh.setMatrixAt(i, m));
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.count = matrices.length;
+  }, [matrices]);
+
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, matrices.length]}>
+      <sphereGeometry args={[0.26, 6, 5]} />
+      <meshStandardMaterial color={color} roughness={0.95} />
+    </instancedMesh>
   );
 }
 
@@ -441,6 +509,92 @@ function Structure({
   );
 }
 
+/**
+ * Bed identifiers, set at the head of each run so they read from the aisle —
+ * the same place the physical tags hang. Billboarded so they stay legible
+ * from any orbit angle.
+ */
+function BedLabel({
+  placement,
+  compact,
+}: {
+  placement: BedPlacement;
+  compact: boolean;
+}) {
+  const isGround = placement.bed.type === "ground";
+  const y = placement.y + (isGround ? 0.75 : 0.3);
+  // Sit just off the near end of the row.
+  const z = placement.z + placement.length / 2 + (isGround ? 0.65 : 0.5);
+
+  return (
+    <Billboard position={[placement.x, y, z]}>
+      <Text
+        fontSize={compact ? 0.3 : 0.42}
+        color={isGround ? "#1f2f42" : "#3f6b4a"}
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.035}
+        outlineColor="#ffffff"
+        renderOrder={999}
+        material-depthTest={false}
+        material-transparent
+      >
+        {compact ? `A${placement.bed.level}` : String(placement.bed.bedNumber).padStart(2, "0")}
+      </Text>
+    </Billboard>
+  );
+}
+
+function PlotLabel({
+  id,
+  label,
+  x,
+  z,
+  count,
+}: {
+  id: string;
+  label: string;
+  x: number;
+  z: number;
+  count: number;
+}) {
+  return (
+    <Billboard position={[x, 4.6, z]}>
+      <Text
+        fontSize={1.5}
+        color="#151f2d"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.09}
+        outlineColor="#ffffff"
+        renderOrder={1000}
+        material-depthTest={false}
+        material-transparent
+      >
+        {label}
+      </Text>
+      <Text
+        position={[0, -1.05, 0]}
+        fontSize={0.62}
+        color="#566d8a"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.05}
+        outlineColor="#ffffff"
+        renderOrder={1000}
+        material-depthTest={false}
+        material-transparent
+      >
+        {`${count} beds`}
+      </Text>
+      <mesh position={[0, -1.75, 0]} key={id} renderOrder={1000}>
+        <boxGeometry args={[3.4, 0.06, 0.06]} />
+        <meshBasicMaterial color="#a3b835" depthTest={false} transparent />
+      </mesh>
+    </Billboard>
+  );
+}
+
 export default function ShadehouseScene({
   placements,
   readings,
@@ -449,6 +603,8 @@ export default function ShadehouseScene({
   showRoof,
   lens,
   nowMs,
+  showPlotLabels,
+  showBedNumbers,
   selectedBedId,
   onSelect,
 }: {
@@ -459,6 +615,8 @@ export default function ShadehouseScene({
   showRoof: boolean;
   lens: LensMode;
   nowMs: number;
+  showPlotLabels: boolean;
+  showBedNumbers: boolean;
   selectedBedId: string | null;
   onSelect: (bedId: string) => void;
 }) {
@@ -470,6 +628,26 @@ export default function ShadehouseScene({
     () => Math.max(...placements.map((p) => Math.abs(p.z) + p.length / 2)) * 2,
     [placements]
   );
+
+  const plotAnchors = useMemo(() => {
+    const byPlot = new Map<string, { xs: number[]; z: number; length: number; count: number }>();
+    for (const p of placements) {
+      if (p.bed.type !== "ground") continue;
+      const cur = byPlot.get(p.bed.plotId);
+      if (cur) { cur.xs.push(p.x); cur.count++; }
+      else byPlot.set(p.bed.plotId, { xs: [p.x], z: p.z, length: p.length, count: 1 });
+    }
+    return [...byPlot.entries()].map(([id, v]) => {
+      const plot = plotConfigs.find((pc) => pc.id === id);
+      return {
+        id,
+        label: plot?.label ?? id,
+        x: (Math.min(...v.xs) + Math.max(...v.xs)) / 2,
+        z: v.z,
+        count: v.count,
+      };
+    });
+  }, [placements]);
 
   // One post line per distinct x/z where a cable runs.
   const postLines = useMemo(() => {
@@ -517,6 +695,22 @@ export default function ShadehouseScene({
           />
         )
       )}
+
+      {showBedNumbers &&
+        placements
+          .filter((p) => visibleLevels.has(p.bed.level))
+          .map((p) => (
+            <BedLabel
+              key={`lbl-${p.bed.bedId}`}
+              placement={p}
+              compact={p.bed.type === "air"}
+            />
+          ))}
+
+      {showPlotLabels &&
+        plotAnchors.map((a) => (
+          <PlotLabel key={a.id} id={a.id} label={a.label} x={a.x} z={a.z} count={a.count} />
+        ))}
     </>
   );
 }

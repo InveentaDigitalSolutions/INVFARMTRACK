@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Droplets, Layers, RotateCcw, X, Eye } from "lucide-react";
+import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon } from "lucide-react";
 import {
   generateBedStack,
   stateColors,
@@ -63,6 +63,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   );
   const [showIrrigation, setShowIrrigation] = useState(true);
   const [lens, setLens] = useState<LensMode>("state");
+  const [showPlotLabels, setShowPlotLabels] = useState(true);
+  const [showBedNumbers, setShowBedNumbers] = useState(false);
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
 
@@ -176,6 +178,27 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           );
         })}
 
+        <span className="w-px h-4 bg-sand-200 mx-1" />
+
+        <button
+          onClick={() => setShowPlotLabels((v) => !v)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+            showPlotLabels ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+          }`}
+        >
+          <MapIcon className="w-3 h-3" />
+          Plots
+        </button>
+        <button
+          onClick={() => setShowBedNumbers((v) => !v)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+            showBedNumbers ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+          }`}
+        >
+          <Tag className="w-3 h-3" />
+          Bed numbers
+        </button>
+
         {showIrrigation && (
           <span className="inline-flex items-center gap-2 ml-auto px-2.5 py-1 rounded-md bg-sky-50 ring-1 ring-sky-200/60">
             <span className="relative flex w-2 h-2">
@@ -234,6 +257,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             showRoof={false}
             lens={lens}
             nowMs={now}
+            showPlotLabels={showPlotLabels}
+            showBedNumbers={showBedNumbers}
             selectedBedId={selectedBedId}
             onSelect={setSelectedBedId}
           />
