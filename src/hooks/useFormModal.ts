@@ -2,13 +2,35 @@ import { useState, useCallback } from "react";
 
 type FormValues = Record<string, unknown>;
 
+/**
+ * Build an empty record with the same shape as a sample row.
+ *
+ * Pages pass an existing record purely to describe the field set. Using that
+ * record as the create-form's initial values pre-fills every new record with a
+ * copy of row one — including its ID, which the user can no longer correct now
+ * that IDs are system-generated. Keys are kept, scalars are cleared.
+ *
+ * Booleans are carried over: they are flags like "active", where the sample's
+ * value is a reasonable default rather than someone else's data.
+ */
+function blankFrom(sample: FormValues): FormValues {
+  const blank: FormValues = {};
+  for (const [key, value] of Object.entries(sample)) {
+    if (typeof value === "boolean") blank[key] = value;
+    else if (Array.isArray(value)) blank[key] = [];
+    else if (value && typeof value === "object") blank[key] = {};
+    else blank[key] = "";
+  }
+  return blank;
+}
+
 export function useFormModal(defaults: FormValues) {
   const [open, setOpen] = useState(false);
-  const [values, setValues] = useState<FormValues>(defaults);
+  const [values, setValues] = useState<FormValues>(() => blankFrom(defaults));
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
   const openCreate = useCallback(() => {
-    setValues({ ...defaults });
+    setValues(blankFrom(defaults));
     setEditIndex(null);
     setOpen(true);
   }, [defaults]);
