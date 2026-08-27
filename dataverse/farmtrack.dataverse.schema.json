@@ -66,7 +66,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Bed",
       "displayName": "Bed",
@@ -95,8 +94,14 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Air" },
-            { "value": 681340001, "label": "Ground" }
+            {
+              "value": 681340000,
+              "label": "Air"
+            },
+            {
+              "value": 681340001,
+              "label": "Ground"
+            }
           ]
         },
         {
@@ -105,10 +110,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "0" },
-            { "value": 681340001, "label": "1" },
-            { "value": 681340002, "label": "2" },
-            { "value": 681340003, "label": "3" }
+            {
+              "value": 681340000,
+              "label": "0"
+            },
+            {
+              "value": 681340001,
+              "label": "1"
+            },
+            {
+              "value": 681340002,
+              "label": "2"
+            },
+            {
+              "value": 681340003,
+              "label": "3"
+            }
           ]
         },
         {
@@ -123,10 +140,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Wood" },
-            { "value": 681340001, "label": "Concrete" },
-            { "value": 681340002, "label": "Plastic" },
-            { "value": 681340003, "label": "Metal" }
+            {
+              "value": 681340000,
+              "label": "Wood"
+            },
+            {
+              "value": 681340001,
+              "label": "Concrete"
+            },
+            {
+              "value": 681340002,
+              "label": "Plastic"
+            },
+            {
+              "value": 681340003,
+              "label": "Metal"
+            }
           ]
         },
         {
@@ -135,12 +164,30 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Sandy" },
-            { "value": 681340001, "label": "Loamy" },
-            { "value": 681340002, "label": "Clay" },
-            { "value": 681340003, "label": "Peaty" },
-            { "value": 681340004, "label": "Chalky" },
-            { "value": 681340005, "label": "Silty" }
+            {
+              "value": 681340000,
+              "label": "Sandy"
+            },
+            {
+              "value": 681340001,
+              "label": "Loamy"
+            },
+            {
+              "value": 681340002,
+              "label": "Clay"
+            },
+            {
+              "value": 681340003,
+              "label": "Peaty"
+            },
+            {
+              "value": 681340004,
+              "label": "Chalky"
+            },
+            {
+              "value": 681340005,
+              "label": "Silty"
+            }
           ]
         },
         {
@@ -149,10 +196,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Excellent" },
-            { "value": 681340001, "label": "Good" },
-            { "value": 681340002, "label": "Moderate" },
-            { "value": 681340003, "label": "Poor" }
+            {
+              "value": 681340000,
+              "label": "Excellent"
+            },
+            {
+              "value": 681340001,
+              "label": "Good"
+            },
+            {
+              "value": 681340002,
+              "label": "Moderate"
+            },
+            {
+              "value": 681340003,
+              "label": "Poor"
+            }
           ]
         },
         {
@@ -161,10 +220,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Drip" },
-            { "value": 681340001, "label": "Sprinkler" },
-            { "value": 681340002, "label": "Manual" },
-            { "value": 681340003, "label": "None" }
+            {
+              "value": 681340000,
+              "label": "Drip"
+            },
+            {
+              "value": 681340001,
+              "label": "Sprinkler"
+            },
+            {
+              "value": 681340002,
+              "label": "Manual"
+            },
+            {
+              "value": 681340003,
+              "label": "None"
+            }
           ]
         },
         {
@@ -183,7 +254,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Plant",
       "displayName": "Plant",
@@ -275,10 +345,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Upright" },
-            { "value": 681340001, "label": "Spreading" },
-            { "value": 681340002, "label": "Climbing" },
-            { "value": 681340003, "label": "Trailing" }
+            {
+              "value": 681340000,
+              "label": "Upright"
+            },
+            {
+              "value": 681340001,
+              "label": "Spreading"
+            },
+            {
+              "value": 681340002,
+              "label": "Climbing"
+            },
+            {
+              "value": 681340003,
+              "label": "Trailing"
+            }
           ]
         },
         {
@@ -287,11 +369,26 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Seed" },
-            { "value": 681340001, "label": "Cutting" },
-            { "value": 681340002, "label": "Division" },
-            { "value": 681340003, "label": "Grafting" },
-            { "value": 681340004, "label": "Tissue Culture" }
+            {
+              "value": 681340000,
+              "label": "Seed"
+            },
+            {
+              "value": 681340001,
+              "label": "Cutting"
+            },
+            {
+              "value": 681340002,
+              "label": "Division"
+            },
+            {
+              "value": 681340003,
+              "label": "Grafting"
+            },
+            {
+              "value": 681340004,
+              "label": "Tissue Culture"
+            }
           ]
         },
         {
@@ -300,9 +397,18 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Full Sun" },
-            { "value": 681340001, "label": "Partial Shade" },
-            { "value": 681340002, "label": "Full Shade" }
+            {
+              "value": 681340000,
+              "label": "Full Sun"
+            },
+            {
+              "value": 681340001,
+              "label": "Partial Shade"
+            },
+            {
+              "value": 681340002,
+              "label": "Full Shade"
+            }
           ]
         },
         {
@@ -311,9 +417,18 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Low" },
-            { "value": 681340001, "label": "Medium" },
-            { "value": 681340002, "label": "High" }
+            {
+              "value": 681340000,
+              "label": "Low"
+            },
+            {
+              "value": 681340001,
+              "label": "Medium"
+            },
+            {
+              "value": 681340002,
+              "label": "High"
+            }
           ]
         },
         {
@@ -322,12 +437,30 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 681340000, "label": "Sandy" },
-            { "value": 681340001, "label": "Loamy" },
-            { "value": 681340002, "label": "Clay" },
-            { "value": 681340003, "label": "Peaty" },
-            { "value": 681340004, "label": "Chalky" },
-            { "value": 681340005, "label": "Silty" }
+            {
+              "value": 681340000,
+              "label": "Sandy"
+            },
+            {
+              "value": 681340001,
+              "label": "Loamy"
+            },
+            {
+              "value": 681340002,
+              "label": "Clay"
+            },
+            {
+              "value": 681340003,
+              "label": "Peaty"
+            },
+            {
+              "value": 681340004,
+              "label": "Chalky"
+            },
+            {
+              "value": 681340005,
+              "label": "Silty"
+            }
           ]
         },
         {
@@ -366,7 +499,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Season",
       "displayName": "Season",
@@ -410,7 +542,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Field",
       "displayName": "Field",
@@ -456,7 +587,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Planting",
       "displayName": "Planting",
@@ -521,7 +651,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Input",
       "displayName": "Input",
@@ -543,12 +672,30 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Fertilizer" },
-            { "value": 747480001, "label": "Pesticide" },
-            { "value": 747480002, "label": "Fungicide" },
-            { "value": 747480003, "label": "Herbicide" },
-            { "value": 747480004, "label": "Growth Regulator" },
-            { "value": 747480005, "label": "Other" }
+            {
+              "value": 747480000,
+              "label": "Fertilizer"
+            },
+            {
+              "value": 747480001,
+              "label": "Pesticide"
+            },
+            {
+              "value": 747480002,
+              "label": "Fungicide"
+            },
+            {
+              "value": 747480003,
+              "label": "Herbicide"
+            },
+            {
+              "value": 747480004,
+              "label": "Growth Regulator"
+            },
+            {
+              "value": 747480005,
+              "label": "Other"
+            }
           ]
         },
         {
@@ -578,12 +725,30 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Foliar Spray" },
-            { "value": 747480001, "label": "Soil Drench" },
-            { "value": 747480002, "label": "Granular" },
-            { "value": 747480003, "label": "Drip" },
-            { "value": 747480004, "label": "Broadcast" },
-            { "value": 747480005, "label": "Other" }
+            {
+              "value": 747480000,
+              "label": "Foliar Spray"
+            },
+            {
+              "value": 747480001,
+              "label": "Soil Drench"
+            },
+            {
+              "value": 747480002,
+              "label": "Granular"
+            },
+            {
+              "value": 747480003,
+              "label": "Drip"
+            },
+            {
+              "value": 747480004,
+              "label": "Broadcast"
+            },
+            {
+              "value": 747480005,
+              "label": "Other"
+            }
           ]
         },
         {
@@ -647,7 +812,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Treatment",
       "displayName": "Treatment",
@@ -690,10 +854,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Insecticide" },
-            { "value": 747480001, "label": "Fungicide" },
-            { "value": 747480002, "label": "Herbicide" },
-            { "value": 747480003, "label": "Regulator" }
+            {
+              "value": 747480000,
+              "label": "Insecticide"
+            },
+            {
+              "value": 747480001,
+              "label": "Fungicide"
+            },
+            {
+              "value": 747480002,
+              "label": "Herbicide"
+            },
+            {
+              "value": 747480003,
+              "label": "Regulator"
+            }
           ]
         },
         {
@@ -730,7 +906,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Irrigation",
       "displayName": "Irrigation",
@@ -772,10 +947,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Drip" },
-            { "value": 747480001, "label": "Sprinkler" },
-            { "value": 747480002, "label": "Manual" },
-            { "value": 747480003, "label": "Flood" }
+            {
+              "value": 747480000,
+              "label": "Drip"
+            },
+            {
+              "value": 747480001,
+              "label": "Sprinkler"
+            },
+            {
+              "value": 747480002,
+              "label": "Manual"
+            },
+            {
+              "value": 747480003,
+              "label": "Flood"
+            }
           ]
         },
         {
@@ -784,10 +971,71 @@
           "type": "memo",
           "maxLength": 2000,
           "required": false
+        },
+        {
+          "schemaName": "inv_StartedOn",
+          "displayName": "Started On",
+          "type": "datetime",
+          "required": false,
+          "description": "When the valve opened. DateTime, not Date — live state needs the time."
+        },
+        {
+          "schemaName": "inv_EndedOn",
+          "displayName": "Ended On",
+          "type": "datetime",
+          "required": false,
+          "description": "When the valve closed. Blank while a run is in progress."
+        },
+        {
+          "schemaName": "inv_Status",
+          "displayName": "Status",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 681340100,
+              "label": "Running"
+            },
+            {
+              "value": 681340101,
+              "label": "Completed"
+            },
+            {
+              "value": 681340102,
+              "label": "Fault"
+            },
+            {
+              "value": 681340103,
+              "label": "Aborted"
+            }
+          ]
+        },
+        {
+          "schemaName": "inv_FlowRateLpm",
+          "displayName": "Flow Rate (L/min)",
+          "type": "decimal",
+          "required": false,
+          "precision": 2
+        },
+        {
+          "schemaName": "inv_Source",
+          "displayName": "Source",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 681340110,
+              "label": "Controller"
+            },
+            {
+              "value": 681340111,
+              "label": "Manual"
+            }
+          ],
+          "description": "Distinguishes an automated run from a hand-opened valve."
         }
       ]
     },
-
     {
       "schemaName": "inv_Harvest",
       "displayName": "Harvest",
@@ -835,10 +1083,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Excellent" },
-            { "value": 747480001, "label": "Good" },
-            { "value": 747480002, "label": "Average" },
-            { "value": 747480003, "label": "Poor" }
+            {
+              "value": 747480000,
+              "label": "Excellent"
+            },
+            {
+              "value": 747480001,
+              "label": "Good"
+            },
+            {
+              "value": 747480002,
+              "label": "Average"
+            },
+            {
+              "value": 747480003,
+              "label": "Poor"
+            }
           ]
         },
         {
@@ -857,7 +1117,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Calendar",
       "displayName": "Calendar",
@@ -972,7 +1231,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Task",
       "displayName": "Task",
@@ -994,17 +1252,50 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Watering" },
-            { "value": 747480001, "label": "Fertilizing" },
-            { "value": 747480002, "label": "Pruning" },
-            { "value": 747480003, "label": "Repotting" },
-            { "value": 747480004, "label": "Pest Control" },
-            { "value": 747480005, "label": "Disease Treatment" },
-            { "value": 747480006, "label": "Harvesting" },
-            { "value": 747480007, "label": "Seeding" },
-            { "value": 747480008, "label": "Packing" },
-            { "value": 747480009, "label": "Inspection" },
-            { "value": 747480010, "label": "General Maintenance" }
+            {
+              "value": 747480000,
+              "label": "Watering"
+            },
+            {
+              "value": 747480001,
+              "label": "Fertilizing"
+            },
+            {
+              "value": 747480002,
+              "label": "Pruning"
+            },
+            {
+              "value": 747480003,
+              "label": "Repotting"
+            },
+            {
+              "value": 747480004,
+              "label": "Pest Control"
+            },
+            {
+              "value": 747480005,
+              "label": "Disease Treatment"
+            },
+            {
+              "value": 747480006,
+              "label": "Harvesting"
+            },
+            {
+              "value": 747480007,
+              "label": "Seeding"
+            },
+            {
+              "value": 747480008,
+              "label": "Packing"
+            },
+            {
+              "value": 747480009,
+              "label": "Inspection"
+            },
+            {
+              "value": 747480010,
+              "label": "General Maintenance"
+            }
           ]
         },
         {
@@ -1039,10 +1330,22 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Pending" },
-            { "value": 747480001, "label": "In Progress" },
-            { "value": 747480002, "label": "Done" },
-            { "value": 747480003, "label": "Skipped" }
+            {
+              "value": 747480000,
+              "label": "Pending"
+            },
+            {
+              "value": 747480001,
+              "label": "In Progress"
+            },
+            {
+              "value": 747480002,
+              "label": "Done"
+            },
+            {
+              "value": 747480003,
+              "label": "Skipped"
+            }
           ]
         },
         {
@@ -1051,10 +1354,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Low" },
-            { "value": 747480001, "label": "Normal" },
-            { "value": 747480002, "label": "High" },
-            { "value": 747480003, "label": "Urgent" }
+            {
+              "value": 747480000,
+              "label": "Low"
+            },
+            {
+              "value": 747480001,
+              "label": "Normal"
+            },
+            {
+              "value": 747480002,
+              "label": "High"
+            },
+            {
+              "value": 747480003,
+              "label": "Urgent"
+            }
           ]
         },
         {
@@ -1073,7 +1388,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Customer",
       "displayName": "Customer",
@@ -1159,11 +1473,26 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "CIF" },
-            { "value": 747480001, "label": "FOB" },
-            { "value": 747480002, "label": "EXW" },
-            { "value": 747480003, "label": "DDP" },
-            { "value": 747480004, "label": "Net 30" }
+            {
+              "value": 747480000,
+              "label": "CIF"
+            },
+            {
+              "value": 747480001,
+              "label": "FOB"
+            },
+            {
+              "value": 747480002,
+              "label": "EXW"
+            },
+            {
+              "value": 747480003,
+              "label": "DDP"
+            },
+            {
+              "value": 747480004,
+              "label": "Net 30"
+            }
           ]
         },
         {
@@ -1182,7 +1511,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Order",
       "displayName": "Order",
@@ -1223,12 +1551,30 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Draft" },
-            { "value": 747480001, "label": "Confirmed" },
-            { "value": 747480002, "label": "In Packing" },
-            { "value": 747480003, "label": "Ready for Pickup" },
-            { "value": 747480004, "label": "Delivered" },
-            { "value": 747480005, "label": "Cancelled" }
+            {
+              "value": 747480000,
+              "label": "Draft"
+            },
+            {
+              "value": 747480001,
+              "label": "Confirmed"
+            },
+            {
+              "value": 747480002,
+              "label": "In Packing"
+            },
+            {
+              "value": 747480003,
+              "label": "Ready for Pickup"
+            },
+            {
+              "value": 747480004,
+              "label": "Delivered"
+            },
+            {
+              "value": 747480005,
+              "label": "Cancelled"
+            }
           ]
         },
         {
@@ -1246,7 +1592,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_OrderItem",
       "displayName": "Order Item",
@@ -1296,7 +1641,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Packing",
       "displayName": "Packing",
@@ -1367,8 +1711,14 @@
           "required": false,
           "globalChoiceName": "PackingTypeChoice",
           "options": [
-            { "value": 685710000, "label": "BNDL" },
-            { "value": 685710001, "label": "IND" }
+            {
+              "value": 685710000,
+              "label": "BNDL"
+            },
+            {
+              "value": 685710001,
+              "label": "IND"
+            }
           ]
         },
         {
@@ -1434,7 +1784,10 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "URC" }
+            {
+              "value": 747480000,
+              "label": "URC"
+            }
           ],
           "description": "URC = Unrooted Cutting"
         },
@@ -1444,7 +1797,10 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "L/E" }
+            {
+              "value": 747480000,
+              "label": "L/E"
+            }
           ],
           "description": "L/E = Leaf & Eye (point of growth)"
         },
@@ -1454,13 +1810,34 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Petit" },
-            { "value": 747480001, "label": "Mini Petit" },
-            { "value": 747480002, "label": "Small" },
-            { "value": 747480003, "label": "Medium" },
-            { "value": 747480004, "label": "California" },
-            { "value": 747480005, "label": "Large" },
-            { "value": 747480006, "label": "Extra Large" }
+            {
+              "value": 747480000,
+              "label": "Petit"
+            },
+            {
+              "value": 747480001,
+              "label": "Mini Petit"
+            },
+            {
+              "value": 747480002,
+              "label": "Small"
+            },
+            {
+              "value": 747480003,
+              "label": "Medium"
+            },
+            {
+              "value": 747480004,
+              "label": "California"
+            },
+            {
+              "value": 747480005,
+              "label": "Large"
+            },
+            {
+              "value": 747480006,
+              "label": "Extra Large"
+            }
           ]
         },
         {
@@ -1478,7 +1855,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_FiscalAuthorization",
       "displayName": "Fiscal Authorization",
@@ -1562,7 +1938,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Invoice",
       "displayName": "Invoice",
@@ -1625,9 +2000,18 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Air" },
-            { "value": 747480001, "label": "Sea" },
-            { "value": 747480002, "label": "Land" }
+            {
+              "value": 747480000,
+              "label": "Air"
+            },
+            {
+              "value": 747480001,
+              "label": "Sea"
+            },
+            {
+              "value": 747480002,
+              "label": "Land"
+            }
           ]
         },
         {
@@ -1672,10 +2056,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "CIF" },
-            { "value": 747480001, "label": "FOB" },
-            { "value": 747480002, "label": "EXW" },
-            { "value": 747480003, "label": "DDP" }
+            {
+              "value": 747480000,
+              "label": "CIF"
+            },
+            {
+              "value": 747480001,
+              "label": "FOB"
+            },
+            {
+              "value": 747480002,
+              "label": "EXW"
+            },
+            {
+              "value": 747480003,
+              "label": "DDP"
+            }
           ]
         },
         {
@@ -1788,12 +2184,30 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Draft" },
-            { "value": 747480001, "label": "Sent" },
-            { "value": 747480002, "label": "Partially Paid" },
-            { "value": 747480003, "label": "Paid" },
-            { "value": 747480004, "label": "Overdue" },
-            { "value": 747480005, "label": "Cancelled" }
+            {
+              "value": 747480000,
+              "label": "Draft"
+            },
+            {
+              "value": 747480001,
+              "label": "Sent"
+            },
+            {
+              "value": 747480002,
+              "label": "Partially Paid"
+            },
+            {
+              "value": 747480003,
+              "label": "Paid"
+            },
+            {
+              "value": 747480004,
+              "label": "Overdue"
+            },
+            {
+              "value": 747480005,
+              "label": "Cancelled"
+            }
           ]
         },
         {
@@ -1819,7 +2233,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_PlantPrice",
       "displayName": "Plant Price",
@@ -1900,7 +2313,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_CAINumber",
       "displayName": "CAI Number",
@@ -1950,10 +2362,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Export Invoice (BANCO)" },
-            { "value": 747480001, "label": "Internal Invoice (JASON)" },
-            { "value": 747480002, "label": "Service Invoice" },
-            { "value": 747480003, "label": "Other" }
+            {
+              "value": 747480000,
+              "label": "Export Invoice (BANCO)"
+            },
+            {
+              "value": 747480001,
+              "label": "Internal Invoice (JASON)"
+            },
+            {
+              "value": 747480002,
+              "label": "Service Invoice"
+            },
+            {
+              "value": 747480003,
+              "label": "Other"
+            }
           ]
         },
         {
@@ -1973,7 +2397,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Expense",
       "displayName": "Expense",
@@ -2001,16 +2424,46 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Supplies" },
-            { "value": 747480001, "label": "Equipment" },
-            { "value": 747480002, "label": "Labor" },
-            { "value": 747480003, "label": "Transportation" },
-            { "value": 747480004, "label": "Utilities" },
-            { "value": 747480005, "label": "Chemicals / Inputs" },
-            { "value": 747480006, "label": "Shipping / Freight" },
-            { "value": 747480007, "label": "Maintenance" },
-            { "value": 747480008, "label": "Office" },
-            { "value": 747480009, "label": "Other" }
+            {
+              "value": 747480000,
+              "label": "Supplies"
+            },
+            {
+              "value": 747480001,
+              "label": "Equipment"
+            },
+            {
+              "value": 747480002,
+              "label": "Labor"
+            },
+            {
+              "value": 747480003,
+              "label": "Transportation"
+            },
+            {
+              "value": 747480004,
+              "label": "Utilities"
+            },
+            {
+              "value": 747480005,
+              "label": "Chemicals / Inputs"
+            },
+            {
+              "value": 747480006,
+              "label": "Shipping / Freight"
+            },
+            {
+              "value": 747480007,
+              "label": "Maintenance"
+            },
+            {
+              "value": 747480008,
+              "label": "Office"
+            },
+            {
+              "value": 747480009,
+              "label": "Other"
+            }
           ]
         },
         {
@@ -2025,8 +2478,14 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "HNL" },
-            { "value": 747480001, "label": "USD" }
+            {
+              "value": 747480000,
+              "label": "HNL"
+            },
+            {
+              "value": 747480001,
+              "label": "USD"
+            }
           ]
         },
         {
@@ -2065,10 +2524,22 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Pending" },
-            { "value": 747480001, "label": "Approved" },
-            { "value": 747480002, "label": "Rejected" },
-            { "value": 747480003, "label": "Paid" }
+            {
+              "value": 747480000,
+              "label": "Pending"
+            },
+            {
+              "value": 747480001,
+              "label": "Approved"
+            },
+            {
+              "value": 747480002,
+              "label": "Rejected"
+            },
+            {
+              "value": 747480003,
+              "label": "Paid"
+            }
           ]
         },
         {
@@ -2080,7 +2551,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Supplier",
       "displayName": "Supplier",
@@ -2109,15 +2579,42 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Chemicals / Inputs" },
-            { "value": 747480001, "label": "Packaging" },
-            { "value": 747480002, "label": "Equipment" },
-            { "value": 747480003, "label": "Substrates" },
-            { "value": 747480004, "label": "Logistics / Freight" },
-            { "value": 747480005, "label": "Maintenance" },
-            { "value": 747480006, "label": "Utilities" },
-            { "value": 747480007, "label": "Professional Services" },
-            { "value": 747480008, "label": "Other" }
+            {
+              "value": 747480000,
+              "label": "Chemicals / Inputs"
+            },
+            {
+              "value": 747480001,
+              "label": "Packaging"
+            },
+            {
+              "value": 747480002,
+              "label": "Equipment"
+            },
+            {
+              "value": 747480003,
+              "label": "Substrates"
+            },
+            {
+              "value": 747480004,
+              "label": "Logistics / Freight"
+            },
+            {
+              "value": 747480005,
+              "label": "Maintenance"
+            },
+            {
+              "value": 747480006,
+              "label": "Utilities"
+            },
+            {
+              "value": 747480007,
+              "label": "Professional Services"
+            },
+            {
+              "value": 747480008,
+              "label": "Other"
+            }
           ]
         },
         {
@@ -2161,11 +2658,26 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Cash" },
-            { "value": 747480001, "label": "Net 15" },
-            { "value": 747480002, "label": "Net 30" },
-            { "value": 747480003, "label": "Net 60" },
-            { "value": 747480004, "label": "Credit" }
+            {
+              "value": 747480000,
+              "label": "Cash"
+            },
+            {
+              "value": 747480001,
+              "label": "Net 15"
+            },
+            {
+              "value": 747480002,
+              "label": "Net 30"
+            },
+            {
+              "value": 747480003,
+              "label": "Net 60"
+            },
+            {
+              "value": 747480004,
+              "label": "Credit"
+            }
           ]
         },
         {
@@ -2184,7 +2696,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_PurchaseOrder",
       "displayName": "Purchase Order",
@@ -2238,8 +2749,14 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "HNL" },
-            { "value": 747480001, "label": "USD" }
+            {
+              "value": 747480000,
+              "label": "HNL"
+            },
+            {
+              "value": 747480001,
+              "label": "USD"
+            }
           ]
         },
         {
@@ -2248,11 +2765,26 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Draft" },
-            { "value": 747480001, "label": "Sent" },
-            { "value": 747480002, "label": "Confirmed" },
-            { "value": 747480003, "label": "Received" },
-            { "value": 747480004, "label": "Cancelled" }
+            {
+              "value": 747480000,
+              "label": "Draft"
+            },
+            {
+              "value": 747480001,
+              "label": "Sent"
+            },
+            {
+              "value": 747480002,
+              "label": "Confirmed"
+            },
+            {
+              "value": 747480003,
+              "label": "Received"
+            },
+            {
+              "value": 747480004,
+              "label": "Cancelled"
+            }
           ]
         },
         {
@@ -2270,7 +2802,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Worker",
       "displayName": "Worker",
@@ -2299,13 +2830,34 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Field Worker" },
-            { "value": 747480001, "label": "Packer" },
-            { "value": 747480002, "label": "Harvester" },
-            { "value": 747480003, "label": "Irrigator" },
-            { "value": 747480004, "label": "Supervisor" },
-            { "value": 747480005, "label": "Driver" },
-            { "value": 747480006, "label": "General" }
+            {
+              "value": 747480000,
+              "label": "Field Worker"
+            },
+            {
+              "value": 747480001,
+              "label": "Packer"
+            },
+            {
+              "value": 747480002,
+              "label": "Harvester"
+            },
+            {
+              "value": 747480003,
+              "label": "Irrigator"
+            },
+            {
+              "value": 747480004,
+              "label": "Supervisor"
+            },
+            {
+              "value": 747480005,
+              "label": "Driver"
+            },
+            {
+              "value": 747480006,
+              "label": "General"
+            }
           ]
         },
         {
@@ -2358,7 +2910,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Timesheet",
       "displayName": "Timesheet",
@@ -2393,13 +2944,34 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Planting" },
-            { "value": 747480001, "label": "Harvesting" },
-            { "value": 747480002, "label": "Packing" },
-            { "value": 747480003, "label": "Treatment" },
-            { "value": 747480004, "label": "Irrigation" },
-            { "value": 747480005, "label": "Maintenance" },
-            { "value": 747480006, "label": "General" }
+            {
+              "value": 747480000,
+              "label": "Planting"
+            },
+            {
+              "value": 747480001,
+              "label": "Harvesting"
+            },
+            {
+              "value": 747480002,
+              "label": "Packing"
+            },
+            {
+              "value": 747480003,
+              "label": "Treatment"
+            },
+            {
+              "value": 747480004,
+              "label": "Irrigation"
+            },
+            {
+              "value": 747480005,
+              "label": "Maintenance"
+            },
+            {
+              "value": 747480006,
+              "label": "General"
+            }
           ]
         },
         {
@@ -2445,7 +3017,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Pruning",
       "displayName": "Pruning",
@@ -2516,7 +3087,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_PruningCurve",
       "displayName": "Pruning Curve",
@@ -2578,7 +3148,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Fertilization",
       "displayName": "Fertilization",
@@ -2626,11 +3195,26 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Foliar Spray" },
-            { "value": 747480001, "label": "Soil Drench" },
-            { "value": 747480002, "label": "Granular" },
-            { "value": 747480003, "label": "Drip / Fertigation" },
-            { "value": 747480004, "label": "Broadcast" }
+            {
+              "value": 747480000,
+              "label": "Foliar Spray"
+            },
+            {
+              "value": 747480001,
+              "label": "Soil Drench"
+            },
+            {
+              "value": 747480002,
+              "label": "Granular"
+            },
+            {
+              "value": 747480003,
+              "label": "Drip / Fertigation"
+            },
+            {
+              "value": 747480004,
+              "label": "Broadcast"
+            }
           ]
         },
         {
@@ -2674,7 +3258,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_Availability",
       "displayName": "Availability",
@@ -2710,13 +3293,34 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Petit" },
-            { "value": 747480001, "label": "Mini Petit" },
-            { "value": 747480002, "label": "Small" },
-            { "value": 747480003, "label": "Medium" },
-            { "value": 747480004, "label": "California" },
-            { "value": 747480005, "label": "Large" },
-            { "value": 747480006, "label": "Extra Large" }
+            {
+              "value": 747480000,
+              "label": "Petit"
+            },
+            {
+              "value": 747480001,
+              "label": "Mini Petit"
+            },
+            {
+              "value": 747480002,
+              "label": "Small"
+            },
+            {
+              "value": 747480003,
+              "label": "Medium"
+            },
+            {
+              "value": 747480004,
+              "label": "California"
+            },
+            {
+              "value": 747480005,
+              "label": "Large"
+            },
+            {
+              "value": 747480006,
+              "label": "Extra Large"
+            }
           ]
         },
         {
@@ -2763,10 +3367,22 @@
           "type": "choice",
           "required": true,
           "options": [
-            { "value": 747480000, "label": "Projected" },
-            { "value": 747480001, "label": "Confirmed - Under" },
-            { "value": 747480002, "label": "Confirmed - Equal" },
-            { "value": 747480003, "label": "Confirmed - Over" }
+            {
+              "value": 747480000,
+              "label": "Projected"
+            },
+            {
+              "value": 747480001,
+              "label": "Confirmed - Under"
+            },
+            {
+              "value": 747480002,
+              "label": "Confirmed - Equal"
+            },
+            {
+              "value": 747480003,
+              "label": "Confirmed - Over"
+            }
           ]
         },
         {
@@ -2790,7 +3406,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_BoxWeight",
       "displayName": "Box Weight",
@@ -2863,7 +3478,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_NutrientBalance",
       "displayName": "Nutrient Balance",
@@ -2962,7 +3576,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_SoilAnalysis",
       "displayName": "Soil Analysis",
@@ -3230,7 +3843,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_FoliarAnalysis",
       "displayName": "Foliar Analysis",
@@ -3361,7 +3973,6 @@
         }
       ]
     },
-
     {
       "schemaName": "inv_DemandForecast",
       "displayName": "Demand Forecast",
@@ -3405,9 +4016,18 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Current Order" },
-            { "value": 747480001, "label": "Additional Request" },
-            { "value": 747480002, "label": "Additional Order" }
+            {
+              "value": 747480000,
+              "label": "Current Order"
+            },
+            {
+              "value": 747480001,
+              "label": "Additional Request"
+            },
+            {
+              "value": 747480002,
+              "label": "Additional Order"
+            }
           ]
         },
         {
@@ -3440,10 +4060,22 @@
           "type": "choice",
           "required": false,
           "options": [
-            { "value": 747480000, "label": "Pending" },
-            { "value": 747480001, "label": "Confirmed" },
-            { "value": 747480002, "label": "Adjusted" },
-            { "value": 747480003, "label": "Cancelled" }
+            {
+              "value": 747480000,
+              "label": "Pending"
+            },
+            {
+              "value": 747480001,
+              "label": "Confirmed"
+            },
+            {
+              "value": 747480002,
+              "label": "Adjusted"
+            },
+            {
+              "value": 747480003,
+              "label": "Cancelled"
+            }
           ]
         },
         {

@@ -69,6 +69,8 @@
   --color-border: var(--color-sand-200);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Display serif — page titles and hero figures only. Never body copy. */
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
 }
 
 @layer base {
@@ -358,3 +360,34 @@
     @apply focus:outline-none focus:ring-2 focus:ring-lime-400/50 focus:ring-offset-1;
   }
 }
+
+/* ── Page rule ─────────────────────────────────────────────────────────────
+   Thin accent divider under a page header. Separates chrome from content
+   without the weight of a bordered header block. */
+.page-rule {
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--color-lime-400) 0%,
+    var(--color-green-500) 28%,
+    var(--color-sand-300) 100%
+  );
+  opacity: 0.75;
+}
+.dark .page-rule {
+  background: linear-gradient(
+    90deg,
+    var(--color-lime-400) 0%,
+    var(--color-green-500) 28%,
+    #2c3e55 100%
+  );
+  opacity: 0.6;
+}
+
+/* ── Hero stat card ────────────────────────────────────────────────────────
+   The hero is already dark in light mode, so the generic .card-surface dark
+   overrides must not repaint its text. */
+.dark .stat-hero { background-color: #12243a; }
+.stat-hero .text-white,
+.dark .stat-hero .text-white { color: #ffffff; }

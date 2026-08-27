@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Leaf,
@@ -16,11 +17,12 @@ import {
   ArrowDownRight,
   Layers,
   CalendarDays,
-  AlertTriangle,
 } from "lucide-react";
 import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
-import ShadehouseView from "../components/ShadehouseView";
+import ShadehouseView, { generateBeds } from "../components/ShadehouseView";
+import InsightPanel, { deriveShadehouseInsight } from "../components/InsightPanel";
+import BedWaffle from "../components/BedWaffle";
 import WeatherWidget from "../components/WeatherWidget";
 import { useExchangeRate } from "../hooks/useExchangeRate";
 
@@ -72,11 +74,6 @@ const upcomingTasks = [
   { title: "Water Shadehouse 1 — Plot E3", due: "Today", priority: "High" },
   { title: "Apply Neem Oil — E3-01", due: "Today", priority: "Normal" },
   { title: "Harvest Hawaiian — Plot C1", due: "Tomorrow", priority: "Urgent" },
-];
-
-const alerts = [
-  { text: "CAI expiry in 362 days — 69 invoices remaining", type: "info" },
-  { text: "C1-20 empty — no planting assigned", type: "warning" },
 ];
 
 function MiniBarChart({ data, max }: { data: { month: string; value: number }[]; max: number }) {
@@ -138,7 +135,9 @@ function DonutChart({ segments, total, label }: { segments: { value: number; col
 }
 
 export default function DashboardPage() {
-  const { rate: exchangeRate, loading: fxLoading, isLive: fxLive } = useExchangeRate();
+  const [beds] = useState(() => generateBeds());
+  const insight = useMemo(() => deriveShadehouseInsight(beds), [beds]);
+  const { rate: exchangeRate, loading: fxLoading, isLive: fxLive, fetchedAt: fxFetchedAt } = useExchangeRate();
   return (
     <motion.div
       initial="hidden"
@@ -149,60 +148,94 @@ export default function DashboardPage() {
       {/* Header */}
       <motion.div variants={item} className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-navy-900 tracking-tight">
+          <h1 className="font-display text-[32px] leading-tight font-semibold text-navy-900 tracking-tight">
             Dashboard
           </h1>
           <p className="text-[12px] text-navy-400">
-            Digital Nursery Intelligence — Season 2026-S1
+            Production · Sales · Season 2026-S1
           </p>
         </div>
-        <div className="flex items-center gap-2 text-[12px]">
-          <CalendarDays className="w-4 h-4 text-navy-400" />
-          <span className="text-navy-500">{new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Reference rate lives with the other page context, not in the body. */}
+          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-navy-800 ring-1 ring-navy-700/50">
+            <DollarSign className="w-4 h-4 text-lime-400 shrink-0" />
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[10px] text-white/45 uppercase tracking-[0.1em]">USD/HNL</span>
+              <span className="text-[15px] font-bold text-white tabular-nums">
+                {fxLoading ? "…" : exchangeRate ? `L ${exchangeRate.value.toFixed(4)}` : "—"}
+              </span>
+            </div>
+            {exchangeRate && (
+              <span className="flex items-center gap-1.5 pl-2.5 border-l border-white/10">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 ${fxLive ? "bg-green-400" : "bg-amber-400"}`}
+                />
+                <span className="text-[10px] text-white/50 whitespace-nowrap">
+                  {fxLive ? "BCH live" : "Manual"} ·{" "}
+                  {fxFetchedAt
+                    ? `${fxFetchedAt.toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}, ${fxFetchedAt.toLocaleTimeString("en-GB", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}`
+                    : exchangeRate.dateISO}
+                </span>
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 text-[12px]">
+            <CalendarDays className="w-4 h-4 text-navy-400" />
+            <span className="text-navy-500">{new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+          </div>
         </div>
       </motion.div>
 
-      {/* Alerts + Exchange Rate */}
-      <motion.div variants={item} className="flex flex-wrap gap-3 mb-5">
-        {/* BCH Exchange Rate */}
-        <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-navy-800 text-white ring-1 ring-navy-700/50">
-          <DollarSign className="w-4 h-4 text-lime-400" />
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-[11px] text-navy-400">USD/HNL</span>
-            <span className="text-[15px] font-bold text-white">
-              {fxLoading ? "..." : exchangeRate ? `L ${exchangeRate.value.toFixed(4)}` : "—"}
-            </span>
-          </div>
-          {exchangeRate && (
-            <span className="text-[9px] text-navy-500 ml-1">
-              {fxLive ? "BCH Live" : "Manual"} · {exchangeRate.dateISO}
-            </span>
-          )}
-        </div>
-
-        {/* Alerts */}
-        {alerts.map((alert, i) => (
-          <div
-            key={i}
-            className={`alert-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ${
-              alert.type === "warning"
-                ? "alert-warning bg-amber-50 text-amber-700 ring-1 ring-amber-200/50"
-                : "alert-info bg-blue-50 text-blue-700 ring-1 ring-blue-200/50"
-            }`}
-          >
-            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-            {alert.text}
-          </div>
-        ))}
-      </motion.div>
+      <motion.div variants={item} className="page-rule mb-5" />
 
       {/* Top stats row */}
-      <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
-        <StatCard label="Active Plantings" value="24" icon={Sprout} color="green" trend={{ value: "+3", positive: true }} />
-        <StatCard label="Revenue (Apr)" value="$6,200" icon={DollarSign} color="lime" trend={{ value: "+21%", positive: true }} />
-        <StatCard label="Boxes This Week" value="38" icon={Boxes} color="amber" />
-        <StatCard label="Harvest (season)" value="76K" icon={Scissors} color="green" trend={{ value: "+23%", positive: true }} />
-        <StatCard label="Open Invoices" value="$1,520" icon={BarChart3} color="blue" />
+      <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-5">
+        <StatCard
+          variant="hero"
+          className="xl:col-span-2"
+          label="Harvest · Season 2026-S1"
+          value="76K"
+          icon={Scissors}
+          delta={{ value: "+23%", direction: "up", label: "vs 2025-S1" }}
+          context="E3 leads · 31K stems · 41% of output"
+        />
+        <StatCard
+          label="Revenue (Apr)"
+          value="$6,200"
+          icon={DollarSign}
+          delta={{ value: "+21%", direction: "up", label: "vs Mar" }}
+          context="18 invoices issued"
+        />
+        <StatCard
+          label="Active Plantings"
+          value="24"
+          icon={Sprout}
+          delta={{ value: "+3", direction: "up", label: "vs Mar" }}
+          context="across 4 plots · 87% bed use"
+        />
+        <StatCard
+          label="Boxes This Week"
+          value="38"
+          icon={Boxes}
+          delta={{ value: "-12", direction: "down", label: "vs plan" }}
+          tone="warning"
+          context="50 planned · 2 beds not cut"
+        />
+        <StatCard
+          label="Open Invoices"
+          value="$1,520"
+          icon={BarChart3}
+          tone="critical"
+          context="3 overdue · oldest 41 days"
+        />
       </motion.div>
 
       {/* Weather */}
@@ -307,6 +340,10 @@ export default function DashboardPage() {
 
         {/* Side panels */}
         <div className="xl:col-span-2 space-y-5">
+          <motion.div variants={item}>
+            <InsightPanel insight={insight} />
+          </motion.div>
+
           {/* Shipments */}
           <motion.div variants={item} className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
             <div className="flex items-center justify-between mb-3">
@@ -351,6 +388,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Bottom row: worker performance + activity */}
+      <motion.div variants={item} className="mb-5">
+        <BedWaffle beds={beds} />
+      </motion.div>
+
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
         {/* Worker performance */}
         <motion.div variants={item} className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">

@@ -139,10 +139,10 @@ export default function SuppliersPage() {
   return (
     <PageShell title="Suppliers" subtitle="Vendor management and purchase orders" icon={Truck}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Active Suppliers" value={suppliers.filter((s) => s.active).length} icon={Users} color="green" />
-        <StatCard label="Open POs" value={pos.filter((p) => p.status !== "Received" && p.status !== "Cancelled").length} icon={FileText} color="amber" />
-        <StatCard label="Monthly Spend" value="L 27,700" icon={ShoppingBag} color="blue" />
-        <StatCard label="Pending Delivery" value={pos.filter((p) => p.status === "Confirmed" || p.status === "Sent").length} icon={Truck} color="lime" />
+        <StatCard variant="hero" label="Active Suppliers" value={suppliers.filter((s) => s.active).length} icon={Users} />
+        <StatCard tone="warning" label="Open POs" value={pos.filter((p) => p.status !== "Received" && p.status !== "Cancelled").length} icon={FileText} />
+        <StatCard label="Monthly Spend" value="L 27,700" icon={ShoppingBag} />
+        <StatCard label="Pending Delivery" value={pos.filter((p) => p.status === "Confirmed" || p.status === "Sent").length} icon={Truck} />
       </motion.div>
       <div className="mb-4"><TabBar tabs={tabs} active={tab} onChange={setTab} /></div>
       <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>

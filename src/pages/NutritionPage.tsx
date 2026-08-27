@@ -210,10 +210,10 @@ export default function NutritionPage() {
         return (
           <>
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <StatCard label="Total Boxes Weighed" value={weight.length} icon={Scale} color="blue" />
-              <StatCard label="Avg Leaf Weight" value={`${(weight.reduce((s, r) => s + r.avgLeafWeight, 0) / weight.length).toFixed(2)} g`} icon={Leaf} color="green" />
-              <StatCard label="Total Fresh Matter" value={`${weight.reduce((s, r) => s + r.netWeight, 0).toFixed(1)} kg`} icon={Scale} color="amber" />
-              <StatCard label="Avg Dry Matter %" value={`${(weight.reduce((s, r) => s + r.dryMatterPct, 0) / weight.length).toFixed(1)}%`} icon={FlaskConical} color="green" />
+              <StatCard label="Total Boxes Weighed" value={weight.length} icon={Scale} />
+              <StatCard label="Avg Leaf Weight" value={`${(weight.reduce((s, r) => s + r.avgLeafWeight, 0) / weight.length).toFixed(2)} g`} icon={Leaf} />
+              <StatCard label="Total Fresh Matter" value={`${weight.reduce((s, r) => s + r.netWeight, 0).toFixed(1)} kg`} icon={Scale} />
+              <StatCard label="Avg Dry Matter %" value={`${(weight.reduce((s, r) => s + r.dryMatterPct, 0) / weight.length).toFixed(1)}%`} icon={FlaskConical} />
             </motion.div>
             <DataTable
               columns={[
@@ -291,10 +291,10 @@ export default function NutritionPage() {
         return (
           <>
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <StatCard label="Analyses Count" value={soil.length} icon={Microscope} color="blue" />
-              <StatCard label="Latest pH" value={soil.length > 0 ? soil[0].ph : "—"} icon={Beaker} color="amber" />
-              <StatCard label="Latest Organic Matter %" value={soil.length > 0 ? `${soil[0].organicMatter}%` : "—"} icon={Leaf} color="green" />
-              <StatCard label="Latest CIC" value={soil.length > 0 ? soil[0].cic : "—"} icon={FlaskConical} color="blue" />
+              <StatCard label="Analyses Count" value={soil.length} icon={Microscope} />
+              <StatCard label="Latest pH" value={soil.length > 0 ? soil[0].ph : "—"} icon={Beaker} />
+              <StatCard label="Latest Organic Matter %" value={soil.length > 0 ? `${soil[0].organicMatter}%` : "—"} icon={Leaf} />
+              <StatCard label="Latest CIC" value={soil.length > 0 ? soil[0].cic : "—"} icon={FlaskConical} />
             </motion.div>
             <DataTable
               columns={[
@@ -326,10 +326,10 @@ export default function NutritionPage() {
         return (
           <>
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <StatCard label="Analyses Count" value={foliar.length} icon={Microscope} color="blue" />
-              <StatCard label="Latest N %" value={foliar.length > 0 ? `${foliar[0].n}%` : "—"} icon={Leaf} color="green" />
-              <StatCard label="Latest K %" value={foliar.length > 0 ? `${foliar[0].k}%` : "—"} icon={FlaskConical} color="amber" />
-              <StatCard label="Latest Lab" value={foliar.length > 0 ? foliar[0].lab : "—"} icon={Beaker} color="blue" />
+              <StatCard label="Analyses Count" value={foliar.length} icon={Microscope} />
+              <StatCard label="Latest N %" value={foliar.length > 0 ? `${foliar[0].n}%` : "—"} icon={Leaf} />
+              <StatCard label="Latest K %" value={foliar.length > 0 ? `${foliar[0].k}%` : "—"} icon={FlaskConical} />
+              <StatCard label="Latest Lab" value={foliar.length > 0 ? foliar[0].lab : "—"} icon={Beaker} />
             </motion.div>
             <DataTable
               columns={[

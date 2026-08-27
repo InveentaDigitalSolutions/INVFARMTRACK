@@ -121,6 +121,10 @@ const plantingFields = [
     { key: "season", label: "Season", type: "select" as const, options: seasonOptions, required: true },
     { key: "date", label: "Planting Date", type: "date" as const, required: true },
     { key: "qty", label: "Quantity", type: "number" as const, min: 1 },
+    // Air beds carry hanging pots in two shapes; the 3D view renders each.
+    { key: "potType", label: "Pot Type", type: "select" as const, options: [
+      { value: "round", label: "Round" }, { value: "square", label: "Square" },
+    ] },
     { key: "status", label: "Status", type: "toggle" as const, options: [{ value: "Active", label: "Active" }, { value: "Inactive", label: "Inactive" }] },
   ]},
 ];
@@ -747,10 +751,10 @@ export default function ProductionPage() {
   return (
     <PageShell title="Production" subtitle="Plantings, treatments, irrigation and harvest" icon={Sprout}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Active Plantings" value={plantings.filter((p) => p.status === "Active").length} icon={Leaf} color="green" />
-        <StatCard label="Treatments (month)" value={treatments.length} icon={Bug} color="amber" />
-        <StatCard label="Water Used (L)" value={irrigation.reduce((s, i) => s + i.liters, 0).toLocaleString()} icon={Droplets} color="blue" />
-        <StatCard label="Harvested" value={harvest.reduce((s, h) => s + h.qty, 0).toLocaleString()} icon={Scissors} color="green" />
+        <StatCard variant="hero" label="Active Plantings" value={plantings.filter((p) => p.status === "Active").length} icon={Leaf} />
+        <StatCard label="Treatments (month)" value={treatments.length} icon={Bug} />
+        <StatCard label="Water Used (L)" value={irrigation.reduce((s, i) => s + i.liters, 0).toLocaleString()} icon={Droplets} />
+        <StatCard label="Harvested" value={harvest.reduce((s, h) => s + h.qty, 0).toLocaleString()} icon={Scissors} />
       </motion.div>
 
       <div className="mb-4">

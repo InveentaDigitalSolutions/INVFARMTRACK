@@ -196,12 +196,19 @@ export default function Sidebar({
 
         <div className="pt-2 border-t border-navy-800/50 space-y-2">
           {open && (
-            <div className="px-2 flex items-center justify-between">
-              <div className="flex items-center gap-1">
-                <span className="text-lime-500 text-[10px]">.</span>
-                <span className="text-[9px] text-navy-600 tracking-wide">inveenta</span>
+            <div className="px-2 py-1">
+              <p className="text-[8px] text-navy-500 uppercase tracking-[0.18em] mb-1">
+                Powered by
+              </p>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="flex items-baseline">
+                  <span className="text-lime-400 text-[17px] leading-none font-bold">.</span>
+                  <span className="text-[15px] leading-none font-semibold text-navy-100 tracking-tight">
+                    inveenta
+                  </span>
+                </span>
+                <span className="text-[9px] text-navy-500 font-mono">v0.1.0</span>
               </div>
-              <span className="text-[8px] text-navy-700 font-mono">v0.1.0</span>
             </div>
           )}
           <button

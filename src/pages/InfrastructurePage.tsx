@@ -9,11 +9,13 @@ import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import ShadehouseView from "../components/ShadehouseView";
+import ShadehouseView3D from "../components/ShadehouseView3D";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 
 const tabs = [
   { id: "shadehouses", label: "Shadehouses" },
   { id: "layout", label: "Shadehouse Layout" },
+  { id: "layout3d", label: "3D View" },
   { id: "fields", label: "Fields" },
   { id: "beds", label: "Beds" },
 ];
@@ -117,6 +119,8 @@ export default function InfrastructurePage() {
         );
       case "layout":
         return <ShadehouseView />;
+      case "layout3d":
+        return <ShadehouseView3D />;
       case "fields":
         return (
           <>
@@ -147,10 +151,10 @@ export default function InfrastructurePage() {
   return (
     <PageShell title="Infrastructure" subtitle="Shadehouses, fields and beds" icon={Warehouse}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Shadehouses" value={shadehouses.filter((s) => s.active).length} icon={Warehouse} color="green" />
-        <StatCard label="Active Fieldes" value={fields.length} icon={Layers} color="blue" />
-        <StatCard label="Active Beds" value={activeBeds} icon={LayoutGrid} color="amber" />
-        <StatCard label="Utilization %" value={`${utilization}%`} icon={BarChart3} color="green" />
+        <StatCard label="Shadehouses" value={shadehouses.filter((s) => s.active).length} icon={Warehouse} />
+        <StatCard label="Active Fields" value={fields.length} icon={Layers} />
+        <StatCard label="Active Beds" value={activeBeds} icon={LayoutGrid} />
+        <StatCard variant="hero" label="Utilization %" value={`${utilization}%`} icon={BarChart3} />
       </motion.div>
 
       <div className="mb-4"><TabBar tabs={tabs} active={tab} onChange={setTab} /></div>

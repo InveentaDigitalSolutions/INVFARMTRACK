@@ -6,18 +6,39 @@ import {
 } from "lucide-react";
 
 // Bed data model
+export type BedLevel = 0 | 1 | 2 | 3;
+
+/** Nursery uses both round and square hanging pots; the shape is per planting. */
+export type PotType = "round" | "square";
+
+export const potTypeLabels: Record<PotType, string> = {
+  round: "Round",
+  square: "Square",
+};
+
 export interface ShadehouseBed {
   bedId: string;
   plotId: string;
   bedNumber: number;
+  /** 0 = ground bed; 1-3 = cable lines strung above that same footprint. */
+  level: BedLevel;
+  /** Ground beds are planted in soil; air beds carry hanging pots on a cable. */
+  type: "ground" | "air";
   widthM: number;
   lengthM: number;
+  /** Air beds only — pots hooked along the cable run. */
+  potCount?: number;
+  /** Air beds only — pot shape chosen when the planting is created. */
+  potType?: PotType;
   state: "empty" | "planted" | "growing" | "harvest-ready" | "issue";
   variety: string;
   plantedDate: string;
   expectedHarvest: string;
   notes: string;
 }
+
+/** Cable heights above the ground bed, in metres. Measured off the photos. */
+export const LEVEL_HEIGHTS_M: Record<BedLevel, number> = { 0: 0, 1: 1.15, 2: 1.75, 3: 2.35 };
 
 export interface PlotConfig {
   id: string;
@@ -29,7 +50,7 @@ export interface PlotConfig {
 }
 
 // State colors matching the spec
-const stateColors: Record<string, { fill: string; label: string }> = {
+export const stateColors: Record<string, { fill: string; label: string }> = {
   empty: { fill: "#d1d5db", label: "Empty" },
   planted: { fill: "#86efac", label: "Planted" },
   growing: { fill: "#2dd4bf", label: "Growing" },
@@ -38,7 +59,7 @@ const stateColors: Record<string, { fill: string; label: string }> = {
 };
 
 // Real shadehouse config — 1 shadehouse with 4 plots
-const plotConfigs: PlotConfig[] = [
+export const plotConfigs: PlotConfig[] = [
   { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Plot E3" },
   { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Plot C3" },
   { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Plot E1" },
@@ -46,7 +67,7 @@ const plotConfigs: PlotConfig[] = [
 ];
 
 // Generate 120 beds with sample data
-function generateBeds(): ShadehouseBed[] {
+export function generateBeds(): ShadehouseBed[] {
   const varieties = [
     "Pothos / Hawaiian", "Pothos / Marble Queen", "Pothos / Jade",
     "Pothos / N'Joy", "Pothos / Neon", "Pothos / High Color",
@@ -67,6 +88,8 @@ function generateBeds(): ShadehouseBed[] {
         bedId: `${plot.id}-${String(i).padStart(2, "0")}`,
         plotId: plot.id,
         bedNumber: i,
+        level: 0,
+        type: "ground",
         widthM: plot.bedWidth,
         lengthM: plot.bedLength,
         state,
@@ -78,6 +101,78 @@ function generateBeds(): ShadehouseBed[] {
     }
   });
   return beds;
+}
+
+/** Posts stand roughly every 3.6 m, whatever the bed pitch. */
+export const POST_SPACING_M = 3.6;
+
+export function postEveryFor(plotId: string): number {
+  const plot = plotConfigs.find((p) => p.id === plotId);
+  if (!plot) return 3;
+  return Math.max(1, Math.round(POST_SPACING_M / plot.bedWidth));
+}
+
+/**
+ * Cables are strung THROUGH the posts, so an air bed can only exist where a
+ * post line stands — not above every ground bed.
+ */
+export function isPostLine(bed: ShadehouseBed): boolean {
+  return (bed.bedNumber - 1) % postEveryFor(bed.plotId) === 0;
+}
+
+/**
+ * Air beds: cable runs carrying hanging pots, strung between posts along the
+ * length of the house. How many levels a given post line carries varies — some
+ * carry none, others up to three.
+ */
+export function airLevelsFor(bed: ShadehouseBed): BedLevel[] {
+  if (!isPostLine(bed)) return [];
+  const seed = (bed.plotId.charCodeAt(0) * 31 + bed.bedNumber * 7) % 100;
+  const count = seed < 12 ? 0 : seed < 45 ? 1 : seed < 80 ? 2 : 3;
+  return ([1, 2, 3] as BedLevel[]).slice(0, count);
+}
+
+export function generateAirBeds(groundBeds: ShadehouseBed[]): ShadehouseBed[] {
+  const varieties = [
+    "Pothos / Marble Queen", "Pothos / N'Joy", "Pothos / Golden Glen",
+    "Pothos / Hawaiian", "Pothos / Neon",
+  ];
+  const states: ShadehouseBed["state"][] = ["empty", "planted", "growing", "harvest-ready", "issue"];
+
+  return groundBeds.flatMap((ground) =>
+    airLevelsFor(ground).map((level) => {
+      const seed = (ground.plotId.charCodeAt(0) * 100 + ground.bedNumber * 13 + level * 29) % 100;
+      const stateIdx = seed < 8 ? 0 : seed < 30 ? 1 : seed < 70 ? 2 : seed < 90 ? 3 : 4;
+      const state = states[stateIdx];
+      // One pot roughly every 45 cm of cable.
+      const potCount = state === "empty" ? 0 : Math.round(ground.lengthM / 0.45) - (seed % 7);
+      const potType: PotType = seed % 3 === 0 ? "square" : "round";
+
+      return {
+        bedId: `${ground.bedId}-A${level}`,
+        plotId: ground.plotId,
+        bedNumber: ground.bedNumber,
+        level,
+        type: "air" as const,
+        widthM: ground.widthM,
+        lengthM: ground.lengthM,
+        potCount,
+        potType,
+        state,
+        variety: state === "empty" ? "" : varieties[(seed + level) % varieties.length],
+        plantedDate: state !== "empty" ? `2026-0${1 + (seed % 4)}-${String(3 + (seed % 22)).padStart(2, "0")}` : "",
+        expectedHarvest: state === "growing" || state === "harvest-ready"
+          ? `2026-0${4 + (seed % 3)}-${String(1 + (seed % 27)).padStart(2, "0")}` : "",
+        notes: state === "issue" ? "Pest detected — check hanging pots" : "",
+      };
+    })
+  );
+}
+
+/** Ground beds plus every cable line above them — the full 3D stack. */
+export function generateBedStack(): ShadehouseBed[] {
+  const ground = generateBeds();
+  return [...ground, ...generateAirBeds(ground)];
 }
 
 // Activity history types

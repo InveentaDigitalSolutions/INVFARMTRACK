@@ -898,10 +898,10 @@ export default function AccountingPage() {
   return (
     <PageShell title="Accounting" subtitle="AR · AP · Cash · Fiscal · Reports" icon={Receipt}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Cash Position" value={fmt(cashOnHandUSD)} icon={Banknote} color="green" />
-        <StatCard label="AR Outstanding" value={fmt(arOutstandingUSD)} icon={DollarSign} color="amber" />
-        <StatCard label="AP Outstanding" value={fmt(apOutstandingUSD)} icon={Wallet} color="red" />
-        <StatCard label="CAI Remaining" value={caiRemaining} icon={Shield} color="blue" />
+        <StatCard variant="hero" label="Cash Position" value={fmt(cashOnHandUSD)} icon={Banknote} />
+        <StatCard tone="warning" label="AR Outstanding" value={fmt(arOutstandingUSD)} icon={DollarSign} />
+        <StatCard tone="critical" label="AP Outstanding" value={fmt(apOutstandingUSD)} icon={Wallet} />
+        <StatCard label="CAI Remaining" value={caiRemaining} icon={Shield} />
       </motion.div>
 
       <div className="mb-4 overflow-x-auto"><TabBar tabs={tabs} active={tab} onChange={setTab} /></div>

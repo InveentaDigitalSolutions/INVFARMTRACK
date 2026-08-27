@@ -149,8 +149,8 @@ export default function LaborPage() {
               { key: "role", label: "Role", render: (r) => roleBadge(r.role as string) },
               { key: "phone", label: "Phone" },
               { key: "hireDate", label: "Hire Date" },
-              { key: "hourlyRate", label: "Rate/hr", render: (r) => `L ${r.hourlyRate}` },
-              { key: "pieceRate", label: "Rate/1K", render: (r) => (r.pieceRate as number) > 0 ? `L ${r.pieceRate}` : "—" },
+              { key: "hourlyRate", label: "Rate/hr", numeric: true, render: (r) => `L ${r.hourlyRate}` },
+              { key: "pieceRate", label: "Rate/1K", numeric: true, render: (r) => (r.pieceRate as number) > 0 ? `L ${r.pieceRate}` : "—" },
               { key: "active", label: "Status", render: (r) => <Badge variant={r.active ? "green" : "gray"}>{r.active ? "Active" : "Inactive"}</Badge> },
             ]} data={workers} onAdd={workerForm.openCreate} onEdit={(r, i) => workerForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Worker" searchPlaceholder="Search workers..." />
             <FormModal open={workerForm.open} onClose={workerForm.close} title={workerForm.isEdit ? "Edit Worker" : "Add Worker"} groups={workerFormGroups} values={workerForm.values} onChange={workerForm.onChange} isEdit={workerForm.isEdit} onSubmit={(v) => save(workers, setWorkers, workerForm, v)} />
@@ -164,11 +164,11 @@ export default function LaborPage() {
               { key: "worker", label: "Worker" },
               { key: "date", label: "Date" },
               { key: "activity", label: "Activity", render: (r) => activityBadge(r.activity as string) },
-              { key: "hours", label: "Hours" },
-              { key: "pieces", label: "Pieces", render: (r) => (r.pieces as number) > 0 ? (r.pieces as number).toLocaleString() : "—" },
-              { key: "boxes", label: "Boxes", render: (r) => (r.boxes as number) > 0 ? String(r.boxes) : "—" },
-              { key: "cost", label: "Cost", render: (r) => `L ${(r.cost as number).toLocaleString()}` },
-            ]} data={timesheets} onAdd={tsForm.openCreate} onEdit={(r, i) => tsForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Log Time" searchPlaceholder="Search timesheets..." />
+              { key: "hours", label: "Hours", numeric: true, heatmap: true },
+              { key: "pieces", label: "Pieces", numeric: true, heatmap: true, render: (r) => (r.pieces as number) > 0 ? (r.pieces as number).toLocaleString() : "—" },
+              { key: "boxes", label: "Boxes", numeric: true, heatmap: true, render: (r) => (r.boxes as number) > 0 ? String(r.boxes) : "—" },
+              { key: "cost", label: "Cost", numeric: true, heatmap: true, render: (r) => `L ${(r.cost as number).toLocaleString()}` },
+            ]} data={timesheets} onAdd={tsForm.openCreate} onEdit={(r, i) => tsForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Log Time" searchPlaceholder="Search timesheets..." showLimits hint="Cell shading compares each figure against the rows on screen" />
             <FormModal open={tsForm.open} onClose={tsForm.close} title={tsForm.isEdit ? "Edit Entry" : "Log Time"} subtitle="Record worker hours and output" groups={timesheetFormGroups} values={tsForm.values} onChange={tsForm.onChange} isEdit={tsForm.isEdit} onSubmit={(v) => save(timesheets, setTimesheets, tsForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Entry" message="Delete this timesheet entry?" onConfirm={() => del(timesheets, setTimesheets)} />
           </>
@@ -233,10 +233,10 @@ export default function LaborPage() {
   return (
     <PageShell title="Labor" subtitle="Workforce management, timesheets and performance" icon={HardHat}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Active Workers" value={workers.filter((w) => w.active).length} icon={Users} color="green" />
-        <StatCard label="Hours Today" value={totalHoursToday} icon={Clock} color="blue" />
-        <StatCard label="Labor Cost Today" value={`L ${totalCostToday.toLocaleString()}`} icon={TrendingUp} color="amber" />
-        <StatCard label="Boxes Today" value={timesheets.filter((t) => t.date === "2026-04-10").reduce((s, t) => s + t.boxes, 0)} icon={Boxes} color="green" />
+        <StatCard variant="hero" label="Active Workers" value={workers.filter((w) => w.active).length} icon={Users} />
+        <StatCard label="Hours Today" value={totalHoursToday} icon={Clock} />
+        <StatCard label="Labor Cost Today" value={`L ${totalCostToday.toLocaleString()}`} icon={TrendingUp} />
+        <StatCard label="Boxes Today" value={timesheets.filter((t) => t.date === "2026-04-10").reduce((s, t) => s + t.boxes, 0)} icon={Boxes} />
       </motion.div>
       <div className="mb-4"><TabBar tabs={tabs} active={tab} onChange={setTab} /></div>
       <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>

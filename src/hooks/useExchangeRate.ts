@@ -13,6 +13,8 @@ interface UseExchangeRateResult {
   loading: boolean;
   error: string | null;
   isLive: boolean;
+  /** Wall-clock time this value was last fetched — distinct from the rate's own date. */
+  fetchedAt: Date | null;
   refresh: () => Promise<void>;
   /** Manual override for when API is unavailable */
   setManualRate: (value: number) => void;
@@ -30,12 +32,14 @@ export function useExchangeRate(): UseExchangeRateResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLive, setIsLive] = useState(false);
+  const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
 
   const refresh = useCallback(async () => {
     if (!bchClient) {
       // No API key — use fallback
       setRate(FALLBACK_RATE);
       setIsLive(false);
+      setFetchedAt(new Date());
       setLoading(false);
       return;
     }
@@ -46,11 +50,13 @@ export function useExchangeRate(): UseExchangeRateResult {
       const result = await bchClient.getReferenceExchangeRate();
       setRate(result);
       setIsLive(true);
+      setFetchedAt(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch exchange rate");
       // Fall back to cached or default
       if (!rate) setRate(FALLBACK_RATE);
       setIsLive(false);
+      setFetchedAt(new Date());
     } finally {
       setLoading(false);
     }
@@ -67,7 +73,8 @@ export function useExchangeRate(): UseExchangeRateResult {
       dateISO: new Date().toISOString().slice(0, 10),
     });
     setIsLive(false);
+    setFetchedAt(new Date());
   }, []);
 
-  return { rate, loading, error, isLive, refresh, setManualRate };
+  return { rate, loading, error, isLive, fetchedAt, refresh, setManualRate };
 }

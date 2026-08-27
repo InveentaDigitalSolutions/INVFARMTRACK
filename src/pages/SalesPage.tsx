@@ -675,10 +675,10 @@ export default function SalesPage() {
         animate={{ opacity: 1, y: 0 }}
         className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
       >
-        <StatCard label="Active Shipments" value={shipments.filter((s) => s.status === "In Progress").length} icon={Plane} color="green" />
-        <StatCard label="Boxes Today" value={totalBoxesToday} icon={Boxes} color="amber" />
-        <StatCard label="Open Orders" value={orders.filter((o) => o.status !== "Delivered").length} icon={FileText} color="blue" />
-        <StatCard label="Active Customers" value={customers.length} icon={Users} color="green" />
+        <StatCard variant="hero" label="Active Shipments" value={shipments.filter((s) => s.status === "In Progress").length} icon={Plane} />
+        <StatCard label="Boxes Today" value={totalBoxesToday} icon={Boxes} />
+        <StatCard label="Open Orders" value={orders.filter((o) => o.status !== "Delivered").length} icon={FileText} />
+        <StatCard label="Active Customers" value={customers.length} icon={Users} />
       </motion.div>
 
       <div className="mb-4">

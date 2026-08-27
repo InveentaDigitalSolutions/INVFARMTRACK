@@ -14,14 +14,14 @@ interface TabBarProps {
 
 export default function TabBar({ tabs, active, onChange }: TabBarProps) {
   return (
-    <div className="flex gap-0.5 bg-sand-100 rounded-lg p-0.5">
+    <div className="flex flex-wrap gap-0.5 bg-sand-100 rounded-lg p-0.5">
       {tabs.map((tab) => {
         const isActive = tab.id === active;
         return (
           <button
             key={tab.id}
             onClick={() => onChange(tab.id)}
-            className={`relative px-4 py-2 text-[13px] font-medium rounded-md transition-colors cursor-pointer ${
+            className={`relative shrink-0 px-4 py-2 text-[13px] font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap ${
               isActive ? "text-navy-900" : "text-navy-400 hover:text-navy-600"
             }`}
           >

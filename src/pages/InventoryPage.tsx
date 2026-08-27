@@ -143,8 +143,8 @@ export default function InventoryPage() {
   return (
     <PageShell title="Inventory" subtitle="Plant catalog and inputs" icon={PackageSearch}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <StatCard label="Plant Varieties" value={plants.length} icon={Leaf} color="green" />
-        <StatCard label="Active Inputs" value={inputs.length} icon={FlaskConical} color="blue" />
+        <StatCard variant="hero" label="Plant Varieties" value={plants.length} icon={Leaf} />
+        <StatCard label="Active Inputs" value={inputs.length} icon={FlaskConical} />
       </motion.div>
 
       <div className="mb-4">

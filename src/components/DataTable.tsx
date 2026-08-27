@@ -1,5 +1,8 @@
 import { useState, useMemo } from "react";
-import { Search, Plus, SlidersHorizontal, Trash2, Pencil, X } from "lucide-react";
+import {
+  Search, Plus, SlidersHorizontal, Trash2, Pencil, X,
+  ChevronUp, ChevronDown, ChevronsUpDown, Columns3,
+} from "lucide-react";
 
 interface Column<T> {
   key: string;
@@ -8,6 +11,25 @@ interface Column<T> {
   width?: string;
   searchable?: boolean;
   filterable?: boolean;
+  /** Right-align and use tabular figures so digits line up column-wise. */
+  numeric?: boolean;
+  /** Tint each cell by magnitude relative to the other visible rows. */
+  heatmap?: boolean;
+  /** Defaults to true. */
+  sortable?: boolean;
+}
+
+type SortState = { key: string; dir: "asc" | "desc" } | null;
+type Limit = "all" | "top5" | "top10" | "bot5";
+
+/** Pull a comparable number out of "L 27,700", "83%", "1.2M t" etc. */
+function toNumber(raw: unknown): number | null {
+  if (typeof raw === "number") return Number.isFinite(raw) ? raw : null;
+  if (typeof raw !== "string") return null;
+  const cleaned = raw.replace(/[^0-9.-]/g, "");
+  if (!cleaned || cleaned === "-" || cleaned === ".") return null;
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : null;
 }
 
 interface DataTableProps<T> {
@@ -19,6 +41,10 @@ interface DataTableProps<T> {
   addLabel?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
+  /** Footer note explaining how to read the table. */
+  hint?: string;
+  /** Show the ALL / TOP 5 / TOP 10 / BOT 5 shortcut pills. */
+  showLimits?: boolean;
 }
 
 export default function DataTable<T extends Record<string, unknown>>({
@@ -30,10 +56,38 @@ export default function DataTable<T extends Record<string, unknown>>({
   addLabel = "Add New",
   searchPlaceholder = "Search...",
   emptyMessage = "No records yet",
+  hint,
+  showLimits = false,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [sort, setSort] = useState<SortState>(null);
+  const [limit, setLimit] = useState<Limit>("all");
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  const [showColumnPicker, setShowColumnPicker] = useState(false);
+
+  const visibleColumns = columns.filter((c) => !hidden.has(c.key));
+
+  const toggleSort = (key: string) => {
+    setSort((prev) =>
+      prev?.key !== key
+        ? { key, dir: "desc" }
+        : prev.dir === "desc"
+          ? { key, dir: "asc" }
+          : null
+    );
+  };
+
+  const toggleColumn = (key: string) => {
+    setHidden((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      // Never let the user hide the last column.
+      else if (columns.length - next.size > 1) next.add(key);
+      return next;
+    });
+  };
 
   const activeFilterCount = Object.values(columnFilters).filter(Boolean).length;
 
@@ -85,6 +139,53 @@ export default function DataTable<T extends Record<string, unknown>>({
     return result;
   }, [data, search, columns, columnFilters]);
 
+  const sorted = useMemo(() => {
+    if (!sort) return filtered;
+    const { key, dir } = sort;
+    const factor = dir === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      const na = toNumber(a[key]);
+      const nb = toNumber(b[key]);
+      // Numbers sort numerically; blanks always sink to the bottom.
+      if (na !== null && nb !== null) return (na - nb) * factor;
+      if (na !== null) return -1;
+      if (nb !== null) return 1;
+      return String(a[key] ?? "").localeCompare(String(b[key] ?? "")) * factor;
+    });
+  }, [filtered, sort]);
+
+  const visible = useMemo(() => {
+    if (limit === "all") return sorted;
+    if (limit === "bot5") return sorted.slice(-5);
+    return sorted.slice(0, limit === "top5" ? 5 : 10);
+  }, [sorted, limit]);
+
+  /** Min/max per heatmap column, computed over the rows actually on screen. */
+  const heatRanges = useMemo(() => {
+    const ranges: Record<string, { min: number; max: number }> = {};
+    for (const col of columns) {
+      if (!col.heatmap) continue;
+      const nums = visible.map((r) => toNumber(r[col.key])).filter((n): n is number => n !== null);
+      if (nums.length > 1) {
+        ranges[col.key] = { min: Math.min(...nums), max: Math.max(...nums) };
+      }
+    }
+    return ranges;
+  }, [visible, columns]);
+
+  const heatStyle = (col: Column<T>, row: T) => {
+    const range = heatRanges[col.key];
+    if (!range) return undefined;
+    const n = toNumber(row[col.key]);
+    if (n === null) return undefined;
+    const span = range.max - range.min;
+    const t = span === 0 ? 0 : (n - range.min) / span;
+    // Translucent so it sits correctly on both light and dark card surfaces.
+    return { backgroundColor: `rgba(163, 184, 53, ${(0.05 + t * 0.3).toFixed(3)})` };
+  };
+
+  const hasHeatmap = Object.keys(heatRanges).length > 0;
+
   const clearFilters = () => {
     setColumnFilters({});
     setShowFilters(false);
@@ -122,11 +223,51 @@ export default function DataTable<T extends Record<string, unknown>>({
               </span>
             )}
           </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowColumnPicker((v) => !v)}
+              className={`relative p-2 rounded-lg border transition-colors cursor-pointer ${
+                showColumnPicker || hidden.size > 0
+                  ? "border-lime-400 text-lime-600 bg-lime-50/50"
+                  : "border-sand-200 text-navy-400 hover:text-navy-600 hover:bg-sand-50"
+              }`}
+              title="Choose columns"
+            >
+              <Columns3 className="w-3.5 h-3.5" />
+            </button>
+            {showColumnPicker && (
+              <div className="absolute z-20 mt-1.5 left-0 w-52 p-1.5 rounded-lg border border-sand-200 bg-white shadow-lg">
+                <p className="px-2 py-1 text-[10px] font-semibold text-navy-400 uppercase tracking-[0.1em]">
+                  Columns
+                </p>
+                {columns.map((col) => (
+                  <button
+                    key={col.key}
+                    onClick={() => toggleColumn(col.key)}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-[12px] text-navy-700 rounded-md hover:bg-sand-50 cursor-pointer text-left"
+                  >
+                    <span
+                      className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 ${
+                        hidden.has(col.key) ? "border-sand-300" : "border-lime-400 bg-lime-400"
+                      }`}
+                    >
+                      {!hidden.has(col.key) && (
+                        <svg viewBox="0 0 10 8" className="w-2.5 h-2 fill-none stroke-navy-900" strokeWidth="2">
+                          <path d="M1 4l2.5 2.5L9 1" />
+                        </svg>
+                      )}
+                    </span>
+                    {col.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          {(search || activeFilterCount > 0) && (
-            <span className="text-[11px] text-navy-400">
-              {filtered.length} of {data.length}
+          {(search || activeFilterCount > 0 || limit !== "all") && (
+            <span className="text-[11px] text-navy-400 tabular-nums">
+              {visible.length} of {data.length}
             </span>
           )}
           {activeFilterCount > 0 && (
@@ -151,23 +292,91 @@ export default function DataTable<T extends Record<string, unknown>>({
         </div>
       </div>
 
+      {/* Shortcuts strip */}
+      {(showLimits || hasHeatmap) && (
+        <div className="flex items-center gap-4 px-4 py-2 border-b border-sand-100 bg-sand-50/40">
+          {showLimits && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-semibold text-navy-400 uppercase tracking-[0.1em] mr-0.5">
+                Show
+              </span>
+              {([
+                ["all", "All"],
+                ["top5", "Top 5"],
+                ["top10", "Top 10"],
+                ["bot5", "Bottom 5"],
+              ] as [Limit, string][]).map(([key, text]) => (
+                <button
+                  key={key}
+                  onClick={() => setLimit(key)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+                    limit === key
+                      ? "bg-navy-800 text-white"
+                      : "text-navy-500 hover:bg-sand-100"
+                  }`}
+                >
+                  {text}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {hasHeatmap && (
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="text-[10px] font-semibold text-navy-400 uppercase tracking-[0.1em]">
+                Heatmap
+              </span>
+              <span
+                className="h-2 w-20 rounded-full"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(163,184,53,0.05), rgba(163,184,53,0.35))",
+                }}
+              />
+              <span className="text-[10px] text-navy-400">Low → High</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Table */}
       {filtered.length > 0 || showFilters ? (
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
               <tr className="border-b border-sand-100 bg-sand-50/50">
-                {columns.map((col) => (
-                  <th
-                    key={col.key}
-                    className="px-4 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase tracking-[0.08em]"
-                    style={col.width ? { width: col.width } : undefined}
-                  >
-                    {col.label}
-                  </th>
-                ))}
+                {visibleColumns.map((col) => {
+                  const canSort = col.sortable !== false;
+                  const active = sort?.key === col.key;
+                  const Indicator = !active
+                    ? ChevronsUpDown
+                    : sort.dir === "desc"
+                      ? ChevronDown
+                      : ChevronUp;
+                  return (
+                    <th
+                      key={col.key}
+                      onClick={canSort ? () => toggleSort(col.key) : undefined}
+                      className={`px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${
+                        col.numeric ? "text-right" : "text-left"
+                      } ${active ? "text-navy-700" : "text-navy-400"} ${
+                        canSort ? "cursor-pointer select-none hover:text-navy-600 transition-colors" : ""
+                      }`}
+                      style={col.width ? { width: col.width } : undefined}
+                    >
+                      <span className={`inline-flex items-center gap-1 ${col.numeric ? "flex-row-reverse" : ""}`}>
+                        {col.label}
+                        {canSort && (
+                          <Indicator
+                            className={`w-3 h-3 shrink-0 ${active ? "opacity-100" : "opacity-25"}`}
+                          />
+                        )}
+                      </span>
+                    </th>
+                  );
+                })}
                 {(onEdit || onDelete) && (
-                  <th className="px-4 py-2.5 text-right text-[10px] font-semibold text-navy-400 uppercase tracking-[0.08em] w-20">
+                  <th className="sticky right-0 z-20 px-4 py-2.5 text-right text-[10px] font-semibold text-navy-400 uppercase tracking-[0.08em] w-20 bg-sand-50 border-l border-sand-200/70">
                     Actions
                   </th>
                 )}
@@ -175,7 +384,7 @@ export default function DataTable<T extends Record<string, unknown>>({
               {/* Filter row */}
               {showFilters && (
                 <tr className="border-b border-sand-100 bg-sand-50/30">
-                  {columns.map((col) => (
+                  {visibleColumns.map((col) => (
                     <th key={col.key} className="px-4 py-2">
                       {filterOptions[col.key] ? (
                         <select
@@ -213,12 +422,14 @@ export default function DataTable<T extends Record<string, unknown>>({
                       )}
                     </th>
                   ))}
-                  {(onEdit || onDelete) && <th className="px-4 py-2" />}
+                  {(onEdit || onDelete) && (
+                    <th className="sticky right-0 z-20 px-4 py-2 bg-sand-50 border-l border-sand-200/70" />
+                  )}
                 </tr>
               )}
             </thead>
             <tbody className="divide-y divide-sand-100/80">
-              {filtered.map((row, i) => (
+              {visible.map((row, i) => (
                 <tr
                   key={i}
                   className={`transition-colors ${
@@ -226,15 +437,21 @@ export default function DataTable<T extends Record<string, unknown>>({
                   }`}
                   onClick={() => onEdit?.(row, i)}
                 >
-                  {columns.map((col) => (
-                    <td key={col.key} className="px-4 py-3 text-navy-800">
+                  {visibleColumns.map((col) => (
+                    <td
+                      key={col.key}
+                      style={heatStyle(col, row)}
+                      className={`px-4 py-3 text-navy-800 ${
+                        col.numeric ? "text-right tabular-nums font-medium" : ""
+                      }`}
+                    >
                       {col.render
                         ? col.render(row)
                         : String(row[col.key] ?? "")}
                     </td>
                   ))}
                   {(onEdit || onDelete) && (
-                    <td className="px-4 py-3 text-right">
+                    <td className="sticky right-0 z-10 px-4 py-3 text-right bg-white border-l border-sand-200/70">
                       <div className="flex items-center justify-end gap-1">
                         {onEdit && (
                           <button
@@ -259,6 +476,13 @@ export default function DataTable<T extends Record<string, unknown>>({
               ))}
             </tbody>
           </table>
+          {hint && filtered.length > 0 && (
+            <div className="px-4 py-2.5 border-t border-sand-100 bg-sand-50/40">
+              <p className="text-[11px] text-navy-400">
+                Click a header to sort · {hint}
+              </p>
+            </div>
+          )}
           {filtered.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-navy-300">
               <p className="text-[13px]">No results match the active filters</p>

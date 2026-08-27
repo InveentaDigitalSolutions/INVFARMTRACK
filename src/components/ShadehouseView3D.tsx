@@ -1,0 +1,373 @@
+import { useEffect, useMemo, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { Droplets, Layers, RotateCcw, X, Eye } from "lucide-react";
+import {
+  generateBedStack,
+  stateColors,
+  potTypeLabels,
+  LEVEL_HEIGHTS_M,
+  type BedLevel,
+  type ShadehouseBed,
+} from "./ShadehouseView";
+import ShadehouseScene, { placeBeds, type LensMode } from "./ShadehouseScene";
+import { readZone, zoneStatusColors, type ZoneReading } from "../services/irrigation";
+import { buildZones, demoAnomalies, simulateFixes } from "../services/irrigationSim";
+
+const ALL_LEVELS: BedLevel[] = [0, 1, 2, 3];
+const LEVEL_LABELS: Record<BedLevel, string> = {
+  0: "Ground",
+  1: "Air L1",
+  2: "Air L2",
+  3: "Air L3",
+};
+
+/** Wall clock drives the telemetry reader; the scene animates independently. */
+function useNow(intervalMs: number) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
+
+const LENSES: { id: LensMode; label: string }[] = [
+  { id: "state", label: "Status" },
+  { id: "age", label: "Plant age" },
+  { id: "harvest", label: "Days to harvest" },
+  { id: "irrigated", label: "Last irrigated" },
+  { id: "issues", label: "Issues" },
+];
+
+const LENS_SCALES: Record<Exclude<LensMode, "state">, { low: string; high: string; gradient: string }> = {
+  age: { low: "Just planted", high: "120+ days", gradient: "linear-gradient(90deg,#e8f4c8,#1a5c30)" },
+  harvest: { low: "Overdue", high: "90+ days out", gradient: "linear-gradient(90deg,#c2410c,#fbbf24,#3d8b40)" },
+  irrigated: { low: "Just watered", high: "12h+ dry", gradient: "linear-gradient(90deg,#38bdf8,#d6c7a0)" },
+  issues: { low: "Healthy", high: "Needs attention", gradient: "linear-gradient(90deg,#c8cec4,#dc2626)" },
+};
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <span className="text-[10px] text-white/40 uppercase tracking-[0.1em]">{label}</span>
+      <span className="text-[11px] text-white/85 text-right">{value}</span>
+    </div>
+  );
+}
+
+export default function ShadehouseView3D({ className = "" }: { className?: string }) {
+  const [beds] = useState<ShadehouseBed[]>(() => generateBedStack());
+  const [visibleLevels, setVisibleLevels] = useState<Set<BedLevel>>(
+    () => new Set(ALL_LEVELS)
+  );
+  const [showIrrigation, setShowIrrigation] = useState(true);
+  const [lens, setLens] = useState<LensMode>("state");
+  const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+
+  const placements = useMemo(() => placeBeds(beds), [beds]);
+  const baseZones = useMemo(() => buildZones(beds), [beds]);
+  const anomalies = useMemo(() => demoAnomalies(baseZones), [baseZones]);
+
+  // Re-read at 1s; the reader itself renders one poll interval behind and
+  // interpolates, so this only controls how often we re-sample that curve.
+  const now = useNow(1000);
+
+  const readings = useMemo(() => {
+    const zones = simulateFixes(baseZones, now, anomalies);
+    const map = new Map<string, ZoneReading>();
+    for (const zone of zones) map.set(zone.bedId, readZone(zone, now));
+    return map;
+  }, [baseZones, now, anomalies]);
+
+  const toggleLevel = (level: BedLevel) => {
+    setVisibleLevels((prev) => {
+      const next = new Set(prev);
+      if (next.has(level)) next.delete(level);
+      else next.add(level);
+      // Never leave the scene empty.
+      return next.size === 0 ? new Set([level]) : next;
+    });
+  };
+
+  const levelCounts = useMemo(() => {
+    const counts = new Map<BedLevel, number>();
+    for (const bed of beds) counts.set(bed.level, (counts.get(bed.level) ?? 0) + 1);
+    return counts;
+  }, [beds]);
+
+  const running = useMemo(
+    () =>
+      [...readings.values()].filter(
+        (r) => r.status === "running" && visibleLevels.has(
+          beds.find((b) => b.bedId === r.bedId)?.level ?? 0
+        )
+      ),
+    [readings, visibleLevels, beds]
+  );
+
+  const degraded = useMemo(
+    () => [...readings.values()].filter((r) => r.status === "stale" || r.status === "fault"),
+    [readings]
+  );
+
+  const selected = selectedBedId ? beds.find((b) => b.bedId === selectedBedId) : null;
+  const selectedReading = selectedBedId ? readings.get(selectedBedId) : undefined;
+
+  const totalFlow = running.reduce((sum, r) => sum + r.flowLpm, 0);
+
+  return (
+    <div className={`card-surface bg-white rounded-xl border border-sand-200/80 overflow-hidden ${className}`}>
+      {/* Header */}
+      <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-5 pb-3">
+        <div>
+          <h3 className="text-[15px] font-bold text-navy-900">Shadehouse — 3D</h3>
+          <p className="text-[11px] text-navy-400">
+            {beds.length} beds across 4 plots · ground rows plus cable lines above · drag to orbit
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowIrrigation((v) => !v)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-colors ${
+              showIrrigation
+                ? "bg-sky-500 text-white"
+                : "bg-sand-100 text-navy-500 hover:bg-sand-200"
+            }`}
+          >
+            <Droplets className="w-3.5 h-3.5" />
+            Irrigation
+          </button>
+          <button
+            onClick={() => setResetKey((k) => k + 1)}
+            title="Reset view"
+            className="p-2 rounded-lg bg-sand-100 text-navy-500 hover:bg-sand-200 cursor-pointer transition-colors"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Layer strip */}
+      <div className="flex flex-wrap items-center gap-2 px-5 pb-3">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-navy-400 uppercase tracking-[0.12em] mr-1">
+          <Layers className="w-3.5 h-3.5" />
+          Layers
+        </span>
+        {ALL_LEVELS.map((level) => {
+          const active = visibleLevels.has(level);
+          const count = levelCounts.get(level) ?? 0;
+          if (!count) return null;
+          return (
+            <button
+              key={level}
+              onClick={() => toggleLevel(level)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+                active
+                  ? "bg-navy-800 text-white"
+                  : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+              }`}
+            >
+              {LEVEL_LABELS[level]}
+              <span className={active ? "text-white/50" : "text-navy-300"}>{count}</span>
+            </button>
+          );
+        })}
+
+        {showIrrigation && (
+          <span className="inline-flex items-center gap-2 ml-auto px-2.5 py-1 rounded-md bg-sky-50 ring-1 ring-sky-200/60">
+            <span className="relative flex w-2 h-2">
+              <span className="absolute inline-flex w-full h-full rounded-full bg-sky-400 opacity-70 animate-ping" />
+              <span className="relative inline-flex w-2 h-2 rounded-full bg-sky-500" />
+            </span>
+            <span className="text-[11px] font-semibold text-sky-700 tabular-nums">
+              {running.length} irrigating · {totalFlow.toFixed(1)} L/min
+            </span>
+            {/* Provenance is never implied. The feed says what it is. */}
+            <span className="text-[10px] font-semibold text-sky-600/70 uppercase tracking-wider">
+              simulated
+            </span>
+          </span>
+        )}
+      </div>
+
+      {/* Lens strip — same geometry, different question. */}
+      <div className="flex flex-wrap items-center gap-2 px-5 pb-3">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-navy-400 uppercase tracking-[0.12em] mr-1">
+          <Eye className="w-3.5 h-3.5" />
+          View by
+        </span>
+        {LENSES.map(({ id, label }) => (
+          <button
+            key={id}
+            onClick={() => setLens(id)}
+            className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+              lens === id
+                ? "bg-navy-800 text-white"
+                : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+        {showIrrigation && lens !== "state" && (
+          <span className="text-[10px] text-navy-400 ml-1">
+            Live irrigation still overrides this view
+          </span>
+        )}
+      </div>
+
+      {/* Scene */}
+      <div className="relative h-[460px] bg-gradient-to-b from-sand-50 to-sand-100">
+        <Canvas
+          key={resetKey}
+          camera={{ position: [48, 41, 56], fov: 38 }}
+          onPointerMissed={() => setSelectedBedId(null)}
+        >
+          <ShadehouseScene
+            placements={placements}
+            readings={readings}
+            visibleLevels={visibleLevels}
+            showIrrigation={showIrrigation}
+            showRoof={false}
+            lens={lens}
+            nowMs={now}
+            selectedBedId={selectedBedId}
+            onSelect={setSelectedBedId}
+          />
+          <OrbitControls
+            makeDefault
+            enablePan
+            minDistance={12}
+            maxDistance={140}
+            maxPolarAngle={Math.PI / 2.15}
+            target={[0, 0.8, 0]}
+          />
+        </Canvas>
+
+        {/* Selection readout */}
+        {selected && (
+          <div className="absolute left-4 bottom-4 w-72 rounded-lg bg-navy-800/95 backdrop-blur ring-1 ring-white/10 overflow-hidden">
+            <div className="flex items-start justify-between gap-2 px-3.5 pt-3.5">
+              <div>
+                <p className="text-[13px] font-bold text-white">{selected.bedId}</p>
+                <p className="text-[11px] text-white/55 mt-0.5">
+                  {selected.type === "ground"
+                    ? `Ground row · ${selected.widthM.toFixed(2)} × ${selected.lengthM.toFixed(1)} m`
+                    : `Cable line · level ${selected.level} · ${(selected.potCount ?? 0).toLocaleString()} pots`}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedBedId(null)}
+                className="p-1 rounded-md text-white/40 hover:text-white/80 hover:bg-white/10 cursor-pointer transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="px-3.5 py-3 space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{ backgroundColor: stateColors[selected.state].fill }}
+                />
+                <span className="text-[11px] text-white/80">
+                  {stateColors[selected.state].label}
+                </span>
+              </div>
+
+              {selected.variety && (
+                <Row label="Variety" value={selected.variety} />
+              )}
+              {selected.plantedDate && (
+                <Row label="Planted" value={selected.plantedDate} />
+              )}
+              {selected.expectedHarvest && (
+                <Row label="Harvest due" value={selected.expectedHarvest} />
+              )}
+              {selected.type === "air" && selected.potType && (
+                <Row label="Pot type" value={potTypeLabels[selected.potType]} />
+              )}
+              {selected.type === "air" && (
+                <Row
+                  label="Height"
+                  value={`${LEVEL_HEIGHTS_M[selected.level].toFixed(2)} m`}
+                />
+              )}
+              {selected.notes && (
+                <p className="text-[11px] text-amber-300/90 pt-1">{selected.notes}</p>
+              )}
+            </div>
+
+            {selectedReading && showIrrigation && (
+              <div className="flex items-center gap-1.5 px-3.5 py-2.5 bg-white/5 border-t border-white/10">
+                <span
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{ backgroundColor: zoneStatusColors[selectedReading.status].fill }}
+                />
+                <span className="text-[11px] text-white/80">
+                  {zoneStatusColors[selectedReading.status].label}
+                  {selectedReading.status === "running" &&
+                    ` · ${selectedReading.flowLpm.toFixed(1)} L/min`}
+                  {selectedReading.status === "stale" &&
+                    ` · ${Math.round(selectedReading.ageMs / 1000)}s since contact`}
+                </span>
+                <span className="ml-auto text-[9px] font-semibold text-white/35 uppercase tracking-wider">
+                  {selectedReading.feed}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Degraded-feed notice — the one thing that must never be silent. */}
+        {showIrrigation && degraded.length > 0 && (
+          <div className="absolute right-4 top-4 px-3 py-2 rounded-lg bg-white/95 backdrop-blur ring-1 ring-sand-200 shadow-sm">
+            <p className="text-[11px] font-semibold text-navy-800">
+              {degraded.length} {degraded.length === 1 ? "zone" : "zones"} not reporting
+            </p>
+            <p className="text-[10px] text-navy-400 mt-0.5">
+              Coast window exceeded — state unknown, not idle
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-5 py-3 border-t border-sand-100">
+        {showIrrigation &&
+          (["running", "stale", "fault"] as const).map((st) => (
+            <span key={st} className="inline-flex items-center gap-1.5">
+              <span
+                className="w-2.5 h-2.5 rounded-[3px]"
+                style={{ backgroundColor: zoneStatusColors[st].fill }}
+              />
+              <span className="text-[11px] text-navy-400">{zoneStatusColors[st].label}</span>
+            </span>
+          ))}
+
+        {showIrrigation && <span className="w-px h-3.5 bg-sand-200" />}
+
+        {lens === "state" ? (
+          Object.entries(stateColors).map(([key, c]) => (
+            <span key={key} className="inline-flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-[3px]" style={{ backgroundColor: c.fill }} />
+              <span className="text-[11px] text-navy-400">{c.label}</span>
+            </span>
+          ))
+        ) : (
+          <span className="inline-flex items-center gap-2">
+            <span className="text-[11px] text-navy-400">{LENS_SCALES[lens].low}</span>
+            <span
+              className="h-2 w-24 rounded-full"
+              style={{ background: LENS_SCALES[lens].gradient }}
+            />
+            <span className="text-[11px] text-navy-400">{LENS_SCALES[lens].high}</span>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}

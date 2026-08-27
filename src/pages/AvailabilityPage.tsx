@@ -311,10 +311,10 @@ export default function AvailabilityPage() {
   return (
     <PageShell title="Availability" subtitle="Projections, pruning curves and confirmations" icon={CalendarCheck}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Projected This Week" value={totalProjected.toLocaleString()} icon={TrendingUp} color="blue" />
-        <StatCard label="Confirmed" value={totalConfirmed.toLocaleString()} icon={CheckCircle} color="green" />
-        <StatCard label="Surplus" value={totalSurplus.toLocaleString()} icon={BarChart3} color="amber" />
-        <StatCard label="Shortfall" value={totalShortfall.toLocaleString()} icon={AlertTriangle} color="red" />
+        <StatCard variant="hero" label="Projected This Week" value={totalProjected.toLocaleString()} icon={TrendingUp} />
+        <StatCard label="Confirmed" value={totalConfirmed.toLocaleString()} icon={CheckCircle} />
+        <StatCard tone="warning" label="Surplus" value={totalSurplus.toLocaleString()} icon={BarChart3} />
+        <StatCard tone="critical" label="Shortfall" value={totalShortfall.toLocaleString()} icon={AlertTriangle} />
       </motion.div>
 
       <div className="mb-4"><TabBar tabs={tabs} active={tab} onChange={setTab} /></div>
