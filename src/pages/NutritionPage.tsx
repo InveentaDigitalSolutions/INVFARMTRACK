@@ -29,20 +29,20 @@ const initWeight = [
 
 // --- Nutrient Balance ---
 const initBalance = [
-  { week: 14, bed: "SHN-C1-B5", nApplied: 1.2, pApplied: 0.8, kApplied: 1.0, caApplied: 0.5, nExtracted: 0.9, pExtracted: 0.6, kExtracted: 0.7, caExtracted: 0.3, dryMatterPct: 25 },
-  { week: 14, bed: "SHN-C2-B16", nApplied: 1.5, pApplied: 1.0, kApplied: 1.2, caApplied: 0.6, nExtracted: 1.1, pExtracted: 0.7, kExtracted: 0.9, caExtracted: 0.4, dryMatterPct: 26 },
-  { week: 13, bed: "SHS-C1-B42", nApplied: 1.0, pApplied: 0.6, kApplied: 0.8, caApplied: 0.4, nExtracted: 1.2, pExtracted: 0.5, kExtracted: 1.0, caExtracted: 0.3, dryMatterPct: 24 },
-  { week: 13, bed: "SHN-C1-B5", nApplied: 1.3, pApplied: 0.9, kApplied: 1.1, caApplied: 0.7, nExtracted: 0.8, pExtracted: 0.4, kExtracted: 0.6, caExtracted: 0.2, dryMatterPct: 25 },
-  { week: 12, bed: "SHE-C1-B103", nApplied: 0.8, pApplied: 0.5, kApplied: 0.7, caApplied: 0.3, nExtracted: 1.0, pExtracted: 0.6, kExtracted: 0.9, caExtracted: 0.4, dryMatterPct: 23 },
-  { week: 12, bed: "SHS-C1-B42", nApplied: 1.1, pApplied: 0.7, kApplied: 0.9, caApplied: 0.5, nExtracted: 0.7, pExtracted: 0.3, kExtracted: 0.5, caExtracted: 0.2, dryMatterPct: 25 },
-  { week: 11, bed: "SHN-C3-B22", nApplied: 1.4, pApplied: 1.1, kApplied: 1.3, caApplied: 0.8, nExtracted: 1.0, pExtracted: 0.8, kExtracted: 1.1, caExtracted: 0.5, dryMatterPct: 26 },
-  { week: 11, bed: "SHE-C1-B103", nApplied: 0.9, pApplied: 0.6, kApplied: 0.8, caApplied: 0.4, nExtracted: 1.1, pExtracted: 0.7, kExtracted: 1.0, caExtracted: 0.6, dryMatterPct: 24 },
+  { week: 14, bed: "E1-03", nApplied: 1.2, pApplied: 0.8, kApplied: 1.0, caApplied: 0.5, nExtracted: 0.9, pExtracted: 0.6, kExtracted: 0.7, caExtracted: 0.3, dryMatterPct: 25 },
+  { week: 14, bed: "E1-24", nApplied: 1.5, pApplied: 1.0, kApplied: 1.2, caApplied: 0.6, nExtracted: 1.1, pExtracted: 0.7, kExtracted: 0.9, caExtracted: 0.4, dryMatterPct: 26 },
+  { week: 13, bed: "E3-25", nApplied: 1.0, pApplied: 0.6, kApplied: 0.8, caApplied: 0.4, nExtracted: 1.2, pExtracted: 0.5, kExtracted: 1.0, caExtracted: 0.3, dryMatterPct: 24 },
+  { week: 13, bed: "E1-03", nApplied: 1.3, pApplied: 0.9, kApplied: 1.1, caApplied: 0.7, nExtracted: 0.8, pExtracted: 0.4, kExtracted: 0.6, caExtracted: 0.2, dryMatterPct: 25 },
+  { week: 12, bed: "E3-27", nApplied: 0.8, pApplied: 0.5, kApplied: 0.7, caApplied: 0.3, nExtracted: 1.0, pExtracted: 0.6, kExtracted: 0.9, caExtracted: 0.4, dryMatterPct: 23 },
+  { week: 12, bed: "E3-25", nApplied: 1.1, pApplied: 0.7, kApplied: 0.9, caApplied: 0.5, nExtracted: 0.7, pExtracted: 0.3, kExtracted: 0.5, caExtracted: 0.2, dryMatterPct: 25 },
+  { week: 11, bed: "C3-20", nApplied: 1.4, pApplied: 1.1, kApplied: 1.3, caApplied: 0.8, nExtracted: 1.0, pExtracted: 0.8, kExtracted: 1.1, caExtracted: 0.5, dryMatterPct: 26 },
+  { week: 11, bed: "E3-27", nApplied: 0.9, pApplied: 0.6, kApplied: 0.8, caApplied: 0.4, nExtracted: 1.1, pExtracted: 0.7, kExtracted: 1.0, caExtracted: 0.6, dryMatterPct: 24 },
 ];
 
 // --- Soil Analysis ---
 const initSoil = [
   {
-    sampleDate: "2023-10-23", reportDate: "2023-11-05", lab: "Zamorano (LSZ)", labCode: "23-S-3674", reportNumber: "2023-329.b", crop: "Epipremnum sp.", bed: "SHN-C1-B5",
+    sampleDate: "2023-10-23", reportDate: "2023-11-05", lab: "Zamorano (LSZ)", labCode: "23-S-3674", reportNumber: "2023-329.b", crop: "Epipremnum sp.", bed: "E1-03",
     texture: "Franco Arcillo Arenoso", sand: 62, silt: 16, clay: 22,
     ph: 5.03, organicCarbon: 3.35, organicMatter: 5.78, nTotal: 0.29, al: 1, alSaturation: 17, ce: 0.11, cl: 11, cic: 14,
     ca: 797, mg: 105, k: 197, na: 0, cice: 6.43,
@@ -54,8 +54,8 @@ const initSoil = [
 
 // --- Foliar Analysis ---
 const initFoliar = [
-  { sampleDate: "2026-03-15", reportDate: "2026-03-28", lab: "Zamorano (LSZ)", labCode: "26-F-0412", crop: "Epipremnum sp.", bed: "SHN-C1-B5", n: 2.85, p: 0.32, k: 3.10, ca: 1.45, mg: 0.38, fe: 125, zn: 32, mn: 85, cu: 6.2, b: 28, s: 0.21 },
-  { sampleDate: "2026-01-20", reportDate: "2026-02-05", lab: "Zamorano (LSZ)", labCode: "26-F-0198", crop: "Epipremnum sp.", bed: "SHS-C1-B42", n: 2.62, p: 0.28, k: 2.90, ca: 1.30, mg: 0.35, fe: 110, zn: 28, mn: 78, cu: 5.8, b: 25, s: 0.19 },
+  { sampleDate: "2026-03-15", reportDate: "2026-03-28", lab: "Zamorano (LSZ)", labCode: "26-F-0412", crop: "Epipremnum sp.", bed: "E1-03", n: 2.85, p: 0.32, k: 3.10, ca: 1.45, mg: 0.38, fe: 125, zn: 32, mn: 85, cu: 6.2, b: 28, s: 0.21 },
+  { sampleDate: "2026-01-20", reportDate: "2026-02-05", lab: "Zamorano (LSZ)", labCode: "26-F-0198", crop: "Epipremnum sp.", bed: "E3-25", n: 2.62, p: 0.28, k: 2.90, ca: 1.30, mg: 0.35, fe: 110, zn: 28, mn: 78, cu: 5.8, b: 25, s: 0.19 },
 ];
 
 // --- Form Definitions ---

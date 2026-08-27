@@ -49,10 +49,10 @@ const initTasks = [
 ];
 
 const initPruning = [
-  { date: "2026-04-08", bed: "SHN-C1-B5", week: 15, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Carlos M." },
-  { date: "2026-04-06", bed: "SHS-C1-B42", week: 15, bedsPruned: 2, cuttingsEstimated: 1000, worker: "Maria L." },
-  { date: "2026-04-03", bed: "SHN-C2-B16", week: 14, bedsPruned: 4, cuttingsEstimated: 2100, worker: "Juan P." },
-  { date: "2026-04-01", bed: "SHE-C1-B103", week: 14, bedsPruned: 3, cuttingsEstimated: 1400, worker: "Ana R." },
+  { date: "2026-04-08", bed: "E1-03", week: 15, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Carlos M." },
+  { date: "2026-04-06", bed: "E3-25", week: 15, bedsPruned: 2, cuttingsEstimated: 1000, worker: "Maria L." },
+  { date: "2026-04-03", bed: "E1-24", week: 14, bedsPruned: 4, cuttingsEstimated: 2100, worker: "Juan P." },
+  { date: "2026-04-01", bed: "E3-27", week: 14, bedsPruned: 3, cuttingsEstimated: 1400, worker: "Ana R." },
 ];
 const initSeasons = [
   { name: "2026-S1", start: "2026-01-01", end: "2026-06-30", description: "First season 2026", active: true },
@@ -60,34 +60,40 @@ const initSeasons = [
 ];
 const productionPlanWeeks = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
 const productionPlan = [
-  { variety: "Pothos / Hawaiian",       bed: "SHN-C1",  plant: [10, 11], grow: [12, 15], harvest: [16, 17], ship: [17, 18], qty: 53525 },
-  { variety: "Pothos / Marble Queen",   bed: "SHN-C2",  plant: [11, 12], grow: [13, 16], harvest: [16, 18], ship: [17, 19], qty: 102500 },
-  { variety: "Pothos / Jade",           bed: "SHS-C1",  plant: [10, 11], grow: [12, 15], harvest: [16, 17], ship: [17, 18], qty: 39250 },
-  { variety: "Pothos / N'Joy",          bed: "SHE-C1",  plant: [12, 13], grow: [14, 17], harvest: [18, 19], ship: [19, 20], qty: 2526 },
-  { variety: "Pothos / Golden Glen",    bed: "SHE-C2",  plant: [12, 13], grow: [14, 18], harvest: [18, 20], ship: [19, 21], qty: 6365 },
-  { variety: "Sansevieria",             bed: "SHN-C3",  plant: [10, 12], grow: [13, 19], harvest: [20, 21], ship: [21, 22], qty: 4000 },
+  { variety: "Pothos / Hawaiian",       shadehouse: "SH-0001", bed: "E3",  plant: [10, 11], grow: [12, 15], harvest: [16, 17], ship: [17, 18], qty: 53525 },
+  { variety: "Pothos / Marble Queen",   shadehouse: "SH-0001", bed: "C3",  plant: [11, 12], grow: [13, 16], harvest: [16, 18], ship: [17, 19], qty: 102500 },
+  { variety: "Pothos / Jade",           shadehouse: "SH-0001", bed: "E1",  plant: [10, 11], grow: [12, 15], harvest: [16, 17], ship: [17, 18], qty: 39250 },
+  { variety: "Pothos / N'Joy",          shadehouse: "SH-0001", bed: "C1",  plant: [12, 13], grow: [14, 17], harvest: [18, 19], ship: [19, 20], qty: 2526 },
+  { variety: "Pothos / Golden Glen",    shadehouse: "SH-0001", bed: "E3",  plant: [12, 13], grow: [14, 18], harvest: [18, 20], ship: [19, 21], qty: 6365 },
+  { variety: "Sansevieria",             shadehouse: "SH-0001", bed: "C3",  plant: [10, 12], grow: [13, 19], harvest: [20, 21], ship: [21, 22], qty: 4000 },
 ];
 
 const utilizationWeeks = [14, 15, 16, 17, 18, 19, 20];
+const SHADEHOUSES: Record<string, string> = { "SH-0001": "Shadehouse 1" };
+const shadehouseLabel = (id: string) => `${id} · ${SHADEHOUSES[id] ?? "Unknown"}`;
+
 const bedUtilization = [
-  { bed: "SHN-C1-B01", area: "Shadehouse North", weeks: { 14: 60, 15: 75, 16: 95, 17: 100, 18: 110, 19: 80, 20: 40 } },
-  { bed: "SHN-C1-B02", area: "Shadehouse North", weeks: { 14: 80, 15: 90, 16: 100, 17: 105, 18: 95, 19: 70, 20: 50 } },
-  { bed: "SHN-C2-B12", area: "Shadehouse North", weeks: { 14: 50, 15: 60, 16: 75, 17: 90, 18: 100, 19: 95, 20: 70 } },
-  { bed: "SHN-C2-B16", area: "Shadehouse North", weeks: { 14: 40, 15: 55, 16: 70, 17: 95, 18: 115, 19: 100, 20: 65 } },
-  { bed: "SHN-C3-B05", area: "Shadehouse North", weeks: { 14: 30, 15: 40, 16: 60, 17: 80, 18: 90, 19: 95, 20: 100 } },
-  { bed: "SHS-C1-B01", area: "Shadehouse South", weeks: { 14: 70, 15: 85, 16: 100, 17: 110, 18: 120, 19: 80, 20: 30 } },
-  { bed: "SHS-C1-B14", area: "Shadehouse South", weeks: { 14: 65, 15: 70, 16: 80, 17: 95, 18: 100, 19: 70, 20: 40 } },
-  { bed: "SHS-C2-B22", area: "Shadehouse South", weeks: { 14: 45, 15: 60, 16: 75, 17: 85, 18: 90, 19: 65, 20: 35 } },
-  { bed: "SHE-C1-B03", area: "Shadehouse East",  weeks: { 14: 30, 15: 40, 16: 55, 17: 70, 18: 85, 19: 100, 20: 95 } },
-  { bed: "SHE-C1-B08", area: "Shadehouse East",  weeks: { 14: 25, 15: 35, 16: 50, 17: 65, 18: 80, 19: 95, 20: 105 } },
-  { bed: "SHE-C2-B11", area: "Shadehouse East",  weeks: { 14: 20, 15: 30, 16: 45, 17: 60, 18: 75, 19: 90, 20: 100 } },
+  // Bed ids are PLOT-NN, as in the layout. Shadehouse is explicit so the view
+  // still reads correctly once a second house exists.
+  { bed: "E3-04", shadehouse: "SH-0001", area: "Plot E3", weeks: { 14: 60, 15: 75, 16: 95, 17: 100, 18: 110, 19: 80, 20: 40 } },
+  { bed: "E3-12", shadehouse: "SH-0001", area: "Plot E3", weeks: { 14: 80, 15: 90, 16: 100, 17: 105, 18: 95, 19: 70, 20: 50 } },
+  { bed: "E3-21", shadehouse: "SH-0001", area: "Plot E3", weeks: { 14: 50, 15: 60, 16: 75, 17: 90, 18: 100, 19: 95, 20: 70 } },
+  { bed: "E3-30", shadehouse: "SH-0001", area: "Plot E3", weeks: { 14: 40, 15: 55, 16: 70, 17: 95, 18: 115, 19: 100, 20: 65 } },
+  { bed: "C3-02", shadehouse: "SH-0001", area: "Plot C3", weeks: { 14: 30, 15: 40, 16: 60, 17: 80, 18: 90, 19: 95, 20: 100 } },
+  { bed: "C3-11", shadehouse: "SH-0001", area: "Plot C3", weeks: { 14: 70, 15: 85, 16: 100, 17: 110, 18: 120, 19: 80, 20: 30 } },
+  { bed: "C3-19", shadehouse: "SH-0001", area: "Plot C3", weeks: { 14: 65, 15: 70, 16: 80, 17: 95, 18: 100, 19: 70, 20: 40 } },
+  { bed: "E1-06", shadehouse: "SH-0001", area: "Plot E1", weeks: { 14: 45, 15: 60, 16: 75, 17: 85, 18: 90, 19: 65, 20: 35 } },
+  { bed: "E1-17", shadehouse: "SH-0001", area: "Plot E1", weeks: { 14: 30, 15: 40, 16: 55, 17: 70, 18: 85, 19: 100, 20: 95 } },
+  { bed: "E1-28", shadehouse: "SH-0001", area: "Plot E1", weeks: { 14: 25, 15: 35, 16: 50, 17: 65, 18: 80, 19: 95, 20: 105 } },
+  { bed: "C1-09", shadehouse: "SH-0001", area: "Plot C1", weeks: { 14: 20, 15: 30, 16: 45, 17: 60, 18: 75, 19: 90, 20: 100 } },
+  { bed: "C1-20", shadehouse: "SH-0001", area: "Plot C1", weeks: { 14: 55, 15: 65, 16: 80, 17: 90, 18: 100, 19: 85, 20: 60 } },
 ];
 
 const initFertilization = [
-  { date: "2026-04-09", bed: "SHN-C1-B3", input: "NPK 20-20-20", qtyKg: 5, method: "Drench", nKg: 1.0, pKg: 1.0, kKg: 1.0, caKg: 0, worker: "Carlos M." },
-  { date: "2026-04-07", bed: "SHS-C1-B45", input: "Calcium Nitrate", qtyKg: 3, method: "Foliar", nKg: 0.5, pKg: 0, kKg: 0, caKg: 0.6, worker: "Maria L." },
-  { date: "2026-04-04", bed: "SHN-C3-B22", input: "NPK 20-20-20", qtyKg: 4, method: "Drench", nKg: 0.8, pKg: 0.8, kKg: 0.8, caKg: 0, worker: "Juan P." },
-  { date: "2026-04-01", bed: "SHE-C1-B108", input: "MKP (0-52-34)", qtyKg: 2, method: "Foliar", nKg: 0, pKg: 1.04, kKg: 0.68, caKg: 0, worker: "Ana R." },
+  { date: "2026-04-09", bed: "E3-31", input: "NPK 20-20-20", qtyKg: 5, method: "Drench", nKg: 1.0, pKg: 1.0, kKg: 1.0, caKg: 0, worker: "Carlos M." },
+  { date: "2026-04-07", bed: "E3-01", input: "Calcium Nitrate", qtyKg: 3, method: "Foliar", nKg: 0.5, pKg: 0, kKg: 0, caKg: 0.6, worker: "Maria L." },
+  { date: "2026-04-04", bed: "C3-20", input: "NPK 20-20-20", qtyKg: 4, method: "Drench", nKg: 0.8, pKg: 0.8, kKg: 0.8, caKg: 0, worker: "Juan P." },
+  { date: "2026-04-01", bed: "C3-16", input: "MKP (0-52-34)", qtyKg: 2, method: "Foliar", nKg: 0, pKg: 1.04, kKg: 0.68, caKg: 0, worker: "Ana R." },
 ];
 
 const plantOptions = [
@@ -276,7 +282,7 @@ function ProductionPlanGantt() {
         <div>
           <h3 className="text-[15px] font-bold text-navy-900 tracking-tight">Production Schedule</h3>
           <p className="text-[12px] text-navy-500 mt-0.5">
-            Q2 2026 · {productionPlan.length} varieties · Weeks {minWeek}–{maxWeek} · <span className="font-mono font-semibold text-navy-700">{totalQty.toLocaleString()}</span> stems
+            {[...new Set(productionPlan.map((r) => r.shadehouse))].map(shadehouseLabel).join(", ")} · Q2 2026 · {productionPlan.length} varieties · Weeks {minWeek}–{maxWeek} · <span className="font-mono font-semibold text-navy-700">{totalQty.toLocaleString()}</span> stems
           </p>
         </div>
         <div className="flex items-center gap-3 px-3.5 py-2 rounded-full bg-white border border-sand-200/80 shadow-sm">
@@ -327,7 +333,9 @@ function ProductionPlanGantt() {
                 >
                   <div className="w-[240px] shrink-0 px-5 py-3.5 border-r border-sand-100">
                     <p className="text-[13px] font-semibold text-navy-900 leading-tight">{row.variety}</p>
-                    <p className="text-[11px] text-navy-400 mt-0.5 font-mono">{row.bed}</p>
+                    <p className="text-[11px] text-navy-400 mt-0.5 font-mono">
+                      {row.shadehouse} · Plot {row.bed}
+                    </p>
                   </div>
                   <div className="flex-1 relative">
                     {/* Gridlines */}
@@ -425,7 +433,7 @@ function BedUtilizationHeatmap() {
         <div>
           <h3 className="text-[15px] font-bold text-navy-900 tracking-tight">Bed Utilization</h3>
           <p className="text-[12px] text-navy-500 mt-0.5">
-            Weeks {utilizationWeeks[0]}–{utilizationWeeks[utilizationWeeks.length - 1]} · {bedUtilization.length} beds · avg <span className="font-mono font-semibold text-navy-700">{avgAll}%</span>
+            {[...new Set(bedUtilization.map((b) => b.shadehouse))].map(shadehouseLabel).join(", ")} · Weeks {utilizationWeeks[0]}–{utilizationWeeks[utilizationWeeks.length - 1]} · {bedUtilization.length} beds · avg <span className="font-mono font-semibold text-navy-700">{avgAll}%</span>
             {overCount > 0 && (
               <> · <span className="text-red-600 font-semibold">{overCount} over-capacity cell{overCount === 1 ? "" : "s"}</span></>
             )}
@@ -470,6 +478,10 @@ function BedUtilizationHeatmap() {
                       colSpan={utilizationWeeks.length + 2}
                       className="px-5 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-navy-700 sticky left-0 bg-sand-100/70 z-20"
                     >
+                      <span className="text-navy-400 font-mono">
+                        {bedUtilization.find((b) => b.area === area)?.shadehouse}
+                      </span>
+                      <span className="mx-1.5 text-navy-300">·</span>
                       {area}
                     </td>
                   </tr>

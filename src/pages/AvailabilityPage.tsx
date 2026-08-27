@@ -61,12 +61,12 @@ const initCurve = [
 
 // --- Pruning Log data ---
 const initLog = [
-  { date: "2026-04-07", bed: "SHN-C1-B3", week: 15, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Carlos M." },
-  { date: "2026-04-06", bed: "SHN-C2-B14", week: 15, bedsPruned: 2, cuttingsEstimated: 1000, worker: "Maria L." },
-  { date: "2026-04-05", bed: "SHS-C1-B45", week: 14, bedsPruned: 4, cuttingsEstimated: 2000, worker: "Juan P." },
-  { date: "2026-04-03", bed: "SHN-C3-B25", week: 14, bedsPruned: 3, cuttingsEstimated: 1400, worker: "Ana R." },
-  { date: "2026-04-01", bed: "SHS-C2-B60", week: 14, bedsPruned: 5, cuttingsEstimated: 2600, worker: "Carlos M." },
-  { date: "2026-03-30", bed: "SHE-C1-B105", week: 13, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Maria L." },
+  { date: "2026-04-07", bed: "E3-31", week: 15, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Carlos M." },
+  { date: "2026-04-06", bed: "E1-18", week: 15, bedsPruned: 2, cuttingsEstimated: 1000, worker: "Maria L." },
+  { date: "2026-04-05", bed: "E3-01", week: 14, bedsPruned: 4, cuttingsEstimated: 2000, worker: "Juan P." },
+  { date: "2026-04-03", bed: "C3-02", week: 14, bedsPruned: 3, cuttingsEstimated: 1400, worker: "Ana R." },
+  { date: "2026-04-01", bed: "E1-26", week: 14, bedsPruned: 5, cuttingsEstimated: 2600, worker: "Carlos M." },
+  { date: "2026-03-30", bed: "E1-33", week: 13, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Maria L." },
 ];
 
 // --- Options ---
