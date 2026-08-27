@@ -1,24 +1,24 @@
 {
-  "publisherPrefix": "inv",
-  "solutionName": "DigitalFarmTracking",
+  "publisherPrefix": "bv",
+  "solutionName": "BrotonVerdeNursery",
   "version": "2.0.0.0",
   "tables": [
     {
-      "schemaName": "inv_Shadehouse",
+      "schemaName": "bv_Shadehouse",
       "displayName": "Shadehouse",
       "displayCollectionName": "Shadehouses",
       "description": "Physical growing structures in the nursery",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_ShadehouseName",
+          "schemaName": "bv_ShadehouseName",
           "displayName": "Shadehouse Name",
           "type": "string",
           "maxLength": 100,
           "required": true
         },
         {
-          "schemaName": "inv_Code",
+          "schemaName": "bv_Code",
           "displayName": "Code",
           "type": "autonumber",
           "maxLength": 40,
@@ -28,39 +28,39 @@
           "description": "Auto-generated identifier, format SH-0001."
         },
         {
-          "schemaName": "inv_Location",
+          "schemaName": "bv_Location",
           "displayName": "Location",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Coordinates",
+          "schemaName": "bv_Coordinates",
           "displayName": "Coordinates",
           "type": "string",
           "maxLength": 100,
           "required": false
         },
         {
-          "schemaName": "inv_Length",
+          "schemaName": "bv_Length",
           "displayName": "Length (m)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Width",
+          "schemaName": "bv_Width",
           "displayName": "Width (m)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Capacity",
+          "schemaName": "bv_Capacity",
           "displayName": "Capacity (beds)",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_IsActive",
+          "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
@@ -69,14 +69,14 @@
       ]
     },
     {
-      "schemaName": "inv_Bed",
+      "schemaName": "bv_Bed",
       "displayName": "Bed",
       "displayCollectionName": "Beds",
       "description": "Growing beds within batches (Shadehouse > Batch > Bed)",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_BedCode",
+          "schemaName": "bv_BedCode",
           "displayName": "Bed ID",
           "type": "autonumber",
           "autoNumberFormat": "BED-{SEQNUM:4}",
@@ -86,178 +86,178 @@
           "description": "Auto-generated identifier, format BED-0001."
         },
         {
-          "schemaName": "inv_BedName",
+          "schemaName": "bv_BedName",
           "displayName": "Bed Name",
           "type": "string",
           "maxLength": 100,
           "required": true
         },
         {
-          "schemaName": "inv_FieldId",
+          "schemaName": "bv_FieldId",
           "displayName": "Field",
           "type": "lookup",
-          "relatedTable": "inv_Field",
+          "relatedTable": "bv_Field",
           "required": true
         },
         {
-          "schemaName": "inv_Type",
+          "schemaName": "bv_Type",
           "displayName": "Type",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Air"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Ground"
             }
           ]
         },
         {
-          "schemaName": "inv_Level",
+          "schemaName": "bv_Level",
           "displayName": "Level",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "0"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "1"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "2"
             },
             {
-              "value": 681340003,
+              "value": 121320003,
               "label": "3"
             }
           ]
         },
         {
-          "schemaName": "inv_Capacity",
+          "schemaName": "bv_Capacity",
           "displayName": "Capacity",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_BedMaterial",
+          "schemaName": "bv_BedMaterial",
           "displayName": "Bed Material",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Wood"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Concrete"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "Plastic"
             },
             {
-              "value": 681340003,
+              "value": 121320003,
               "label": "Metal"
             }
           ]
         },
         {
-          "schemaName": "inv_SoilType",
+          "schemaName": "bv_SoilType",
           "displayName": "Soil Type",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Sandy"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Loamy"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "Clay"
             },
             {
-              "value": 681340003,
+              "value": 121320003,
               "label": "Peaty"
             },
             {
-              "value": 681340004,
+              "value": 121320004,
               "label": "Chalky"
             },
             {
-              "value": 681340005,
+              "value": 121320005,
               "label": "Silty"
             }
           ]
         },
         {
-          "schemaName": "inv_Drainage",
+          "schemaName": "bv_Drainage",
           "displayName": "Drainage",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Excellent"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Good"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "Moderate"
             },
             {
-              "value": 681340003,
+              "value": 121320003,
               "label": "Poor"
             }
           ]
         },
         {
-          "schemaName": "inv_IrrigationType",
+          "schemaName": "bv_IrrigationType",
           "displayName": "Irrigation Type",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Drip"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Sprinkler"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "Manual"
             },
             {
-              "value": 681340003,
+              "value": 121320003,
               "label": "None"
             }
           ]
         },
         {
-          "schemaName": "inv_Location",
+          "schemaName": "bv_Location",
           "displayName": "Location",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_IsActive",
+          "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
@@ -266,21 +266,21 @@
       ]
     },
     {
-      "schemaName": "inv_Plant",
+      "schemaName": "bv_Plant",
       "displayName": "Plant",
       "displayCollectionName": "Plants",
       "description": "Plant species, varieties, and patent catalog",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_PlantName",
+          "schemaName": "bv_PlantName",
           "displayName": "Plant Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_InvoiceName",
+          "schemaName": "bv_InvoiceName",
           "displayName": "Invoice Name",
           "type": "string",
           "maxLength": 200,
@@ -288,7 +288,7 @@
           "description": "Auto-composed: {Name} / {Variety} — used on invoices and packing lists"
         },
         {
-          "schemaName": "inv_PlantCode",
+          "schemaName": "bv_PlantCode",
           "displayName": "Plant Code",
           "type": "autonumber",
           "maxLength": 40,
@@ -298,213 +298,213 @@
           "description": "Auto-generated identifier, format PLT-0001."
         },
         {
-          "schemaName": "inv_LatinName",
+          "schemaName": "bv_LatinName",
           "displayName": "Latin Name",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Species",
+          "schemaName": "bv_Species",
           "displayName": "Species",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Variety",
+          "schemaName": "bv_Variety",
           "displayName": "Variety",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Origin",
+          "schemaName": "bv_Origin",
           "displayName": "Origin",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_PatentNumber",
+          "schemaName": "bv_PatentNumber",
           "displayName": "Patent Number",
           "type": "string",
           "maxLength": 100,
           "required": false
         },
         {
-          "schemaName": "inv_PatentHolder",
+          "schemaName": "bv_PatentHolder",
           "displayName": "Patent Holder",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_PatentExpiry",
+          "schemaName": "bv_PatentExpiry",
           "displayName": "Patent Expiry Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_IsPatented",
+          "schemaName": "bv_IsPatented",
           "displayName": "Is Patented",
           "type": "boolean",
           "required": false,
           "defaultValue": false
         },
         {
-          "schemaName": "inv_GrowthHabit",
+          "schemaName": "bv_GrowthHabit",
           "displayName": "Growth Habit",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Upright"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Spreading"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "Climbing"
             },
             {
-              "value": 681340003,
+              "value": 121320003,
               "label": "Trailing"
             }
           ]
         },
         {
-          "schemaName": "inv_PropagationMethod",
+          "schemaName": "bv_PropagationMethod",
           "displayName": "Propagation Method",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Seed"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Cutting"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "Division"
             },
             {
-              "value": 681340003,
+              "value": 121320003,
               "label": "Grafting"
             },
             {
-              "value": 681340004,
+              "value": 121320004,
               "label": "Tissue Culture"
             }
           ]
         },
         {
-          "schemaName": "inv_SunlightRequirement",
+          "schemaName": "bv_SunlightRequirement",
           "displayName": "Sunlight Requirement",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Full Sun"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Partial Shade"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "Full Shade"
             }
           ]
         },
         {
-          "schemaName": "inv_WaterRequirement",
+          "schemaName": "bv_WaterRequirement",
           "displayName": "Water Requirement",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Low"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Medium"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "High"
             }
           ]
         },
         {
-          "schemaName": "inv_SoilType",
+          "schemaName": "bv_SoilType",
           "displayName": "Soil Type",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340000,
+              "value": 121320000,
               "label": "Sandy"
             },
             {
-              "value": 681340001,
+              "value": 121320001,
               "label": "Loamy"
             },
             {
-              "value": 681340002,
+              "value": 121320002,
               "label": "Clay"
             },
             {
-              "value": 681340003,
+              "value": 121320003,
               "label": "Peaty"
             },
             {
-              "value": 681340004,
+              "value": 121320004,
               "label": "Chalky"
             },
             {
-              "value": 681340005,
+              "value": 121320005,
               "label": "Silty"
             }
           ]
         },
         {
-          "schemaName": "inv_BloomPeriod",
+          "schemaName": "bv_BloomPeriod",
           "displayName": "Bloom Period",
           "type": "string",
           "maxLength": 100,
           "required": false
         },
         {
-          "schemaName": "inv_DefaultUnitPrice",
+          "schemaName": "bv_DefaultUnitPrice",
           "displayName": "Default Unit Price",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_Characteristics",
+          "schemaName": "bv_Characteristics",
           "displayName": "Characteristics",
           "type": "memo",
           "maxLength": 4000,
           "required": false
         },
         {
-          "schemaName": "inv_ImageUrl",
+          "schemaName": "bv_ImageUrl",
           "displayName": "Image URL",
           "type": "string",
           "maxLength": 500,
           "required": false
         },
         {
-          "schemaName": "inv_IsActive",
+          "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
@@ -513,14 +513,14 @@
       ]
     },
     {
-      "schemaName": "inv_Season",
+      "schemaName": "bv_Season",
       "displayName": "Season",
       "displayCollectionName": "Seasons",
       "description": "Growing seasons for tracking performance over time",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_SeasonCode",
+          "schemaName": "bv_SeasonCode",
           "displayName": "Season ID",
           "type": "autonumber",
           "autoNumberFormat": "SSN-{SEQNUM:4}",
@@ -530,33 +530,33 @@
           "description": "Auto-generated identifier, format SSN-0001."
         },
         {
-          "schemaName": "inv_SeasonName",
+          "schemaName": "bv_SeasonName",
           "displayName": "Season Name",
           "type": "string",
           "maxLength": 100,
           "required": true
         },
         {
-          "schemaName": "inv_StartDate",
+          "schemaName": "bv_StartDate",
           "displayName": "Start Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_EndDate",
+          "schemaName": "bv_EndDate",
           "displayName": "End Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_Description",
+          "schemaName": "bv_Description",
           "displayName": "Description",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_IsActive",
+          "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
@@ -565,14 +565,14 @@
       ]
     },
     {
-      "schemaName": "inv_Field",
+      "schemaName": "bv_Field",
       "displayName": "Field",
       "displayCollectionName": "Fields",
       "description": "Production fields of plants within a shadehouse",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_FieldCode",
+          "schemaName": "bv_FieldCode",
           "displayName": "Field Code",
           "type": "autonumber",
           "maxLength": 40,
@@ -582,28 +582,28 @@
           "description": "Auto-generated identifier, format FLD-0001."
         },
         {
-          "schemaName": "inv_ShadehouseId",
+          "schemaName": "bv_ShadehouseId",
           "displayName": "Shadehouse",
           "type": "lookup",
-          "relatedTable": "inv_Shadehouse",
+          "relatedTable": "bv_Shadehouse",
           "required": true
         },
         {
-          "schemaName": "inv_SeasonId",
+          "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
-          "relatedTable": "inv_Season",
+          "relatedTable": "bv_Season",
           "required": false
         },
         {
-          "schemaName": "inv_Position",
+          "schemaName": "bv_Position",
           "displayName": "Position",
           "type": "string",
           "maxLength": 100,
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -612,14 +612,14 @@
       ]
     },
     {
-      "schemaName": "inv_Planting",
+      "schemaName": "bv_Planting",
       "displayName": "Planting",
       "displayCollectionName": "Plantings",
       "description": "Records of plants placed in beds — central activity hub",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_PlantingCode",
+          "schemaName": "bv_PlantingCode",
           "displayName": "Planting ID",
           "type": "autonumber",
           "autoNumberFormat": "PLG-{SEQNUM:4}",
@@ -629,54 +629,54 @@
           "description": "Auto-generated identifier, format PLG-0001."
         },
         {
-          "schemaName": "inv_PlantingDescription",
+          "schemaName": "bv_PlantingDescription",
           "displayName": "Planting Description",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_PlantId",
+          "schemaName": "bv_PlantId",
           "displayName": "Plant",
           "type": "lookup",
-          "relatedTable": "inv_Plant",
+          "relatedTable": "bv_Plant",
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": true
         },
         {
-          "schemaName": "inv_SeasonId",
+          "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
-          "relatedTable": "inv_Season",
+          "relatedTable": "bv_Season",
           "required": true
         },
         {
-          "schemaName": "inv_PlantingDate",
+          "schemaName": "bv_PlantingDate",
           "displayName": "Planting Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_Quantity",
+          "schemaName": "bv_Quantity",
           "displayName": "Quantity",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_CurrentPlanting",
+          "schemaName": "bv_CurrentPlanting",
           "displayName": "Current Planting",
           "type": "boolean",
           "required": false,
           "defaultValue": true
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -685,14 +685,14 @@
       ]
     },
     {
-      "schemaName": "inv_Input",
+      "schemaName": "bv_Input",
       "displayName": "Input",
       "displayCollectionName": "Inputs",
       "description": "Catalog of fertilizers, pesticides, and other inputs",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_InputCode",
+          "schemaName": "bv_InputCode",
           "displayName": "Input ID",
           "type": "autonumber",
           "autoNumberFormat": "INP-{SEQNUM:4}",
@@ -702,157 +702,157 @@
           "description": "Auto-generated identifier, format INP-0001."
         },
         {
-          "schemaName": "inv_InputName",
+          "schemaName": "bv_InputName",
           "displayName": "Input Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_InputCategory",
+          "schemaName": "bv_InputCategory",
           "displayName": "Input Category",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Fertilizer"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Pesticide"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Fungicide"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Herbicide"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Growth Regulator"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Other"
             }
           ]
         },
         {
-          "schemaName": "inv_InputSubtype",
+          "schemaName": "bv_InputSubtype",
           "displayName": "Input Subtype",
           "type": "string",
           "maxLength": 100,
           "required": false
         },
         {
-          "schemaName": "inv_Brand",
+          "schemaName": "bv_Brand",
           "displayName": "Brand",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Composition",
+          "schemaName": "bv_Composition",
           "displayName": "Composition",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_ApplicationMethod",
+          "schemaName": "bv_ApplicationMethod",
           "displayName": "Application Method",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Foliar Spray"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Soil Drench"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Granular"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Drip"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Broadcast"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Other"
             }
           ]
         },
         {
-          "schemaName": "inv_SafetyIntervalDays",
+          "schemaName": "bv_SafetyIntervalDays",
           "displayName": "Safety Interval (days)",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_StorageInstructions",
+          "schemaName": "bv_StorageInstructions",
           "displayName": "Storage Instructions",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_EnvironmentalImpact",
+          "schemaName": "bv_EnvironmentalImpact",
           "displayName": "Environmental Impact",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_ManufacturerContact",
+          "schemaName": "bv_ManufacturerContact",
           "displayName": "Manufacturer Contact",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_Formulation",
+          "schemaName": "bv_Formulation",
           "displayName": "Formulation",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340210,
+              "value": 121320210,
               "label": "Solid"
             },
             {
-              "value": 681340211,
+              "value": 121320211,
               "label": "Soluble powder"
             },
             {
-              "value": 681340212,
+              "value": 121320212,
               "label": "Liquid"
             },
             {
-              "value": 681340213,
+              "value": 121320213,
               "label": "Suspension"
             }
           ]
         },
         {
-          "schemaName": "inv_DensityKgPerL",
+          "schemaName": "bv_DensityKgPerL",
           "displayName": "Density (kg/L)",
           "type": "decimal",
           "precision": 3,
@@ -864,14 +864,14 @@
       ]
     },
     {
-      "schemaName": "inv_Treatment",
+      "schemaName": "bv_Treatment",
       "displayName": "Treatment",
       "displayCollectionName": "Treatments",
       "description": "Treatment/fumigation applications to plantings",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_TreatmentCode",
+          "schemaName": "bv_TreatmentCode",
           "displayName": "Treatment ID",
           "type": "autonumber",
           "autoNumberFormat": "TRT-{SEQNUM:4}",
@@ -881,91 +881,91 @@
           "description": "Auto-generated identifier, format TRT-0001."
         },
         {
-          "schemaName": "inv_TreatmentName",
+          "schemaName": "bv_TreatmentName",
           "displayName": "Treatment Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": true,
           "description": "Which bed was treated"
         },
         {
-          "schemaName": "inv_InputId",
+          "schemaName": "bv_InputId",
           "displayName": "Input",
           "type": "lookup",
-          "relatedTable": "inv_Input",
+          "relatedTable": "bv_Input",
           "required": false
         },
         {
-          "schemaName": "inv_Date",
+          "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_Type",
+          "schemaName": "bv_Type",
           "displayName": "Type",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Insecticide"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Fungicide"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Herbicide"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Regulator"
             }
           ]
         },
         {
-          "schemaName": "inv_TemperatureC",
+          "schemaName": "bv_TemperatureC",
           "displayName": "Temperature (C)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Humidity",
+          "schemaName": "bv_Humidity",
           "displayName": "Humidity (%)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_PH",
+          "schemaName": "bv_PH",
           "displayName": "pH",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Worker",
+          "schemaName": "bv_Worker",
           "displayName": "Worker",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_Dose",
+          "schemaName": "bv_Dose",
           "displayName": "Dose",
           "type": "decimal",
           "precision": 4,
@@ -975,31 +975,31 @@
           "description": "Amount of product applied; unit in Dose Unit."
         },
         {
-          "schemaName": "inv_DoseUnit",
+          "schemaName": "bv_DoseUnit",
           "displayName": "Dose Unit",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340230,
+              "value": 121320230,
               "label": "kg"
             },
             {
-              "value": 681340231,
+              "value": 121320231,
               "label": "L"
             },
             {
-              "value": 681340232,
+              "value": 121320232,
               "label": "g"
             },
             {
-              "value": 681340233,
+              "value": 121320233,
               "label": "mL"
             }
           ]
         },
         {
-          "schemaName": "inv_WaterVolumeL",
+          "schemaName": "bv_WaterVolumeL",
           "displayName": "Water Volume (L)",
           "type": "decimal",
           "precision": 2,
@@ -1011,14 +1011,14 @@
       ]
     },
     {
-      "schemaName": "inv_Irrigation",
+      "schemaName": "bv_Irrigation",
       "displayName": "Irrigation",
       "displayCollectionName": "Irrigations",
       "description": "Watering events for plantings",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_IrrigationCode",
+          "schemaName": "bv_IrrigationCode",
           "displayName": "Irrigation ID",
           "type": "autonumber",
           "autoNumberFormat": "IRR-{SEQNUM:4}",
@@ -1028,120 +1028,120 @@
           "description": "Auto-generated identifier, format IRR-0001."
         },
         {
-          "schemaName": "inv_IrrigationName",
+          "schemaName": "bv_IrrigationName",
           "displayName": "Irrigation Event Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": true,
           "description": "Which bed was irrigated"
         },
         {
-          "schemaName": "inv_Date",
+          "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_AmountLiters",
+          "schemaName": "bv_AmountLiters",
           "displayName": "Amount (Liters)",
           "type": "decimal",
           "required": true
         },
         {
-          "schemaName": "inv_Method",
+          "schemaName": "bv_Method",
           "displayName": "Method",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Drip"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Sprinkler"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Manual"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Flood"
             }
           ]
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_StartedOn",
+          "schemaName": "bv_StartedOn",
           "displayName": "Started On",
           "type": "datetime",
           "required": false,
           "description": "When the valve opened. DateTime, not Date — live state needs the time."
         },
         {
-          "schemaName": "inv_EndedOn",
+          "schemaName": "bv_EndedOn",
           "displayName": "Ended On",
           "type": "datetime",
           "required": false,
           "description": "When the valve closed. Blank while a run is in progress."
         },
         {
-          "schemaName": "inv_Status",
+          "schemaName": "bv_Status",
           "displayName": "Status",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340100,
+              "value": 121320100,
               "label": "Running"
             },
             {
-              "value": 681340101,
+              "value": 121320101,
               "label": "Completed"
             },
             {
-              "value": 681340102,
+              "value": 121320102,
               "label": "Fault"
             },
             {
-              "value": 681340103,
+              "value": 121320103,
               "label": "Aborted"
             }
           ]
         },
         {
-          "schemaName": "inv_FlowRateLpm",
+          "schemaName": "bv_FlowRateLpm",
           "displayName": "Flow Rate (L/min)",
           "type": "decimal",
           "required": false,
           "precision": 2
         },
         {
-          "schemaName": "inv_Source",
+          "schemaName": "bv_Source",
           "displayName": "Source",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340110,
+              "value": 121320110,
               "label": "Controller"
             },
             {
-              "value": 681340111,
+              "value": 121320111,
               "label": "Manual"
             }
           ],
@@ -1150,14 +1150,14 @@
       ]
     },
     {
-      "schemaName": "inv_Harvest",
+      "schemaName": "bv_Harvest",
       "displayName": "Harvest",
       "displayCollectionName": "Harvests",
       "description": "Harvest events tracking yield and quality per bed",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_HarvestCode",
+          "schemaName": "bv_HarvestCode",
           "displayName": "Harvest ID",
           "type": "autonumber",
           "autoNumberFormat": "HRV-{SEQNUM:4}",
@@ -1167,71 +1167,71 @@
           "description": "Auto-generated identifier, format HRV-0001."
         },
         {
-          "schemaName": "inv_HarvestName",
+          "schemaName": "bv_HarvestName",
           "displayName": "Harvest Event Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": true,
           "description": "Which bed was harvested"
         },
         {
-          "schemaName": "inv_Date",
+          "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_YieldKg",
+          "schemaName": "bv_YieldKg",
           "displayName": "Yield (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_QuantityHarvested",
+          "schemaName": "bv_QuantityHarvested",
           "displayName": "Quantity Harvested",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_Quality",
+          "schemaName": "bv_Quality",
           "displayName": "Quality",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Excellent"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Good"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Average"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Poor"
             }
           ]
         },
         {
-          "schemaName": "inv_Worker",
+          "schemaName": "bv_Worker",
           "displayName": "Harvested By",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -1240,14 +1240,14 @@
       ]
     },
     {
-      "schemaName": "inv_Calendar",
+      "schemaName": "bv_Calendar",
       "displayName": "Calendar",
       "displayCollectionName": "Calendar",
       "description": "Date dimension table for scheduling and reporting",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_CalendarCode",
+          "schemaName": "bv_CalendarCode",
           "displayName": "Calendar ID",
           "type": "autonumber",
           "autoNumberFormat": "CAL-{SEQNUM:4}",
@@ -1257,104 +1257,104 @@
           "description": "Auto-generated identifier, format CAL-0001."
         },
         {
-          "schemaName": "inv_DateLabel",
+          "schemaName": "bv_DateLabel",
           "displayName": "Date Label",
           "type": "string",
           "maxLength": 50,
           "required": true
         },
         {
-          "schemaName": "inv_Date",
+          "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_ISODateID",
+          "schemaName": "bv_ISODateID",
           "displayName": "ISO Date ID",
           "type": "string",
           "maxLength": 10,
           "required": true
         },
         {
-          "schemaName": "inv_Year",
+          "schemaName": "bv_Year",
           "displayName": "Year",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_Quarter",
+          "schemaName": "bv_Quarter",
           "displayName": "Quarter",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_MonthNumber",
+          "schemaName": "bv_MonthNumber",
           "displayName": "Month Number",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_MonthLongName",
+          "schemaName": "bv_MonthLongName",
           "displayName": "Month Long Name",
           "type": "string",
           "maxLength": 20,
           "required": true
         },
         {
-          "schemaName": "inv_MonthShortName",
+          "schemaName": "bv_MonthShortName",
           "displayName": "Month Short Name",
           "type": "string",
           "maxLength": 3,
           "required": true
         },
         {
-          "schemaName": "inv_WeekNumber",
+          "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_DayOfMonth",
+          "schemaName": "bv_DayOfMonth",
           "displayName": "Day of Month",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_DayOfYear",
+          "schemaName": "bv_DayOfYear",
           "displayName": "Day of Year",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_WeekdayNumber",
+          "schemaName": "bv_WeekdayNumber",
           "displayName": "Weekday Number",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_WeekdayLongName",
+          "schemaName": "bv_WeekdayLongName",
           "displayName": "Weekday Long Name",
           "type": "string",
           "maxLength": 10,
           "required": true
         },
         {
-          "schemaName": "inv_WeekdayShortName",
+          "schemaName": "bv_WeekdayShortName",
           "displayName": "Weekday Short Name",
           "type": "string",
           "maxLength": 3,
           "required": true
         },
         {
-          "schemaName": "inv_QuarterYear",
+          "schemaName": "bv_QuarterYear",
           "displayName": "Quarter Year",
           "type": "string",
           "maxLength": 10,
           "required": true
         },
         {
-          "schemaName": "inv_IsWeekend",
+          "schemaName": "bv_IsWeekend",
           "displayName": "Is Weekend",
           "type": "boolean",
           "required": false,
@@ -1363,14 +1363,14 @@
       ]
     },
     {
-      "schemaName": "inv_Task",
+      "schemaName": "bv_Task",
       "displayName": "Task",
       "displayCollectionName": "Tasks",
       "description": "Scheduled and assigned nursery tasks",
       "ownershipType": "UserOwned",
       "columns": [
         {
-          "schemaName": "inv_TaskCode",
+          "schemaName": "bv_TaskCode",
           "displayName": "Task ID",
           "type": "autonumber",
           "autoNumberFormat": "TSK-{SEQNUM:4}",
@@ -1380,147 +1380,147 @@
           "description": "Auto-generated identifier, format TSK-0001."
         },
         {
-          "schemaName": "inv_TaskTitle",
+          "schemaName": "bv_TaskTitle",
           "displayName": "Task Title",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_TaskType",
+          "schemaName": "bv_TaskType",
           "displayName": "Task Type",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Watering"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Fertilizing"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Pruning"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Repotting"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Pest Control"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Disease Treatment"
             },
             {
-              "value": 747480006,
+              "value": 187460006,
               "label": "Harvesting"
             },
             {
-              "value": 747480007,
+              "value": 187460007,
               "label": "Seeding"
             },
             {
-              "value": 747480008,
+              "value": 187460008,
               "label": "Packing"
             },
             {
-              "value": 747480009,
+              "value": 187460009,
               "label": "Inspection"
             },
             {
-              "value": 747480010,
+              "value": 187460010,
               "label": "General Maintenance"
             }
           ]
         },
         {
-          "schemaName": "inv_PlantingId",
+          "schemaName": "bv_PlantingId",
           "displayName": "Related Planting",
           "type": "lookup",
-          "relatedTable": "inv_Planting",
+          "relatedTable": "bv_Planting",
           "required": false
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Related Bed",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": false
         },
         {
-          "schemaName": "inv_DueDate",
+          "schemaName": "bv_DueDate",
           "displayName": "Due Date",
           "type": "datetime",
           "required": true
         },
         {
-          "schemaName": "inv_CompletedDate",
+          "schemaName": "bv_CompletedDate",
           "displayName": "Completed Date",
           "type": "datetime",
           "required": false
         },
         {
-          "schemaName": "inv_Status",
+          "schemaName": "bv_Status",
           "displayName": "Status",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Pending"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "In Progress"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Done"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Skipped"
             }
           ]
         },
         {
-          "schemaName": "inv_Priority",
+          "schemaName": "bv_Priority",
           "displayName": "Priority",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Low"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Normal"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "High"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Urgent"
             }
           ]
         },
         {
-          "schemaName": "inv_AssignedTo",
+          "schemaName": "bv_AssignedTo",
           "displayName": "Assigned To",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -1529,21 +1529,21 @@
       ]
     },
     {
-      "schemaName": "inv_Customer",
+      "schemaName": "bv_Customer",
       "displayName": "Customer",
       "displayCollectionName": "Customers",
       "description": "Nursery customers for orders and invoicing",
       "ownershipType": "UserOwned",
       "columns": [
         {
-          "schemaName": "inv_CustomerName",
+          "schemaName": "bv_CustomerName",
           "displayName": "Customer Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_CustomerCode",
+          "schemaName": "bv_CustomerCode",
           "displayName": "Customer Code",
           "type": "autonumber",
           "maxLength": 40,
@@ -1553,49 +1553,49 @@
           "description": "Auto-generated identifier, format CUS-0001."
         },
         {
-          "schemaName": "inv_Email",
+          "schemaName": "bv_Email",
           "displayName": "Email",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Phone",
+          "schemaName": "bv_Phone",
           "displayName": "Phone",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_Address",
+          "schemaName": "bv_Address",
           "displayName": "Address",
           "type": "memo",
           "maxLength": 500,
           "required": false
         },
         {
-          "schemaName": "inv_TaxId",
+          "schemaName": "bv_TaxId",
           "displayName": "Tax ID",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_ContactName",
+          "schemaName": "bv_ContactName",
           "displayName": "Contact Name",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_ContactEmail",
+          "schemaName": "bv_ContactEmail",
           "displayName": "Contact Email",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_DeliverToName",
+          "schemaName": "bv_DeliverToName",
           "displayName": "Deliver To (Name)",
           "type": "string",
           "maxLength": 200,
@@ -1603,49 +1603,49 @@
           "description": "If different from sold-to customer"
         },
         {
-          "schemaName": "inv_DeliverToAddress",
+          "schemaName": "bv_DeliverToAddress",
           "displayName": "Deliver To (Address)",
           "type": "memo",
           "maxLength": 500,
           "required": false
         },
         {
-          "schemaName": "inv_PaymentTerms",
+          "schemaName": "bv_PaymentTerms",
           "displayName": "Payment Terms",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "CIF"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "FOB"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "EXW"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "DDP"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Net 30"
             }
           ]
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_IsActive",
+          "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
@@ -1654,14 +1654,14 @@
       ]
     },
     {
-      "schemaName": "inv_Order",
+      "schemaName": "bv_Order",
       "displayName": "Order",
       "displayCollectionName": "Orders",
       "description": "Customer orders",
       "ownershipType": "UserOwned",
       "columns": [
         {
-          "schemaName": "inv_OrderNumber",
+          "schemaName": "bv_OrderNumber",
           "displayName": "Order Number",
           "type": "autonumber",
           "maxLength": 40,
@@ -1671,64 +1671,64 @@
           "description": "Auto-generated identifier, format ORD-0001."
         },
         {
-          "schemaName": "inv_CustomerId",
+          "schemaName": "bv_CustomerId",
           "displayName": "Customer",
           "type": "lookup",
-          "relatedTable": "inv_Customer",
+          "relatedTable": "bv_Customer",
           "required": true
         },
         {
-          "schemaName": "inv_OrderDate",
+          "schemaName": "bv_OrderDate",
           "displayName": "Order Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_RequestedDeliveryDate",
+          "schemaName": "bv_RequestedDeliveryDate",
           "displayName": "Requested Delivery Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_Status",
+          "schemaName": "bv_Status",
           "displayName": "Status",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Draft"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Confirmed"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "In Packing"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Ready for Pickup"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Delivered"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Cancelled"
             }
           ]
         },
         {
-          "schemaName": "inv_TotalAmount",
+          "schemaName": "bv_TotalAmount",
           "displayName": "Total Amount",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -1737,14 +1737,14 @@
       ]
     },
     {
-      "schemaName": "inv_OrderItem",
+      "schemaName": "bv_OrderItem",
       "displayName": "Order Item",
       "displayCollectionName": "Order Items",
       "description": "Line items within an order",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_OrderItemCode",
+          "schemaName": "bv_OrderItemCode",
           "displayName": "Order Item ID",
           "type": "autonumber",
           "autoNumberFormat": "OIT-{SEQNUM:4}",
@@ -1754,40 +1754,40 @@
           "description": "Auto-generated identifier, format OIT-0001."
         },
         {
-          "schemaName": "inv_OrderItemName",
+          "schemaName": "bv_OrderItemName",
           "displayName": "Order Item Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_OrderId",
+          "schemaName": "bv_OrderId",
           "displayName": "Order",
           "type": "lookup",
-          "relatedTable": "inv_Order",
+          "relatedTable": "bv_Order",
           "required": true
         },
         {
-          "schemaName": "inv_PlantId",
+          "schemaName": "bv_PlantId",
           "displayName": "Plant",
           "type": "lookup",
-          "relatedTable": "inv_Plant",
+          "relatedTable": "bv_Plant",
           "required": true
         },
         {
-          "schemaName": "inv_Quantity",
+          "schemaName": "bv_Quantity",
           "displayName": "Quantity",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_UnitPrice",
+          "schemaName": "bv_UnitPrice",
           "displayName": "Unit Price",
           "type": "currency",
           "required": true
         },
         {
-          "schemaName": "inv_LineTotal",
+          "schemaName": "bv_LineTotal",
           "displayName": "Line Total",
           "type": "currency",
           "required": false
@@ -1795,14 +1795,14 @@
       ]
     },
     {
-      "schemaName": "inv_Packing",
+      "schemaName": "bv_Packing",
       "displayName": "Packing",
       "displayCollectionName": "Packing",
       "description": "Per-box packing records — each record is one box with full traceability",
       "ownershipType": "UserOwned",
       "columns": [
         {
-          "schemaName": "inv_PackingCode",
+          "schemaName": "bv_PackingCode",
           "displayName": "Packing ID",
           "type": "autonumber",
           "autoNumberFormat": "PCK-{SEQNUM:4}",
@@ -1812,205 +1812,205 @@
           "description": "Auto-generated identifier, format PCK-0001."
         },
         {
-          "schemaName": "inv_PackingId",
+          "schemaName": "bv_PackingId",
           "displayName": "ID",
           "type": "string",
           "maxLength": 50,
           "required": true
         },
         {
-          "schemaName": "inv_Barcode",
+          "schemaName": "bv_Barcode",
           "displayName": "Barcode",
           "type": "string",
           "maxLength": 100,
           "required": false
         },
         {
-          "schemaName": "inv_BoxNumber",
+          "schemaName": "bv_BoxNumber",
           "displayName": "Box Number",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_PlantId",
+          "schemaName": "bv_PlantId",
           "displayName": "Product (Plant)",
           "type": "lookup",
-          "relatedTable": "inv_Plant",
+          "relatedTable": "bv_Plant",
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed (source)",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": false
         },
         {
-          "schemaName": "inv_ShadehouseId",
+          "schemaName": "bv_ShadehouseId",
           "displayName": "Shadehouse",
           "type": "lookup",
-          "relatedTable": "inv_Shadehouse",
+          "relatedTable": "bv_Shadehouse",
           "required": false
         },
         {
-          "schemaName": "inv_OrderId",
+          "schemaName": "bv_OrderId",
           "displayName": "Order",
           "type": "lookup",
-          "relatedTable": "inv_Order",
+          "relatedTable": "bv_Order",
           "required": false
         },
         {
-          "schemaName": "inv_InvoiceId",
+          "schemaName": "bv_InvoiceId",
           "displayName": "Invoice",
           "type": "lookup",
-          "relatedTable": "inv_Invoice",
+          "relatedTable": "bv_Invoice",
           "required": false
         },
         {
-          "schemaName": "inv_PackingType",
+          "schemaName": "bv_PackingType",
           "displayName": "Packing Type",
           "type": "choice",
           "required": false,
           "globalChoiceName": "PackingTypeChoice",
           "options": [
             {
-              "value": 685710000,
+              "value": 125690000,
               "label": "BNDL"
             },
             {
-              "value": 685710001,
+              "value": 125690001,
               "label": "IND"
             }
           ]
         },
         {
-          "schemaName": "inv_BundleSize",
+          "schemaName": "bv_BundleSize",
           "displayName": "Bundle Size",
           "type": "integer",
           "required": false,
           "description": "3 or 5 — only applicable when PackingType = BNDL"
         },
         {
-          "schemaName": "inv_Quantity",
+          "schemaName": "bv_Quantity",
           "displayName": "Quantity",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_GrossWeight",
+          "schemaName": "bv_GrossWeight",
           "displayName": "Gross Weight",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_NetWeight",
+          "schemaName": "bv_NetWeight",
           "displayName": "Net Weight",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_TotalWeight",
+          "schemaName": "bv_TotalWeight",
           "displayName": "Total Weight",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_UnitPrice",
+          "schemaName": "bv_UnitPrice",
           "displayName": "Unit Price",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_LineTotal",
+          "schemaName": "bv_LineTotal",
           "displayName": "Line Total",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_PackedBy",
+          "schemaName": "bv_PackedBy",
           "displayName": "Packed By",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_WorkerId",
+          "schemaName": "bv_WorkerId",
           "displayName": "Worker ID",
           "type": "string",
           "maxLength": 20,
           "required": false
         },
         {
-          "schemaName": "inv_ProductType",
+          "schemaName": "bv_ProductType",
           "displayName": "Product Type",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "URC"
             }
           ],
           "description": "URC = Unrooted Cutting"
         },
         {
-          "schemaName": "inv_CuttingType",
+          "schemaName": "bv_CuttingType",
           "displayName": "Cutting Type",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "L/E"
             }
           ],
           "description": "L/E = Leaf & Eye (point of growth)"
         },
         {
-          "schemaName": "inv_Size",
+          "schemaName": "bv_Size",
           "displayName": "Size",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Petit"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Mini Petit"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Small"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Medium"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "California"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Large"
             },
             {
-              "value": 747480006,
+              "value": 187460006,
               "label": "Extra Large"
             }
           ]
         },
         {
-          "schemaName": "inv_PackingCompleted",
+          "schemaName": "bv_PackingCompleted",
           "displayName": "Packing Completed",
           "type": "boolean",
           "required": false,
           "defaultValue": false
         },
         {
-          "schemaName": "inv_PackingDate",
+          "schemaName": "bv_PackingDate",
           "displayName": "Packing Date",
           "type": "date",
           "required": false
@@ -2018,14 +2018,14 @@
       ]
     },
     {
-      "schemaName": "inv_FiscalAuthorization",
+      "schemaName": "bv_FiscalAuthorization",
       "displayName": "Fiscal Authorization",
       "displayCollectionName": "Fiscal Authorizations",
       "description": "Honduras SAR CAI authorizations — invoice number ranges and expiration dates",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_FiscalAuthorizationCode",
+          "schemaName": "bv_FiscalAuthorizationCode",
           "displayName": "Fiscal Authorization ID",
           "type": "autonumber",
           "autoNumberFormat": "FIS-{SEQNUM:4}",
@@ -2035,14 +2035,14 @@
           "description": "Auto-generated identifier, format FIS-0001."
         },
         {
-          "schemaName": "inv_FiscalAuthName",
+          "schemaName": "bv_FiscalAuthName",
           "displayName": "Fiscal Authorization Name",
           "type": "string",
           "maxLength": 100,
           "required": true
         },
         {
-          "schemaName": "inv_CAI",
+          "schemaName": "bv_CAI",
           "displayName": "CAI",
           "type": "string",
           "maxLength": 50,
@@ -2050,7 +2050,7 @@
           "description": "Clave de Autorización de Impresión from SAR"
         },
         {
-          "schemaName": "inv_RTN",
+          "schemaName": "bv_RTN",
           "displayName": "RTN",
           "type": "string",
           "maxLength": 20,
@@ -2058,7 +2058,7 @@
           "description": "Registro Tributario Nacional"
         },
         {
-          "schemaName": "inv_RangeStart",
+          "schemaName": "bv_RangeStart",
           "displayName": "Range Start",
           "type": "string",
           "maxLength": 30,
@@ -2066,7 +2066,7 @@
           "description": "e.g. 000-001-01-00001461"
         },
         {
-          "schemaName": "inv_RangeEnd",
+          "schemaName": "bv_RangeEnd",
           "displayName": "Range End",
           "type": "string",
           "maxLength": 30,
@@ -2074,34 +2074,34 @@
           "description": "e.g. 000-001-01-00001530"
         },
         {
-          "schemaName": "inv_ExpirationDate",
+          "schemaName": "bv_ExpirationDate",
           "displayName": "Expiration Date",
           "type": "date",
           "required": true,
           "description": "Fecha límite de emisión"
         },
         {
-          "schemaName": "inv_TotalAuthorized",
+          "schemaName": "bv_TotalAuthorized",
           "displayName": "Total Authorized",
           "type": "integer",
           "required": false,
           "description": "Number of invoices authorized in this range (e.g. 70)"
         },
         {
-          "schemaName": "inv_NextNumber",
+          "schemaName": "bv_NextNumber",
           "displayName": "Next Available Number",
           "type": "integer",
           "required": false,
           "description": "Auto-incremented counter for next invoice in range"
         },
         {
-          "schemaName": "inv_RequestDate",
+          "schemaName": "bv_RequestDate",
           "displayName": "Request Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_IsActive",
+          "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
@@ -2110,14 +2110,14 @@
       ]
     },
     {
-      "schemaName": "inv_Invoice",
+      "schemaName": "bv_Invoice",
       "displayName": "Invoice",
       "displayCollectionName": "Invoices",
       "description": "Export invoices with shipping, fiscal, and payment tracking",
       "ownershipType": "UserOwned",
       "columns": [
         {
-          "schemaName": "inv_InvoiceNumber",
+          "schemaName": "bv_InvoiceNumber",
           "displayName": "Invoice Number",
           "type": "autonumber",
           "maxLength": 40,
@@ -2127,74 +2127,74 @@
           "autoNumberFormat": "INV-{SEQNUM:4}"
         },
         {
-          "schemaName": "inv_FiscalAuthId",
+          "schemaName": "bv_FiscalAuthId",
           "displayName": "Fiscal Authorization",
           "type": "lookup",
-          "relatedTable": "inv_FiscalAuthorization",
+          "relatedTable": "bv_FiscalAuthorization",
           "required": false
         },
         {
-          "schemaName": "inv_CustomerId",
+          "schemaName": "bv_CustomerId",
           "displayName": "Customer",
           "type": "lookup",
-          "relatedTable": "inv_Customer",
+          "relatedTable": "bv_Customer",
           "required": true
         },
         {
-          "schemaName": "inv_InvoiceDate",
+          "schemaName": "bv_InvoiceDate",
           "displayName": "Invoice Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_WeekNumber",
+          "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_ETD",
+          "schemaName": "bv_ETD",
           "displayName": "ETD",
           "type": "date",
           "required": false,
           "description": "Estimated Time of Departure"
         },
         {
-          "schemaName": "inv_ETA",
+          "schemaName": "bv_ETA",
           "displayName": "ETA",
           "type": "date",
           "required": false,
           "description": "Estimated Time of Arrival"
         },
         {
-          "schemaName": "inv_ShippedVia",
+          "schemaName": "bv_ShippedVia",
           "displayName": "Shipped Via",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Air"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Sea"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Land"
             }
           ]
         },
         {
-          "schemaName": "inv_Carrier",
+          "schemaName": "bv_Carrier",
           "displayName": "Vessel / Carrier",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_AWBNumber",
+          "schemaName": "bv_AWBNumber",
           "displayName": "BL / AWB Number",
           "type": "string",
           "maxLength": 50,
@@ -2202,66 +2202,66 @@
           "description": "Bill of Lading or Air Waybill number"
         },
         {
-          "schemaName": "inv_ContainerNumber",
+          "schemaName": "bv_ContainerNumber",
           "displayName": "Container / Flight Number",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_SealNumber",
+          "schemaName": "bv_SealNumber",
           "displayName": "Seal Number",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_TempRecord",
+          "schemaName": "bv_TempRecord",
           "displayName": "Temperature Record",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_Terms",
+          "schemaName": "bv_Terms",
           "displayName": "Terms",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "CIF"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "FOB"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "EXW"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "DDP"
             }
           ]
         },
         {
-          "schemaName": "inv_PortOfEntry",
+          "schemaName": "bv_PortOfEntry",
           "displayName": "Port of Entry",
           "type": "string",
           "maxLength": 100,
           "required": false
         },
         {
-          "schemaName": "inv_PhytoNumber",
+          "schemaName": "bv_PhytoNumber",
           "displayName": "Phytosanitary Certificate",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_NotifyPartyName",
+          "schemaName": "bv_NotifyPartyName",
           "displayName": "Notify Party (Name)",
           "type": "string",
           "maxLength": 200,
@@ -2269,127 +2269,127 @@
           "description": "Freight forwarder or notify on arrival"
         },
         {
-          "schemaName": "inv_NotifyPartyAddress",
+          "schemaName": "bv_NotifyPartyAddress",
           "displayName": "Notify Party (Address)",
           "type": "memo",
           "maxLength": 500,
           "required": false
         },
         {
-          "schemaName": "inv_NotifyPartyContact",
+          "schemaName": "bv_NotifyPartyContact",
           "displayName": "Notify Party (Contact)",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Subtotal",
+          "schemaName": "bv_Subtotal",
           "displayName": "Subtotal",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_ISV15",
+          "schemaName": "bv_ISV15",
           "displayName": "ISV 15%",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_ISV18",
+          "schemaName": "bv_ISV18",
           "displayName": "ISV 18%",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_SubtotalExonerated",
+          "schemaName": "bv_SubtotalExonerated",
           "displayName": "Subtotal Exonerated",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_Discounts",
+          "schemaName": "bv_Discounts",
           "displayName": "Discounts",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_AirFreight",
+          "schemaName": "bv_AirFreight",
           "displayName": "Air Freight",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_TotalAmount",
+          "schemaName": "bv_TotalAmount",
           "displayName": "Total Amount (USD)",
           "type": "currency",
           "required": true
         },
         {
-          "schemaName": "inv_ExchangeRate",
+          "schemaName": "bv_ExchangeRate",
           "displayName": "Exchange Rate (HNL/USD)",
           "type": "decimal",
           "required": false,
           "description": "Honduras central bank exchange rate at invoice time"
         },
         {
-          "schemaName": "inv_TotalAmountHNL",
+          "schemaName": "bv_TotalAmountHNL",
           "displayName": "Total Amount (HNL)",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_PaidAmount",
+          "schemaName": "bv_PaidAmount",
           "displayName": "Paid Amount",
           "type": "currency",
           "required": false,
           "defaultValue": 0
         },
         {
-          "schemaName": "inv_Balance",
+          "schemaName": "bv_Balance",
           "displayName": "Balance",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_Status",
+          "schemaName": "bv_Status",
           "displayName": "Status",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Draft"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Sent"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Partially Paid"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Paid"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Overdue"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Cancelled"
             }
           ]
         },
         {
-          "schemaName": "inv_DueDate",
+          "schemaName": "bv_DueDate",
           "displayName": "Due Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_SharePointUrl",
+          "schemaName": "bv_SharePointUrl",
           "displayName": "SharePoint PDF URL",
           "type": "string",
           "maxLength": 500,
@@ -2397,7 +2397,7 @@
           "description": "Link to generated PDF stored in SharePoint"
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -2406,14 +2406,14 @@
       ]
     },
     {
-      "schemaName": "inv_PlantPrice",
+      "schemaName": "bv_PlantPrice",
       "displayName": "Plant Price",
       "displayCollectionName": "Plant Prices",
       "description": "Price history per plant — export and internal prices, with optional customer-specific overrides",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_PlantPriceCode",
+          "schemaName": "bv_PlantPriceCode",
           "displayName": "Plant Price ID",
           "type": "autonumber",
           "autoNumberFormat": "PRC-{SEQNUM:4}",
@@ -2423,7 +2423,7 @@
           "description": "Auto-generated identifier, format PRC-0001."
         },
         {
-          "schemaName": "inv_PlantPriceName",
+          "schemaName": "bv_PlantPriceName",
           "displayName": "Plant Price Name",
           "type": "string",
           "maxLength": 200,
@@ -2431,62 +2431,62 @@
           "description": "Auto-composed: {Plant} / {Customer or 'Base'} / {EffectiveFrom}"
         },
         {
-          "schemaName": "inv_PlantId",
+          "schemaName": "bv_PlantId",
           "displayName": "Plant",
           "type": "lookup",
-          "relatedTable": "inv_Plant",
+          "relatedTable": "bv_Plant",
           "required": true
         },
         {
-          "schemaName": "inv_SeasonId",
+          "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
-          "relatedTable": "inv_Season",
+          "relatedTable": "bv_Season",
           "required": false
         },
         {
-          "schemaName": "inv_CustomerId",
+          "schemaName": "bv_CustomerId",
           "displayName": "Customer",
           "type": "lookup",
-          "relatedTable": "inv_Customer",
+          "relatedTable": "bv_Customer",
           "required": false,
           "description": "If set, this price applies only to this customer. If null, it is the base/default price."
         },
         {
-          "schemaName": "inv_EffectiveFrom",
+          "schemaName": "bv_EffectiveFrom",
           "displayName": "Effective From",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_EffectiveTo",
+          "schemaName": "bv_EffectiveTo",
           "displayName": "Effective To",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_PriceEXT",
+          "schemaName": "bv_PriceEXT",
           "displayName": "Export Price (USD)",
           "type": "currency",
           "required": true,
           "description": "Price per unit for export shipments"
         },
         {
-          "schemaName": "inv_PriceINT",
+          "schemaName": "bv_PriceINT",
           "displayName": "Internal Price (USD)",
           "type": "currency",
           "required": false,
           "description": "Price per unit for internal/domestic sales (in USD — HNL conversion at invoice time via BCH exchange rate)"
         },
         {
-          "schemaName": "inv_IsActive",
+          "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
           "defaultValue": true
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -2495,14 +2495,14 @@
       ]
     },
     {
-      "schemaName": "inv_CAINumber",
+      "schemaName": "bv_CAINumber",
       "displayName": "CAI Number",
       "displayCollectionName": "CAI Numbers",
       "description": "Individual invoice numbers within a CAI authorization range — tracks used/available status",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_CAINumberCode",
+          "schemaName": "bv_CAINumberCode",
           "displayName": "CAI Number ID",
           "type": "autonumber",
           "autoNumberFormat": "CAI-{SEQNUM:4}",
@@ -2512,7 +2512,7 @@
           "description": "Auto-generated identifier, format CAI-0001."
         },
         {
-          "schemaName": "inv_CAINumberName",
+          "schemaName": "bv_CAINumberName",
           "displayName": "Invoice Number",
           "type": "string",
           "maxLength": 30,
@@ -2520,66 +2520,66 @@
           "description": "Full fiscal invoice number (e.g., 000-001-01-00001461)"
         },
         {
-          "schemaName": "inv_FiscalAuthId",
+          "schemaName": "bv_FiscalAuthId",
           "displayName": "Fiscal Authorization",
           "type": "lookup",
-          "relatedTable": "inv_FiscalAuthorization",
+          "relatedTable": "bv_FiscalAuthorization",
           "required": true
         },
         {
-          "schemaName": "inv_SequenceNumber",
+          "schemaName": "bv_SequenceNumber",
           "displayName": "Sequence Number",
           "type": "integer",
           "required": true,
           "description": "The numeric part (e.g., 1461)"
         },
         {
-          "schemaName": "inv_IsUsed",
+          "schemaName": "bv_IsUsed",
           "displayName": "Used",
           "type": "boolean",
           "required": false,
           "defaultValue": false
         },
         {
-          "schemaName": "inv_UsedDate",
+          "schemaName": "bv_UsedDate",
           "displayName": "Used Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_UsedFor",
+          "schemaName": "bv_UsedFor",
           "displayName": "Used For",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Export Invoice (BANCO)"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Internal Invoice (JASON)"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Service Invoice"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Other"
             }
           ]
         },
         {
-          "schemaName": "inv_InvoiceId",
+          "schemaName": "bv_InvoiceId",
           "displayName": "Invoice",
           "type": "lookup",
-          "relatedTable": "inv_Invoice",
+          "relatedTable": "bv_Invoice",
           "required": false,
           "description": "Link to the invoice that used this number (if generated by the app)"
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "string",
           "maxLength": 200,
@@ -2588,14 +2588,14 @@
       ]
     },
     {
-      "schemaName": "inv_Expense",
+      "schemaName": "bv_Expense",
       "displayName": "Expense",
       "displayCollectionName": "Expenses",
       "description": "Operational expenses with optional receipt photo and AI extraction",
       "ownershipType": "UserOwned",
       "columns": [
         {
-          "schemaName": "inv_ExpenseCode",
+          "schemaName": "bv_ExpenseCode",
           "displayName": "Expense ID",
           "type": "autonumber",
           "autoNumberFormat": "EXP-{SEQNUM:4}",
@@ -2605,97 +2605,97 @@
           "description": "Auto-generated identifier, format EXP-0001."
         },
         {
-          "schemaName": "inv_ExpenseName",
+          "schemaName": "bv_ExpenseName",
           "displayName": "Expense Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_Date",
+          "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_Category",
+          "schemaName": "bv_Category",
           "displayName": "Category",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Supplies"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Equipment"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Labor"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Transportation"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Utilities"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Chemicals / Inputs"
             },
             {
-              "value": 747480006,
+              "value": 187460006,
               "label": "Shipping / Freight"
             },
             {
-              "value": 747480007,
+              "value": 187460007,
               "label": "Maintenance"
             },
             {
-              "value": 747480008,
+              "value": 187460008,
               "label": "Office"
             },
             {
-              "value": 747480009,
+              "value": 187460009,
               "label": "Other"
             }
           ]
         },
         {
-          "schemaName": "inv_Amount",
+          "schemaName": "bv_Amount",
           "displayName": "Amount",
           "type": "currency",
           "required": true
         },
         {
-          "schemaName": "inv_Currency",
+          "schemaName": "bv_Currency",
           "displayName": "Currency",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "HNL"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "USD"
             }
           ]
         },
         {
-          "schemaName": "inv_Vendor",
+          "schemaName": "bv_Vendor",
           "displayName": "Vendor / Supplier",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_ReceiptUrl",
+          "schemaName": "bv_ReceiptUrl",
           "displayName": "Receipt Image URL",
           "type": "string",
           "maxLength": 500,
@@ -2703,7 +2703,7 @@
           "description": "Link to receipt photo stored in SharePoint"
         },
         {
-          "schemaName": "inv_AIExtracted",
+          "schemaName": "bv_AIExtracted",
           "displayName": "AI Extracted",
           "type": "boolean",
           "required": false,
@@ -2711,38 +2711,38 @@
           "description": "Whether this record was auto-populated from receipt photo via AI"
         },
         {
-          "schemaName": "inv_ApprovedBy",
+          "schemaName": "bv_ApprovedBy",
           "displayName": "Approved By",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Status",
+          "schemaName": "bv_Status",
           "displayName": "Status",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Pending"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Approved"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Rejected"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Paid"
             }
           ]
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -2751,21 +2751,21 @@
       ]
     },
     {
-      "schemaName": "inv_Supplier",
+      "schemaName": "bv_Supplier",
       "displayName": "Supplier",
       "displayCollectionName": "Suppliers",
       "description": "Vendors and suppliers for inputs, materials, and services",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_SupplierName",
+          "schemaName": "bv_SupplierName",
           "displayName": "Supplier Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_SupplierCode",
+          "schemaName": "bv_SupplierCode",
           "displayName": "Supplier Code",
           "type": "autonumber",
           "maxLength": 40,
@@ -2775,121 +2775,121 @@
           "description": "Auto-generated identifier, format SUP-0001."
         },
         {
-          "schemaName": "inv_Category",
+          "schemaName": "bv_Category",
           "displayName": "Category",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Chemicals / Inputs"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Packaging"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Equipment"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Substrates"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Logistics / Freight"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Maintenance"
             },
             {
-              "value": 747480006,
+              "value": 187460006,
               "label": "Utilities"
             },
             {
-              "value": 747480007,
+              "value": 187460007,
               "label": "Professional Services"
             },
             {
-              "value": 747480008,
+              "value": 187460008,
               "label": "Other"
             }
           ]
         },
         {
-          "schemaName": "inv_ContactName",
+          "schemaName": "bv_ContactName",
           "displayName": "Contact Name",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Phone",
+          "schemaName": "bv_Phone",
           "displayName": "Phone",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_Email",
+          "schemaName": "bv_Email",
           "displayName": "Email",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Address",
+          "schemaName": "bv_Address",
           "displayName": "Address",
           "type": "memo",
           "maxLength": 500,
           "required": false
         },
         {
-          "schemaName": "inv_TaxId",
+          "schemaName": "bv_TaxId",
           "displayName": "Tax ID / RTN",
           "type": "string",
           "maxLength": 30,
           "required": false
         },
         {
-          "schemaName": "inv_PaymentTerms",
+          "schemaName": "bv_PaymentTerms",
           "displayName": "Payment Terms",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Cash"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Net 15"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Net 30"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Net 60"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Credit"
             }
           ]
         },
         {
-          "schemaName": "inv_IsActive",
+          "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
           "defaultValue": true
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -2898,14 +2898,14 @@
       ]
     },
     {
-      "schemaName": "inv_PurchaseOrder",
+      "schemaName": "bv_PurchaseOrder",
       "displayName": "Purchase Order",
       "displayCollectionName": "Purchase Orders",
       "description": "Orders placed to suppliers for inputs, materials, and services",
       "ownershipType": "UserOwned",
       "columns": [
         {
-          "schemaName": "inv_PONumber",
+          "schemaName": "bv_PONumber",
           "displayName": "PO Number",
           "type": "autonumber",
           "maxLength": 40,
@@ -2915,89 +2915,89 @@
           "description": "Auto-generated identifier, format PO-0001."
         },
         {
-          "schemaName": "inv_SupplierId",
+          "schemaName": "bv_SupplierId",
           "displayName": "Supplier",
           "type": "lookup",
-          "relatedTable": "inv_Supplier",
+          "relatedTable": "bv_Supplier",
           "required": true
         },
         {
-          "schemaName": "inv_OrderDate",
+          "schemaName": "bv_OrderDate",
           "displayName": "Order Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_ExpectedDelivery",
+          "schemaName": "bv_ExpectedDelivery",
           "displayName": "Expected Delivery",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_Description",
+          "schemaName": "bv_Description",
           "displayName": "Description",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_Amount",
+          "schemaName": "bv_Amount",
           "displayName": "Amount",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_Currency",
+          "schemaName": "bv_Currency",
           "displayName": "Currency",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "HNL"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "USD"
             }
           ]
         },
         {
-          "schemaName": "inv_Status",
+          "schemaName": "bv_Status",
           "displayName": "Status",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Draft"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Sent"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Confirmed"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Received"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Cancelled"
             }
           ]
         },
         {
-          "schemaName": "inv_ReceivedDate",
+          "schemaName": "bv_ReceivedDate",
           "displayName": "Received Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -3006,21 +3006,21 @@
       ]
     },
     {
-      "schemaName": "inv_Worker",
+      "schemaName": "bv_Worker",
       "displayName": "Worker",
       "displayCollectionName": "Workers",
       "description": "Nursery workers and field staff for labor tracking and performance measurement",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_WorkerName",
+          "schemaName": "bv_WorkerName",
           "displayName": "Full Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_WorkerCode",
+          "schemaName": "bv_WorkerCode",
           "displayName": "Worker ID",
           "type": "autonumber",
           "maxLength": 40,
@@ -3030,50 +3030,50 @@
           "description": "Auto-generated identifier, format WRK-0001."
         },
         {
-          "schemaName": "inv_Role",
+          "schemaName": "bv_Role",
           "displayName": "Role",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Field Worker"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Packer"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Harvester"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Irrigator"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Supervisor"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Driver"
             },
             {
-              "value": 747480006,
+              "value": 187460006,
               "label": "General"
             }
           ]
         },
         {
-          "schemaName": "inv_Phone",
+          "schemaName": "bv_Phone",
           "displayName": "Phone",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_IdentityNumber",
+          "schemaName": "bv_IdentityNumber",
           "displayName": "Identity Number",
           "type": "string",
           "maxLength": 30,
@@ -3081,33 +3081,33 @@
           "description": "Honduras national ID"
         },
         {
-          "schemaName": "inv_HireDate",
+          "schemaName": "bv_HireDate",
           "displayName": "Hire Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_HourlyRate",
+          "schemaName": "bv_HourlyRate",
           "displayName": "Hourly Rate (HNL)",
           "type": "currency",
           "required": false
         },
         {
-          "schemaName": "inv_PieceRate",
+          "schemaName": "bv_PieceRate",
           "displayName": "Piece Rate (per 1000 cuttings)",
           "type": "currency",
           "required": false,
           "description": "Rate per 1000 cuttings harvested/packed"
         },
         {
-          "schemaName": "inv_IsActive",
+          "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
           "defaultValue": true
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -3116,14 +3116,14 @@
       ]
     },
     {
-      "schemaName": "inv_Timesheet",
+      "schemaName": "bv_Timesheet",
       "displayName": "Timesheet",
       "displayCollectionName": "Timesheets",
       "description": "Daily labor records — hours, tasks, piece count, and cost allocation",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_TimesheetCode",
+          "schemaName": "bv_TimesheetCode",
           "displayName": "Timesheet ID",
           "type": "autonumber",
           "autoNumberFormat": "TMS-{SEQNUM:4}",
@@ -3133,97 +3133,97 @@
           "description": "Auto-generated identifier, format TMS-0001."
         },
         {
-          "schemaName": "inv_TimesheetName",
+          "schemaName": "bv_TimesheetName",
           "displayName": "Timesheet Entry",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_WorkerId",
+          "schemaName": "bv_WorkerId",
           "displayName": "Worker",
           "type": "lookup",
-          "relatedTable": "inv_Worker",
+          "relatedTable": "bv_Worker",
           "required": true
         },
         {
-          "schemaName": "inv_Date",
+          "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_ActivityType",
+          "schemaName": "bv_ActivityType",
           "displayName": "Activity Type",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Planting"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Harvesting"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Packing"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Treatment"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Irrigation"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Maintenance"
             },
             {
-              "value": 747480006,
+              "value": 187460006,
               "label": "General"
             }
           ]
         },
         {
-          "schemaName": "inv_HoursWorked",
+          "schemaName": "bv_HoursWorked",
           "displayName": "Hours Worked",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_PieceCount",
+          "schemaName": "bv_PieceCount",
           "displayName": "Piece Count",
           "type": "integer",
           "required": false,
           "description": "Number of cuttings harvested/packed (for piece-rate pay)"
         },
         {
-          "schemaName": "inv_BoxesPacked",
+          "schemaName": "bv_BoxesPacked",
           "displayName": "Boxes Packed",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": false,
           "description": "Which bed was worked on"
         },
         {
-          "schemaName": "inv_LaborCost",
+          "schemaName": "bv_LaborCost",
           "displayName": "Labor Cost (HNL)",
           "type": "currency",
           "required": false,
           "description": "Calculated: hours x hourly rate, or pieces x piece rate"
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -3232,14 +3232,14 @@
       ]
     },
     {
-      "schemaName": "inv_Pruning",
+      "schemaName": "bv_Pruning",
       "displayName": "Pruning",
       "displayCollectionName": "Prunings",
       "description": "Pruning (poda) events — drives availability projections",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_PruningCode",
+          "schemaName": "bv_PruningCode",
           "displayName": "Pruning ID",
           "type": "autonumber",
           "autoNumberFormat": "PRN-{SEQNUM:4}",
@@ -3249,60 +3249,60 @@
           "description": "Auto-generated identifier, format PRN-0001."
         },
         {
-          "schemaName": "inv_PruningName",
+          "schemaName": "bv_PruningName",
           "displayName": "Pruning Event",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": true
         },
         {
-          "schemaName": "inv_SeasonId",
+          "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
-          "relatedTable": "inv_Season",
+          "relatedTable": "bv_Season",
           "required": false
         },
         {
-          "schemaName": "inv_Date",
+          "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_WeekNumber",
+          "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_BedsPruned",
+          "schemaName": "bv_BedsPruned",
           "displayName": "Beds Pruned",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_CuttingsEstimated",
+          "schemaName": "bv_CuttingsEstimated",
           "displayName": "Cuttings Estimated",
           "type": "integer",
           "required": false,
           "description": "Estimated cuttings that will be available from this pruning"
         },
         {
-          "schemaName": "inv_Worker",
+          "schemaName": "bv_Worker",
           "displayName": "Worker",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -3311,14 +3311,14 @@
       ]
     },
     {
-      "schemaName": "inv_PruningCurve",
+      "schemaName": "bv_PruningCurve",
       "displayName": "Pruning Curve",
       "displayCollectionName": "Pruning Curves",
       "description": "Seasonal pruning plan — planned vs actual beds per week for the whole nursery",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_PruningCurveCode",
+          "schemaName": "bv_PruningCurveCode",
           "displayName": "Pruning Curve ID",
           "type": "autonumber",
           "autoNumberFormat": "PCV-{SEQNUM:4}",
@@ -3328,51 +3328,51 @@
           "description": "Auto-generated identifier, format PCV-0001."
         },
         {
-          "schemaName": "inv_PruningCurveName",
+          "schemaName": "bv_PruningCurveName",
           "displayName": "Curve Entry",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_SeasonId",
+          "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
-          "relatedTable": "inv_Season",
+          "relatedTable": "bv_Season",
           "required": true
         },
         {
-          "schemaName": "inv_WeekNumber",
+          "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_PlannedBeds",
+          "schemaName": "bv_PlannedBeds",
           "displayName": "Planned Beds",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_ActualBeds",
+          "schemaName": "bv_ActualBeds",
           "displayName": "Actual Beds",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_PlannedCuttings",
+          "schemaName": "bv_PlannedCuttings",
           "displayName": "Planned Cuttings",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_ActualCuttings",
+          "schemaName": "bv_ActualCuttings",
           "displayName": "Actual Cuttings",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -3381,14 +3381,14 @@
       ]
     },
     {
-      "schemaName": "inv_Fertilization",
+      "schemaName": "bv_Fertilization",
       "displayName": "Fertilization",
       "displayCollectionName": "Fertilizations",
       "description": "Fertilization events with nutrient quantities (N, P, K, Ca) applied per bed",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_FertilizationCode",
+          "schemaName": "bv_FertilizationCode",
           "displayName": "Fertilization ID",
           "type": "autonumber",
           "autoNumberFormat": "FRT-{SEQNUM:4}",
@@ -3398,100 +3398,100 @@
           "description": "Auto-generated identifier, format FRT-0001."
         },
         {
-          "schemaName": "inv_FertilizationName",
+          "schemaName": "bv_FertilizationName",
           "displayName": "Fertilization Event",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": true
         },
         {
-          "schemaName": "inv_InputId",
+          "schemaName": "bv_InputId",
           "displayName": "Input (Fertilizer)",
           "type": "lookup",
-          "relatedTable": "inv_Input",
+          "relatedTable": "bv_Input",
           "required": true
         },
         {
-          "schemaName": "inv_Date",
+          "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_Quantity_kg",
+          "schemaName": "bv_Quantity_kg",
           "displayName": "Quantity (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Method",
+          "schemaName": "bv_Method",
           "displayName": "Method",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Foliar Spray"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Soil Drench"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Granular"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Drip / Fertigation"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "Broadcast"
             }
           ]
         },
         {
-          "schemaName": "inv_Worker",
+          "schemaName": "bv_Worker",
           "displayName": "Worker",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
           "required": false
         },
         {
-          "schemaName": "inv_DoseUnit",
+          "schemaName": "bv_DoseUnit",
           "displayName": "Dose Unit",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 681340220,
+              "value": 121320220,
               "label": "kg"
             },
             {
-              "value": 681340221,
+              "value": 121320221,
               "label": "L"
             },
             {
-              "value": 681340222,
+              "value": 121320222,
               "label": "g"
             },
             {
-              "value": 681340223,
+              "value": 121320223,
               "label": "mL"
             }
           ]
@@ -3499,14 +3499,14 @@
       ]
     },
     {
-      "schemaName": "inv_Availability",
+      "schemaName": "bv_Availability",
       "displayName": "Availability",
       "displayCollectionName": "Availability",
       "description": "Weekly availability projections — Friday generation, Monday confirmation",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_AvailabilityCode",
+          "schemaName": "bv_AvailabilityCode",
           "displayName": "Availability ID",
           "type": "autonumber",
           "autoNumberFormat": "AVL-{SEQNUM:4}",
@@ -3516,138 +3516,138 @@
           "description": "Auto-generated identifier, format AVL-0001."
         },
         {
-          "schemaName": "inv_AvailabilityName",
+          "schemaName": "bv_AvailabilityName",
           "displayName": "Availability Entry",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_SeasonId",
+          "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
-          "relatedTable": "inv_Season",
+          "relatedTable": "bv_Season",
           "required": true
         },
         {
-          "schemaName": "inv_PlantId",
+          "schemaName": "bv_PlantId",
           "displayName": "Plant",
           "type": "lookup",
-          "relatedTable": "inv_Plant",
+          "relatedTable": "bv_Plant",
           "required": true
         },
         {
-          "schemaName": "inv_Size",
+          "schemaName": "bv_Size",
           "displayName": "Size",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Petit"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Mini Petit"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Small"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Medium"
             },
             {
-              "value": 747480004,
+              "value": 187460004,
               "label": "California"
             },
             {
-              "value": 747480005,
+              "value": 187460005,
               "label": "Large"
             },
             {
-              "value": 747480006,
+              "value": 187460006,
               "label": "Extra Large"
             }
           ]
         },
         {
-          "schemaName": "inv_ShipmentWeek",
+          "schemaName": "bv_ShipmentWeek",
           "displayName": "Shipment Week",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_GeneratedDate",
+          "schemaName": "bv_GeneratedDate",
           "displayName": "Generated Date (Friday)",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_ProjectedQty",
+          "schemaName": "bv_ProjectedQty",
           "displayName": "Projected Quantity",
           "type": "integer",
           "required": true,
           "description": "Available cuttings projected from pruning data"
         },
         {
-          "schemaName": "inv_OrderedQty",
+          "schemaName": "bv_OrderedQty",
           "displayName": "Ordered Quantity",
           "type": "integer",
           "required": false,
           "description": "What the customer ordered for this week"
         },
         {
-          "schemaName": "inv_ConfirmedQty",
+          "schemaName": "bv_ConfirmedQty",
           "displayName": "Confirmed Quantity",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_ConfirmationDate",
+          "schemaName": "bv_ConfirmationDate",
           "displayName": "Confirmation Date (Monday)",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_Status",
+          "schemaName": "bv_Status",
           "displayName": "Status",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Projected"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Confirmed - Under"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Confirmed - Equal"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Confirmed - Over"
             }
           ]
         },
         {
-          "schemaName": "inv_SurplusQty",
+          "schemaName": "bv_SurplusQty",
           "displayName": "Surplus",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_ShortfallQty",
+          "schemaName": "bv_ShortfallQty",
           "displayName": "Shortfall",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -3656,14 +3656,14 @@
       ]
     },
     {
-      "schemaName": "inv_BoxWeight",
+      "schemaName": "bv_BoxWeight",
       "displayName": "Box Weight",
       "displayCollectionName": "Box Weights",
       "description": "Per-box weight details linked to AWB — avg leaf weight, net weight, gross weight",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_BoxWeightCode",
+          "schemaName": "bv_BoxWeightCode",
           "displayName": "Box Weight ID",
           "type": "autonumber",
           "autoNumberFormat": "BXW-{SEQNUM:4}",
@@ -3673,62 +3673,62 @@
           "description": "Auto-generated identifier, format BXW-0001."
         },
         {
-          "schemaName": "inv_BoxWeightName",
+          "schemaName": "bv_BoxWeightName",
           "displayName": "Box Weight Entry",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_PackingId",
+          "schemaName": "bv_PackingId",
           "displayName": "Packing Box",
           "type": "lookup",
-          "relatedTable": "inv_Packing",
+          "relatedTable": "bv_Packing",
           "required": true
         },
         {
-          "schemaName": "inv_AWBNumber",
+          "schemaName": "bv_AWBNumber",
           "displayName": "AWB Number",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_AvgLeafWeight_g",
+          "schemaName": "bv_AvgLeafWeight_g",
           "displayName": "Avg Leaf Weight (g)",
           "type": "decimal",
           "required": false,
           "description": "Average weight per leaf/cutting, sampled at farm"
         },
         {
-          "schemaName": "inv_NetWeight_kg",
+          "schemaName": "bv_NetWeight_kg",
           "displayName": "Net Weight (kg)",
           "type": "decimal",
           "required": false,
           "description": "Leaves/cuttings only, inside the box"
         },
         {
-          "schemaName": "inv_GrossWeight_kg",
+          "schemaName": "bv_GrossWeight_kg",
           "displayName": "Gross Weight (kg)",
           "type": "decimal",
           "required": false,
           "description": "Total packed box weight"
         },
         {
-          "schemaName": "inv_DryMatterPct",
+          "schemaName": "bv_DryMatterPct",
           "displayName": "Dry Matter %",
           "type": "decimal",
           "required": false,
           "description": "Configurable default 20-30%. Fresh matter × DM% = dry matter extracted"
         },
         {
-          "schemaName": "inv_Date",
+          "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -3737,14 +3737,14 @@
       ]
     },
     {
-      "schemaName": "inv_NutrientBalance",
+      "schemaName": "bv_NutrientBalance",
       "displayName": "Nutrient Balance",
       "displayCollectionName": "Nutrient Balances",
       "description": "Running nutrient balance per bed per season — applied (fertilization) vs extracted (harvest)",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_NutrientBalanceCode",
+          "schemaName": "bv_NutrientBalanceCode",
           "displayName": "Nutrient Balance ID",
           "type": "autonumber",
           "autoNumberFormat": "NBL-{SEQNUM:4}",
@@ -3754,88 +3754,88 @@
           "description": "Auto-generated identifier, format NBL-0001."
         },
         {
-          "schemaName": "inv_NutrientBalanceName",
+          "schemaName": "bv_NutrientBalanceName",
           "displayName": "Balance Entry",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": true
         },
         {
-          "schemaName": "inv_SeasonId",
+          "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
-          "relatedTable": "inv_Season",
+          "relatedTable": "bv_Season",
           "required": false
         },
         {
-          "schemaName": "inv_WeekNumber",
+          "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_N_Applied",
+          "schemaName": "bv_N_Applied",
           "displayName": "N Applied (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_P_Applied",
+          "schemaName": "bv_P_Applied",
           "displayName": "P Applied (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_K_Applied",
+          "schemaName": "bv_K_Applied",
           "displayName": "K Applied (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Ca_Applied",
+          "schemaName": "bv_Ca_Applied",
           "displayName": "Ca Applied (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_N_Extracted",
+          "schemaName": "bv_N_Extracted",
           "displayName": "N Extracted (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_P_Extracted",
+          "schemaName": "bv_P_Extracted",
           "displayName": "P Extracted (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_K_Extracted",
+          "schemaName": "bv_K_Extracted",
           "displayName": "K Extracted (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Ca_Extracted",
+          "schemaName": "bv_Ca_Extracted",
           "displayName": "Ca Extracted (kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_DryMatterPct",
+          "schemaName": "bv_DryMatterPct",
           "displayName": "Dry Matter %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -3844,14 +3844,14 @@
       ]
     },
     {
-      "schemaName": "inv_SoilAnalysis",
+      "schemaName": "bv_SoilAnalysis",
       "displayName": "Soil Analysis",
       "displayCollectionName": "Soil Analyses",
       "description": "Lab soil analysis results — Zamorano format with full chemical and physical parameters",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_SoilAnalysisCode",
+          "schemaName": "bv_SoilAnalysisCode",
           "displayName": "Soil Analysis ID",
           "type": "autonumber",
           "autoNumberFormat": "SOL-{SEQNUM:4}",
@@ -3861,61 +3861,61 @@
           "description": "Auto-generated identifier, format SOL-0001."
         },
         {
-          "schemaName": "inv_SoilAnalysisName",
+          "schemaName": "bv_SoilAnalysisName",
           "displayName": "Analysis Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed / Location",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": false
         },
         {
-          "schemaName": "inv_SampleDate",
+          "schemaName": "bv_SampleDate",
           "displayName": "Sample Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_ReportDate",
+          "schemaName": "bv_ReportDate",
           "displayName": "Report Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_Lab",
+          "schemaName": "bv_Lab",
           "displayName": "Laboratory",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_LabCode",
+          "schemaName": "bv_LabCode",
           "displayName": "Lab Sample Code",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_ReportNumber",
+          "schemaName": "bv_ReportNumber",
           "displayName": "Report Number",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_Crop",
+          "schemaName": "bv_Crop",
           "displayName": "Crop",
           "type": "string",
           "maxLength": 100,
           "required": false
         },
         {
-          "schemaName": "inv_Texture",
+          "schemaName": "bv_Texture",
           "displayName": "Texture",
           "type": "string",
           "maxLength": 100,
@@ -3923,195 +3923,195 @@
           "description": "e.g. Franco Arcillo Arenoso"
         },
         {
-          "schemaName": "inv_Sand_pct",
+          "schemaName": "bv_Sand_pct",
           "displayName": "Sand %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Silt_pct",
+          "schemaName": "bv_Silt_pct",
           "displayName": "Silt %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Clay_pct",
+          "schemaName": "bv_Clay_pct",
           "displayName": "Clay %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_pH",
+          "schemaName": "bv_pH",
           "displayName": "pH (H₂O)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_OrganicCarbon_pct",
+          "schemaName": "bv_OrganicCarbon_pct",
           "displayName": "Organic Carbon (C.O.) %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_OrganicMatter_pct",
+          "schemaName": "bv_OrganicMatter_pct",
           "displayName": "Organic Matter (M.O.) %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_N_total_pct",
+          "schemaName": "bv_N_total_pct",
           "displayName": "N Total %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Al_cmol",
+          "schemaName": "bv_Al_cmol",
           "displayName": "Aluminum (cmol(+)/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Al_Saturation_pct",
+          "schemaName": "bv_Al_Saturation_pct",
           "displayName": "Al Saturation %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_CE_dS",
+          "schemaName": "bv_CE_dS",
           "displayName": "CE (dS/m)",
           "type": "decimal",
           "required": false,
           "description": "Electrical Conductivity"
         },
         {
-          "schemaName": "inv_Cl_mg",
+          "schemaName": "bv_Cl_mg",
           "displayName": "Chloride (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_CIC",
+          "schemaName": "bv_CIC",
           "displayName": "CIC (cmol(+)/kg)",
           "type": "decimal",
           "required": false,
           "description": "Cation Exchange Capacity"
         },
         {
-          "schemaName": "inv_Ca_mg",
+          "schemaName": "bv_Ca_mg",
           "displayName": "Ca (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Mg_mg",
+          "schemaName": "bv_Mg_mg",
           "displayName": "Mg (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_K_mg",
+          "schemaName": "bv_K_mg",
           "displayName": "K (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Na_mg",
+          "schemaName": "bv_Na_mg",
           "displayName": "Na (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_CICE",
+          "schemaName": "bv_CICE",
           "displayName": "CICE (cmol(+)/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Ca_Sat_pct",
+          "schemaName": "bv_Ca_Sat_pct",
           "displayName": "Ca Saturation %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Mg_Sat_pct",
+          "schemaName": "bv_Mg_Sat_pct",
           "displayName": "Mg Saturation %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_K_Sat_pct",
+          "schemaName": "bv_K_Sat_pct",
           "displayName": "K Saturation %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_CaMg_ratio",
+          "schemaName": "bv_CaMg_ratio",
           "displayName": "Ca/Mg Ratio",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_MgK_ratio",
+          "schemaName": "bv_MgK_ratio",
           "displayName": "Mg/K Ratio",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_CaK_ratio",
+          "schemaName": "bv_CaK_ratio",
           "displayName": "Ca/K Ratio",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_CaMgK_ratio",
+          "schemaName": "bv_CaMgK_ratio",
           "displayName": "Ca+Mg/K Ratio",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Cu_mg",
+          "schemaName": "bv_Cu_mg",
           "displayName": "Cu (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Fe_mg",
+          "schemaName": "bv_Fe_mg",
           "displayName": "Fe (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Mn_mg",
+          "schemaName": "bv_Mn_mg",
           "displayName": "Mn (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Zn_mg",
+          "schemaName": "bv_Zn_mg",
           "displayName": "Zn (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_B_mg",
+          "schemaName": "bv_B_mg",
           "displayName": "B (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_S_mg",
+          "schemaName": "bv_S_mg",
           "displayName": "S (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_P_mg",
+          "schemaName": "bv_P_mg",
           "displayName": "P (mg/kg)",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -4120,14 +4120,14 @@
       ]
     },
     {
-      "schemaName": "inv_FoliarAnalysis",
+      "schemaName": "bv_FoliarAnalysis",
       "displayName": "Foliar Analysis",
       "displayCollectionName": "Foliar Analyses",
       "description": "Lab foliar/tissue analysis results for nutrient content in plant tissue",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_FoliarAnalysisCode",
+          "schemaName": "bv_FoliarAnalysisCode",
           "displayName": "Foliar Analysis ID",
           "type": "autonumber",
           "autoNumberFormat": "FOL-{SEQNUM:4}",
@@ -4137,120 +4137,120 @@
           "description": "Auto-generated identifier, format FOL-0001."
         },
         {
-          "schemaName": "inv_FoliarAnalysisName",
+          "schemaName": "bv_FoliarAnalysisName",
           "displayName": "Analysis Name",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_BedId",
+          "schemaName": "bv_BedId",
           "displayName": "Bed / Location",
           "type": "lookup",
-          "relatedTable": "inv_Bed",
+          "relatedTable": "bv_Bed",
           "required": false
         },
         {
-          "schemaName": "inv_SampleDate",
+          "schemaName": "bv_SampleDate",
           "displayName": "Sample Date",
           "type": "date",
           "required": true
         },
         {
-          "schemaName": "inv_ReportDate",
+          "schemaName": "bv_ReportDate",
           "displayName": "Report Date",
           "type": "date",
           "required": false
         },
         {
-          "schemaName": "inv_Lab",
+          "schemaName": "bv_Lab",
           "displayName": "Laboratory",
           "type": "string",
           "maxLength": 200,
           "required": false
         },
         {
-          "schemaName": "inv_LabCode",
+          "schemaName": "bv_LabCode",
           "displayName": "Lab Sample Code",
           "type": "string",
           "maxLength": 50,
           "required": false
         },
         {
-          "schemaName": "inv_Crop",
+          "schemaName": "bv_Crop",
           "displayName": "Crop / Variety",
           "type": "string",
           "maxLength": 100,
           "required": false
         },
         {
-          "schemaName": "inv_N_pct",
+          "schemaName": "bv_N_pct",
           "displayName": "Nitrogen (N) %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_P_pct",
+          "schemaName": "bv_P_pct",
           "displayName": "Phosphorus (P) %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_K_pct",
+          "schemaName": "bv_K_pct",
           "displayName": "Potassium (K) %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Ca_pct",
+          "schemaName": "bv_Ca_pct",
           "displayName": "Calcium (Ca) %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Mg_pct",
+          "schemaName": "bv_Mg_pct",
           "displayName": "Magnesium (Mg) %",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Fe_ppm",
+          "schemaName": "bv_Fe_ppm",
           "displayName": "Iron (Fe) ppm",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Zn_ppm",
+          "schemaName": "bv_Zn_ppm",
           "displayName": "Zinc (Zn) ppm",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Mn_ppm",
+          "schemaName": "bv_Mn_ppm",
           "displayName": "Manganese (Mn) ppm",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Cu_ppm",
+          "schemaName": "bv_Cu_ppm",
           "displayName": "Copper (Cu) ppm",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_B_ppm",
+          "schemaName": "bv_B_ppm",
           "displayName": "Boron (B) ppm",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_S_ppm",
+          "schemaName": "bv_S_ppm",
           "displayName": "Sulfur (S) ppm",
           "type": "decimal",
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -4259,14 +4259,14 @@
       ]
     },
     {
-      "schemaName": "inv_DemandForecast",
+      "schemaName": "bv_DemandForecast",
       "displayName": "Demand Forecast",
       "displayCollectionName": "Demand Forecasts",
       "description": "Quarterly demand forecast from customers — per variety × size × week",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_DemandForecastCode",
+          "schemaName": "bv_DemandForecastCode",
           "displayName": "Demand Forecast ID",
           "type": "autonumber",
           "autoNumberFormat": "DFC-{SEQNUM:4}",
@@ -4276,28 +4276,28 @@
           "description": "Auto-generated identifier, format DFC-0001."
         },
         {
-          "schemaName": "inv_DemandForecastName",
+          "schemaName": "bv_DemandForecastName",
           "displayName": "Forecast Entry",
           "type": "string",
           "maxLength": 200,
           "required": true
         },
         {
-          "schemaName": "inv_CustomerId",
+          "schemaName": "bv_CustomerId",
           "displayName": "Customer",
           "type": "lookup",
-          "relatedTable": "inv_Customer",
+          "relatedTable": "bv_Customer",
           "required": true
         },
         {
-          "schemaName": "inv_PlantId",
+          "schemaName": "bv_PlantId",
           "displayName": "Plant / Variety",
           "type": "lookup",
-          "relatedTable": "inv_Plant",
+          "relatedTable": "bv_Plant",
           "required": true
         },
         {
-          "schemaName": "inv_Size",
+          "schemaName": "bv_Size",
           "displayName": "Size / Pot Type",
           "type": "string",
           "maxLength": 100,
@@ -4305,75 +4305,75 @@
           "description": "e.g. 9cm HQD Bowls, 12cm Canopy, 17cm"
         },
         {
-          "schemaName": "inv_RequestType",
+          "schemaName": "bv_RequestType",
           "displayName": "Request Type",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Current Order"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Additional Request"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Additional Order"
             }
           ]
         },
         {
-          "schemaName": "inv_WeekNumber",
+          "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_Year",
+          "schemaName": "bv_Year",
           "displayName": "Year",
           "type": "integer",
           "required": true
         },
         {
-          "schemaName": "inv_RequestedQty",
+          "schemaName": "bv_RequestedQty",
           "displayName": "Requested Quantity",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_ConfirmedQty",
+          "schemaName": "bv_ConfirmedQty",
           "displayName": "Confirmed Quantity",
           "type": "integer",
           "required": false
         },
         {
-          "schemaName": "inv_Status",
+          "schemaName": "bv_Status",
           "displayName": "Status",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 747480000,
+              "value": 187460000,
               "label": "Pending"
             },
             {
-              "value": 747480001,
+              "value": 187460001,
               "label": "Confirmed"
             },
             {
-              "value": 747480002,
+              "value": 187460002,
               "label": "Adjusted"
             },
             {
-              "value": 747480003,
+              "value": 187460003,
               "label": "Cancelled"
             }
           ]
         },
         {
-          "schemaName": "inv_Quarter",
+          "schemaName": "bv_Quarter",
           "displayName": "Quarter",
           "type": "string",
           "maxLength": 10,
@@ -4381,7 +4381,7 @@
           "description": "e.g. Q2-2026"
         },
         {
-          "schemaName": "inv_ImportBatch",
+          "schemaName": "bv_ImportBatch",
           "displayName": "Import Batch",
           "type": "string",
           "maxLength": 50,
@@ -4389,7 +4389,7 @@
           "description": "Groups rows from the same Excel import"
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -4398,14 +4398,14 @@
       ]
     },
     {
-      "schemaName": "inv_Component",
+      "schemaName": "bv_Component",
       "displayName": "Component",
       "displayCollectionName": "Components",
       "description": "Anything an input can contain: a nutrient, an active ingredient, an organic fraction, a carrier.",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_ComponentCode",
+          "schemaName": "bv_ComponentCode",
           "displayName": "Component ID",
           "type": "autonumber",
           "autoNumberFormat": "CMP-{SEQNUM:4}",
@@ -4415,7 +4415,7 @@
           "description": "Auto-generated identifier, format CMP-0001."
         },
         {
-          "schemaName": "inv_ComponentName",
+          "schemaName": "bv_ComponentName",
           "displayName": "Name",
           "type": "string",
           "maxLength": 150,
@@ -4423,7 +4423,7 @@
           "description": "e.g. Nitrogen, Phosphorus pentoxide, Azadirachtin, Humic acid."
         },
         {
-          "schemaName": "inv_Symbol",
+          "schemaName": "bv_Symbol",
           "displayName": "Symbol / Formula",
           "type": "string",
           "maxLength": 40,
@@ -4431,43 +4431,43 @@
           "description": "N, P2O5, K2O, Fe, or a compound formula."
         },
         {
-          "schemaName": "inv_Category",
+          "schemaName": "bv_Category",
           "displayName": "Category",
           "type": "choice",
           "required": true,
           "options": [
             {
-              "value": 681340300,
+              "value": 121320300,
               "label": "Macronutrient"
             },
             {
-              "value": 681340301,
+              "value": 121320301,
               "label": "Secondary nutrient"
             },
             {
-              "value": 681340302,
+              "value": 121320302,
               "label": "Micronutrient"
             },
             {
-              "value": 681340303,
+              "value": 121320303,
               "label": "Active ingredient"
             },
             {
-              "value": 681340304,
+              "value": 121320304,
               "label": "Organic / biostimulant"
             },
             {
-              "value": 681340305,
+              "value": 121320305,
               "label": "Carrier / inert"
             },
             {
-              "value": 681340306,
+              "value": 121320306,
               "label": "Other"
             }
           ]
         },
         {
-          "schemaName": "inv_ElementSymbol",
+          "schemaName": "bv_ElementSymbol",
           "displayName": "Reports As (element)",
           "type": "string",
           "maxLength": 10,
@@ -4475,7 +4475,7 @@
           "description": "Element this rolls up to. P2O5 reports as P; K2O reports as K."
         },
         {
-          "schemaName": "inv_ElementalFactor",
+          "schemaName": "bv_ElementalFactor",
           "displayName": "Elemental Factor",
           "type": "decimal",
           "precision": 4,
@@ -4485,13 +4485,13 @@
           "description": "Multiplier to elemental mass. P2O5 = 0.4364, K2O = 0.8301, elemental forms = 1."
         },
         {
-          "schemaName": "inv_IsNutrient",
+          "schemaName": "bv_IsNutrient",
           "displayName": "Counts Toward Nutrient Balance",
           "type": "boolean",
           "required": false
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
@@ -4500,14 +4500,14 @@
       ]
     },
     {
-      "schemaName": "inv_InputComponent",
+      "schemaName": "bv_InputComponent",
       "displayName": "Input Component",
       "displayCollectionName": "Input Components",
       "description": "One line of an input's guaranteed analysis. An input has as many as it needs.",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
-          "schemaName": "inv_InputComponentCode",
+          "schemaName": "bv_InputComponentCode",
           "displayName": "Line ID",
           "type": "autonumber",
           "autoNumberFormat": "ICP-{SEQNUM:4}",
@@ -4517,21 +4517,21 @@
           "description": "Auto-generated identifier, format ICP-0001."
         },
         {
-          "schemaName": "inv_InputId",
+          "schemaName": "bv_InputId",
           "displayName": "Input",
           "type": "lookup",
-          "relatedTable": "inv_Input",
+          "relatedTable": "bv_Input",
           "required": true
         },
         {
-          "schemaName": "inv_ComponentId",
+          "schemaName": "bv_ComponentId",
           "displayName": "Component",
           "type": "lookup",
-          "relatedTable": "inv_Component",
+          "relatedTable": "bv_Component",
           "required": true
         },
         {
-          "schemaName": "inv_Percentage",
+          "schemaName": "bv_Percentage",
           "displayName": "Percentage (% w/w)",
           "type": "decimal",
           "precision": 4,
@@ -4541,7 +4541,7 @@
           "description": "Percent by weight of product, as printed on the label."
         },
         {
-          "schemaName": "inv_Notes",
+          "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,

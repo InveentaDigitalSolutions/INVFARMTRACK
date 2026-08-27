@@ -24,10 +24,10 @@ const DRY_RUN = process.argv.includes('--dry-run')
 const LCID = 1033
 
 const PUBLISHER = {
-  uniqueName: 'inveenta',
-  friendlyName: 'Inveenta',
-  prefix: 'inv',
-  optionValuePrefix: 68134,
+  uniqueName: 'BrotonVerde',
+  friendlyName: 'BrotonVerde',
+  prefix: 'bv',
+  optionValuePrefix: 12132,
 }
 
 const schema = JSON.parse(readFileSync(join(REPO_ROOT, 'dataverse', 'farmtrack.dataverse.schema.json'), 'utf8'))
@@ -54,8 +54,28 @@ const logical = (schemaName) => schemaName.toLowerCase()
 let token = ''
 const stats = { tables: 0, columns: 0, relationships: 0, skipped: 0 }
 
+/** Transient network faults to this host are common; retry before giving up. */
+async function fetchWithRetry(url, init, attempts = 9) {
+  let lastError
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await fetch(url, init)
+    } catch (err) {
+      lastError = err
+      const transient = ['ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND', 'EAI_AGAIN', 'UND_ERR_CONNECT_TIMEOUT']
+        .includes(err?.cause?.code) || /fetch failed/i.test(err?.message ?? '')
+      if (!transient || attempt === attempts) break
+      // Outages here have lasted minutes, so be patient rather than fail fast.
+      const waitMs = Math.min(45_000, 1_500 * 2 ** (attempt - 1))
+      console.log(`    … network hiccup (${err?.cause?.code ?? 'unknown'}), retry ${attempt}/${attempts - 1} in ${waitMs / 1000}s`)
+      await new Promise((r) => setTimeout(r, waitMs))
+    }
+  }
+  throw lastError
+}
+
 async function api(method, path, body, extraHeaders = {}) {
-  const res = await fetch(`${DV_URL}/api/data/v9.2/${path}`, {
+  const res = await fetchWithRetry(`${DV_URL}/api/data/v9.2/${path}`, {
     method,
     headers: {
       Authorization: `Bearer ${token}`,
@@ -323,7 +343,10 @@ async function ensureColumns(table) {
 async function ensureRelationship(table, col) {
   const child = logical(table.schemaName)
   const parent = logical(col.relatedTable)
-  const relName = `inv_${table.schemaName.replace(/^inv_/i, '')}_${col.schemaName.replace(/^inv_/i, '')}`
+  // Derive from the schema's own publisher prefix — hardcoding it produced
+  // names like inv_bv_Field_bv_ShadehouseId once the prefix changed.
+  const strip = (n) => n.replace(new RegExp(`^${schema.publisherPrefix}_`, 'i'), '')
+  const relName = `${schema.publisherPrefix}_${strip(table.schemaName)}_${strip(col.schemaName)}`
 
   const found = await api('GET', `RelationshipDefinitions?$select=SchemaName&$filter=SchemaName eq '${relName}'`)
   if (found.value?.length) { stats.skipped++; return }
@@ -352,7 +375,11 @@ async function ensureRelationship(table, col) {
     },
     CascadeConfiguration: {
       Assign: 'NoCascade',
-      Delete: col.required ? 'Cascade' : 'RemoveLink',
+      // Referential, never parental. Cascade delete makes a relationship
+      // parental and Dataverse allows a child only ONE parent — bv_Planting
+      // has required lookups to Plant, Bed and Season. Cascade is also wrong
+      // on the merits: deleting a Plant must not delete every Planting.
+      Delete: col.required ? 'Restrict' : 'RemoveLink',
       Merge: 'NoCascade',
       Reparent: 'NoCascade',
       Share: 'NoCascade',
