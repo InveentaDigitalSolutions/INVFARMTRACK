@@ -14,10 +14,32 @@ export interface DataverseBinding {
   dataSource: string;
   /** Dataverse primary key column, e.g. "bv_plantid" */
   primaryKey: string;
+  /**
+   * App field name -> Dataverse column. The app's own names are short and
+   * table-local ("code", "name"); Dataverse prefixes everything and spells
+   * some differently ("bv_plantcode", "bv_patentnumber"). Without this the
+   * rows arrive intact but every cell reads undefined — which renders as a
+   * table full of blank rows rather than an error.
+   *
+   * Fields absent from the map pass through untouched.
+   */
+  fields?: Record<string, string>;
 }
 
 export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
-  plants: { dataSource: "bv_plants", primaryKey: "bv_plantid" },
+  plants: {
+    dataSource: "bv_plants",
+    primaryKey: "bv_plantid",
+    fields: {
+      code: "bv_plantcode",
+      name: "bv_plantname",
+      latin: "bv_latinname",
+      variety: "bv_variety",
+      invoiceName: "bv_invoicename",
+      patentNum: "bv_patentnumber",
+      active: "bv_isactive",
+    },
+  },
   shadehouses: { dataSource: "bv_shadehouses", primaryKey: "bv_shadehouseid" },
   fields: { dataSource: "bv_fields", primaryKey: "bv_fieldid" },
   beds: { dataSource: "bv_beds", primaryKey: "bv_bedid" },

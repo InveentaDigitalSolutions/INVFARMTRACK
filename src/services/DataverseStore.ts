@@ -24,30 +24,52 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
 
   private readonly dataSourceName: string;
   private readonly primaryKey: string;
+  /** app field -> Dataverse column */
+  private readonly toColumn: Record<string, string>;
+  /** Dataverse column -> app field */
+  private readonly toField: Record<string, string>;
 
   /**
    * @param dataSourceName as it appears in power.config.json, e.g. "bv_shadehouses"
    * @param primaryKey     the Dataverse key column, e.g. "bv_shadehouseid"
+   * @param fields         app field -> Dataverse column; unmapped names pass through
    */
-  constructor(dataSourceName: string, primaryKey: string) {
+  constructor(
+    dataSourceName: string,
+    primaryKey: string,
+    fields: Record<string, string> = {}
+  ) {
     this.dataSourceName = dataSourceName;
     this.primaryKey = primaryKey;
+    this.toColumn = fields;
+    this.toField = Object.fromEntries(Object.entries(fields).map(([k, v]) => [v, k]));
   }
 
-  /** Dataverse record -> app record: expose the key as `id`. */
+  /** Dataverse record -> app record: rename columns and expose the key as `id`. */
   private toApp(record: Row): T {
-    const { [this.primaryKey]: key, ...rest } = record;
-    return { ...rest, id: String(key ?? "") } as unknown as T;
+    const out: Row = {};
+    for (const [column, value] of Object.entries(record)) {
+      // Drop OData annotations (@odata.etag, _x_value@…) — they are noise here.
+      if (column.startsWith("@") || column.includes("@odata")) continue;
+      if (column === this.primaryKey) continue;
+      out[this.toField[column] ?? column] = value;
+    }
+    out.id = String(record[this.primaryKey] ?? "");
+    return out as unknown as T;
   }
 
-  /** App record -> Dataverse record: drop `id`, never send the key on write. */
+  /** App record -> Dataverse record: rename fields, never send the key. */
   private toDataverse(record: Row): Row {
     const out: Row = {};
-    for (const [k, v] of Object.entries(record)) {
-      if (k === "id" || k === this.primaryKey) continue;
+    for (const [field, value] of Object.entries(record)) {
+      if (field === "id" || field === this.primaryKey) continue;
       // Autonumber and other server-computed columns must not be written.
-      if (v === undefined) continue;
-      out[k] = v;
+      if (value === undefined) continue;
+      const column = this.toColumn[field] ?? field;
+      // Only send columns Dataverse knows about; an unmapped app-only field
+      // would be rejected for the whole request.
+      if (!column.startsWith("bv_")) continue;
+      out[column] = value;
     }
     return out;
   }

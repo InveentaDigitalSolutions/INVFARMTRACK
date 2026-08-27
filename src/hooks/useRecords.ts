@@ -32,7 +32,7 @@ function storeFor(table: string, seed: Record<string, unknown>[]): DataStore<Ide
 
   const binding = DATAVERSE_TABLES[table];
   if (binding && ENABLED_TABLES.has(table) && dataverseConfigured()) {
-    store = new DataverseStore<Identified>(binding.dataSource, binding.primaryKey);
+    store = new DataverseStore<Identified>(binding.dataSource, binding.primaryKey, binding.fields);
     console.info(`[data] ${table} -> Dataverse (${binding.dataSource})`);
   } else {
     store = new LocalStore<Identified>(table, seed as Identified[]);
