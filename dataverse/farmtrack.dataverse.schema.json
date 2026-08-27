@@ -15,7 +15,8 @@
           "displayName": "Shadehouse Name",
           "type": "string",
           "maxLength": 100,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_Code",
@@ -32,39 +33,45 @@
           "displayName": "Location",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Where this sits physically."
         },
         {
           "schemaName": "bv_Coordinates",
           "displayName": "Coordinates",
           "type": "string",
           "maxLength": 100,
-          "required": false
+          "required": false,
+          "description": "Latitude and longitude, used for the weather lookup."
         },
         {
           "schemaName": "bv_Length",
           "displayName": "Length (m)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Physical dimension in metres."
         },
         {
           "schemaName": "bv_Width",
           "displayName": "Width (m)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Physical dimension in metres."
         },
         {
           "schemaName": "bv_Capacity",
           "displayName": "Capacity (beds)",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Maximum the unit can hold."
         },
         {
           "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Whether the record is currently in use."
         }
       ]
     },
@@ -90,14 +97,16 @@
           "displayName": "Bed Name",
           "type": "string",
           "maxLength": 100,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_FieldId",
           "displayName": "Field",
           "type": "lookup",
           "relatedTable": "bv_Field",
-          "required": true
+          "required": true,
+          "description": "Link to the related Field record."
         },
         {
           "schemaName": "bv_Type",
@@ -113,7 +122,8 @@
               "value": 121320001,
               "label": "Ground"
             }
-          ]
+          ],
+          "description": "Whether this is a ground bed planted in soil, or an air bed of hanging pots on a cable. One of: Air, Ground."
         },
         {
           "schemaName": "bv_Level",
@@ -137,13 +147,15 @@
               "value": 121320003,
               "label": "3"
             }
-          ]
+          ],
+          "description": "Vertical level: 0 is the ground bed, 1-3 are the cable lines strung above it. One of: 0, 1, 2, 3."
         },
         {
           "schemaName": "bv_Capacity",
           "displayName": "Capacity",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Maximum the unit can hold."
         },
         {
           "schemaName": "bv_BedMaterial",
@@ -167,7 +179,8 @@
               "value": 121320003,
               "label": "Metal"
             }
-          ]
+          ],
+          "description": "One of: Wood, Concrete, Plastic, Metal."
         },
         {
           "schemaName": "bv_SoilType",
@@ -199,7 +212,8 @@
               "value": 121320005,
               "label": "Silty"
             }
-          ]
+          ],
+          "description": "One of: Sandy, Loamy, Clay, Peaty, Chalky, Silty."
         },
         {
           "schemaName": "bv_Drainage",
@@ -223,7 +237,8 @@
               "value": 121320003,
               "label": "Poor"
             }
-          ]
+          ],
+          "description": "One of: Excellent, Good, Moderate, Poor."
         },
         {
           "schemaName": "bv_IrrigationType",
@@ -247,21 +262,24 @@
               "value": 121320003,
               "label": "None"
             }
-          ]
+          ],
+          "description": "One of: Drip, Sprinkler, Manual, None."
         },
         {
           "schemaName": "bv_Location",
           "displayName": "Location",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Where this sits physically."
         },
         {
           "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Whether the record is currently in use."
         }
       ]
     },
@@ -277,7 +295,8 @@
           "displayName": "Plant Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_InvoiceName",
@@ -302,55 +321,63 @@
           "displayName": "Latin Name",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_Species",
           "displayName": "Species",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Species for the Plant."
         },
         {
           "schemaName": "bv_Variety",
           "displayName": "Variety",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Variety for the Plant."
         },
         {
           "schemaName": "bv_Origin",
           "displayName": "Origin",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Origin for the Plant."
         },
         {
           "schemaName": "bv_PatentNumber",
           "displayName": "Patent Number",
           "type": "string",
           "maxLength": 100,
-          "required": false
+          "required": false,
+          "description": "Short text value. Patent Number for the Plant."
         },
         {
           "schemaName": "bv_PatentHolder",
           "displayName": "Patent Holder",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Patent Holder for the Plant."
         },
         {
           "schemaName": "bv_PatentExpiry",
           "displayName": "Patent Expiry Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date value (date only, no time). Patent Expiry Date for the Plant."
         },
         {
           "schemaName": "bv_IsPatented",
           "displayName": "Is Patented",
           "type": "boolean",
           "required": false,
-          "defaultValue": false
+          "defaultValue": false,
+          "description": "Yes/no flag. Is Patented for the Plant."
         },
         {
           "schemaName": "bv_GrowthHabit",
@@ -374,7 +401,8 @@
               "value": 121320003,
               "label": "Trailing"
             }
-          ]
+          ],
+          "description": "One of: Upright, Spreading, Climbing, Trailing."
         },
         {
           "schemaName": "bv_PropagationMethod",
@@ -402,7 +430,8 @@
               "value": 121320004,
               "label": "Tissue Culture"
             }
-          ]
+          ],
+          "description": "One of: Seed, Cutting, Division, Grafting, Tissue Culture."
         },
         {
           "schemaName": "bv_SunlightRequirement",
@@ -422,7 +451,8 @@
               "value": 121320002,
               "label": "Full Shade"
             }
-          ]
+          ],
+          "description": "One of: Full Sun, Partial Shade, Full Shade."
         },
         {
           "schemaName": "bv_WaterRequirement",
@@ -442,7 +472,8 @@
               "value": 121320002,
               "label": "High"
             }
-          ]
+          ],
+          "description": "One of: Low, Medium, High."
         },
         {
           "schemaName": "bv_SoilType",
@@ -474,41 +505,47 @@
               "value": 121320005,
               "label": "Silty"
             }
-          ]
+          ],
+          "description": "One of: Sandy, Loamy, Clay, Peaty, Chalky, Silty."
         },
         {
           "schemaName": "bv_BloomPeriod",
           "displayName": "Bloom Period",
           "type": "string",
           "maxLength": 100,
-          "required": false
+          "required": false,
+          "description": "Short text value. Bloom Period for the Plant."
         },
         {
           "schemaName": "bv_DefaultUnitPrice",
           "displayName": "Default Unit Price",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Unit price."
         },
         {
           "schemaName": "bv_Characteristics",
           "displayName": "Characteristics",
           "type": "memo",
           "maxLength": 4000,
-          "required": false
+          "required": false,
+          "description": "Long-form text. Characteristics for the Plant."
         },
         {
           "schemaName": "bv_ImageUrl",
           "displayName": "Image URL",
           "type": "string",
           "maxLength": 500,
-          "required": false
+          "required": false,
+          "description": "Short text value. Image URL for the Plant."
         },
         {
           "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Whether the record is currently in use."
         }
       ]
     },
@@ -534,33 +571,38 @@
           "displayName": "Season Name",
           "type": "string",
           "maxLength": 100,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_StartDate",
           "displayName": "Start Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_EndDate",
           "displayName": "End Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Description",
           "displayName": "Description",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Long-form text. Description for the Season."
         },
         {
           "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Whether the record is currently in use."
         }
       ]
     },
@@ -586,28 +628,32 @@
           "displayName": "Shadehouse",
           "type": "lookup",
           "relatedTable": "bv_Shadehouse",
-          "required": true
+          "required": true,
+          "description": "Link to the related Shadehouse record."
         },
         {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
           "relatedTable": "bv_Season",
-          "required": false
+          "required": false,
+          "description": "Link to the related Season record."
         },
         {
           "schemaName": "bv_Position",
           "displayName": "Position",
           "type": "string",
           "maxLength": 100,
-          "required": false
+          "required": false,
+          "description": "Short text value. Position for the Field."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -633,54 +679,62 @@
           "displayName": "Planting Description",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Short text value. Planting Description for the Planting."
         },
         {
           "schemaName": "bv_PlantId",
           "displayName": "Plant",
           "type": "lookup",
           "relatedTable": "bv_Plant",
-          "required": true
+          "required": true,
+          "description": "Link to the related Plant record."
         },
         {
           "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
           "relatedTable": "bv_Bed",
-          "required": true
+          "required": true,
+          "description": "Link to the related Bed record."
         },
         {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
           "relatedTable": "bv_Season",
-          "required": true
+          "required": true,
+          "description": "Link to the related Season record."
         },
         {
           "schemaName": "bv_PlantingDate",
           "displayName": "Planting Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Quantity",
           "displayName": "Quantity",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Amount recorded for this entry."
         },
         {
           "schemaName": "bv_CurrentPlanting",
           "displayName": "Current Planting",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Yes/no flag. Current Planting for the Planting."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -706,7 +760,8 @@
           "displayName": "Input Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_InputCategory",
@@ -738,28 +793,32 @@
               "value": 187460005,
               "label": "Other"
             }
-          ]
+          ],
+          "description": "One of: Fertilizer, Pesticide, Fungicide, Herbicide, Growth Regulator, Other."
         },
         {
           "schemaName": "bv_InputSubtype",
           "displayName": "Input Subtype",
           "type": "string",
           "maxLength": 100,
-          "required": false
+          "required": false,
+          "description": "Short text value. Input Subtype for the Input."
         },
         {
           "schemaName": "bv_Brand",
           "displayName": "Brand",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Manufacturer or brand name."
         },
         {
           "schemaName": "bv_Composition",
           "displayName": "Composition",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Long-form text. Composition for the Input."
         },
         {
           "schemaName": "bv_ApplicationMethod",
@@ -791,41 +850,47 @@
               "value": 187460005,
               "label": "Other"
             }
-          ]
+          ],
+          "description": "One of: Foliar Spray, Soil Drench, Granular, Drip, Broadcast, Other."
         },
         {
           "schemaName": "bv_SafetyIntervalDays",
           "displayName": "Safety Interval (days)",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Safety Interval (days) for the Input."
         },
         {
           "schemaName": "bv_StorageInstructions",
           "displayName": "Storage Instructions",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Long-form text. Storage Instructions for the Input."
         },
         {
           "schemaName": "bv_EnvironmentalImpact",
           "displayName": "Environmental Impact",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Long-form text. Environmental Impact for the Input."
         },
         {
           "schemaName": "bv_ManufacturerContact",
           "displayName": "Manufacturer Contact",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Manufacturer Contact for the Input."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         },
         {
           "schemaName": "bv_Formulation",
@@ -849,7 +914,8 @@
               "value": 121320213,
               "label": "Suspension"
             }
-          ]
+          ],
+          "description": "Physical form of the product. One of: Solid, Soluble powder, Liquid, Suspension."
         },
         {
           "schemaName": "bv_DensityKgPerL",
@@ -885,7 +951,8 @@
           "displayName": "Treatment Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_BedId",
@@ -900,13 +967,15 @@
           "displayName": "Input",
           "type": "lookup",
           "relatedTable": "bv_Input",
-          "required": false
+          "required": false,
+          "description": "Link to the related Input record."
         },
         {
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Type",
@@ -930,39 +999,45 @@
               "value": 187460003,
               "label": "Regulator"
             }
-          ]
+          ],
+          "description": "One of: Insecticide, Fungicide, Herbicide, Regulator."
         },
         {
           "schemaName": "bv_TemperatureC",
           "displayName": "Temperature (C)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Temperature in degrees Celsius."
         },
         {
           "schemaName": "bv_Humidity",
           "displayName": "Humidity (%)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Relative humidity, percent."
         },
         {
           "schemaName": "bv_PH",
           "displayName": "pH",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "pH measurement."
         },
         {
           "schemaName": "bv_Worker",
           "displayName": "Worker",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Person who carried out the work."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         },
         {
           "schemaName": "bv_Dose",
@@ -996,7 +1071,8 @@
               "value": 121320233,
               "label": "mL"
             }
-          ]
+          ],
+          "description": "Unit the dose is expressed in. One of: kg, L, g, mL."
         },
         {
           "schemaName": "bv_WaterVolumeL",
@@ -1032,7 +1108,8 @@
           "displayName": "Irrigation Event Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_BedId",
@@ -1046,13 +1123,15 @@
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_AmountLiters",
           "displayName": "Amount (Liters)",
           "type": "decimal",
-          "required": true
+          "required": true,
+          "description": "Volume in litres."
         },
         {
           "schemaName": "bv_Method",
@@ -1076,14 +1155,16 @@
               "value": 187460003,
               "label": "Flood"
             }
-          ]
+          ],
+          "description": "One of: Drip, Sprinkler, Manual, Flood."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         },
         {
           "schemaName": "bv_StartedOn",
@@ -1121,14 +1202,16 @@
               "value": 121320103,
               "label": "Aborted"
             }
-          ]
+          ],
+          "description": "Current state of the record. One of: Running, Completed, Fault, Aborted."
         },
         {
           "schemaName": "bv_FlowRateLpm",
           "displayName": "Flow Rate (L/min)",
           "type": "decimal",
           "required": false,
-          "precision": 2
+          "precision": 2,
+          "description": "Decimal number. Flow Rate (L/min) for the Irrigation."
         },
         {
           "schemaName": "bv_Source",
@@ -1145,7 +1228,7 @@
               "label": "Manual"
             }
           ],
-          "description": "Distinguishes an automated run from a hand-opened valve."
+          "description": "Distinguishes an automated controller run from a hand-opened valve. One of: Controller, Manual."
         }
       ]
     },
@@ -1171,7 +1254,8 @@
           "displayName": "Harvest Event Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_BedId",
@@ -1185,19 +1269,22 @@
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_YieldKg",
           "displayName": "Yield (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Yield (kg) for the Harvest."
         },
         {
           "schemaName": "bv_QuantityHarvested",
           "displayName": "Quantity Harvested",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Amount recorded for this entry."
         },
         {
           "schemaName": "bv_Quality",
@@ -1221,21 +1308,24 @@
               "value": 187460003,
               "label": "Poor"
             }
-          ]
+          ],
+          "description": "One of: Excellent, Good, Average, Poor."
         },
         {
           "schemaName": "bv_Worker",
           "displayName": "Harvested By",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Person who carried out the work."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -1261,104 +1351,120 @@
           "displayName": "Date Label",
           "type": "string",
           "maxLength": 50,
-          "required": true
+          "required": true,
+          "description": "Short text value. Date Label for the Calendar."
         },
         {
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_ISODateID",
           "displayName": "ISO Date ID",
           "type": "string",
           "maxLength": 10,
-          "required": true
+          "required": true,
+          "description": "Short text value. ISO Date ID for the Calendar."
         },
         {
           "schemaName": "bv_Year",
           "displayName": "Year",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Whole number. Year for the Calendar."
         },
         {
           "schemaName": "bv_Quarter",
           "displayName": "Quarter",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Whole number. Quarter for the Calendar."
         },
         {
           "schemaName": "bv_MonthNumber",
           "displayName": "Month Number",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Calendar month, 1-12."
         },
         {
           "schemaName": "bv_MonthLongName",
           "displayName": "Month Long Name",
           "type": "string",
           "maxLength": 20,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_MonthShortName",
           "displayName": "Month Short Name",
           "type": "string",
           "maxLength": 3,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "ISO week number."
         },
         {
           "schemaName": "bv_DayOfMonth",
           "displayName": "Day of Month",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Whole number. Day of Month for the Calendar."
         },
         {
           "schemaName": "bv_DayOfYear",
           "displayName": "Day of Year",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Whole number. Day of Year for the Calendar."
         },
         {
           "schemaName": "bv_WeekdayNumber",
           "displayName": "Weekday Number",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Day of week, 1 = Monday."
         },
         {
           "schemaName": "bv_WeekdayLongName",
           "displayName": "Weekday Long Name",
           "type": "string",
           "maxLength": 10,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_WeekdayShortName",
           "displayName": "Weekday Short Name",
           "type": "string",
           "maxLength": 3,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_QuarterYear",
           "displayName": "Quarter Year",
           "type": "string",
           "maxLength": 10,
-          "required": true
+          "required": true,
+          "description": "Short text value. Quarter Year for the Calendar."
         },
         {
           "schemaName": "bv_IsWeekend",
           "displayName": "Is Weekend",
           "type": "boolean",
           "required": false,
-          "defaultValue": false
+          "defaultValue": false,
+          "description": "Yes/no flag. Is Weekend for the Calendar."
         }
       ]
     },
@@ -1384,7 +1490,8 @@
           "displayName": "Task Title",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Short text value. Task Title for the Task."
         },
         {
           "schemaName": "bv_TaskType",
@@ -1436,33 +1543,38 @@
               "value": 187460010,
               "label": "General Maintenance"
             }
-          ]
+          ],
+          "description": "One of: Watering, Fertilizing, Pruning, Repotting, Pest Control, Disease Treatment, Harvesting, Seeding, Packing, Inspection, General Maintenance."
         },
         {
           "schemaName": "bv_PlantingId",
           "displayName": "Related Planting",
           "type": "lookup",
           "relatedTable": "bv_Planting",
-          "required": false
+          "required": false,
+          "description": "Link to the related Planting record."
         },
         {
           "schemaName": "bv_BedId",
           "displayName": "Related Bed",
           "type": "lookup",
           "relatedTable": "bv_Bed",
-          "required": false
+          "required": false,
+          "description": "Link to the related Bed record."
         },
         {
           "schemaName": "bv_DueDate",
           "displayName": "Due Date",
           "type": "datetime",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_CompletedDate",
           "displayName": "Completed Date",
           "type": "datetime",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Status",
@@ -1486,7 +1598,8 @@
               "value": 187460003,
               "label": "Skipped"
             }
-          ]
+          ],
+          "description": "Current state of the record. One of: Pending, In Progress, Done, Skipped."
         },
         {
           "schemaName": "bv_Priority",
@@ -1510,21 +1623,24 @@
               "value": 187460003,
               "label": "Urgent"
             }
-          ]
+          ],
+          "description": "One of: Low, Normal, High, Urgent."
         },
         {
           "schemaName": "bv_AssignedTo",
           "displayName": "Assigned To",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Assigned To for the Task."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -1540,7 +1656,8 @@
           "displayName": "Customer Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_CustomerCode",
@@ -1557,42 +1674,48 @@
           "displayName": "Email",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Contact email address."
         },
         {
           "schemaName": "bv_Phone",
           "displayName": "Phone",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Contact telephone number."
         },
         {
           "schemaName": "bv_Address",
           "displayName": "Address",
           "type": "memo",
           "maxLength": 500,
-          "required": false
+          "required": false,
+          "description": "Postal address."
         },
         {
           "schemaName": "bv_TaxId",
           "displayName": "Tax ID",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Short text value. Tax ID for the Customer."
         },
         {
           "schemaName": "bv_ContactName",
           "displayName": "Contact Name",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_ContactEmail",
           "displayName": "Contact Email",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Contact email address."
         },
         {
           "schemaName": "bv_DeliverToName",
@@ -1607,7 +1730,8 @@
           "displayName": "Deliver To (Address)",
           "type": "memo",
           "maxLength": 500,
-          "required": false
+          "required": false,
+          "description": "Postal address."
         },
         {
           "schemaName": "bv_PaymentTerms",
@@ -1635,21 +1759,24 @@
               "value": 187460004,
               "label": "Net 30"
             }
-          ]
+          ],
+          "description": "One of: CIF, FOB, EXW, DDP, Net 30."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         },
         {
           "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Whether the record is currently in use."
         }
       ]
     },
@@ -1675,19 +1802,22 @@
           "displayName": "Customer",
           "type": "lookup",
           "relatedTable": "bv_Customer",
-          "required": true
+          "required": true,
+          "description": "Link to the related Customer record."
         },
         {
           "schemaName": "bv_OrderDate",
           "displayName": "Order Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_RequestedDeliveryDate",
           "displayName": "Requested Delivery Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Status",
@@ -1719,20 +1849,23 @@
               "value": 187460005,
               "label": "Cancelled"
             }
-          ]
+          ],
+          "description": "Current state of the record. One of: Draft, Confirmed, In Packing, Ready for Pickup, Delivered, Cancelled."
         },
         {
           "schemaName": "bv_TotalAmount",
           "displayName": "Total Amount",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Total amount."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -1758,39 +1891,45 @@
           "displayName": "Order Item Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_OrderId",
           "displayName": "Order",
           "type": "lookup",
           "relatedTable": "bv_Order",
-          "required": true
+          "required": true,
+          "description": "Link to the related Order record."
         },
         {
           "schemaName": "bv_PlantId",
           "displayName": "Plant",
           "type": "lookup",
           "relatedTable": "bv_Plant",
-          "required": true
+          "required": true,
+          "description": "Link to the related Plant record."
         },
         {
           "schemaName": "bv_Quantity",
           "displayName": "Quantity",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Amount recorded for this entry."
         },
         {
           "schemaName": "bv_UnitPrice",
           "displayName": "Unit Price",
           "type": "currency",
-          "required": true
+          "required": true,
+          "description": "Unit price."
         },
         {
           "schemaName": "bv_LineTotal",
           "displayName": "Line Total",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Total amount."
         }
       ]
     },
@@ -1816,55 +1955,63 @@
           "displayName": "ID",
           "type": "string",
           "maxLength": 50,
-          "required": true
+          "required": true,
+          "description": "Short text value. ID for the Packing."
         },
         {
           "schemaName": "bv_Barcode",
           "displayName": "Barcode",
           "type": "string",
           "maxLength": 100,
-          "required": false
+          "required": false,
+          "description": "Short text value. Barcode for the Packing."
         },
         {
           "schemaName": "bv_BoxNumber",
           "displayName": "Box Number",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Box Number for the Packing."
         },
         {
           "schemaName": "bv_PlantId",
           "displayName": "Product (Plant)",
           "type": "lookup",
           "relatedTable": "bv_Plant",
-          "required": true
+          "required": true,
+          "description": "Link to the related Plant record."
         },
         {
           "schemaName": "bv_BedId",
           "displayName": "Bed (source)",
           "type": "lookup",
           "relatedTable": "bv_Bed",
-          "required": false
+          "required": false,
+          "description": "Link to the related Bed record."
         },
         {
           "schemaName": "bv_ShadehouseId",
           "displayName": "Shadehouse",
           "type": "lookup",
           "relatedTable": "bv_Shadehouse",
-          "required": false
+          "required": false,
+          "description": "Link to the related Shadehouse record."
         },
         {
           "schemaName": "bv_OrderId",
           "displayName": "Order",
           "type": "lookup",
           "relatedTable": "bv_Order",
-          "required": false
+          "required": false,
+          "description": "Link to the related Order record."
         },
         {
           "schemaName": "bv_InvoiceId",
           "displayName": "Invoice",
           "type": "lookup",
           "relatedTable": "bv_Invoice",
-          "required": false
+          "required": false,
+          "description": "Link to the related Invoice record."
         },
         {
           "schemaName": "bv_PackingType",
@@ -1881,7 +2028,8 @@
               "value": 125690001,
               "label": "IND"
             }
-          ]
+          ],
+          "description": "One of: BNDL, IND."
         },
         {
           "schemaName": "bv_BundleSize",
@@ -1894,51 +2042,59 @@
           "schemaName": "bv_Quantity",
           "displayName": "Quantity",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Amount recorded for this entry."
         },
         {
           "schemaName": "bv_GrossWeight",
           "displayName": "Gross Weight",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Gross Weight for the Packing."
         },
         {
           "schemaName": "bv_NetWeight",
           "displayName": "Net Weight",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Net Weight for the Packing."
         },
         {
           "schemaName": "bv_TotalWeight",
           "displayName": "Total Weight",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Total amount."
         },
         {
           "schemaName": "bv_UnitPrice",
           "displayName": "Unit Price",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Unit price."
         },
         {
           "schemaName": "bv_LineTotal",
           "displayName": "Line Total",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Total amount."
         },
         {
           "schemaName": "bv_PackedBy",
           "displayName": "Packed By",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Packed By for the Packing."
         },
         {
           "schemaName": "bv_WorkerId",
           "displayName": "Worker ID",
           "type": "string",
           "maxLength": 20,
-          "required": false
+          "required": false,
+          "description": "Short text value. Worker ID for the Packing."
         },
         {
           "schemaName": "bv_ProductType",
@@ -2000,20 +2156,23 @@
               "value": 187460006,
               "label": "Extra Large"
             }
-          ]
+          ],
+          "description": "One of: Petit, Mini Petit, Small, Medium, California, Large, Extra Large."
         },
         {
           "schemaName": "bv_PackingCompleted",
           "displayName": "Packing Completed",
           "type": "boolean",
           "required": false,
-          "defaultValue": false
+          "defaultValue": false,
+          "description": "Yes/no flag. Packing Completed for the Packing."
         },
         {
           "schemaName": "bv_PackingDate",
           "displayName": "Packing Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         }
       ]
     },
@@ -2039,7 +2198,8 @@
           "displayName": "Fiscal Authorization Name",
           "type": "string",
           "maxLength": 100,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_CAI",
@@ -2098,14 +2258,16 @@
           "schemaName": "bv_RequestDate",
           "displayName": "Request Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Whether the record is currently in use."
         }
       ]
     },
@@ -2131,26 +2293,30 @@
           "displayName": "Fiscal Authorization",
           "type": "lookup",
           "relatedTable": "bv_FiscalAuthorization",
-          "required": false
+          "required": false,
+          "description": "Link to the related Fiscal Authorization record."
         },
         {
           "schemaName": "bv_CustomerId",
           "displayName": "Customer",
           "type": "lookup",
           "relatedTable": "bv_Customer",
-          "required": true
+          "required": true,
+          "description": "Link to the related Customer record."
         },
         {
           "schemaName": "bv_InvoiceDate",
           "displayName": "Invoice Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "ISO week number."
         },
         {
           "schemaName": "bv_ETD",
@@ -2184,14 +2350,16 @@
               "value": 187460002,
               "label": "Land"
             }
-          ]
+          ],
+          "description": "One of: Air, Sea, Land."
         },
         {
           "schemaName": "bv_Carrier",
           "displayName": "Vessel / Carrier",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Vessel / Carrier for the Invoice."
         },
         {
           "schemaName": "bv_AWBNumber",
@@ -2206,21 +2374,24 @@
           "displayName": "Container / Flight Number",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Short text value. Container / Flight Number for the Invoice."
         },
         {
           "schemaName": "bv_SealNumber",
           "displayName": "Seal Number",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Short text value. Seal Number for the Invoice."
         },
         {
           "schemaName": "bv_TempRecord",
           "displayName": "Temperature Record",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Short text value. Temperature Record for the Invoice."
         },
         {
           "schemaName": "bv_Terms",
@@ -2244,21 +2415,24 @@
               "value": 187460003,
               "label": "DDP"
             }
-          ]
+          ],
+          "description": "One of: CIF, FOB, EXW, DDP."
         },
         {
           "schemaName": "bv_PortOfEntry",
           "displayName": "Port of Entry",
           "type": "string",
           "maxLength": 100,
-          "required": false
+          "required": false,
+          "description": "Short text value. Port of Entry for the Invoice."
         },
         {
           "schemaName": "bv_PhytoNumber",
           "displayName": "Phytosanitary Certificate",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Short text value. Phytosanitary Certificate for the Invoice."
         },
         {
           "schemaName": "bv_NotifyPartyName",
@@ -2273,56 +2447,65 @@
           "displayName": "Notify Party (Address)",
           "type": "memo",
           "maxLength": 500,
-          "required": false
+          "required": false,
+          "description": "Postal address."
         },
         {
           "schemaName": "bv_NotifyPartyContact",
           "displayName": "Notify Party (Contact)",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Notify Party (Contact) for the Invoice."
         },
         {
           "schemaName": "bv_Subtotal",
           "displayName": "Subtotal",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Total amount."
         },
         {
           "schemaName": "bv_ISV15",
           "displayName": "ISV 15%",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Monetary amount. ISV 15% for the Invoice."
         },
         {
           "schemaName": "bv_ISV18",
           "displayName": "ISV 18%",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Monetary amount. ISV 18% for the Invoice."
         },
         {
           "schemaName": "bv_SubtotalExonerated",
           "displayName": "Subtotal Exonerated",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Total amount."
         },
         {
           "schemaName": "bv_Discounts",
           "displayName": "Discounts",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Monetary amount. Discounts for the Invoice."
         },
         {
           "schemaName": "bv_AirFreight",
           "displayName": "Air Freight",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Monetary amount. Air Freight for the Invoice."
         },
         {
           "schemaName": "bv_TotalAmount",
           "displayName": "Total Amount (USD)",
           "type": "currency",
-          "required": true
+          "required": true,
+          "description": "Total amount."
         },
         {
           "schemaName": "bv_ExchangeRate",
@@ -2335,20 +2518,23 @@
           "schemaName": "bv_TotalAmountHNL",
           "displayName": "Total Amount (HNL)",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Total amount."
         },
         {
           "schemaName": "bv_PaidAmount",
           "displayName": "Paid Amount",
           "type": "currency",
           "required": false,
-          "defaultValue": 0
+          "defaultValue": 0,
+          "description": "Monetary amount. Paid Amount for the Invoice."
         },
         {
           "schemaName": "bv_Balance",
           "displayName": "Balance",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Monetary amount. Balance for the Invoice."
         },
         {
           "schemaName": "bv_Status",
@@ -2380,13 +2566,15 @@
               "value": 187460005,
               "label": "Cancelled"
             }
-          ]
+          ],
+          "description": "Current state of the record. One of: Draft, Sent, Partially Paid, Paid, Overdue, Cancelled."
         },
         {
           "schemaName": "bv_DueDate",
           "displayName": "Due Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_SharePointUrl",
@@ -2401,7 +2589,8 @@
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -2435,14 +2624,16 @@
           "displayName": "Plant",
           "type": "lookup",
           "relatedTable": "bv_Plant",
-          "required": true
+          "required": true,
+          "description": "Link to the related Plant record."
         },
         {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
           "relatedTable": "bv_Season",
-          "required": false
+          "required": false,
+          "description": "Link to the related Season record."
         },
         {
           "schemaName": "bv_CustomerId",
@@ -2456,13 +2647,15 @@
           "schemaName": "bv_EffectiveFrom",
           "displayName": "Effective From",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date value (date only, no time). Effective From for the Plant Price."
         },
         {
           "schemaName": "bv_EffectiveTo",
           "displayName": "Effective To",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date value (date only, no time). Effective To for the Plant Price."
         },
         {
           "schemaName": "bv_PriceEXT",
@@ -2483,14 +2676,16 @@
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Whether the record is currently in use."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -2524,7 +2719,8 @@
           "displayName": "Fiscal Authorization",
           "type": "lookup",
           "relatedTable": "bv_FiscalAuthorization",
-          "required": true
+          "required": true,
+          "description": "Link to the related Fiscal Authorization record."
         },
         {
           "schemaName": "bv_SequenceNumber",
@@ -2538,13 +2734,15 @@
           "displayName": "Used",
           "type": "boolean",
           "required": false,
-          "defaultValue": false
+          "defaultValue": false,
+          "description": "Yes/no flag. Used for the CAI Number."
         },
         {
           "schemaName": "bv_UsedDate",
           "displayName": "Used Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_UsedFor",
@@ -2568,7 +2766,8 @@
               "value": 187460003,
               "label": "Other"
             }
-          ]
+          ],
+          "description": "One of: Export Invoice (BANCO), Internal Invoice (JASON), Service Invoice, Other."
         },
         {
           "schemaName": "bv_InvoiceId",
@@ -2583,7 +2782,8 @@
           "displayName": "Notes",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -2609,13 +2809,15 @@
           "displayName": "Expense Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Category",
@@ -2663,13 +2865,15 @@
               "value": 187460009,
               "label": "Other"
             }
-          ]
+          ],
+          "description": "What kind of component this is: nutrient, active ingredient, organic fraction or carrier. One of: Supplies, Equipment, Labor, Transportation, Utilities, Chemicals / Inputs, Shipping / Freight, Maintenance, Office, Other."
         },
         {
           "schemaName": "bv_Amount",
           "displayName": "Amount",
           "type": "currency",
-          "required": true
+          "required": true,
+          "description": "Monetary amount. Amount for the Expense."
         },
         {
           "schemaName": "bv_Currency",
@@ -2685,14 +2889,16 @@
               "value": 187460001,
               "label": "USD"
             }
-          ]
+          ],
+          "description": "One of: HNL, USD."
         },
         {
           "schemaName": "bv_Vendor",
           "displayName": "Vendor / Supplier",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Vendor / Supplier for the Expense."
         },
         {
           "schemaName": "bv_ReceiptUrl",
@@ -2715,7 +2921,8 @@
           "displayName": "Approved By",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Approved By for the Expense."
         },
         {
           "schemaName": "bv_Status",
@@ -2739,14 +2946,16 @@
               "value": 187460003,
               "label": "Paid"
             }
-          ]
+          ],
+          "description": "Current state of the record. One of: Pending, Approved, Rejected, Paid."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -2762,7 +2971,8 @@
           "displayName": "Supplier Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_SupplierCode",
@@ -2816,42 +3026,48 @@
               "value": 187460008,
               "label": "Other"
             }
-          ]
+          ],
+          "description": "What kind of component this is: nutrient, active ingredient, organic fraction or carrier. One of: Chemicals / Inputs, Packaging, Equipment, Substrates, Logistics / Freight, Maintenance, Utilities, Professional Services, Other."
         },
         {
           "schemaName": "bv_ContactName",
           "displayName": "Contact Name",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_Phone",
           "displayName": "Phone",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Contact telephone number."
         },
         {
           "schemaName": "bv_Email",
           "displayName": "Email",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Contact email address."
         },
         {
           "schemaName": "bv_Address",
           "displayName": "Address",
           "type": "memo",
           "maxLength": 500,
-          "required": false
+          "required": false,
+          "description": "Postal address."
         },
         {
           "schemaName": "bv_TaxId",
           "displayName": "Tax ID / RTN",
           "type": "string",
           "maxLength": 30,
-          "required": false
+          "required": false,
+          "description": "Short text value. Tax ID / RTN for the Supplier."
         },
         {
           "schemaName": "bv_PaymentTerms",
@@ -2879,21 +3095,24 @@
               "value": 187460004,
               "label": "Credit"
             }
-          ]
+          ],
+          "description": "One of: Cash, Net 15, Net 30, Net 60, Credit."
         },
         {
           "schemaName": "bv_IsActive",
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Whether the record is currently in use."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -2919,32 +3138,37 @@
           "displayName": "Supplier",
           "type": "lookup",
           "relatedTable": "bv_Supplier",
-          "required": true
+          "required": true,
+          "description": "Link to the related Supplier record."
         },
         {
           "schemaName": "bv_OrderDate",
           "displayName": "Order Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_ExpectedDelivery",
           "displayName": "Expected Delivery",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date value (date only, no time). Expected Delivery for the Purchase Order."
         },
         {
           "schemaName": "bv_Description",
           "displayName": "Description",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Long-form text. Description for the Purchase Order."
         },
         {
           "schemaName": "bv_Amount",
           "displayName": "Amount",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Monetary amount. Amount for the Purchase Order."
         },
         {
           "schemaName": "bv_Currency",
@@ -2960,7 +3184,8 @@
               "value": 187460001,
               "label": "USD"
             }
-          ]
+          ],
+          "description": "One of: HNL, USD."
         },
         {
           "schemaName": "bv_Status",
@@ -2988,20 +3213,23 @@
               "value": 187460004,
               "label": "Cancelled"
             }
-          ]
+          ],
+          "description": "Current state of the record. One of: Draft, Sent, Confirmed, Received, Cancelled."
         },
         {
           "schemaName": "bv_ReceivedDate",
           "displayName": "Received Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -3017,7 +3245,8 @@
           "displayName": "Full Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_WorkerCode",
@@ -3063,14 +3292,16 @@
               "value": 187460006,
               "label": "General"
             }
-          ]
+          ],
+          "description": "One of: Field Worker, Packer, Harvester, Irrigator, Supervisor, Driver, General."
         },
         {
           "schemaName": "bv_Phone",
           "displayName": "Phone",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Contact telephone number."
         },
         {
           "schemaName": "bv_IdentityNumber",
@@ -3084,13 +3315,15 @@
           "schemaName": "bv_HireDate",
           "displayName": "Hire Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_HourlyRate",
           "displayName": "Hourly Rate (HNL)",
           "type": "currency",
-          "required": false
+          "required": false,
+          "description": "Monetary amount. Hourly Rate (HNL) for the Worker."
         },
         {
           "schemaName": "bv_PieceRate",
@@ -3104,14 +3337,16 @@
           "displayName": "Is Active",
           "type": "boolean",
           "required": false,
-          "defaultValue": true
+          "defaultValue": true,
+          "description": "Whether the record is currently in use."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -3137,20 +3372,23 @@
           "displayName": "Timesheet Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_WorkerId",
           "displayName": "Worker",
           "type": "lookup",
           "relatedTable": "bv_Worker",
-          "required": true
+          "required": true,
+          "description": "Link to the related Worker record."
         },
         {
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_ActivityType",
@@ -3186,13 +3424,15 @@
               "value": 187460006,
               "label": "General"
             }
-          ]
+          ],
+          "description": "One of: Planting, Harvesting, Packing, Treatment, Irrigation, Maintenance, General."
         },
         {
           "schemaName": "bv_HoursWorked",
           "displayName": "Hours Worked",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Hours Worked for the Timesheet."
         },
         {
           "schemaName": "bv_PieceCount",
@@ -3205,7 +3445,8 @@
           "schemaName": "bv_BoxesPacked",
           "displayName": "Boxes Packed",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Boxes Packed for the Timesheet."
         },
         {
           "schemaName": "bv_BedId",
@@ -3227,7 +3468,8 @@
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -3253,39 +3495,45 @@
           "displayName": "Pruning Event",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
           "relatedTable": "bv_Bed",
-          "required": true
+          "required": true,
+          "description": "Link to the related Bed record."
         },
         {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
           "relatedTable": "bv_Season",
-          "required": false
+          "required": false,
+          "description": "Link to the related Season record."
         },
         {
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "ISO week number."
         },
         {
           "schemaName": "bv_BedsPruned",
           "displayName": "Beds Pruned",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Beds Pruned for the Pruning."
         },
         {
           "schemaName": "bv_CuttingsEstimated",
@@ -3299,14 +3547,16 @@
           "displayName": "Worker",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Person who carried out the work."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -3332,51 +3582,59 @@
           "displayName": "Curve Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
           "relatedTable": "bv_Season",
-          "required": true
+          "required": true,
+          "description": "Link to the related Season record."
         },
         {
           "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "ISO week number."
         },
         {
           "schemaName": "bv_PlannedBeds",
           "displayName": "Planned Beds",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Whole number. Planned Beds for the Pruning Curve."
         },
         {
           "schemaName": "bv_ActualBeds",
           "displayName": "Actual Beds",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Actual Beds for the Pruning Curve."
         },
         {
           "schemaName": "bv_PlannedCuttings",
           "displayName": "Planned Cuttings",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Planned Cuttings for the Pruning Curve."
         },
         {
           "schemaName": "bv_ActualCuttings",
           "displayName": "Actual Cuttings",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Actual Cuttings for the Pruning Curve."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -3402,33 +3660,38 @@
           "displayName": "Fertilization Event",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
           "relatedTable": "bv_Bed",
-          "required": true
+          "required": true,
+          "description": "Link to the related Bed record."
         },
         {
           "schemaName": "bv_InputId",
           "displayName": "Input (Fertilizer)",
           "type": "lookup",
           "relatedTable": "bv_Input",
-          "required": true
+          "required": true,
+          "description": "Link to the related Input record."
         },
         {
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Quantity_kg",
           "displayName": "Quantity (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Mass in kilograms."
         },
         {
           "schemaName": "bv_Method",
@@ -3456,21 +3719,24 @@
               "value": 187460004,
               "label": "Broadcast"
             }
-          ]
+          ],
+          "description": "One of: Foliar Spray, Soil Drench, Granular, Drip / Fertigation, Broadcast."
         },
         {
           "schemaName": "bv_Worker",
           "displayName": "Worker",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Person who carried out the work."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         },
         {
           "schemaName": "bv_DoseUnit",
@@ -3494,7 +3760,8 @@
               "value": 121320223,
               "label": "mL"
             }
-          ]
+          ],
+          "description": "Unit the dose is expressed in. One of: kg, L, g, mL."
         }
       ]
     },
@@ -3520,21 +3787,24 @@
           "displayName": "Availability Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
           "relatedTable": "bv_Season",
-          "required": true
+          "required": true,
+          "description": "Link to the related Season record."
         },
         {
           "schemaName": "bv_PlantId",
           "displayName": "Plant",
           "type": "lookup",
           "relatedTable": "bv_Plant",
-          "required": true
+          "required": true,
+          "description": "Link to the related Plant record."
         },
         {
           "schemaName": "bv_Size",
@@ -3570,19 +3840,22 @@
               "value": 187460006,
               "label": "Extra Large"
             }
-          ]
+          ],
+          "description": "One of: Petit, Mini Petit, Small, Medium, California, Large, Extra Large."
         },
         {
           "schemaName": "bv_ShipmentWeek",
           "displayName": "Shipment Week",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Whole number. Shipment Week for the Availability."
         },
         {
           "schemaName": "bv_GeneratedDate",
           "displayName": "Generated Date (Friday)",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_ProjectedQty",
@@ -3602,13 +3875,15 @@
           "schemaName": "bv_ConfirmedQty",
           "displayName": "Confirmed Quantity",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Confirmed Quantity for the Availability."
         },
         {
           "schemaName": "bv_ConfirmationDate",
           "displayName": "Confirmation Date (Monday)",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Status",
@@ -3632,26 +3907,30 @@
               "value": 187460003,
               "label": "Confirmed - Over"
             }
-          ]
+          ],
+          "description": "Current state of the record. One of: Projected, Confirmed - Under, Confirmed - Equal, Confirmed - Over."
         },
         {
           "schemaName": "bv_SurplusQty",
           "displayName": "Surplus",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Surplus for the Availability."
         },
         {
           "schemaName": "bv_ShortfallQty",
           "displayName": "Shortfall",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Shortfall for the Availability."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -3677,21 +3956,24 @@
           "displayName": "Box Weight Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_PackingId",
           "displayName": "Packing Box",
           "type": "lookup",
           "relatedTable": "bv_Packing",
-          "required": true
+          "required": true,
+          "description": "Link to the related Packing record."
         },
         {
           "schemaName": "bv_AWBNumber",
           "displayName": "AWB Number",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Short text value. AWB Number for the Box Weight."
         },
         {
           "schemaName": "bv_AvgLeafWeight_g",
@@ -3725,14 +4007,16 @@
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -3758,88 +4042,102 @@
           "displayName": "Balance Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_BedId",
           "displayName": "Bed",
           "type": "lookup",
           "relatedTable": "bv_Bed",
-          "required": true
+          "required": true,
+          "description": "Link to the related Bed record."
         },
         {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
           "relatedTable": "bv_Season",
-          "required": false
+          "required": false,
+          "description": "Link to the related Season record."
         },
         {
           "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "ISO week number."
         },
         {
           "schemaName": "bv_N_Applied",
           "displayName": "N Applied (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. N Applied (kg) for the Nutrient Balance."
         },
         {
           "schemaName": "bv_P_Applied",
           "displayName": "P Applied (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. P Applied (kg) for the Nutrient Balance."
         },
         {
           "schemaName": "bv_K_Applied",
           "displayName": "K Applied (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. K Applied (kg) for the Nutrient Balance."
         },
         {
           "schemaName": "bv_Ca_Applied",
           "displayName": "Ca Applied (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Ca Applied (kg) for the Nutrient Balance."
         },
         {
           "schemaName": "bv_N_Extracted",
           "displayName": "N Extracted (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. N Extracted (kg) for the Nutrient Balance."
         },
         {
           "schemaName": "bv_P_Extracted",
           "displayName": "P Extracted (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. P Extracted (kg) for the Nutrient Balance."
         },
         {
           "schemaName": "bv_K_Extracted",
           "displayName": "K Extracted (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. K Extracted (kg) for the Nutrient Balance."
         },
         {
           "schemaName": "bv_Ca_Extracted",
           "displayName": "Ca Extracted (kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Ca Extracted (kg) for the Nutrient Balance."
         },
         {
           "schemaName": "bv_DryMatterPct",
           "displayName": "Dry Matter %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Dry Matter % for the Nutrient Balance."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -3865,54 +4163,62 @@
           "displayName": "Analysis Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_BedId",
           "displayName": "Bed / Location",
           "type": "lookup",
           "relatedTable": "bv_Bed",
-          "required": false
+          "required": false,
+          "description": "Link to the related Bed record."
         },
         {
           "schemaName": "bv_SampleDate",
           "displayName": "Sample Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_ReportDate",
           "displayName": "Report Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Lab",
           "displayName": "Laboratory",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Laboratory for the Soil Analysis."
         },
         {
           "schemaName": "bv_LabCode",
           "displayName": "Lab Sample Code",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Short text value. Lab Sample Code for the Soil Analysis."
         },
         {
           "schemaName": "bv_ReportNumber",
           "displayName": "Report Number",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Short text value. Report Number for the Soil Analysis."
         },
         {
           "schemaName": "bv_Crop",
           "displayName": "Crop",
           "type": "string",
           "maxLength": 100,
-          "required": false
+          "required": false,
+          "description": "Short text value. Crop for the Soil Analysis."
         },
         {
           "schemaName": "bv_Texture",
@@ -3926,55 +4232,64 @@
           "schemaName": "bv_Sand_pct",
           "displayName": "Sand %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_Silt_pct",
           "displayName": "Silt %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_Clay_pct",
           "displayName": "Clay %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_pH",
           "displayName": "pH (H₂O)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "pH measurement."
         },
         {
           "schemaName": "bv_OrganicCarbon_pct",
           "displayName": "Organic Carbon (C.O.) %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_OrganicMatter_pct",
           "displayName": "Organic Matter (M.O.) %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_N_total_pct",
           "displayName": "N Total %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_Al_cmol",
           "displayName": "Aluminum (cmol(+)/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Aluminum (cmol(+)/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_Al_Saturation_pct",
           "displayName": "Al Saturation %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_CE_dS",
@@ -3987,7 +4302,8 @@
           "schemaName": "bv_Cl_mg",
           "displayName": "Chloride (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Chloride (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_CIC",
@@ -4000,122 +4316,142 @@
           "schemaName": "bv_Ca_mg",
           "displayName": "Ca (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Ca (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_Mg_mg",
           "displayName": "Mg (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Mg (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_K_mg",
           "displayName": "K (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. K (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_Na_mg",
           "displayName": "Na (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Na (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_CICE",
           "displayName": "CICE (cmol(+)/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. CICE (cmol(+)/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_Ca_Sat_pct",
           "displayName": "Ca Saturation %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_Mg_Sat_pct",
           "displayName": "Mg Saturation %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_K_Sat_pct",
           "displayName": "K Saturation %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_CaMg_ratio",
           "displayName": "Ca/Mg Ratio",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Ca/Mg Ratio for the Soil Analysis."
         },
         {
           "schemaName": "bv_MgK_ratio",
           "displayName": "Mg/K Ratio",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Mg/K Ratio for the Soil Analysis."
         },
         {
           "schemaName": "bv_CaK_ratio",
           "displayName": "Ca/K Ratio",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Ca/K Ratio for the Soil Analysis."
         },
         {
           "schemaName": "bv_CaMgK_ratio",
           "displayName": "Ca+Mg/K Ratio",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Ca+Mg/K Ratio for the Soil Analysis."
         },
         {
           "schemaName": "bv_Cu_mg",
           "displayName": "Cu (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Cu (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_Fe_mg",
           "displayName": "Fe (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Fe (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_Mn_mg",
           "displayName": "Mn (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Mn (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_Zn_mg",
           "displayName": "Zn (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Zn (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_B_mg",
           "displayName": "B (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. B (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_S_mg",
           "displayName": "S (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. S (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_P_mg",
           "displayName": "P (mg/kg)",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. P (mg/kg) for the Soil Analysis."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -4141,120 +4477,139 @@
           "displayName": "Analysis Name",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_BedId",
           "displayName": "Bed / Location",
           "type": "lookup",
           "relatedTable": "bv_Bed",
-          "required": false
+          "required": false,
+          "description": "Link to the related Bed record."
         },
         {
           "schemaName": "bv_SampleDate",
           "displayName": "Sample Date",
           "type": "date",
-          "required": true
+          "required": true,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_ReportDate",
           "displayName": "Report Date",
           "type": "date",
-          "required": false
+          "required": false,
+          "description": "Date the event took place."
         },
         {
           "schemaName": "bv_Lab",
           "displayName": "Laboratory",
           "type": "string",
           "maxLength": 200,
-          "required": false
+          "required": false,
+          "description": "Short text value. Laboratory for the Foliar Analysis."
         },
         {
           "schemaName": "bv_LabCode",
           "displayName": "Lab Sample Code",
           "type": "string",
           "maxLength": 50,
-          "required": false
+          "required": false,
+          "description": "Short text value. Lab Sample Code for the Foliar Analysis."
         },
         {
           "schemaName": "bv_Crop",
           "displayName": "Crop / Variety",
           "type": "string",
           "maxLength": 100,
-          "required": false
+          "required": false,
+          "description": "Short text value. Crop / Variety for the Foliar Analysis."
         },
         {
           "schemaName": "bv_N_pct",
           "displayName": "Nitrogen (N) %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_P_pct",
           "displayName": "Phosphorus (P) %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_K_pct",
           "displayName": "Potassium (K) %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_Ca_pct",
           "displayName": "Calcium (Ca) %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_Mg_pct",
           "displayName": "Magnesium (Mg) %",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "bv_Fe_ppm",
           "displayName": "Iron (Fe) ppm",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Iron (Fe) ppm for the Foliar Analysis."
         },
         {
           "schemaName": "bv_Zn_ppm",
           "displayName": "Zinc (Zn) ppm",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Zinc (Zn) ppm for the Foliar Analysis."
         },
         {
           "schemaName": "bv_Mn_ppm",
           "displayName": "Manganese (Mn) ppm",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Manganese (Mn) ppm for the Foliar Analysis."
         },
         {
           "schemaName": "bv_Cu_ppm",
           "displayName": "Copper (Cu) ppm",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Copper (Cu) ppm for the Foliar Analysis."
         },
         {
           "schemaName": "bv_B_ppm",
           "displayName": "Boron (B) ppm",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Boron (B) ppm for the Foliar Analysis."
         },
         {
           "schemaName": "bv_S_ppm",
           "displayName": "Sulfur (S) ppm",
           "type": "decimal",
-          "required": false
+          "required": false,
+          "description": "Decimal number. Sulfur (S) ppm for the Foliar Analysis."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -4280,21 +4635,24 @@
           "displayName": "Forecast Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true
+          "required": true,
+          "description": "Descriptive name, shown wherever the record is listed."
         },
         {
           "schemaName": "bv_CustomerId",
           "displayName": "Customer",
           "type": "lookup",
           "relatedTable": "bv_Customer",
-          "required": true
+          "required": true,
+          "description": "Link to the related Customer record."
         },
         {
           "schemaName": "bv_PlantId",
           "displayName": "Plant / Variety",
           "type": "lookup",
           "relatedTable": "bv_Plant",
-          "required": true
+          "required": true,
+          "description": "Link to the related Plant record."
         },
         {
           "schemaName": "bv_Size",
@@ -4322,31 +4680,36 @@
               "value": 187460002,
               "label": "Additional Order"
             }
-          ]
+          ],
+          "description": "One of: Current Order, Additional Request, Additional Order."
         },
         {
           "schemaName": "bv_WeekNumber",
           "displayName": "Week Number",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "ISO week number."
         },
         {
           "schemaName": "bv_Year",
           "displayName": "Year",
           "type": "integer",
-          "required": true
+          "required": true,
+          "description": "Whole number. Year for the Demand Forecast."
         },
         {
           "schemaName": "bv_RequestedQty",
           "displayName": "Requested Quantity",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Requested Quantity for the Demand Forecast."
         },
         {
           "schemaName": "bv_ConfirmedQty",
           "displayName": "Confirmed Quantity",
           "type": "integer",
-          "required": false
+          "required": false,
+          "description": "Whole number. Confirmed Quantity for the Demand Forecast."
         },
         {
           "schemaName": "bv_Status",
@@ -4370,7 +4733,8 @@
               "value": 187460003,
               "label": "Cancelled"
             }
-          ]
+          ],
+          "description": "Current state of the record. One of: Pending, Confirmed, Adjusted, Cancelled."
         },
         {
           "schemaName": "bv_Quarter",
@@ -4393,7 +4757,8 @@
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -4464,7 +4829,8 @@
               "value": 121320306,
               "label": "Other"
             }
-          ]
+          ],
+          "description": "What kind of component this is: nutrient, active ingredient, organic fraction or carrier. One of: Macronutrient, Secondary nutrient, Micronutrient, Active ingredient, Organic / biostimulant, Carrier / inert, Other."
         },
         {
           "schemaName": "bv_ElementSymbol",
@@ -4488,14 +4854,16 @@
           "schemaName": "bv_IsNutrient",
           "displayName": "Counts Toward Nutrient Balance",
           "type": "boolean",
-          "required": false
+          "required": false,
+          "description": "Yes/no flag. Counts Toward Nutrient Balance for the Component."
         },
         {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     },
@@ -4521,14 +4889,16 @@
           "displayName": "Input",
           "type": "lookup",
           "relatedTable": "bv_Input",
-          "required": true
+          "required": true,
+          "description": "Link to the related Input record."
         },
         {
           "schemaName": "bv_ComponentId",
           "displayName": "Component",
           "type": "lookup",
           "relatedTable": "bv_Component",
-          "required": true
+          "required": true,
+          "description": "Link to the related Component record."
         },
         {
           "schemaName": "bv_Percentage",
@@ -4545,7 +4915,8 @@
           "displayName": "Notes",
           "type": "memo",
           "maxLength": 2000,
-          "required": false
+          "required": false,
+          "description": "Free-text notes."
         }
       ]
     }

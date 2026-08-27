@@ -10,11 +10,13 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "dataverse:dry-run": "node scripts/dataverse/apply-schema.mjs --dry-run",
-    "dataverse:apply": "node scripts/dataverse/apply-schema.mjs",
+    "dataverse:apply": "node scripts/dataverse/apply-schema.mjs && node scripts/dataverse/generate-docs.mjs",
     "dataverse:seed": "node scripts/dataverse/seed-data.mjs",
     "deploy": "npm run build && node scripts/deploy.mjs",
     "deploy:skip-build": "node scripts/deploy.mjs",
-    "postinstall": "rm -f node_modules/@microsoft/power-apps-cli/node_modules/@ms/power-platform-api/tsconfig.json"
+    "postinstall": "rm -f node_modules/@microsoft/power-apps-cli/node_modules/@ms/power-platform-api/tsconfig.json",
+    "dataverse:docs": "node scripts/dataverse/generate-docs.mjs",
+    "dataverse:seed-reset": "node scripts/dataverse/set-autonumber-seed.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
