@@ -115,6 +115,17 @@ function buildAttribute(col) {
         FormatName: { Value: 'Text' },
       }
 
+    // Autonumber: a string attribute carrying AutoNumberFormat. Dataverse
+    // populates it on create and the value is never user-supplied.
+    case 'autonumber':
+      return {
+        ...base,
+        '@odata.type': 'Microsoft.Dynamics.CRM.StringAttributeMetadata',
+        MaxLength: col.maxLength || 40,
+        FormatName: { Value: 'Text' },
+        AutoNumberFormat: col.autoNumberFormat,
+      }
+
     case 'memo':
       return {
         ...base,
@@ -263,6 +274,8 @@ async function ensureTable(table) {
       MaxLength: primary.maxLength || 100,
       FormatName: { Value: 'Text' },
       IsPrimaryName: true,
+      // Present when the primary column is auto-numbered (SH-0001 etc.).
+      ...(primary.autoNumberFormat ? { AutoNumberFormat: primary.autoNumberFormat } : {}),
     }],
   }
   if (table.description) payload.Description = label(table.description)

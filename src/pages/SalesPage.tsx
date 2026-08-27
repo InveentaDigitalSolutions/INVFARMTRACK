@@ -115,7 +115,7 @@ const orderStatusOptions = [
 
 const orderFields = [
   { title: "Order Details", columns: 2 as const, fields: [
-    { key: "number", label: "Order Number", type: "text" as const, required: true, placeholder: "ORD-2026-…" },
+    { key: "number", label: "Order Number", type: "text" as const, readOnly: true, placeholder: "ORD-0001 (auto)" },
     { key: "customer", label: "Customer", type: "text" as const, required: true },
     { key: "date", label: "Order Date", type: "date" as const, required: true },
     { key: "delivery", label: "Delivery Date", type: "date" as const, required: true },
@@ -132,7 +132,7 @@ const termsOptions = [
 
 const customerFields = [
   { title: "Customer Details", columns: 2 as const, fields: [
-    { key: "code", label: "Customer Code", type: "text" as const, required: true, placeholder: "e.g. VA24477" },
+    { key: "code", label: "Customer ID", type: "text" as const, readOnly: true, placeholder: "CUS-0001 (auto)" },
     { key: "name", label: "Company Name", type: "text" as const, required: true, span: 2 as const },
     { key: "contact", label: "Contact Person", type: "text" as const },
     { key: "email", label: "Email", type: "text" as const, placeholder: "name@company.com" },

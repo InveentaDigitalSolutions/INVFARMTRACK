@@ -44,7 +44,7 @@ const seasonOptions = [{ value: "2026-S1", label: "2026-S1" }, { value: "2025-S2
 const shadehouseFormGroups = [
   { title: "Shadehouse Details", columns: 2 as const, fields: [
     { key: "name", label: "Name", type: "text" as const, required: true },
-    { key: "code", label: "Code", type: "text" as const, required: true },
+    { key: "code", label: "Shadehouse ID", type: "text" as const, readOnly: true, placeholder: "SH-0001 (auto)" },
     { key: "location", label: "Location", type: "text" as const },
     { key: "coordinates", label: "GPS Coordinates", type: "text" as const },
     { key: "length", label: "Length", type: "number" as const, suffix: "m" },
@@ -55,7 +55,7 @@ const shadehouseFormGroups = [
 ];
 const fieldFormGroups = [
   { title: "Field Details", columns: 2 as const, fields: [
-    { key: "code", label: "Field Code", type: "text" as const, required: true },
+    { key: "code", label: "Field ID", type: "text" as const, readOnly: true, placeholder: "FLD-0001 (auto)" },
     { key: "shadehouse", label: "Shadehouse", type: "select" as const, options: shOptions, required: true },
     { key: "season", label: "Season", type: "select" as const, options: seasonOptions },
     { key: "position", label: "Position", type: "text" as const },

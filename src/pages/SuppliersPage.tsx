@@ -35,7 +35,7 @@ const supplierOptions = initSuppliers.map((s) => ({ value: s.name, label: s.name
 const supplierFormGroups = [
   { title: "Supplier Information", columns: 2 as const, fields: [
     { key: "name", label: "Supplier Name", type: "text" as const, required: true },
-    { key: "code", label: "Supplier Code", type: "text" as const },
+    { key: "code", label: "Supplier ID", type: "text" as const, readOnly: true, placeholder: "SUP-0001 (auto)" },
     { key: "category", label: "Category", type: "select" as const, required: true, options: [
       { value: "Chemicals / Inputs", label: "Chemicals / Inputs" }, { value: "Packaging", label: "Packaging" },
       { value: "Equipment", label: "Equipment" }, { value: "Substrates", label: "Substrates" },
@@ -60,7 +60,7 @@ const supplierFormGroups = [
 
 const poFormGroups = [
   { title: "Purchase Order", columns: 2 as const, fields: [
-    { key: "number", label: "PO Number", type: "text" as const, required: true },
+    { key: "number", label: "PO Number", type: "text" as const, readOnly: true, placeholder: "PO-0001 (auto)" },
     { key: "supplier", label: "Supplier", type: "select" as const, options: supplierOptions, required: true },
     { key: "date", label: "Order Date", type: "date" as const, required: true },
     { key: "delivery", label: "Expected Delivery", type: "date" as const },

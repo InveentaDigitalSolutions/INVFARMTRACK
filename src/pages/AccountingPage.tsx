@@ -128,7 +128,7 @@ const currencyOptions = [{ value: "HNL", label: "HNL" }, { value: "USD", label: 
 
 const invoiceFormGroups = [
   { title: "Invoice Details", columns: 2 as const, fields: [
-    { key: "number", label: "Invoice Number", type: "text" as const, required: true },
+    { key: "number", label: "Invoice Number", type: "text" as const, readOnly: true, placeholder: "INV-0001 (auto)" },
     { key: "customer", label: "Customer", type: "select" as const, options: customerOptions, required: true },
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "dueDate", label: "Due Date", type: "date" as const, required: true },
@@ -147,7 +147,7 @@ const invoiceFormGroups = [
 
 const billFormGroups = [
   { title: "Bill Details", columns: 2 as const, fields: [
-    { key: "number", label: "Bill Number", type: "text" as const, required: true },
+    { key: "number", label: "Bill Number", type: "text" as const, readOnly: true, placeholder: "BIL-0001 (auto)" },
     { key: "supplier", label: "Supplier", type: "select" as const, options: supplierOptions, required: true },
     { key: "poRef", label: "PO Reference", type: "text" as const, placeholder: "PO-2026-…" },
     { key: "rtn", label: "Supplier RTN", type: "text" as const },
@@ -192,7 +192,7 @@ const expenseFormGroups = (accounts: BankAccount[]) => [
 
 const paymentFormGroups = (accounts: BankAccount[]) => [
   { title: "Payment Details", columns: 2 as const, fields: [
-    { key: "id", label: "Payment ID", type: "text" as const, required: true },
+    { key: "id", label: "Payment ID", type: "text" as const, readOnly: true, placeholder: "PAY-0001 (auto)" },
     { key: "type", label: "Type", type: "select" as const, options: [
       { value: "Receipt", label: "Receipt (money in)" },
       { value: "Payment", label: "Payment (money out)" },
@@ -216,7 +216,7 @@ const paymentFormGroups = (accounts: BankAccount[]) => [
 
 const bankAccountFormGroups = [
   { title: "Bank Account", columns: 2 as const, fields: [
-    { key: "id", label: "Account ID", type: "text" as const, required: true, placeholder: "BA-001" },
+    { key: "id", label: "Account ID", type: "text" as const, readOnly: true, placeholder: "BA-0001 (auto)" },
     { key: "name", label: "Display Name", type: "text" as const, required: true },
     { key: "bank", label: "Bank", type: "text" as const, required: true },
     { key: "accountNumber", label: "Account Number", type: "text" as const },
@@ -228,7 +228,7 @@ const bankAccountFormGroups = [
 
 const statementFormGroups = (accounts: BankAccount[]) => [
   { title: "Statement Line", columns: 2 as const, fields: [
-    { key: "id", label: "Line ID", type: "text" as const, required: true },
+    { key: "id", label: "Line ID", type: "text" as const, readOnly: true, placeholder: "STM-0001 (auto)" },
     { key: "bankAccount", label: "Bank Account", type: "select" as const, options: bankAccountOptions(accounts), required: true },
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "description", label: "Description", type: "text" as const, required: true, span: 2 as const },

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, Lock } from "lucide-react";
 import BedSelector from "./BedSelector";
 
 // Field definition types
@@ -8,6 +8,12 @@ interface BaseField {
   label: string;
   required?: boolean;
   span?: 1 | 2 | 3 | 4;
+  /**
+   * System-owned value the user must not set — record IDs in particular.
+   * Dataverse generates these via autonumber, so the field is shown for
+   * context but never accepts input.
+   */
+  readOnly?: boolean;
 }
 
 interface TextField extends BaseField {
@@ -97,6 +103,20 @@ function renderField(
     case "email":
     case "date":
     case "datetime-local":
+      if (field.readOnly) {
+        return (
+          <div
+            className="w-full px-3 py-2.5 text-[13px] rounded-lg border border-sand-200 bg-sand-100
+                       text-navy-500 flex items-center gap-2 select-none"
+            title="Generated automatically — not editable"
+          >
+            <Lock className="w-3.5 h-3.5 text-navy-300 shrink-0" />
+            <span className={String(v) ? "" : "text-navy-300 italic"}>
+              {String(v) || field.placeholder || "Generated on save"}
+            </span>
+          </div>
+        );
+      }
       return (
         <input
           type={field.type}

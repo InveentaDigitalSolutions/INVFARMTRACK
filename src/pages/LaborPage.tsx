@@ -39,7 +39,7 @@ const workerOptions = initWorkers.map((w) => ({ value: w.name, label: `${w.name}
 const workerFormGroups = [
   { title: "Personal Information", columns: 2 as const, fields: [
     { key: "name", label: "Full Name", type: "text" as const, required: true },
-    { key: "code", label: "Worker ID", type: "text" as const, required: true },
+    { key: "code", label: "Worker ID", type: "text" as const, readOnly: true, placeholder: "WRK-0001 (auto)" },
     { key: "role", label: "Role", type: "select" as const, options: [
       { value: "Field Worker", label: "Field Worker" }, { value: "Packer", label: "Packer" },
       { value: "Harvester", label: "Harvester" }, { value: "Irrigator", label: "Irrigator" },

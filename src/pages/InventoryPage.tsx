@@ -31,7 +31,7 @@ const initInputs = [
 ];
 const plantFields = [
   { title: "Plant Information", columns: 2 as const, fields: [
-    { key: "code", label: "Plant Code", type: "text" as const, required: true },
+    { key: "code", label: "Plant ID", type: "text" as const, readOnly: true, placeholder: "PLT-0001 (auto)" },
     { key: "name", label: "Common Name", type: "text" as const, required: true },
     { key: "latin", label: "Latin Name", type: "text" as const },
     { key: "variety", label: "Variety", type: "text" as const },

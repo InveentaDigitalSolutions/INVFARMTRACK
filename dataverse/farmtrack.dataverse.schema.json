@@ -15,15 +15,17 @@
           "displayName": "Shadehouse Name",
           "type": "string",
           "maxLength": 100,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_Code",
           "displayName": "Code",
-          "type": "string",
-          "maxLength": 20,
-          "required": true
+          "type": "autonumber",
+          "maxLength": 40,
+          "required": true,
+          "autoNumberFormat": "SH-{SEQNUM:4}",
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format SH-0001."
         },
         {
           "schemaName": "inv_Location",
@@ -74,12 +76,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_BedCode",
+          "displayName": "Bed ID",
+          "type": "autonumber",
+          "autoNumberFormat": "BED-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format BED-0001."
+        },
+        {
           "schemaName": "inv_BedName",
           "displayName": "Bed Name",
           "type": "string",
           "maxLength": 100,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_FieldId",
@@ -266,8 +277,7 @@
           "displayName": "Plant Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_InvoiceName",
@@ -280,9 +290,12 @@
         {
           "schemaName": "inv_PlantCode",
           "displayName": "Plant Code",
-          "type": "string",
-          "maxLength": 30,
-          "required": true
+          "type": "autonumber",
+          "maxLength": 40,
+          "required": true,
+          "autoNumberFormat": "PLT-{SEQNUM:4}",
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format PLT-0001."
         },
         {
           "schemaName": "inv_LatinName",
@@ -507,12 +520,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_SeasonCode",
+          "displayName": "Season ID",
+          "type": "autonumber",
+          "autoNumberFormat": "SSN-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format SSN-0001."
+        },
+        {
           "schemaName": "inv_SeasonName",
           "displayName": "Season Name",
           "type": "string",
           "maxLength": 100,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_StartDate",
@@ -552,10 +574,12 @@
         {
           "schemaName": "inv_FieldCode",
           "displayName": "Field Code",
-          "type": "string",
-          "maxLength": 50,
+          "type": "autonumber",
+          "maxLength": 40,
           "required": true,
-          "isPrimaryName": true
+          "isPrimaryName": true,
+          "autoNumberFormat": "FLD-{SEQNUM:4}",
+          "description": "Auto-generated identifier, format FLD-0001."
         },
         {
           "schemaName": "inv_ShadehouseId",
@@ -595,12 +619,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_PlantingCode",
+          "displayName": "Planting ID",
+          "type": "autonumber",
+          "autoNumberFormat": "PLG-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format PLG-0001."
+        },
+        {
           "schemaName": "inv_PlantingDescription",
           "displayName": "Planting Description",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_PlantId",
@@ -659,12 +692,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_InputCode",
+          "displayName": "Input ID",
+          "type": "autonumber",
+          "autoNumberFormat": "INP-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format INP-0001."
+        },
+        {
           "schemaName": "inv_InputName",
           "displayName": "Input Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_InputCategory",
@@ -820,12 +862,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_TreatmentCode",
+          "displayName": "Treatment ID",
+          "type": "autonumber",
+          "autoNumberFormat": "TRT-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format TRT-0001."
+        },
+        {
           "schemaName": "inv_TreatmentName",
           "displayName": "Treatment Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_BedId",
@@ -914,12 +965,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_IrrigationCode",
+          "displayName": "Irrigation ID",
+          "type": "autonumber",
+          "autoNumberFormat": "IRR-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format IRR-0001."
+        },
+        {
           "schemaName": "inv_IrrigationName",
           "displayName": "Irrigation Event Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_BedId",
@@ -1044,12 +1104,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_HarvestCode",
+          "displayName": "Harvest ID",
+          "type": "autonumber",
+          "autoNumberFormat": "HRV-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format HRV-0001."
+        },
+        {
           "schemaName": "inv_HarvestName",
           "displayName": "Harvest Event Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_BedId",
@@ -1125,12 +1194,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_CalendarCode",
+          "displayName": "Calendar ID",
+          "type": "autonumber",
+          "autoNumberFormat": "CAL-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format CAL-0001."
+        },
+        {
           "schemaName": "inv_DateLabel",
           "displayName": "Date Label",
           "type": "string",
           "maxLength": 50,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_Date",
@@ -1239,12 +1317,21 @@
       "ownershipType": "UserOwned",
       "columns": [
         {
+          "schemaName": "inv_TaskCode",
+          "displayName": "Task ID",
+          "type": "autonumber",
+          "autoNumberFormat": "TSK-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format TSK-0001."
+        },
+        {
           "schemaName": "inv_TaskTitle",
           "displayName": "Task Title",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_TaskType",
@@ -1400,15 +1487,17 @@
           "displayName": "Customer Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_CustomerCode",
           "displayName": "Customer Code",
-          "type": "string",
-          "maxLength": 30,
-          "required": true
+          "type": "autonumber",
+          "maxLength": 40,
+          "required": true,
+          "autoNumberFormat": "CUS-{SEQNUM:4}",
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format CUS-0001."
         },
         {
           "schemaName": "inv_Email",
@@ -1521,10 +1610,12 @@
         {
           "schemaName": "inv_OrderNumber",
           "displayName": "Order Number",
-          "type": "string",
-          "maxLength": 30,
+          "type": "autonumber",
+          "maxLength": 40,
           "required": true,
-          "isPrimaryName": true
+          "isPrimaryName": true,
+          "autoNumberFormat": "ORD-{SEQNUM:4}",
+          "description": "Auto-generated identifier, format ORD-0001."
         },
         {
           "schemaName": "inv_CustomerId",
@@ -1600,12 +1691,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_OrderItemCode",
+          "displayName": "Order Item ID",
+          "type": "autonumber",
+          "autoNumberFormat": "OIT-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format OIT-0001."
+        },
+        {
           "schemaName": "inv_OrderItemName",
           "displayName": "Order Item Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_OrderId",
@@ -1649,12 +1749,21 @@
       "ownershipType": "UserOwned",
       "columns": [
         {
+          "schemaName": "inv_PackingCode",
+          "displayName": "Packing ID",
+          "type": "autonumber",
+          "autoNumberFormat": "PCK-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format PCK-0001."
+        },
+        {
           "schemaName": "inv_PackingId",
           "displayName": "ID",
           "type": "string",
           "maxLength": 50,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_Barcode",
@@ -1863,12 +1972,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_FiscalAuthorizationCode",
+          "displayName": "Fiscal Authorization ID",
+          "type": "autonumber",
+          "autoNumberFormat": "FIS-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format FIS-0001."
+        },
+        {
           "schemaName": "inv_FiscalAuthName",
           "displayName": "Fiscal Authorization Name",
           "type": "string",
           "maxLength": 100,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_CAI",
@@ -1948,11 +2066,12 @@
         {
           "schemaName": "inv_InvoiceNumber",
           "displayName": "Invoice Number",
-          "type": "string",
-          "maxLength": 30,
+          "type": "autonumber",
+          "maxLength": 40,
           "required": true,
           "isPrimaryName": true,
-          "description": "Fiscal invoice number from CAI range (e.g. 000-001-01-00001461)"
+          "description": "Auto-generated identifier, format INV-0001.",
+          "autoNumberFormat": "INV-{SEQNUM:4}"
         },
         {
           "schemaName": "inv_FiscalAuthId",
@@ -2241,12 +2360,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_PlantPriceCode",
+          "displayName": "Plant Price ID",
+          "type": "autonumber",
+          "autoNumberFormat": "PRC-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format PRC-0001."
+        },
+        {
           "schemaName": "inv_PlantPriceName",
           "displayName": "Plant Price Name",
           "type": "string",
           "maxLength": 200,
           "required": true,
-          "isPrimaryName": true,
           "description": "Auto-composed: {Plant} / {Customer or 'Base'} / {EffectiveFrom}"
         },
         {
@@ -2321,12 +2449,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_CAINumberCode",
+          "displayName": "CAI Number ID",
+          "type": "autonumber",
+          "autoNumberFormat": "CAI-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format CAI-0001."
+        },
+        {
           "schemaName": "inv_CAINumberName",
           "displayName": "Invoice Number",
           "type": "string",
           "maxLength": 30,
           "required": true,
-          "isPrimaryName": true,
           "description": "Full fiscal invoice number (e.g., 000-001-01-00001461)"
         },
         {
@@ -2405,12 +2542,21 @@
       "ownershipType": "UserOwned",
       "columns": [
         {
+          "schemaName": "inv_ExpenseCode",
+          "displayName": "Expense ID",
+          "type": "autonumber",
+          "autoNumberFormat": "EXP-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format EXP-0001."
+        },
+        {
           "schemaName": "inv_ExpenseName",
           "displayName": "Expense Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_Date",
@@ -2563,15 +2709,17 @@
           "displayName": "Supplier Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_SupplierCode",
           "displayName": "Supplier Code",
-          "type": "string",
-          "maxLength": 30,
-          "required": false
+          "type": "autonumber",
+          "maxLength": 40,
+          "required": true,
+          "autoNumberFormat": "SUP-{SEQNUM:4}",
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format SUP-0001."
         },
         {
           "schemaName": "inv_Category",
@@ -2706,10 +2854,12 @@
         {
           "schemaName": "inv_PONumber",
           "displayName": "PO Number",
-          "type": "string",
-          "maxLength": 30,
+          "type": "autonumber",
+          "maxLength": 40,
           "required": true,
-          "isPrimaryName": true
+          "isPrimaryName": true,
+          "autoNumberFormat": "PO-{SEQNUM:4}",
+          "description": "Auto-generated identifier, format PO-0001."
         },
         {
           "schemaName": "inv_SupplierId",
@@ -2814,15 +2964,17 @@
           "displayName": "Full Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_WorkerCode",
           "displayName": "Worker ID",
-          "type": "string",
-          "maxLength": 20,
-          "required": true
+          "type": "autonumber",
+          "maxLength": 40,
+          "required": true,
+          "autoNumberFormat": "WRK-{SEQNUM:4}",
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format WRK-0001."
         },
         {
           "schemaName": "inv_Role",
@@ -2918,12 +3070,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_TimesheetCode",
+          "displayName": "Timesheet ID",
+          "type": "autonumber",
+          "autoNumberFormat": "TMS-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format TMS-0001."
+        },
+        {
           "schemaName": "inv_TimesheetName",
           "displayName": "Timesheet Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_WorkerId",
@@ -3025,12 +3186,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_PruningCode",
+          "displayName": "Pruning ID",
+          "type": "autonumber",
+          "autoNumberFormat": "PRN-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format PRN-0001."
+        },
+        {
           "schemaName": "inv_PruningName",
           "displayName": "Pruning Event",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_BedId",
@@ -3095,12 +3265,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_PruningCurveCode",
+          "displayName": "Pruning Curve ID",
+          "type": "autonumber",
+          "autoNumberFormat": "PCV-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format PCV-0001."
+        },
+        {
           "schemaName": "inv_PruningCurveName",
           "displayName": "Curve Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_SeasonId",
@@ -3156,12 +3335,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_FertilizationCode",
+          "displayName": "Fertilization ID",
+          "type": "autonumber",
+          "autoNumberFormat": "FRT-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format FRT-0001."
+        },
+        {
           "schemaName": "inv_FertilizationName",
           "displayName": "Fertilization Event",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_BedId",
@@ -3266,12 +3454,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_AvailabilityCode",
+          "displayName": "Availability ID",
+          "type": "autonumber",
+          "autoNumberFormat": "AVL-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format AVL-0001."
+        },
+        {
           "schemaName": "inv_AvailabilityName",
           "displayName": "Availability Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_SeasonId",
@@ -3414,12 +3611,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_BoxWeightCode",
+          "displayName": "Box Weight ID",
+          "type": "autonumber",
+          "autoNumberFormat": "BXW-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format BXW-0001."
+        },
+        {
           "schemaName": "inv_BoxWeightName",
           "displayName": "Box Weight Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_PackingId",
@@ -3486,12 +3692,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_NutrientBalanceCode",
+          "displayName": "Nutrient Balance ID",
+          "type": "autonumber",
+          "autoNumberFormat": "NBL-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format NBL-0001."
+        },
+        {
           "schemaName": "inv_NutrientBalanceName",
           "displayName": "Balance Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_BedId",
@@ -3584,12 +3799,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_SoilAnalysisCode",
+          "displayName": "Soil Analysis ID",
+          "type": "autonumber",
+          "autoNumberFormat": "SOL-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format SOL-0001."
+        },
+        {
           "schemaName": "inv_SoilAnalysisName",
           "displayName": "Analysis Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_BedId",
@@ -3851,12 +4075,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_FoliarAnalysisCode",
+          "displayName": "Foliar Analysis ID",
+          "type": "autonumber",
+          "autoNumberFormat": "FOL-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format FOL-0001."
+        },
+        {
           "schemaName": "inv_FoliarAnalysisName",
           "displayName": "Analysis Name",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_BedId",
@@ -3981,12 +4214,21 @@
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
+          "schemaName": "inv_DemandForecastCode",
+          "displayName": "Demand Forecast ID",
+          "type": "autonumber",
+          "autoNumberFormat": "DFC-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format DFC-0001."
+        },
+        {
           "schemaName": "inv_DemandForecastName",
           "displayName": "Forecast Entry",
           "type": "string",
           "maxLength": 200,
-          "required": true,
-          "isPrimaryName": true
+          "required": true
         },
         {
           "schemaName": "inv_CustomerId",
