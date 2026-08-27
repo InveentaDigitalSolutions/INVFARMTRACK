@@ -1,0 +1,594 @@
+{
+  "name": "bv_soilanalysis",
+  "title": "Soil Analyses",
+  "schema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "x-ms-dataverse-entity": true,
+      "x-ms-dataverse-entityset": "bv_soilanalysises",
+      "x-ms-dataverse-primary-id": "bv_soilanalysisid",
+      "x-ms-dataverse-primary-name": "bv_soilanalysiscode",
+      "properties": {
+        "bv_al_cmol": {
+          "type": "string",
+          "title": "Aluminum (cmol(+)/kg)",
+          "x-ms-dataverse-attribute": "bv_al_cmol",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Al_cmol"
+        },
+        "bv_al_saturation_pct": {
+          "type": "string",
+          "title": "Al Saturation %",
+          "x-ms-dataverse-attribute": "bv_al_saturation_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Al_Saturation_pct"
+        },
+        "bv_b_mg": {
+          "type": "string",
+          "title": "B (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_b_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_B_mg"
+        },
+        "bv_bedid": {
+          "type": "string",
+          "title": "Bed / Location",
+          "x-ms-dataverse-attribute": "bv_bedid",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "bv_BedId"
+        },
+        "bv_bedidname": {
+          "type": "string",
+          "title": "bv_bedidname",
+          "x-ms-dataverse-attribute": "bv_bedidname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_BedIdName",
+          "x-ms-read-only": true,
+          "maxLength": 40
+        },
+        "bv_ca_mg": {
+          "type": "string",
+          "title": "Ca (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_ca_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Ca_mg"
+        },
+        "bv_ca_sat_pct": {
+          "type": "string",
+          "title": "Ca Saturation %",
+          "x-ms-dataverse-attribute": "bv_ca_sat_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Ca_Sat_pct"
+        },
+        "bv_cak_ratio": {
+          "type": "string",
+          "title": "Ca/K Ratio",
+          "x-ms-dataverse-attribute": "bv_cak_ratio",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_CaK_ratio"
+        },
+        "bv_camg_ratio": {
+          "type": "string",
+          "title": "Ca/Mg Ratio",
+          "x-ms-dataverse-attribute": "bv_camg_ratio",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_CaMg_ratio"
+        },
+        "bv_camgk_ratio": {
+          "type": "string",
+          "title": "Ca+Mg/K Ratio",
+          "x-ms-dataverse-attribute": "bv_camgk_ratio",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_CaMgK_ratio"
+        },
+        "bv_ce_ds": {
+          "type": "string",
+          "title": "CE (dS/m)",
+          "x-ms-dataverse-attribute": "bv_ce_ds",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_CE_dS"
+        },
+        "bv_cic": {
+          "type": "string",
+          "title": "CIC (cmol(+)/kg)",
+          "x-ms-dataverse-attribute": "bv_cic",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_CIC"
+        },
+        "bv_cice": {
+          "type": "string",
+          "title": "CICE (cmol(+)/kg)",
+          "x-ms-dataverse-attribute": "bv_cice",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_CICE"
+        },
+        "bv_cl_mg": {
+          "type": "string",
+          "title": "Chloride (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_cl_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Cl_mg"
+        },
+        "bv_clay_pct": {
+          "type": "string",
+          "title": "Clay %",
+          "x-ms-dataverse-attribute": "bv_clay_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Clay_pct"
+        },
+        "bv_crop": {
+          "type": "string",
+          "title": "Crop",
+          "x-ms-dataverse-attribute": "bv_crop",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_Crop",
+          "maxLength": 100
+        },
+        "bv_cu_mg": {
+          "type": "string",
+          "title": "Cu (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_cu_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Cu_mg"
+        },
+        "bv_fe_mg": {
+          "type": "string",
+          "title": "Fe (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_fe_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Fe_mg"
+        },
+        "bv_k_mg": {
+          "type": "string",
+          "title": "K (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_k_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_K_mg"
+        },
+        "bv_k_sat_pct": {
+          "type": "string",
+          "title": "K Saturation %",
+          "x-ms-dataverse-attribute": "bv_k_sat_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_K_Sat_pct"
+        },
+        "bv_lab": {
+          "type": "string",
+          "title": "Laboratory",
+          "x-ms-dataverse-attribute": "bv_lab",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_Lab",
+          "maxLength": 200
+        },
+        "bv_labcode": {
+          "type": "string",
+          "title": "Lab Sample Code",
+          "x-ms-dataverse-attribute": "bv_labcode",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_LabCode",
+          "maxLength": 50
+        },
+        "bv_mg_mg": {
+          "type": "string",
+          "title": "Mg (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_mg_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Mg_mg"
+        },
+        "bv_mg_sat_pct": {
+          "type": "string",
+          "title": "Mg Saturation %",
+          "x-ms-dataverse-attribute": "bv_mg_sat_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Mg_Sat_pct"
+        },
+        "bv_mgk_ratio": {
+          "type": "string",
+          "title": "Mg/K Ratio",
+          "x-ms-dataverse-attribute": "bv_mgk_ratio",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_MgK_ratio"
+        },
+        "bv_mn_mg": {
+          "type": "string",
+          "title": "Mn (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_mn_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Mn_mg"
+        },
+        "bv_n_total_pct": {
+          "type": "string",
+          "title": "N Total %",
+          "x-ms-dataverse-attribute": "bv_n_total_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_N_total_pct"
+        },
+        "bv_na_mg": {
+          "type": "string",
+          "title": "Na (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_na_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Na_mg"
+        },
+        "bv_notes": {
+          "type": "string",
+          "title": "Notes",
+          "x-ms-dataverse-attribute": "bv_notes",
+          "x-ms-dataverse-type": "MemoType",
+          "x-ms-schema-name": "bv_Notes",
+          "maxLength": 2000
+        },
+        "bv_organiccarbon_pct": {
+          "type": "string",
+          "title": "Organic Carbon (C.O.) %",
+          "x-ms-dataverse-attribute": "bv_organiccarbon_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_OrganicCarbon_pct"
+        },
+        "bv_organicmatter_pct": {
+          "type": "string",
+          "title": "Organic Matter (M.O.) %",
+          "x-ms-dataverse-attribute": "bv_organicmatter_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_OrganicMatter_pct"
+        },
+        "bv_p_mg": {
+          "type": "string",
+          "title": "P (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_p_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_P_mg"
+        },
+        "bv_ph": {
+          "type": "string",
+          "title": "pH (H₂O)",
+          "x-ms-dataverse-attribute": "bv_ph",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_pH"
+        },
+        "bv_reportdate": {
+          "type": "string",
+          "title": "Report Date",
+          "x-ms-dataverse-attribute": "bv_reportdate",
+          "x-ms-dataverse-type": "DateTimeType",
+          "x-ms-schema-name": "bv_ReportDate"
+        },
+        "bv_reportnumber": {
+          "type": "string",
+          "title": "Report Number",
+          "x-ms-dataverse-attribute": "bv_reportnumber",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_ReportNumber",
+          "maxLength": 50
+        },
+        "bv_s_mg": {
+          "type": "string",
+          "title": "S (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_s_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_S_mg"
+        },
+        "bv_sampledate": {
+          "type": "string",
+          "title": "Sample Date",
+          "x-ms-dataverse-attribute": "bv_sampledate",
+          "x-ms-dataverse-type": "DateTimeType",
+          "x-ms-schema-name": "bv_SampleDate",
+          "required": true
+        },
+        "bv_sand_pct": {
+          "type": "string",
+          "title": "Sand %",
+          "x-ms-dataverse-attribute": "bv_sand_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Sand_pct"
+        },
+        "bv_silt_pct": {
+          "type": "string",
+          "title": "Silt %",
+          "x-ms-dataverse-attribute": "bv_silt_pct",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Silt_pct"
+        },
+        "bv_soilanalysiscode": {
+          "type": "string",
+          "title": "Soil Analysis ID",
+          "x-ms-dataverse-attribute": "bv_soilanalysiscode",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_SoilAnalysisCode",
+          "x-ms-dataverse-primary-name": true,
+          "required": true,
+          "maxLength": 40
+        },
+        "bv_soilanalysisid": {
+          "type": "string",
+          "title": "Soil Analysis",
+          "x-ms-dataverse-attribute": "bv_soilanalysisid",
+          "x-ms-dataverse-type": "UniqueidentifierType",
+          "x-ms-schema-name": "bv_SoilAnalysisId",
+          "x-ms-dataverse-primary-id": true,
+          "required": true,
+          "x-ms-keyType": "primary"
+        },
+        "bv_soilanalysisname": {
+          "type": "string",
+          "title": "Analysis Name",
+          "x-ms-dataverse-attribute": "bv_soilanalysisname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_SoilAnalysisName",
+          "required": true,
+          "maxLength": 200
+        },
+        "bv_texture": {
+          "type": "string",
+          "title": "Texture",
+          "x-ms-dataverse-attribute": "bv_texture",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_Texture",
+          "maxLength": 100
+        },
+        "bv_zn_mg": {
+          "type": "string",
+          "title": "Zn (mg/kg)",
+          "x-ms-dataverse-attribute": "bv_zn_mg",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Zn_mg"
+        },
+        "createdby": {
+          "type": "string",
+          "title": "Created By",
+          "x-ms-dataverse-attribute": "createdby",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "CreatedBy",
+          "x-ms-read-only": true
+        },
+        "createdbyname": {
+          "type": "string",
+          "title": "createdbyname",
+          "x-ms-dataverse-attribute": "createdbyname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "CreatedByName",
+          "x-ms-read-only": true,
+          "maxLength": 100
+        },
+        "createdbyyominame": {
+          "type": "string",
+          "title": "createdbyyominame",
+          "x-ms-dataverse-attribute": "createdbyyominame",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "CreatedByYomiName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "createdon": {
+          "type": "string",
+          "title": "Created On",
+          "x-ms-dataverse-attribute": "createdon",
+          "x-ms-dataverse-type": "DateTimeType",
+          "x-ms-schema-name": "CreatedOn",
+          "x-ms-read-only": true
+        },
+        "createdonbehalfby": {
+          "type": "string",
+          "title": "Created By (Delegate)",
+          "x-ms-dataverse-attribute": "createdonbehalfby",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "CreatedOnBehalfBy",
+          "x-ms-read-only": true
+        },
+        "createdonbehalfbyname": {
+          "type": "string",
+          "title": "createdonbehalfbyname",
+          "x-ms-dataverse-attribute": "createdonbehalfbyname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "CreatedOnBehalfByName",
+          "x-ms-read-only": true,
+          "maxLength": 100
+        },
+        "createdonbehalfbyyominame": {
+          "type": "string",
+          "title": "createdonbehalfbyyominame",
+          "x-ms-dataverse-attribute": "createdonbehalfbyyominame",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "CreatedOnBehalfByYomiName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "importsequencenumber": {
+          "type": "string",
+          "title": "Import Sequence Number",
+          "x-ms-dataverse-attribute": "importsequencenumber",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "ImportSequenceNumber"
+        },
+        "modifiedby": {
+          "type": "string",
+          "title": "Modified By",
+          "x-ms-dataverse-attribute": "modifiedby",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "ModifiedBy",
+          "x-ms-read-only": true
+        },
+        "modifiedbyname": {
+          "type": "string",
+          "title": "modifiedbyname",
+          "x-ms-dataverse-attribute": "modifiedbyname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "ModifiedByName",
+          "x-ms-read-only": true,
+          "maxLength": 100
+        },
+        "modifiedbyyominame": {
+          "type": "string",
+          "title": "modifiedbyyominame",
+          "x-ms-dataverse-attribute": "modifiedbyyominame",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "ModifiedByYomiName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "modifiedon": {
+          "type": "string",
+          "title": "Modified On",
+          "x-ms-dataverse-attribute": "modifiedon",
+          "x-ms-dataverse-type": "DateTimeType",
+          "x-ms-schema-name": "ModifiedOn",
+          "x-ms-read-only": true
+        },
+        "modifiedonbehalfby": {
+          "type": "string",
+          "title": "Modified By (Delegate)",
+          "x-ms-dataverse-attribute": "modifiedonbehalfby",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "ModifiedOnBehalfBy",
+          "x-ms-read-only": true
+        },
+        "modifiedonbehalfbyname": {
+          "type": "string",
+          "title": "modifiedonbehalfbyname",
+          "x-ms-dataverse-attribute": "modifiedonbehalfbyname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "ModifiedOnBehalfByName",
+          "x-ms-read-only": true,
+          "maxLength": 100
+        },
+        "modifiedonbehalfbyyominame": {
+          "type": "string",
+          "title": "modifiedonbehalfbyyominame",
+          "x-ms-dataverse-attribute": "modifiedonbehalfbyyominame",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "ModifiedOnBehalfByYomiName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "organizationid": {
+          "type": "string",
+          "title": "Organization Id",
+          "x-ms-dataverse-attribute": "organizationid",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "OrganizationId",
+          "x-ms-read-only": true
+        },
+        "organizationidname": {
+          "type": "string",
+          "title": "organizationidname",
+          "x-ms-dataverse-attribute": "organizationidname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "OrganizationIdName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "overriddencreatedon": {
+          "type": "string",
+          "title": "Record Created On",
+          "x-ms-dataverse-attribute": "overriddencreatedon",
+          "x-ms-dataverse-type": "DateTimeType",
+          "x-ms-schema-name": "OverriddenCreatedOn"
+        },
+        "statecode": {
+          "type": "string",
+          "title": "Status",
+          "x-ms-dataverse-attribute": "statecode",
+          "x-ms-dataverse-type": "StateType",
+          "x-ms-schema-name": "statecode",
+          "required": true,
+          "enum": [
+            "Active",
+            "Inactive"
+          ],
+          "x-ms-enum-values": [
+            0,
+            1
+          ],
+          "Color": [
+            null,
+            null
+          ],
+          "x-ms-optionsetmetadataid": "0e992da6-3ba2-f111-b8de-002248d8760d",
+          "x-ms-isGlobal": false,
+          "x-ms-optionsetdisplayname": "Status",
+          "x-ms-optionSetType": "State"
+        },
+        "statecodename": {
+          "type": "string",
+          "title": "statecodename",
+          "x-ms-dataverse-attribute": "statecodename",
+          "x-ms-dataverse-type": "VirtualType",
+          "x-ms-schema-name": "statecodeName",
+          "x-ms-read-only": true
+        },
+        "statuscode": {
+          "type": "string",
+          "title": "Status Reason",
+          "x-ms-dataverse-attribute": "statuscode",
+          "x-ms-dataverse-type": "StatusType",
+          "x-ms-schema-name": "statuscode",
+          "enum": [
+            "Active",
+            "Inactive"
+          ],
+          "x-ms-enum-values": [
+            1,
+            2
+          ],
+          "Color": [
+            null,
+            null
+          ],
+          "x-ms-optionsetmetadataid": "18992da6-3ba2-f111-b8de-002248d8760d",
+          "x-ms-isGlobal": false,
+          "x-ms-optionsetdisplayname": "Status Reason",
+          "x-ms-optionSetType": "Status"
+        },
+        "statuscodename": {
+          "type": "string",
+          "title": "statuscodename",
+          "x-ms-dataverse-attribute": "statuscodename",
+          "x-ms-dataverse-type": "VirtualType",
+          "x-ms-schema-name": "statuscodeName",
+          "x-ms-read-only": true
+        },
+        "timezoneruleversionnumber": {
+          "type": "string",
+          "title": "Time Zone Rule Version Number",
+          "x-ms-dataverse-attribute": "timezoneruleversionnumber",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "TimeZoneRuleVersionNumber"
+        },
+        "utcconversiontimezonecode": {
+          "type": "string",
+          "title": "UTC Conversion Time Zone Code",
+          "x-ms-dataverse-attribute": "utcconversiontimezonecode",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "UTCConversionTimeZoneCode"
+        },
+        "versionnumber": {
+          "type": "string",
+          "title": "Version Number",
+          "x-ms-dataverse-attribute": "versionnumber",
+          "x-ms-dataverse-type": "BigIntType",
+          "x-ms-schema-name": "VersionNumber",
+          "x-ms-read-only": true
+        }
+      },
+      "required": [
+        "bv_sampledate",
+        "bv_soilanalysiscode",
+        "bv_soilanalysisid",
+        "bv_soilanalysisname",
+        "createdbyyominame",
+        "createdonbehalfbyyominame",
+        "modifiedbyyominame",
+        "modifiedonbehalfbyyominame",
+        "organizationidname",
+        "statecode"
+      ]
+    }
+  }
+}

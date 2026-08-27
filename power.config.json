@@ -3,7 +3,7 @@
   "appId": "",
   "appDisplayName": "INV-FarmTrack",
   "region": "prod",
-  "environmentId": "",
+  "environmentId": "Default-47176c00-abb5-4125-8ce3-a795dffd8b87",
   "description": "Ornamental Plant Nursery Management App",
   "buildPath": "./dist",
   "buildEntryPoint": "index.html",
@@ -13,141 +13,149 @@
   "databaseReferences": {
     "default.cds": {
       "dataSources": {
-        "Shadehouse": {
-          "entitySetName": "inv_shadehouses",
-          "logicalName": "inv_shadehouse"
+        "shadehouses": {
+          "entitySetName": "bv_shadehouses",
+          "logicalName": "bv_shadehouse"
         },
-        "Bed": {
-          "entitySetName": "inv_beds",
-          "logicalName": "inv_bed"
+        "availability": {
+          "entitySetName": "bv_availabilities",
+          "logicalName": "bv_availability"
         },
-        "Plant": {
-          "entitySetName": "inv_plants",
-          "logicalName": "inv_plant"
+        "beds": {
+          "entitySetName": "bv_beds",
+          "logicalName": "bv_bed"
         },
-        "Season": {
-          "entitySetName": "inv_seasons",
-          "logicalName": "inv_season"
+        "boxweights": {
+          "entitySetName": "bv_boxweights",
+          "logicalName": "bv_boxweight"
         },
-        "Field": {
-          "entitySetName": "inv_fields",
-          "logicalName": "inv_field"
+        "cainumbers": {
+          "entitySetName": "bv_cainumbers",
+          "logicalName": "bv_cainumber"
         },
-        "Planting": {
-          "entitySetName": "inv_plantings",
-          "logicalName": "inv_planting"
+        "calendar": {
+          "entitySetName": "bv_calendars",
+          "logicalName": "bv_calendar"
         },
-        "Input": {
-          "entitySetName": "inv_inputs",
-          "logicalName": "inv_input"
+        "components": {
+          "entitySetName": "bv_components",
+          "logicalName": "bv_component"
         },
-        "Treatment": {
-          "entitySetName": "inv_treatments",
-          "logicalName": "inv_treatment"
+        "customers": {
+          "entitySetName": "bv_customers",
+          "logicalName": "bv_customer"
         },
-        "Irrigation": {
-          "entitySetName": "inv_irrigations",
-          "logicalName": "inv_irrigation"
+        "fields": {
+          "entitySetName": "bv_fields",
+          "logicalName": "bv_field"
         },
-        "Harvest": {
-          "entitySetName": "inv_harvests",
-          "logicalName": "inv_harvest"
+        "fiscalauthorizations": {
+          "entitySetName": "bv_fiscalauthorizations",
+          "logicalName": "bv_fiscalauthorization"
         },
-        "Calendar": {
-          "entitySetName": "inv_calendars",
-          "logicalName": "inv_calendar"
+        "foliaranalyses": {
+          "entitySetName": "bv_foliaranalysises",
+          "logicalName": "bv_foliaranalysis"
         },
-        "Task": {
-          "entitySetName": "inv_tasks",
-          "logicalName": "inv_task"
+        "harvests": {
+          "entitySetName": "bv_harvests",
+          "logicalName": "bv_harvest"
         },
-        "Customer": {
-          "entitySetName": "inv_customers",
-          "logicalName": "inv_customer"
+        "inputs": {
+          "entitySetName": "bv_inputs",
+          "logicalName": "bv_input"
         },
-        "Order": {
-          "entitySetName": "inv_orders",
-          "logicalName": "inv_order"
+        "orders": {
+          "entitySetName": "bv_orders",
+          "logicalName": "bv_order"
         },
-        "OrderItem": {
-          "entitySetName": "inv_orderitems",
-          "logicalName": "inv_orderitem"
+        "orderitems": {
+          "entitySetName": "bv_orderitems",
+          "logicalName": "bv_orderitem"
         },
-        "Packing": {
-          "entitySetName": "inv_packings",
-          "logicalName": "inv_packing"
+        "packing": {
+          "entitySetName": "bv_packings",
+          "logicalName": "bv_packing"
         },
-        "FiscalAuthorization": {
-          "entitySetName": "inv_fiscalauthorizations",
-          "logicalName": "inv_fiscalauthorization"
+        "plants": {
+          "entitySetName": "bv_plants",
+          "logicalName": "bv_plant"
         },
-        "Invoice": {
-          "entitySetName": "inv_invoices",
-          "logicalName": "inv_invoice"
+        "plantings": {
+          "entitySetName": "bv_plantings",
+          "logicalName": "bv_planting"
         },
-        "PlantPrice": {
-          "entitySetName": "inv_plantprices",
-          "logicalName": "inv_plantprice"
+        "plantprices": {
+          "entitySetName": "bv_plantprices",
+          "logicalName": "bv_plantprice"
         },
-        "CAINumber": {
-          "entitySetName": "inv_cainumbers",
-          "logicalName": "inv_cainumber"
+        "prunings": {
+          "entitySetName": "bv_prunings",
+          "logicalName": "bv_pruning"
         },
-        "Expense": {
-          "entitySetName": "inv_expenses",
-          "logicalName": "inv_expense"
+        "soilanalyses": {
+          "entitySetName": "bv_soilanalysises",
+          "logicalName": "bv_soilanalysis"
         },
-        "Supplier": {
-          "entitySetName": "inv_suppliers",
-          "logicalName": "inv_supplier"
+        "suppliers": {
+          "entitySetName": "bv_suppliers",
+          "logicalName": "bv_supplier"
         },
-        "PurchaseOrder": {
-          "entitySetName": "inv_purchaseorders",
-          "logicalName": "inv_purchaseorder"
+        "tasks": {
+          "entitySetName": "bv_tasks",
+          "logicalName": "bv_task"
         },
-        "Worker": {
-          "entitySetName": "inv_workers",
-          "logicalName": "inv_worker"
+        "workers": {
+          "entitySetName": "bv_workers",
+          "logicalName": "bv_worker"
         },
-        "Timesheet": {
-          "entitySetName": "inv_timesheets",
-          "logicalName": "inv_timesheet"
+        "demandforecasts": {
+          "entitySetName": "bv_demandforecasts",
+          "logicalName": "bv_demandforecast"
         },
-        "Pruning": {
-          "entitySetName": "inv_prunings",
-          "logicalName": "inv_pruning"
+        "expenses": {
+          "entitySetName": "bv_expenses",
+          "logicalName": "bv_expense"
         },
-        "PruningCurve": {
-          "entitySetName": "inv_pruningcurves",
-          "logicalName": "inv_pruningcurve"
+        "fertilizations": {
+          "entitySetName": "bv_fertilizations",
+          "logicalName": "bv_fertilization"
         },
-        "Fertilization": {
-          "entitySetName": "inv_fertilizations",
-          "logicalName": "inv_fertilization"
+        "inputcomponents": {
+          "entitySetName": "bv_inputcomponents",
+          "logicalName": "bv_inputcomponent"
         },
-        "Availability": {
-          "entitySetName": "inv_availabilities",
-          "logicalName": "inv_availability"
+        "invoices": {
+          "entitySetName": "bv_invoices",
+          "logicalName": "bv_invoice"
         },
-        "BoxWeight": {
-          "entitySetName": "inv_boxweights",
-          "logicalName": "inv_boxweight"
+        "irrigations": {
+          "entitySetName": "bv_irrigations",
+          "logicalName": "bv_irrigation"
         },
-        "NutrientBalance": {
-          "entitySetName": "inv_nutrientbalances",
-          "logicalName": "inv_nutrientbalance"
+        "nutrientbalances": {
+          "entitySetName": "bv_nutrientbalances",
+          "logicalName": "bv_nutrientbalance"
         },
-        "SoilAnalysis": {
-          "entitySetName": "inv_soilanalyses",
-          "logicalName": "inv_soilanalysis"
+        "pruningcurves": {
+          "entitySetName": "bv_pruningcurves",
+          "logicalName": "bv_pruningcurve"
         },
-        "FoliarAnalysis": {
-          "entitySetName": "inv_foliaranalyses",
-          "logicalName": "inv_foliaranalysis"
+        "purchaseorders": {
+          "entitySetName": "bv_purchaseorders",
+          "logicalName": "bv_purchaseorder"
         },
-        "DemandForecast": {
-          "entitySetName": "inv_demandforecasts",
-          "logicalName": "inv_demandforecast"
+        "treatments": {
+          "entitySetName": "bv_treatments",
+          "logicalName": "bv_treatment"
+        },
+        "seasons": {
+          "entitySetName": "bv_seasons",
+          "logicalName": "bv_season"
+        },
+        "timesheets": {
+          "entitySetName": "bv_timesheets",
+          "logicalName": "bv_timesheet"
         }
       }
     }
