@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import markLight from "../assets/brand/mark-light.svg";
 import {
   Leaf,
   LayoutDashboard,
@@ -204,7 +205,7 @@ export default function Sidebar({
                 {/* Official wordmark from the Inveenta brand set — light
                     variant, for dark backgrounds. Do not re-draw in markup. */}
                 <img
-                  src="/brand/mark-light.svg"
+                  src={markLight}
                   alt="Inveenta"
                   className="h-[18px] w-auto"
                 />
