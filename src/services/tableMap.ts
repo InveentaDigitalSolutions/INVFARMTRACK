@@ -40,14 +40,88 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       active: "bv_isactive",
     },
   },
-  shadehouses: { dataSource: "bv_shadehouses", primaryKey: "bv_shadehouseid" },
+  shadehouses: {
+    dataSource: "bv_shadehouses",
+    primaryKey: "bv_shadehouseid",
+    fields: {
+      name: "bv_shadehousename",
+      code: "bv_code",
+      location: "bv_location",
+      coordinates: "bv_coordinates",
+      length: "bv_length",
+      width: "bv_width",
+      capacity: "bv_capacity",
+      active: "bv_isactive",
+    },
+  },
   fields: { dataSource: "bv_fields", primaryKey: "bv_fieldid" },
   beds: { dataSource: "bv_beds", primaryKey: "bv_bedid" },
-  seasons: { dataSource: "bv_seasons", primaryKey: "bv_seasonid" },
-  inputs: { dataSource: "bv_inputs", primaryKey: "bv_inputid" },
-  workers: { dataSource: "bv_workers", primaryKey: "bv_workerid" },
-  suppliers: { dataSource: "bv_suppliers", primaryKey: "bv_supplierid" },
-  customers: { dataSource: "bv_customers", primaryKey: "bv_customerid" },
+  seasons: {
+    dataSource: "bv_seasons",
+    primaryKey: "bv_seasonid",
+    fields: {
+      name: "bv_seasonname",
+      start: "bv_startdate",
+      end: "bv_enddate",
+      description: "bv_description",
+      active: "bv_isactive",
+    },
+  },
+  inputs: {
+    dataSource: "bv_inputs",
+    primaryKey: "bv_inputid",
+    fields: {
+      name: "bv_inputname",
+      category: "bv_inputcategory",
+      method: "bv_applicationmethod",
+      safety: "bv_safetyintervaldays",
+      brand: "bv_brand",
+      composition: "bv_composition",
+    },
+  },
+  workers: {
+    dataSource: "bv_workers",
+    primaryKey: "bv_workerid",
+    fields: {
+      name: "bv_workername",
+      code: "bv_workercode",
+      role: "bv_role",
+      phone: "bv_phone",
+      identity: "bv_identitynumber",
+      hireDate: "bv_hiredate",
+      hourlyRate: "bv_hourlyrate",
+      pieceRate: "bv_piecerate",
+      active: "bv_isactive",
+      notes: "bv_notes",
+    },
+  },
+  suppliers: {
+    dataSource: "bv_suppliers",
+    primaryKey: "bv_supplierid",
+    fields: {
+      name: "bv_suppliername",
+      code: "bv_suppliercode",
+      category: "bv_category",
+      contact: "bv_contactname",
+      phone: "bv_phone",
+      email: "bv_email",
+      taxId: "bv_taxid",
+      terms: "bv_paymentterms",
+      active: "bv_isactive",
+      notes: "bv_notes",
+    },
+  },
+  customers: {
+    dataSource: "bv_customers",
+    primaryKey: "bv_customerid",
+    fields: {
+      code: "bv_customercode",
+      name: "bv_customername",
+      contact: "bv_contactname",
+      email: "bv_email",
+      terms: "bv_paymentterms",
+    },
+  },
   plantings: { dataSource: "bv_plantings", primaryKey: "bv_plantingid" },
   treatments: { dataSource: "bv_treatments", primaryKey: "bv_treatmentid" },
   irrigation: { dataSource: "bv_irrigations", primaryKey: "bv_irrigationid" },
@@ -75,7 +149,15 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
  * identity mapping and the token flow are proven on a small surface before
  * twenty-nine tables depend on them. Add keys here as each is verified.
  */
-export const ENABLED_TABLES = new Set<string>(["plants"]);
+export const ENABLED_TABLES = new Set<string>([
+  "plants",
+  "shadehouses",
+  "seasons",
+  "inputs",
+  "workers",
+  "suppliers",
+  "customers",
+]);
 
 /** Dataverse is only usable when the app has a session — locally that means dev:dv. */
 export function dataverseConfigured(): boolean {
