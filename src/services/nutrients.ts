@@ -1,35 +1,62 @@
 /**
  * Nutrient accounting.
  *
- * An input carries a guaranteed analysis (its percentages). A dose applied to
- * a bed therefore delivers a computable mass of each element — which is what
- * makes per-bed nutrient balance possible rather than guesswork.
+ * An input's composition is a LIST, not a fixed set of fields. A fertiliser
+ * may declare twelve nutrients, a pesticide two active ingredients, a
+ * biostimulant humic acid and seaweed extract. So composition lives in
+ * inv_InputComponent (input x component x percentage) and this module works
+ * off whatever lines an input happens to have.
  *
- * The one thing that must not be got wrong: fertiliser labels quote P and K as
- * OXIDES. "20-20-20" means 20% N, 20% P2O5, 20% K2O — not 20% elemental P and
- * K. Treating the label figure as elemental overstates P by roughly 2.3x and K
- * by 1.2x, which would quietly corrupt every balance the nursery relies on.
+ * The conversion that must not be got wrong: labels quote P and K as OXIDES.
+ * "20-20-20" is 20% N, 20% P2O5, 20% K2O. Read as elemental it overstates P by
+ * ~2.29x and K by ~1.20x. Each component therefore carries its own elemental
+ * factor rather than the input carrying one global basis flag — because a
+ * single product can mix oxide and elemental declarations.
  */
 
-/** P2O5 -> P. Molar: 2 x 30.97 / 141.94 */
-export const P2O5_TO_P = 0.4364;
-/** K2O -> K. Molar: 2 x 39.10 / 94.20 */
-export const K2O_TO_K = 0.8301;
-
-export type AnalysisBasis = "oxide" | "elemental";
 export type DoseUnit = "kg" | "g" | "L" | "mL";
 
-export interface InputAnalysis {
-  basis: AnalysisBasis;
+export type ComponentCategory =
+  | "macronutrient" | "secondary" | "micronutrient"
+  | "active-ingredient" | "organic" | "carrier" | "other";
+
+/** A row of the component catalogue (inv_Component). */
+export interface Component {
+  id: string;
+  name: string;
+  /** N, P2O5, K2O, Fe, Azadirachtin … */
+  symbol?: string;
+  category: ComponentCategory;
+  /** Element this rolls up to: P2O5 -> "P". Absent for non-nutrients. */
+  reportsAs?: string;
+  /** Multiplier to elemental mass. P2O5 = 0.4364, K2O = 0.8301, else 1. */
+  elementalFactor?: number;
+  isNutrient?: boolean;
+}
+
+/** One line of an input's guaranteed analysis (inv_InputComponent). */
+export interface CompositionLine {
+  component: Component;
   /** Percent by weight of product, as printed on the label. */
-  N?: number; P?: number; K?: number;
-  Ca?: number; Mg?: number; S?: number;
-  Fe?: number; Mn?: number; Zn?: number; B?: number; Cu?: number; Mo?: number;
-  /** Required to convert a liquid dose into kilograms of product. */
+  percentage: number;
+}
+
+export interface Input {
+  id: string;
+  name: string;
+  composition: CompositionLine[];
+  /** Required to turn a litre dose into kilograms of product. */
   densityKgPerL?: number;
 }
 
-export type NutrientMass = Record<string, number>;
+/** Standard oxide conversions, for seeding the catalogue. */
+export const ELEMENTAL_FACTORS: Record<string, { reportsAs: string; factor: number }> = {
+  P2O5: { reportsAs: "P", factor: 0.4364 },
+  K2O: { reportsAs: "K", factor: 0.8301 },
+  CaO: { reportsAs: "Ca", factor: 0.7147 },
+  MgO: { reportsAs: "Mg", factor: 0.6030 },
+  SO3: { reportsAs: "S", factor: 0.4005 },
+};
 
 /** Convert any dose to kilograms of product. */
 export function doseToKg(amount: number, unit: DoseUnit, densityKgPerL?: number): number | null {
@@ -40,66 +67,73 @@ export function doseToKg(amount: number, unit: DoseUnit, densityKgPerL?: number)
     case "L":
     case "mL": {
       const litres = unit === "L" ? amount : amount / 1000;
-      // Without a density a volume cannot become a mass. Refuse rather than
-      // silently assuming water at 1.0 kg/L, which fertiliser rarely is.
+      // A volume is not a mass. Refuse rather than assume water — fertiliser
+      // concentrates run 1.2-1.4 kg/L, so guessing 1.0 is a 20-40% error.
       if (!densityKgPerL) return null;
       return litres * densityKgPerL;
     }
   }
 }
 
+export interface AppliedComponent {
+  component: Component;
+  /** Mass of the declared substance, e.g. kg of P2O5. */
+  productKg: number;
+  /** Mass expressed as the element it reports as, e.g. kg of P. */
+  elementalKg: number;
+}
+
 /**
- * Elemental mass of each nutrient delivered by one application, in kg.
+ * What one application actually delivered, line by line.
  * Returns null when the dose cannot be resolved to a mass.
  */
-export function nutrientsApplied(
-  analysis: InputAnalysis,
+export function applicationBreakdown(
+  input: Input,
   amount: number,
   unit: DoseUnit
-): NutrientMass | null {
-  const productKg = doseToKg(amount, unit, analysis.densityKgPerL);
+): AppliedComponent[] | null {
+  const productKg = doseToKg(amount, unit, input.densityKgPerL);
   if (productKg === null) return null;
 
-  const share = (pct?: number) => ((pct ?? 0) / 100) * productKg;
+  return input.composition.map((line) => {
+    const mass = (line.percentage / 100) * productKg;
+    return {
+      component: line.component,
+      productKg: mass,
+      elementalKg: mass * (line.component.elementalFactor ?? 1),
+    };
+  });
+}
 
-  // N is always elemental on a label; P and K depend on the basis.
-  const pFactor = analysis.basis === "oxide" ? P2O5_TO_P : 1;
-  const kFactor = analysis.basis === "oxide" ? K2O_TO_K : 1;
-
-  const out: NutrientMass = {
-    N: share(analysis.N),
-    P: share(analysis.P) * pFactor,
-    K: share(analysis.K) * kFactor,
-    Ca: share(analysis.Ca),
-    Mg: share(analysis.Mg),
-    S: share(analysis.S),
-    Fe: share(analysis.Fe),
-    Mn: share(analysis.Mn),
-    Zn: share(analysis.Zn),
-    B: share(analysis.B),
-    Cu: share(analysis.Cu),
-    Mo: share(analysis.Mo),
-  };
-
-  // Drop nutrients this product does not contain, so a UI can list only what
-  // was actually applied.
-  for (const key of Object.keys(out)) if (!out[key]) delete out[key];
+/** Roll a breakdown up by element — the figure a nutrient balance needs. */
+export function byElement(applied: AppliedComponent[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const a of applied) {
+    if (a.component.isNutrient === false) continue;
+    const key = a.component.reportsAs ?? a.component.symbol ?? a.component.name;
+    out[key] = (out[key] ?? 0) + a.elementalKg;
+  }
   return out;
 }
 
 /** Sum many applications — per bed, per plot, per season. */
-export function totalNutrients(applications: NutrientMass[]): NutrientMass {
-  const total: NutrientMass = {};
-  for (const app of applications) {
-    for (const [k, v] of Object.entries(app)) total[k] = (total[k] ?? 0) + v;
+export function totalByElement(all: Record<string, number>[]): Record<string, number> {
+  const total: Record<string, number> = {};
+  for (const one of all) {
+    for (const [k, v] of Object.entries(one)) total[k] = (total[k] ?? 0) + v;
   }
   return total;
 }
 
-/** Grams of nutrient per square metre — the figure agronomists actually use. */
-export function perSquareMetre(mass: NutrientMass, areaM2: number): NutrientMass {
+/** Grams per square metre — the figure agronomists actually work in. */
+export function perSquareMetre(mass: Record<string, number>, areaM2: number): Record<string, number> {
   if (!areaM2) return {};
-  const out: NutrientMass = {};
+  const out: Record<string, number> = {};
   for (const [k, v] of Object.entries(mass)) out[k] = (v * 1000) / areaM2;
   return out;
+}
+
+/** Active ingredients only — what a re-entry or residue check cares about. */
+export function activeIngredients(applied: AppliedComponent[]): AppliedComponent[] {
+  return applied.filter((a) => a.component.category === "active-ingredient");
 }

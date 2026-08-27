@@ -814,31 +814,6 @@
           "required": false
         },
         {
-          "schemaName": "inv_N_pct",
-          "displayName": "Nitrogen (N) %",
-          "type": "decimal",
-          "required": false,
-          "description": "Nutrient composition — for nutrient balance calculations"
-        },
-        {
-          "schemaName": "inv_P_pct",
-          "displayName": "Phosphorus (P) %",
-          "type": "decimal",
-          "required": false
-        },
-        {
-          "schemaName": "inv_K_pct",
-          "displayName": "Potassium (K) %",
-          "type": "decimal",
-          "required": false
-        },
-        {
-          "schemaName": "inv_Ca_pct",
-          "displayName": "Calcium (Ca) %",
-          "type": "decimal",
-          "required": false
-        },
-        {
           "schemaName": "inv_ManufacturerContact",
           "displayName": "Manufacturer Contact",
           "type": "string",
@@ -851,23 +826,6 @@
           "type": "memo",
           "maxLength": 2000,
           "required": false
-        },
-        {
-          "schemaName": "inv_AnalysisBasis",
-          "displayName": "Analysis Basis",
-          "type": "choice",
-          "required": true,
-          "description": "Whether P and K on the label are oxide (P2O5/K2O) or elemental. Determines the conversion factor.",
-          "options": [
-            {
-              "value": 681340200,
-              "label": "Oxide (N-P2O5-K2O)"
-            },
-            {
-              "value": 681340201,
-              "label": "Elemental (N-P-K)"
-            }
-          ]
         },
         {
           "schemaName": "inv_Formulation",
@@ -902,95 +860,6 @@
           "maxValue": 5,
           "required": false,
           "description": "Liquids only — converts a dose in litres to kilograms of product."
-        },
-        {
-          "schemaName": "inv_Mg_pct",
-          "displayName": "Mg %",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100,
-          "required": false
-        },
-        {
-          "schemaName": "inv_S_pct",
-          "displayName": "S %",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100,
-          "required": false
-        },
-        {
-          "schemaName": "inv_Fe_pct",
-          "displayName": "Fe %",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100,
-          "required": false
-        },
-        {
-          "schemaName": "inv_Mn_pct",
-          "displayName": "Mn %",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100,
-          "required": false
-        },
-        {
-          "schemaName": "inv_Zn_pct",
-          "displayName": "Zn %",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100,
-          "required": false
-        },
-        {
-          "schemaName": "inv_B_pct",
-          "displayName": "B %",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100,
-          "required": false
-        },
-        {
-          "schemaName": "inv_Cu_pct",
-          "displayName": "Cu %",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100,
-          "required": false
-        },
-        {
-          "schemaName": "inv_Mo_pct",
-          "displayName": "Mo %",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100,
-          "required": false
-        },
-        {
-          "schemaName": "inv_ActiveIngredient",
-          "displayName": "Active Ingredient",
-          "type": "string",
-          "maxLength": 150,
-          "required": false,
-          "description": "For pesticides/fungicides — the a.i. name, e.g. Azadirachtin."
-        },
-        {
-          "schemaName": "inv_ActiveIngredient_pct",
-          "displayName": "Active Ingredient %",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100,
-          "required": false
         }
       ]
     },
@@ -3590,31 +3459,6 @@
           ]
         },
         {
-          "schemaName": "inv_N_kg",
-          "displayName": "Nitrogen (N) kg",
-          "type": "decimal",
-          "required": false,
-          "description": "Auto-calculated from input composition x quantity"
-        },
-        {
-          "schemaName": "inv_P_kg",
-          "displayName": "Phosphorus (P) kg",
-          "type": "decimal",
-          "required": false
-        },
-        {
-          "schemaName": "inv_K_kg",
-          "displayName": "Potassium (K) kg",
-          "type": "decimal",
-          "required": false
-        },
-        {
-          "schemaName": "inv_Ca_kg",
-          "displayName": "Calcium (Ca) kg",
-          "type": "decimal",
-          "required": false
-        },
-        {
           "schemaName": "inv_Worker",
           "displayName": "Worker",
           "type": "string",
@@ -3627,66 +3471,6 @@
           "type": "memo",
           "maxLength": 2000,
           "required": false
-        },
-        {
-          "schemaName": "inv_Mg_kg",
-          "displayName": "Mg applied (kg)",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100000,
-          "required": false,
-          "description": "Derived: quantity applied x guaranteed analysis. Not hand-entered."
-        },
-        {
-          "schemaName": "inv_S_kg",
-          "displayName": "S applied (kg)",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100000,
-          "required": false,
-          "description": "Derived: quantity applied x guaranteed analysis. Not hand-entered."
-        },
-        {
-          "schemaName": "inv_Fe_kg",
-          "displayName": "Fe applied (kg)",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100000,
-          "required": false,
-          "description": "Derived: quantity applied x guaranteed analysis. Not hand-entered."
-        },
-        {
-          "schemaName": "inv_Mn_kg",
-          "displayName": "Mn applied (kg)",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100000,
-          "required": false,
-          "description": "Derived: quantity applied x guaranteed analysis. Not hand-entered."
-        },
-        {
-          "schemaName": "inv_Zn_kg",
-          "displayName": "Zn applied (kg)",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100000,
-          "required": false,
-          "description": "Derived: quantity applied x guaranteed analysis. Not hand-entered."
-        },
-        {
-          "schemaName": "inv_B_kg",
-          "displayName": "B applied (kg)",
-          "type": "decimal",
-          "precision": 4,
-          "minValue": 0,
-          "maxValue": 100000,
-          "required": false,
-          "description": "Derived: quantity applied x guaranteed analysis. Not hand-entered."
         },
         {
           "schemaName": "inv_DoseUnit",
@@ -4603,6 +4387,158 @@
           "maxLength": 50,
           "required": false,
           "description": "Groups rows from the same Excel import"
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "inv_Component",
+      "displayName": "Component",
+      "displayCollectionName": "Components",
+      "description": "Anything an input can contain: a nutrient, an active ingredient, an organic fraction, a carrier.",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_ComponentCode",
+          "displayName": "Component ID",
+          "type": "autonumber",
+          "autoNumberFormat": "CMP-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format CMP-0001."
+        },
+        {
+          "schemaName": "inv_ComponentName",
+          "displayName": "Name",
+          "type": "string",
+          "maxLength": 150,
+          "required": true,
+          "description": "e.g. Nitrogen, Phosphorus pentoxide, Azadirachtin, Humic acid."
+        },
+        {
+          "schemaName": "inv_Symbol",
+          "displayName": "Symbol / Formula",
+          "type": "string",
+          "maxLength": 40,
+          "required": false,
+          "description": "N, P2O5, K2O, Fe, or a compound formula."
+        },
+        {
+          "schemaName": "inv_Category",
+          "displayName": "Category",
+          "type": "choice",
+          "required": true,
+          "options": [
+            {
+              "value": 681340300,
+              "label": "Macronutrient"
+            },
+            {
+              "value": 681340301,
+              "label": "Secondary nutrient"
+            },
+            {
+              "value": 681340302,
+              "label": "Micronutrient"
+            },
+            {
+              "value": 681340303,
+              "label": "Active ingredient"
+            },
+            {
+              "value": 681340304,
+              "label": "Organic / biostimulant"
+            },
+            {
+              "value": 681340305,
+              "label": "Carrier / inert"
+            },
+            {
+              "value": 681340306,
+              "label": "Other"
+            }
+          ]
+        },
+        {
+          "schemaName": "inv_ElementSymbol",
+          "displayName": "Reports As (element)",
+          "type": "string",
+          "maxLength": 10,
+          "required": false,
+          "description": "Element this rolls up to. P2O5 reports as P; K2O reports as K."
+        },
+        {
+          "schemaName": "inv_ElementalFactor",
+          "displayName": "Elemental Factor",
+          "type": "decimal",
+          "precision": 4,
+          "minValue": 0,
+          "maxValue": 10,
+          "required": false,
+          "description": "Multiplier to elemental mass. P2O5 = 0.4364, K2O = 0.8301, elemental forms = 1."
+        },
+        {
+          "schemaName": "inv_IsNutrient",
+          "displayName": "Counts Toward Nutrient Balance",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "schemaName": "inv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "maxLength": 2000,
+          "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "inv_InputComponent",
+      "displayName": "Input Component",
+      "displayCollectionName": "Input Components",
+      "description": "One line of an input's guaranteed analysis. An input has as many as it needs.",
+      "ownershipType": "OrganizationOwned",
+      "columns": [
+        {
+          "schemaName": "inv_InputComponentCode",
+          "displayName": "Line ID",
+          "type": "autonumber",
+          "autoNumberFormat": "ICP-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format ICP-0001."
+        },
+        {
+          "schemaName": "inv_InputId",
+          "displayName": "Input",
+          "type": "lookup",
+          "relatedTable": "inv_Input",
+          "required": true
+        },
+        {
+          "schemaName": "inv_ComponentId",
+          "displayName": "Component",
+          "type": "lookup",
+          "relatedTable": "inv_Component",
+          "required": true
+        },
+        {
+          "schemaName": "inv_Percentage",
+          "displayName": "Percentage (% w/w)",
+          "type": "decimal",
+          "precision": 4,
+          "minValue": 0,
+          "maxValue": 100,
+          "required": true,
+          "description": "Percent by weight of product, as printed on the label."
         },
         {
           "schemaName": "inv_Notes",
