@@ -12,6 +12,7 @@ import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useRecords } from "../hooks/useRecords";
 
 /* -----------------------------------------------------------------
  * Types
@@ -325,13 +326,13 @@ const tabs = [
 export default function AccountingPage() {
   const [tab, setTab] = useState("dashboard");
 
-  const [invoices, setInvoices] = useState(initInvoices);
-  const [bills, setBills] = useState(initBills);
-  const [expenses, setExpenses] = useState(initExpenses);
-  const [payments, setPayments] = useState(initPayments);
-  const [bankAccounts, setBankAccounts] = useState(initBankAccounts);
-  const [statements, setStatements] = useState(initStatementLines);
-  const [fiscal, setFiscal] = useState(initFiscal);
+  const [invoices, setInvoices] = useRecords("invoices", initInvoices);
+  const [bills, setBills] = useRecords("bills", initBills);
+  const [expenses, setExpenses] = useRecords("expenses", initExpenses);
+  const [payments, setPayments] = useRecords("payments", initPayments);
+  const [bankAccounts, setBankAccounts] = useRecords("bankAccounts", initBankAccounts);
+  const [statements, setStatements] = useRecords("statements", initStatementLines);
+  const [fiscal, setFiscal] = useRecords("fiscal", initFiscal);
 
   const invoiceForm = useFormModal(initInvoices[0] as unknown as Record<string, unknown>);
   const billForm = useFormModal(initBills[0] as unknown as Record<string, unknown>);

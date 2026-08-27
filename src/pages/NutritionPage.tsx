@@ -8,6 +8,7 @@ import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useRecords } from "../hooks/useRecords";
 
 const tabs = [
   { id: "weight", label: "Weight Tracking" },
@@ -176,10 +177,10 @@ const foliarFields = [
 export default function NutritionPage() {
   const [tab, setTab] = useState("weight");
 
-  const [weight, setWeight] = useState(initWeight);
-  const [balance, setBalance] = useState(initBalance);
-  const [soil, setSoil] = useState(initSoil);
-  const [foliar, setFoliar] = useState(initFoliar);
+  const [weight, setWeight] = useRecords("weight", initWeight);
+  const [balance, setBalance] = useRecords("balance", initBalance);
+  const [soil, setSoil] = useRecords("soil", initSoil);
+  const [foliar, setFoliar] = useRecords("foliar", initFoliar);
 
   const weightForm = useFormModal(initWeight[0]);
   const balanceForm = useFormModal(initBalance[0]);

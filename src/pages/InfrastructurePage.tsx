@@ -11,6 +11,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import ShadehouseView from "../components/ShadehouseView";
 import ShadehouseView3D from "../components/ShadehouseView3D";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useRecords } from "../hooks/useRecords";
 
 const tabs = [
   { id: "shadehouses", label: "Shadehouses" },
@@ -80,9 +81,9 @@ const bedFormGroups = [
 export default function InfrastructurePage() {
   const [tab, setTab] = useState("shadehouses");
 
-  const [shadehouses, setShadehouses] = useState(initShadehouses);
-  const [fields, setFieldes] = useState(initFieldes);
-  const [beds, setBeds] = useState(initBeds);
+  const [shadehouses, setShadehouses] = useRecords("shadehouses", initShadehouses);
+  const [fields, setFieldes] = useRecords("fields", initFieldes);
+  const [beds, setBeds] = useRecords("beds", initBeds);
 
   const shForm = useFormModal(initShadehouses[0]);
   const fieldForm = useFormModal(initFieldes[0]);

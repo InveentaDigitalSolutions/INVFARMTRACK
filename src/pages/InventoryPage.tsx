@@ -9,6 +9,7 @@ import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useRecords } from "../hooks/useRecords";
 
 const tabs = [
   { id: "plants", label: "Plant Catalog" },
@@ -65,8 +66,8 @@ const inputFields = [
 export default function InventoryPage() {
   const [tab, setTab] = useState("plants");
 
-  const [plants, setPlants] = useState(initPlants);
-  const [inputs, setInputs] = useState(initInputs);
+  const [plants, setPlants] = useRecords("plants", initPlants);
+  const [inputs, setInputs] = useRecords("inputs", initInputs);
 
   const plantForm = useFormModal(initPlants[0]);
   const inputForm = useFormModal(initInputs[0]);

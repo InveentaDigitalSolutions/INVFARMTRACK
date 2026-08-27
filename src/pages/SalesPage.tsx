@@ -19,6 +19,7 @@ import ShipmentDetail from "../components/ShipmentDetail";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useRecords } from "../hooks/useRecords";
 import ExcelImport from "../components/ExcelImport";
 import { Upload } from "lucide-react";
 import { getNextInvoiceNumber, allocateInvoiceNumber } from "../services/invoiceNumberService";
@@ -184,15 +185,15 @@ const statusBadge = (s: string) => {
 
 export default function SalesPage() {
   const [tab, setTab] = useState("shipments");
-  const [shipments, setShipments] = useState(initialShipments);
+  const [shipments, setShipments] = useRecords("shipments", initialShipments);
   const [activeShipment, setActiveShipment] = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
-  const [prices, setPrices] = useState(initPrices);
+  const [prices, setPrices] = useRecords("prices", initPrices);
   const priceForm = useFormModal(initPrices[0]);
   const priceConfirm = useConfirmDialog();
 
-  const [orders, setOrders] = useState(initialOrders);
-  const [customers, setCustomers] = useState(initialCustomers);
+  const [orders, setOrders] = useRecords("orders", initialOrders);
+  const [customers, setCustomers] = useRecords("customers", initialCustomers);
   const orderForm = useFormModal({
     number: "",
     customer: "",

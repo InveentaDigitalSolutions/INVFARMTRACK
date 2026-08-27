@@ -9,6 +9,7 @@ import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useRecords } from "../hooks/useRecords";
 
 const tabs = [
   { id: "workers", label: "Workers" },
@@ -88,8 +89,8 @@ const activityBadge = (a: string) => {
 
 export default function LaborPage() {
   const [tab, setTab] = useState("workers");
-  const [workers, setWorkers] = useState(initWorkers);
-  const [timesheets, setTimesheets] = useState(initTimesheets);
+  const [workers, setWorkers] = useRecords("workers", initWorkers);
+  const [timesheets, setTimesheets] = useRecords("timesheets", initTimesheets);
 
   const workerForm = useFormModal(initWorkers[0]);
   const tsForm = useFormModal(initTimesheets[0]);

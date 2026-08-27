@@ -9,6 +9,7 @@ import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useRecords } from "../hooks/useRecords";
 
 const tabs = [
   { id: "suppliers", label: "Suppliers" },
@@ -82,8 +83,8 @@ const statusBadge = (s: string) => {
 
 export default function SuppliersPage() {
   const [tab, setTab] = useState("suppliers");
-  const [suppliers, setSuppliers] = useState(initSuppliers);
-  const [pos, setPOs] = useState(initPOs);
+  const [suppliers, setSuppliers] = useRecords("suppliers", initSuppliers);
+  const [pos, setPOs] = useRecords("purchaseOrders", initPOs);
 
   const supplierForm = useFormModal(initSuppliers[0]);
   const poForm = useFormModal(initPOs[0]);

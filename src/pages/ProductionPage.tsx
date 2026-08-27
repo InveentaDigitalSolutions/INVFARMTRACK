@@ -9,6 +9,7 @@ import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useRecords } from "../hooks/useRecords";
 
 const tabs = [
   { id: "plantings", label: "Plantings" },
@@ -531,14 +532,14 @@ function BedUtilizationHeatmap() {
 export default function ProductionPage() {
   const [tab, setTab] = useState("plantings");
 
-  const [plantings, setPlantings] = useState(initPlantings);
-  const [treatments, setTreatments] = useState(initTreatments);
-  const [irrigation, setIrrigation] = useState(initIrrigation);
-  const [harvest, setHarvest] = useState(initHarvest);
-  const [tasks, setTasks] = useState(initTasks);
-  const [pruning, setPruning] = useState(initPruning);
-  const [fertilization, setFertilization] = useState(initFertilization);
-  const [seasons, setSeasons] = useState(initSeasons);
+  const [plantings, setPlantings] = useRecords("plantings", initPlantings);
+  const [treatments, setTreatments] = useRecords("treatments", initTreatments);
+  const [irrigation, setIrrigation] = useRecords("irrigation", initIrrigation);
+  const [harvest, setHarvest] = useRecords("harvest", initHarvest);
+  const [tasks, setTasks] = useRecords("tasks", initTasks);
+  const [pruning, setPruning] = useRecords("pruning", initPruning);
+  const [fertilization, setFertilization] = useRecords("fertilization", initFertilization);
+  const [seasons, setSeasons] = useRecords("seasons", initSeasons);
 
   const plantingForm = useFormModal(initPlantings[0]);
   const treatmentForm = useFormModal(initTreatments[0]);

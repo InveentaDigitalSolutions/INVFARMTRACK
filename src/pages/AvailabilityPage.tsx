@@ -9,6 +9,7 @@ import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useRecords } from "../hooks/useRecords";
 
 const tabs = [
   { id: "projections", label: "Weekly Projections" },
@@ -194,9 +195,9 @@ function PruningCurveChart({ data }: { data: typeof initCurve }) {
 export default function AvailabilityPage() {
   const [tab, setTab] = useState("projections");
 
-  const [projections, setProjections] = useState(initProjections);
-  const [curve, setCurve] = useState(initCurve);
-  const [log, setLog] = useState(initLog);
+  const [projections, setProjections] = useRecords("projections", initProjections);
+  const [curve, setCurve] = useRecords("curve", initCurve);
+  const [log, setLog] = useRecords("log", initLog);
 
   const projectionForm = useFormModal(initProjections[0]);
   const curveForm = useFormModal(initCurve[0]);
