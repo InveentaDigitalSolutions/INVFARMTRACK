@@ -20,6 +20,8 @@
     "dataverse:token": "node scripts/dev-token.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/playfair-display": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
     "@hookform/resolvers": "^5.2.2",
     "@microsoft/power-apps": "^1.0.4",
     "@react-three/drei": "^10.7.8",
