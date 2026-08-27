@@ -257,6 +257,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <Canvas
           key={resetKey}
           shadows="percentage"
+          dpr={[1, 2]}
+          gl={{ antialias: true, toneMappingExposure: 1.05 }}
           camera={{ position: [62, 52, 74], fov: 36 }}
           onPointerMissed={() => setSelectedBedId(null)}
         >

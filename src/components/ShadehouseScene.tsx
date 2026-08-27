@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Billboard, Text } from "@react-three/drei";
+import { Billboard, RoundedBox, Text } from "@react-three/drei";
 import * as THREE from "three";
 import {
   LEVEL_HEIGHTS_M,
@@ -10,6 +10,24 @@ import {
   type ShadehouseBed,
 } from "./ShadehouseView";
 import { zoneStatusColors, type ZoneReading } from "../services/irrigation";
+
+/** Rounded-rectangle shape, mirroring the plan's rx on every rect. */
+function roundedRectShape(w: number, h: number, r: number) {
+  const radius = Math.min(r, w / 2, h / 2);
+  const x = -w / 2;
+  const y = -h / 2;
+  const shape = new THREE.Shape();
+  shape.moveTo(x + radius, y);
+  shape.lineTo(x + w - radius, y);
+  shape.quadraticCurveTo(x + w, y, x + w, y + radius);
+  shape.lineTo(x + w, y + h - radius);
+  shape.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  shape.lineTo(x + radius, y + h);
+  shape.quadraticCurveTo(x, y + h, x, y + h - radius);
+  shape.lineTo(x, y + radius);
+  shape.quadraticCurveTo(x, y, x + radius, y);
+  return shape;
+}
 
 /** Palette shared with the 2D Shadehouse Layout. */
 export const PLAN_COLORS = {
@@ -78,20 +96,49 @@ function RoadDashes({
   );
 }
 
+/** Rounded outline around a plot, matching the plan's rx="4" frame. */
+function PlotOutline({
+  x,
+  z,
+  width,
+  length,
+}: {
+  x: number;
+  z: number;
+  width: number;
+  length: number;
+}) {
+  const points = useMemo(
+    () => roundedRectShape(width, length, 1.1).getPoints(48),
+    [width, length]
+  );
+  const geometry = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    g.setFromPoints(points.map((p) => new THREE.Vector3(p.x, p.y, 0)));
+    return g;
+  }, [points]);
+
+  return (
+    <lineLoop position={[x, 0.02, z]} rotation={[-Math.PI / 2, 0, 0]} geometry={geometry}>
+      <lineBasicMaterial color="#cbd5e1" />
+    </lineLoop>
+  );
+}
+
 function Roads() {
   const roads = useMemo(() => computeRoads(), []);
   return (
     <group>
       {/* Logistics road, running the length of the house */}
       <mesh position={[roads.vertical.x, 0.006, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[roads.vertical.width, roads.vertical.length]} />
+        <shapeGeometry args={[roundedRectShape(roads.vertical.width, roads.vertical.length, 0.9)]} />
         <meshStandardMaterial color={PLAN_COLORS.road} roughness={1} />
       </mesh>
       <RoadDashes along="z" fixed={roads.vertical.x} length={roads.vertical.length} />
 
       {/* Cross aisle */}
-      <mesh position={[0, 0.006, roads.horizontal.z]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[roads.horizontal.length, roads.horizontal.width]} />
+      <mesh position={[0, 0.007, roads.horizontal.z]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <shapeGeometry args={[roundedRectShape(roads.horizontal.length, roads.horizontal.width, 0.9)]} />
         <meshStandardMaterial color={PLAN_COLORS.road} roughness={1} />
       </mesh>
       <RoadDashes along="x" fixed={roads.horizontal.z} length={roads.horizontal.length} />
@@ -283,10 +330,8 @@ function Bed({
   });
 
   return (
-    <mesh
+    <group
       position={[placement.x, placement.y + height / 2, placement.z]}
-      castShadow={!dimmed}
-      receiveShadow={!dimmed}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(placement.bed.bedId);
@@ -299,17 +344,25 @@ function Bed({
         document.body.style.cursor = "";
       }}
     >
-      <boxGeometry args={[placement.width, height, placement.length]} />
-      <meshStandardMaterial
-        ref={mat}
-        color={base}
-        emissive={base}
-        transparent
-        opacity={dimmed ? 0.12 : 1}
-        roughness={0.8}
-        metalness={0}
-      />
-    </mesh>
+      <RoundedBox
+        args={[placement.width, height, placement.length]}
+        radius={Math.min(0.085, placement.width / 2.6, height / 2.2)}
+        smoothness={4}
+        creaseAngle={0.5}
+        castShadow={!dimmed}
+        receiveShadow={!dimmed}
+      >
+        <meshStandardMaterial
+          ref={mat}
+          color={base}
+          emissive={base}
+          transparent
+          opacity={dimmed ? 0.12 : 1}
+          roughness={0.62}
+          metalness={0.02}
+        />
+      </RoundedBox>
+    </group>
   );
 }
 
@@ -455,9 +508,10 @@ function AirLine({
       {/* Terracotta pots hooked along the cable — round or square. */}
       <instancedMesh ref={potsRef} args={[undefined, undefined, matrices.length]}>
         {placement.bed.potType === "square" ? (
-          <boxGeometry args={[0.2, 0.17, 0.2]} />
+          // Squared pots in the nursery still have softened corners.
+          <cylinderGeometry args={[0.135, 0.1, 0.17, 4, 1]} />
         ) : (
-          <cylinderGeometry args={[0.115, 0.075, 0.17, 10]} />
+          <cylinderGeometry args={[0.115, 0.078, 0.17, 14]} />
         )}
         <meshStandardMaterial
           color="#b5623c"
@@ -473,7 +527,7 @@ function AirLine({
         args={[undefined, undefined, matrices.length]}
         position={[0, 0.13, 0]}
       >
-        <sphereGeometry args={[0.16, 7, 5]} />
+        <sphereGeometry args={[0.165, 12, 9]} />
         <meshStandardMaterial
           color={foliage}
           emissive={foliage}
@@ -516,8 +570,8 @@ function Structure({
     <group>
       {posts.map(([x, z], i) => (
         <mesh key={i} position={[x, 1.55, z]} castShadow>
-          <cylinderGeometry args={[0.075, 0.095, 3.1, 7]} />
-          <meshStandardMaterial color="#6b5340" roughness={1} flatShading />
+          <cylinderGeometry args={[0.075, 0.095, 3.1, 14]} />
+          <meshStandardMaterial color="#7a6048" roughness={0.85} />
         </mesh>
       ))}
       {showRoof && (
@@ -699,21 +753,30 @@ export default function ShadehouseScene({
   );
 
   const plotAnchors = useMemo(() => {
-    const byPlot = new Map<string, { xs: number[]; z: number; length: number; count: number }>();
+    const byPlot = new Map<
+      string,
+      { xs: number[]; z: number; length: number; count: number; bedWidth: number }
+    >();
     for (const p of placements) {
       if (p.bed.type !== "ground") continue;
       const cur = byPlot.get(p.bed.plotId);
       if (cur) { cur.xs.push(p.x); cur.count++; }
-      else byPlot.set(p.bed.plotId, { xs: [p.x], z: p.z, length: p.length, count: 1 });
+      else byPlot.set(p.bed.plotId, {
+        xs: [p.x], z: p.z, length: p.length, count: 1, bedWidth: p.bed.widthM,
+      });
     }
     return [...byPlot.entries()].map(([id, v]) => {
       const plot = plotConfigs.find((pc) => pc.id === id);
+      const min = Math.min(...v.xs);
+      const max = Math.max(...v.xs);
       return {
         id,
         label: plot?.label ?? id,
-        x: (Math.min(...v.xs) + Math.max(...v.xs)) / 2,
+        x: (min + max) / 2,
         z: v.z,
         count: v.count,
+        width: max - min + v.bedWidth + 0.5,
+        length: v.length + 0.9,
       };
     });
   }, [placements]);
@@ -731,14 +794,15 @@ export default function ShadehouseScene({
 
   return (
     <>
-      <hemisphereLight args={["#dff0ff", "#8a7a5f", 0.85]} />
-      <ambientLight intensity={0.25} />
+      <hemisphereLight args={["#eaf4ff", "#c9c3b4", 1.0]} />
+      <ambientLight intensity={0.42} />
       <directionalLight
         position={[34, 42, 22]}
-        intensity={1.25}
-        color="#fff6e6"
+        intensity={1.05}
+        color="#fff8ec"
         castShadow
         shadow-mapSize={[2048, 2048]}
+        shadow-radius={4}
         shadow-camera-left={-60}
         shadow-camera-right={60}
         shadow-camera-top={60}
@@ -788,6 +852,10 @@ export default function ShadehouseScene({
               compact={p.bed.type === "air"}
             />
           ))}
+
+      {plotAnchors.map((a) => (
+        <PlotOutline key={`outline-${a.id}`} x={a.x} z={a.z} width={a.width} length={a.length} />
+      ))}
 
       {showCompass && <Compass span={span} depth={depth} />}
 

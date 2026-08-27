@@ -300,10 +300,10 @@ export default function DashboardPage() {
           <p className="text-[13px] font-semibold text-navy-900 mb-1">Bed Utilization</p>
           <p className="text-[11px] text-navy-400 mb-4">Active beds / capacity</p>
           <div className="space-y-3">
-            {bedUtilization.map((sh) => {
+            {bedUtilization.map((sh, shIndex) => {
               const pct = Math.round((sh.used / sh.total) * 100);
               return (
-                <div key={sh.name}>
+                <div key={`${sh.name}-${shIndex}`}>
                   <div className="flex items-center justify-between text-[12px] mb-1">
                     <span className="text-navy-700 font-medium">{sh.name}</span>
                     <span className="text-navy-400">{sh.used}/{sh.total} <span className="font-semibold text-navy-700">{pct}%</span></span>
