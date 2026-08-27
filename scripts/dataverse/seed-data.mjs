@@ -149,38 +149,68 @@ const entitySets = (() => {
   return map
 })()
 
-function primaryNameOf(logicalName) {
-  const table = schema.tables.find((t) => t.schemaName.toLowerCase() === logicalName)
-  const primary = table?.columns.find((c) => c.isPrimaryName)
-  return primary?.schemaName.toLowerCase()
+/** Cache of seeded records per table: descriptive value -> GUID. */
+const idIndex = new Map()
+
+/** Dataverse names its key after the table: bv_bed -> bv_bedid. */
+const keyOf = (logicalName) => `${logicalName}id`
+
+async function indexTable(logicalName, nameField) {
+  const set = entitySets[logicalName]
+  const key = keyOf(logicalName)
+  const found = await api('GET', `${set}?$select=${nameField},${key}`)
+  const map = new Map()
+  for (const r of found.value ?? []) map.set(String(r[nameField]), r[key])
+  idIndex.set(logicalName, map)
+  return map
 }
 
-async function seedTable(logicalName, rows) {
-  const set = entitySets[logicalName]
+/** Turn a row's `_ref` entries into @odata.bind bindings. */
+function bindRefs(row, plannedTable) {
+  const { _ref, ...rest } = row
+  if (!_ref) return rest
+  for (const [lookupColumn, [parentTable, parentName]] of Object.entries(_ref)) {
+    const parents = idIndex.get(parentTable)
+    const guid = parents?.get(parentName)
+    if (!guid) {
+      throw new Error(
+        `${plannedTable}: cannot resolve ${lookupColumn} -> ${parentTable} "${parentName}". ` +
+        `Seed ${parentTable} first.`
+      )
+    }
+    rest[`${lookupColumn}@odata.bind`] = `/${entitySets[parentTable]}(${guid})`
+  }
+  return rest
+}
+
+async function seedTable(plan) {
+  const { table, nameField } = plan
+  const rows = typeof plan.rows === 'function' ? plan.rows() : plan.rows
+  const set = entitySets[table]
   if (!set) {
-    console.log(`  ${logicalName}: not in power.config.json — skipped`)
-    return { created: 0, skipped: rows.length }
+    console.log(`  ${table}: not in power.config.json — skipped`)
+    return 0
   }
 
-  // The primary name is an autonumber, so identity for de-duplication comes
-  // from the descriptive column instead.
-  const nameField = Object.keys(rows[0]).find((k) => k.endsWith('name'))
-  const existing = new Set()
-  if (nameField) {
-    const found = await api('GET', `${set}?$select=${nameField}`)
-    for (const r of found.value ?? []) existing.add(String(r[nameField]))
-  }
+  // The primary column is an autonumber, so de-duplication uses the
+  // descriptive field instead — re-running tops up rather than duplicating.
+  const existing = await indexTable(table, nameField)
 
   let created = 0
   let skipped = 0
   for (const row of rows) {
-    if (nameField && existing.has(String(row[nameField]))) { skipped++; continue }
+    const name = String(row[nameField])
+    if (existing.has(name)) { skipped++; continue }
     if (DRY_RUN) { created++; continue }
-    await api('POST', set, row)
+    const body = bindRefs({ ...row }, table)
+    for (const k of Object.keys(body)) if (body[k] === undefined) delete body[k]
+    const saved = await api('POST', set, body)
+    if (saved?.[keyOf(table)]) existing.set(name, saved[keyOf(table)])
     created++
+    if (created % 25 === 0) console.log(`    … ${created} of ${rows.length}`)
   }
-  console.log(`  ${logicalName}: +${created} created, ${skipped} already present`)
-  return { created, skipped }
+  console.log(`  ${table}: +${created} created, ${skipped} already present`)
+  return created
 }
 
 async function main() {
@@ -195,10 +225,9 @@ async function main() {
   await api('GET', 'WhoAmI')
 
   let created = 0
-  for (const [table, rows] of Object.entries(SEED)) {
-    const result = await seedTable(table, rows)
-    created += result.created
-  }
+  // Order matters: a table's parents must be indexed before its refs resolve.
+  for (const plan of SEED_PLAN) created += await seedTable(plan)
+
   console.log(`\nTotal records ${DRY_RUN ? 'that would be created' : 'created'}: ${created}`)
   if (!DRY_RUN) console.log('Autonumber IDs (SH-0001, PLT-0001 …) are assigned by Dataverse.')
 }

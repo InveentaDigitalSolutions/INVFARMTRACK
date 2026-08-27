@@ -624,6 +624,14 @@
           "description": "Auto-generated identifier, format FLD-0001."
         },
         {
+          "schemaName": "bv_FieldName",
+          "displayName": "Plot Name",
+          "type": "string",
+          "maxLength": 100,
+          "required": true,
+          "description": "Human-readable plot name, e.g. \"Plot E3\". The primary column is an autonumber, so this is what people actually refer to."
+        },
+        {
           "schemaName": "bv_ShadehouseId",
           "displayName": "Shadehouse",
           "type": "lookup",

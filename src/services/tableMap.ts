@@ -54,8 +54,26 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       active: "bv_isactive",
     },
   },
-  fields: { dataSource: "bv_fields", primaryKey: "bv_fieldid" },
-  beds: { dataSource: "bv_beds", primaryKey: "bv_bedid" },
+  fields: {
+    dataSource: "bv_fields",
+    primaryKey: "bv_fieldid",
+    fields: {
+      code: "bv_fieldcode",
+      name: "bv_fieldname",
+      position: "bv_position",
+      notes: "bv_notes",
+    },
+  },
+  beds: {
+    dataSource: "bv_beds",
+    primaryKey: "bv_bedid",
+    fields: {
+      name: "bv_bedname",
+      capacity: "bv_capacity",
+      active: "bv_isactive",
+      location: "bv_location",
+    },
+  },
   seasons: {
     dataSource: "bv_seasons",
     primaryKey: "bv_seasonid",
@@ -157,6 +175,8 @@ export const ENABLED_TABLES = new Set<string>([
   "workers",
   "suppliers",
   "customers",
+  "fields",
+  "beds",
 ]);
 
 /** Dataverse is only usable when the app has a session — locally that means dev:dv. */
