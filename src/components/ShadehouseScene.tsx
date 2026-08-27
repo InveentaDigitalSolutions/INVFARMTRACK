@@ -11,9 +11,104 @@ import {
 } from "./ShadehouseView";
 import { zoneStatusColors, type ZoneReading } from "../services/irrigation";
 
+/** Palette shared with the 2D Shadehouse Layout. */
+export const PLAN_COLORS = {
+  ground: "#f9fafb",
+  road: "#e5e7eb",
+  roadLine: "#d1d5db",
+  roadLabel: "#9ca3af",
+};
+
 /** Gap between the two plot columns — the logistics road in the layout. */
 const ROAD_M = 3.5;
-const PLOT_GAP_M = 2.5;
+const PLOT_GAP_M = 3.5;
+
+export interface RoadLayout {
+  vertical: { x: number; width: number; length: number };
+  horizontal: { z: number; width: number; length: number };
+}
+
+export function computeRoads(): RoadLayout {
+  const widthOf = (plotId: string) => {
+    const plot = plotConfigs.find((p) => p.id === plotId)!;
+    return plot.bedCount * plot.bedWidth;
+  };
+  const westWidth = Math.max(widthOf("E3"), widthOf("E1"));
+  const eastWidth = Math.max(widthOf("C3"), widthOf("C1"));
+  const totalWidth = westWidth + ROAD_M + eastWidth;
+  const bedLength = plotConfigs[0].bedLength;
+  const depth = 2 * (bedLength + PLOT_GAP_M / 2);
+
+  return {
+    vertical: { x: -totalWidth / 2 + westWidth + ROAD_M / 2, width: ROAD_M, length: depth },
+    horizontal: { z: 0, width: PLOT_GAP_M, length: totalWidth },
+  };
+}
+
+/** Dashed centre line, as on the plan. */
+function RoadDashes({
+  along,
+  fixed,
+  length,
+}: {
+  along: "x" | "z";
+  fixed: number;
+  length: number;
+}) {
+  const dashes = useMemo(() => {
+    const out: number[] = [];
+    const step = 2.2;
+    for (let d = -length / 2 + step; d < length / 2 - step; d += step) out.push(d);
+    return out;
+  }, [length]);
+
+  return (
+    <group>
+      {dashes.map((d, i) => (
+        <mesh
+          key={i}
+          position={along === "z" ? [fixed, 0.012, d] : [d, 0.012, fixed]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <planeGeometry args={along === "z" ? [0.12, 1.2] : [1.2, 0.12]} />
+          <meshBasicMaterial color={PLAN_COLORS.roadLine} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function Roads() {
+  const roads = useMemo(() => computeRoads(), []);
+  return (
+    <group>
+      {/* Logistics road, running the length of the house */}
+      <mesh position={[roads.vertical.x, 0.006, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[roads.vertical.width, roads.vertical.length]} />
+        <meshStandardMaterial color={PLAN_COLORS.road} roughness={1} />
+      </mesh>
+      <RoadDashes along="z" fixed={roads.vertical.x} length={roads.vertical.length} />
+
+      {/* Cross aisle */}
+      <mesh position={[0, 0.006, roads.horizontal.z]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[roads.horizontal.length, roads.horizontal.width]} />
+        <meshStandardMaterial color={PLAN_COLORS.road} roughness={1} />
+      </mesh>
+      <RoadDashes along="x" fixed={roads.horizontal.z} length={roads.horizontal.length} />
+
+      <Text
+        position={[roads.vertical.x, 0.05, roads.vertical.length / 2 + 1.8]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        fontSize={1.05}
+        color={PLAN_COLORS.roadLabel}
+        anchorX="center"
+        anchorY="middle"
+      >
+        Logistics Road
+      </Text>
+    </group>
+  );
+}
 
 export interface BedPlacement {
   bed: ShadehouseBed;
@@ -188,7 +283,10 @@ function Bed({
   });
 
   return (
-    <group
+    <mesh
+      position={[placement.x, placement.y + height / 2, placement.z]}
+      castShadow={!dimmed}
+      receiveShadow={!dimmed}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(placement.bed.bedId);
@@ -201,114 +299,24 @@ function Bed({
         document.body.style.cursor = "";
       }}
     >
-      {/* Soil bed */}
-      <mesh
-        position={[placement.x, placement.y + 0.09, placement.z]}
-        castShadow={!dimmed}
-        receiveShadow={!dimmed}
-      >
-        <boxGeometry args={[placement.width, 0.18, placement.length]} />
-        <meshStandardMaterial
-          color="#5c4a3a"
-          transparent
-          opacity={dimmed ? 0.1 : 1}
-          roughness={1}
-          metalness={0}
-        />
-      </mesh>
-
-      {/* Canopy — the planted mass that makes a row read as a row. */}
-      <mesh
-        position={[placement.x, placement.y + 0.18 + height / 2, placement.z]}
-        castShadow={!dimmed}
-        receiveShadow={!dimmed}
-      >
-        <boxGeometry args={[placement.width * 0.96, height, placement.length]} />
-        <meshStandardMaterial
-          ref={mat}
-          color={base}
-          emissive={base}
-          transparent
-          opacity={dimmed ? 0.12 : 1}
-          roughness={0.85}
-          metalness={0}
-        />
-      </mesh>
-
-      {!dimmed && placement.bed.state !== "empty" && (
-        <GroundCanopy placement={placement} color={base} height={height} />
-      )}
-    </group>
-  );
-}
-
-/** Leaf clumps along a ground row, instanced so 120 rows stay cheap. */
-function GroundCanopy({
-  placement,
-  color,
-  height,
-}: {
-  placement: BedPlacement;
-  color: THREE.Color;
-  height: number;
-}) {
-  const ref = useRef<THREE.InstancedMesh>(null);
-
-  const { matrices, tints } = useMemo(() => {
-    const out: THREE.Matrix4[] = [];
-    const cols: THREE.Color[] = [];
-    const dummy = new THREE.Object3D();
-    const step = 0.78;
-    const span = placement.length - step;
-    const count = Math.max(1, Math.floor(span / step));
-    for (let i = 0; i < count; i++) {
-      for (const lane of [-0.24, 0.24]) {
-        const jitter = ((i * 13 + (lane > 0 ? 5 : 0)) % 9) / 9 - 0.5;
-        dummy.position.set(
-          placement.x + lane * placement.width + jitter * 0.12,
-          placement.y + 0.18 + height * 0.72,
-          placement.z - span / 2 + i * step + (lane > 0 ? step / 2 : 0)
-        );
-        dummy.rotation.set(0, jitter * 2.4, jitter * 0.25);
-        const sc = 0.9 + ((i * 7 + (lane > 0 ? 3 : 0)) % 5) * 0.09;
-        dummy.scale.set(sc, sc * 0.78, sc);
-        dummy.updateMatrix();
-        out.push(dummy.matrix.clone());
-        // Shade each clump slightly so the row does not read as one solid tone.
-        const shade = 0.86 + (((i * 5 + (lane > 0 ? 2 : 0)) % 7) / 7) * 0.28;
-        cols.push(color.clone().multiplyScalar(shade));
-      }
-    }
-    return { matrices: out, tints: cols };
-  }, [placement, height, color]);
-
-  useEffect(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    matrices.forEach((m, i) => mesh.setMatrixAt(i, m));
-    tints.forEach((c, i) => mesh.setColorAt(i, c));
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    mesh.count = matrices.length;
-  }, [matrices, tints]);
-
-  return (
-    <instancedMesh
-      ref={ref}
-      args={[undefined, undefined, matrices.length]}
-      castShadow
-      receiveShadow
-    >
-      <icosahedronGeometry args={[0.27, 0]} />
-      <meshStandardMaterial roughness={0.92} flatShading />
-    </instancedMesh>
+      <boxGeometry args={[placement.width, height, placement.length]} />
+      <meshStandardMaterial
+        ref={mat}
+        color={base}
+        emissive={base}
+        transparent
+        opacity={dimmed ? 0.12 : 1}
+        roughness={0.8}
+        metalness={0}
+      />
+    </mesh>
   );
 }
 
 /**
  * Foliage is always green — a plant does not turn orange because it is ready
- * to cut. State is expressed as a shift in vitality, and the irrigation layer
- * is what introduces non-green hues.
+ * to cut. State is a shift in vitality, which leaves non-green hues free for
+ * the irrigation layer to own.
  */
 const leafColors: Record<ShadehouseBed["state"], string> = {
   empty: "#8a8f83",
@@ -525,7 +533,7 @@ function Structure({
       )}
       <mesh position={[0, -0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[span + 8, depth + 8]} />
-        <meshStandardMaterial color="#b9ae99" roughness={1} />
+        <meshStandardMaterial color={PLAN_COLORS.ground} roughness={1} />
       </mesh>
     </group>
   );
@@ -740,6 +748,7 @@ export default function ShadehouseScene({
       <directionalLight position={[-24, 18, -16]} intensity={0.3} color="#cfe3ff" />
 
       <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} />
+      <Roads />
 
       {placements.map((placement) =>
         placement.bed.type === "ground" ? (
