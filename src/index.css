@@ -1,11 +1,11 @@
 /* Fonts are bundled, not fetched. The Power Apps player enforces
    style-src 'self' 'unsafe-inline', so a Google Fonts <link> is blocked
    outright and the app silently falls back to system faces. */
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
-@import "@fontsource/inter/700.css";
-@import "@fontsource-variable/playfair-display";
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource/inter/latin-700.css";
+@import "@fontsource-variable/playfair-display/wght.css";
 
 @import "tailwindcss";
 
