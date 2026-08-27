@@ -1,17 +1,15 @@
 import { useState, useMemo, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion} from "framer-motion";
 import { downloadInvoicePDFs, type InvoiceData } from "../services/InvoicePDF";
 import { useExchangeRate } from "../hooks/useExchangeRate";
 import {
   FileText,
   Check,
-  Download,
   ChevronDown,
   DollarSign,
   Calculator,
   Upload,
   Mail,
-  AlertCircle,
   X,
 } from "lucide-react";
 import Badge from "./Badge";
@@ -146,7 +144,7 @@ export default function InvoiceGenerator({
 
     let boxCounter = 0;
     const lines: InvoiceLine[] = [];
-    groups.forEach((boxes, key) => {
+    groups.forEach((boxes) => {
       const first = boxes[0];
       const startBox = boxCounter + 1;
       const endBox = boxCounter + boxes.length;

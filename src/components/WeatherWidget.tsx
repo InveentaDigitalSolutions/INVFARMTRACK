@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Thermometer, Droplets, Wind, Sun, CloudRain, Gauge,
-  ArrowUp, ChevronDown, ChevronUp, Sunrise, Sunset, CloudSun,
+  ChevronDown, ChevronUp, Sunrise, Sunset, CloudSun,
   Cloud, CloudDrizzle, CloudLightning, Snowflake, CloudFog,
 } from "lucide-react";
 
@@ -118,7 +118,6 @@ export default function WeatherWidget({ compact = false, className = "" }: Weath
         const c = data.current;
 
         // Parse hourly — only next 24h from now
-        const nowHour = new Date().getHours();
         const hourlyAll: HourlyForecast[] = data.hourly.time.map((t: string, i: number) => ({
           time: t,
           temperature: data.hourly.temperature_2m[i],
@@ -320,7 +319,7 @@ export default function WeatherWidget({ compact = false, className = "" }: Weath
             {view === "hourly" && (
               <div className="px-4 pb-3">
                 <div className="flex gap-1 overflow-x-auto pb-1">
-                  {weather.hourly.slice(0, 24).map((h, i) => (
+                  {weather.hourly.slice(0, 24).map((h) => (
                     <div
                       key={h.time}
                       className="flex flex-col items-center gap-1 min-w-[48px] py-2 px-1.5 rounded-lg hover:bg-sand-50 transition-colors"
@@ -342,7 +341,7 @@ export default function WeatherWidget({ compact = false, className = "" }: Weath
             {/* Daily forecast */}
             {view === "daily" && (
               <div className="px-4 pb-3 space-y-0.5">
-                {weather.daily.map((d, i) => (
+                {weather.daily.map((d) => (
                   <div
                     key={d.date}
                     className="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-sand-50 transition-colors"

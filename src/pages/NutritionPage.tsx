@@ -4,7 +4,6 @@ import { FlaskConical, Scale, Beaker, Microscope, Leaf } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
-import Badge from "../components/Badge";
 import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";

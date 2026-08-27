@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Droplets, Bug, Scissors, Sprout, Leaf, FlaskConical,
-  Calendar, ChevronDown, Clock,
+  ChevronDown, Clock,
 } from "lucide-react";
 
 // Bed data model

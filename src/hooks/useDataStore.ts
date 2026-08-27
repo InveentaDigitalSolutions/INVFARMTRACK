@@ -6,9 +6,9 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import type { DataStore, QueryOptions } from "../services/DataService";
+import type { DataStore, Identified, QueryOptions } from "../services/DataService";
 
-interface UseDataStoreResult<T extends Record<string, unknown>> {
+interface UseDataStoreResult<T extends Identified> {
   data: T[];
   loading: boolean;
   error: string | null;
@@ -19,7 +19,7 @@ interface UseDataStoreResult<T extends Record<string, unknown>> {
   count: number;
 }
 
-export function useDataStore<T extends Record<string, unknown>>(
+export function useDataStore<T extends Identified>(
   store: DataStore<T>,
   options?: QueryOptions
 ): UseDataStoreResult<T> {

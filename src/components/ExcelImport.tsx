@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileSpreadsheet, Check, AlertCircle, X, ChevronDown } from "lucide-react";
+import { motion} from "framer-motion";
+import { Upload, FileSpreadsheet, Check, AlertCircle, X} from "lucide-react";
 import * as XLSX from "xlsx";
 import Badge from "./Badge";
 

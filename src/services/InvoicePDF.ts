@@ -99,7 +99,6 @@ export function generateInvoicePDF(data: InvoiceData, variant: InvoiceVariant = 
   // Colors
   const blue = [0, 51, 153] as [number, number, number];
   const black = [0, 0, 0] as [number, number, number];
-  const gray = [100, 100, 100] as [number, number, number];
 
   // === HEADER ===
   doc.setFontSize(14);

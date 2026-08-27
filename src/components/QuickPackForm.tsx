@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Package,
   Boxes,
   ChevronDown,
   Zap,

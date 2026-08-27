@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { motion } from "framer-motion";
-import { Sprout, Leaf, Bug, Droplets, Scissors, ClipboardList, FlaskConical } from "lucide-react";
+import { Sprout, Leaf, Bug, Droplets, Scissors} from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";

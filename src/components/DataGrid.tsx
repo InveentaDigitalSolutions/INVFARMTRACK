@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, Plus, SlidersHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Search, Plus, Pencil, Trash2 } from "lucide-react";
 
 interface GridField {
   key: string;

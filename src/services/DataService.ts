@@ -17,7 +17,10 @@ export interface QueryOptions {
   search?: string;
 }
 
-export interface DataStore<T extends Record<string, unknown>> {
+/** Every stored record carries an id — LocalStore assigns one, Dataverse supplies one. */
+export type Identified = Record<string, unknown> & { id: string };
+
+export interface DataStore<T extends Identified> {
   getAll(options?: QueryOptions): Promise<T[]>;
   getById(id: string): Promise<T | null>;
   create(record: Omit<T, "id">): Promise<T>;
@@ -36,7 +39,7 @@ function generateId(): string {
  * LocalStore — In-memory store with localStorage persistence.
  * Used during local development.
  */
-export class LocalStore<T extends Record<string, unknown>> implements DataStore<T> {
+export class LocalStore<T extends Identified> implements DataStore<T> {
   private data: Map<string, T>;
   private storageKey: string;
 
@@ -117,7 +120,9 @@ export class LocalStore<T extends Record<string, unknown>> implements DataStore<
 
   async create(record: Omit<T, "id">): Promise<T> {
     const id = generateId();
-    const newRecord = { ...record, id } as T;
+    // `{ ...record, id }` is structurally T, but TS cannot prove that for a
+    // generic T, so the widening is made explicit here rather than suppressed.
+    const newRecord = { ...record, id } as unknown as T;
     this.data.set(id, newRecord);
     this.persist();
     return newRecord;

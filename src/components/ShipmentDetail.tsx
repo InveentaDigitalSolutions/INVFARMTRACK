@@ -2,15 +2,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
-  Package,
-  Plane,
-  Truck,
-  ChevronDown,
   Plus,
   UserCheck,
   FileText,
   Check,
-  Boxes,
   AlertCircle,
 } from "lucide-react";
 import Badge from "./Badge";

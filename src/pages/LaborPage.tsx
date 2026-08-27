@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { HardHat, Users, Clock, TrendingUp, Boxes, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { HardHat, Users, Clock, TrendingUp, Boxes} from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
