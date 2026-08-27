@@ -202,18 +202,27 @@ function Bed({
       }}
     >
       {/* Soil bed */}
-      <mesh position={[placement.x, placement.y + 0.09, placement.z]}>
+      <mesh
+        position={[placement.x, placement.y + 0.09, placement.z]}
+        castShadow={!dimmed}
+        receiveShadow={!dimmed}
+      >
         <boxGeometry args={[placement.width, 0.18, placement.length]} />
         <meshStandardMaterial
-          color="#6b5644"
+          color="#5c4a3a"
           transparent
           opacity={dimmed ? 0.1 : 1}
           roughness={1}
+          metalness={0}
         />
       </mesh>
 
       {/* Canopy — the planted mass that makes a row read as a row. */}
-      <mesh position={[placement.x, placement.y + 0.18 + height / 2, placement.z]}>
+      <mesh
+        position={[placement.x, placement.y + 0.18 + height / 2, placement.z]}
+        castShadow={!dimmed}
+        receiveShadow={!dimmed}
+      >
         <boxGeometry args={[placement.width * 0.96, height, placement.length]} />
         <meshStandardMaterial
           ref={mat}
@@ -244,41 +253,54 @@ function GroundCanopy({
   height: number;
 }) {
   const ref = useRef<THREE.InstancedMesh>(null);
-  const matrices = useMemo(() => {
+
+  const { matrices, tints } = useMemo(() => {
     const out: THREE.Matrix4[] = [];
+    const cols: THREE.Color[] = [];
     const dummy = new THREE.Object3D();
-    const step = 1.15;
+    const step = 0.78;
     const span = placement.length - step;
     const count = Math.max(1, Math.floor(span / step));
     for (let i = 0; i < count; i++) {
-      // Two staggered files per row, as the beds are planted in the photos.
-      for (const lane of [-0.22, 0.22]) {
+      for (const lane of [-0.24, 0.24]) {
+        const jitter = ((i * 13 + (lane > 0 ? 5 : 0)) % 9) / 9 - 0.5;
         dummy.position.set(
-          placement.x + lane * placement.width,
-          placement.y + 0.18 + height * 0.75,
+          placement.x + lane * placement.width + jitter * 0.12,
+          placement.y + 0.18 + height * 0.72,
           placement.z - span / 2 + i * step + (lane > 0 ? step / 2 : 0)
         );
-        const sc = 0.85 + ((i * 7 + (lane > 0 ? 3 : 0)) % 5) * 0.07;
-        dummy.scale.set(sc, sc * 0.8, sc);
+        dummy.rotation.set(0, jitter * 2.4, jitter * 0.25);
+        const sc = 0.9 + ((i * 7 + (lane > 0 ? 3 : 0)) % 5) * 0.09;
+        dummy.scale.set(sc, sc * 0.78, sc);
         dummy.updateMatrix();
         out.push(dummy.matrix.clone());
+        // Shade each clump slightly so the row does not read as one solid tone.
+        const shade = 0.86 + (((i * 5 + (lane > 0 ? 2 : 0)) % 7) / 7) * 0.28;
+        cols.push(color.clone().multiplyScalar(shade));
       }
     }
-    return out;
-  }, [placement, height]);
+    return { matrices: out, tints: cols };
+  }, [placement, height, color]);
 
   useEffect(() => {
     const mesh = ref.current;
     if (!mesh) return;
     matrices.forEach((m, i) => mesh.setMatrixAt(i, m));
+    tints.forEach((c, i) => mesh.setColorAt(i, c));
     mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     mesh.count = matrices.length;
-  }, [matrices]);
+  }, [matrices, tints]);
 
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, matrices.length]}>
-      <sphereGeometry args={[0.26, 6, 5]} />
-      <meshStandardMaterial color={color} roughness={0.95} />
+    <instancedMesh
+      ref={ref}
+      args={[undefined, undefined, matrices.length]}
+      castShadow
+      receiveShadow
+    >
+      <icosahedronGeometry args={[0.27, 0]} />
+      <meshStandardMaterial roughness={0.92} flatShading />
     </instancedMesh>
   );
 }
@@ -485,9 +507,9 @@ function Structure({
   return (
     <group>
       {posts.map(([x, z], i) => (
-        <mesh key={i} position={[x, 1.55, z]}>
-          <cylinderGeometry args={[0.07, 0.08, 3.1, 6]} />
-          <meshStandardMaterial color="#5b4636" roughness={0.9} />
+        <mesh key={i} position={[x, 1.55, z]} castShadow>
+          <cylinderGeometry args={[0.075, 0.095, 3.1, 7]} />
+          <meshStandardMaterial color="#6b5340" roughness={1} flatShading />
         </mesh>
       ))}
       {showRoof && (
@@ -502,8 +524,8 @@ function Structure({
         </mesh>
       )}
       <mesh position={[0, -0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[span + 5, depth + 5]} />
-        <meshStandardMaterial color="#d9d3c6" roughness={1} />
+        <planeGeometry args={[span + 8, depth + 8]} />
+        <meshStandardMaterial color="#b9ae99" roughness={1} />
       </mesh>
     </group>
   );
@@ -595,6 +617,43 @@ function PlotLabel({
   );
 }
 
+function Compass({ span, depth }: { span: number; depth: number }) {
+  const half = { x: span / 2 + 3.5, z: depth / 2 + 3.5 };
+  const marks: { label: string; pos: [number, number, number]; primary: boolean }[] = [
+    { label: "N", pos: [0, 0.05, -half.z], primary: true },
+    { label: "S", pos: [0, 0.05, half.z], primary: false },
+    { label: "E", pos: [half.x, 0.05, 0], primary: false },
+    { label: "W", pos: [-half.x, 0.05, 0], primary: false },
+  ];
+
+  return (
+    <group>
+      {marks.map((m) => (
+        <group key={m.label} position={m.pos}>
+          <Text
+            rotation={[-Math.PI / 2, 0, 0]}
+            fontSize={m.primary ? 4 : 3}
+            color={m.primary ? "#3d8b40" : "#8a9aae"}
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.16}
+            outlineColor="#ffffff"
+          >
+            {m.label}
+          </Text>
+          {m.primary && (
+            // Arrow pointing north, as on the plan.
+            <mesh position={[0, 0, -3.4]} rotation={[-Math.PI / 2, 0, 0]}>
+              <coneGeometry args={[1.1, 2.6, 3]} />
+              <meshBasicMaterial color="#3d8b40" />
+            </mesh>
+          )}
+        </group>
+      ))}
+    </group>
+  );
+}
+
 export default function ShadehouseScene({
   placements,
   readings,
@@ -605,6 +664,7 @@ export default function ShadehouseScene({
   nowMs,
   showPlotLabels,
   showBedNumbers,
+  showCompass,
   selectedBedId,
   onSelect,
 }: {
@@ -617,6 +677,7 @@ export default function ShadehouseScene({
   nowMs: number;
   showPlotLabels: boolean;
   showBedNumbers: boolean;
+  showCompass: boolean;
   selectedBedId: string | null;
   onSelect: (bedId: string) => void;
 }) {
@@ -662,9 +723,21 @@ export default function ShadehouseScene({
 
   return (
     <>
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[28, 34, 18]} intensity={1.15} />
-      <directionalLight position={[-20, 16, -14]} intensity={0.35} />
+      <hemisphereLight args={["#dff0ff", "#8a7a5f", 0.85]} />
+      <ambientLight intensity={0.25} />
+      <directionalLight
+        position={[34, 42, 22]}
+        intensity={1.25}
+        color="#fff6e6"
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-60}
+        shadow-camera-right={60}
+        shadow-camera-top={60}
+        shadow-camera-bottom={-60}
+        shadow-bias={-0.0006}
+      />
+      <directionalLight position={[-24, 18, -16]} intensity={0.3} color="#cfe3ff" />
 
       <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} />
 
@@ -706,6 +779,8 @@ export default function ShadehouseScene({
               compact={p.bed.type === "air"}
             />
           ))}
+
+      {showCompass && <Compass span={span} depth={depth} />}
 
       {showPlotLabels &&
         plotAnchors.map((a) => (

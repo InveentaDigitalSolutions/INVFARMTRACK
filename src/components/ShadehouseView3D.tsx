@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon } from "lucide-react";
+import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass } from "lucide-react";
 import {
   generateBedStack,
   stateColors,
@@ -65,6 +65,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const [lens, setLens] = useState<LensMode>("state");
   const [showPlotLabels, setShowPlotLabels] = useState(true);
   const [showBedNumbers, setShowBedNumbers] = useState(false);
+  const [showCompass, setShowCompass] = useState(true);
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
 
@@ -190,6 +191,15 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           Plots
         </button>
         <button
+          onClick={() => setShowCompass((v) => !v)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+            showCompass ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+          }`}
+        >
+          <Compass className="w-3 h-3" />
+          Compass
+        </button>
+        <button
           onClick={() => setShowBedNumbers((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
             showBedNumbers ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
@@ -246,7 +256,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
       <div className="relative h-[460px] bg-gradient-to-b from-sand-50 to-sand-100">
         <Canvas
           key={resetKey}
-          camera={{ position: [48, 41, 56], fov: 38 }}
+          shadows="percentage"
+          camera={{ position: [62, 52, 74], fov: 36 }}
           onPointerMissed={() => setSelectedBedId(null)}
         >
           <ShadehouseScene
@@ -259,6 +270,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             nowMs={now}
             showPlotLabels={showPlotLabels}
             showBedNumbers={showBedNumbers}
+            showCompass={showCompass}
             selectedBedId={selectedBedId}
             onSelect={setSelectedBedId}
           />
