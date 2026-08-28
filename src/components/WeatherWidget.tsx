@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FarmTrack_GetWeatherService } from "../generated/services/FarmTrack_GetWeatherService";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Thermometer, Droplets, Wind, Sun, CloudRain, Gauge,
@@ -101,20 +102,51 @@ interface WeatherWidgetProps {
   className?: string;
 }
 
+/**
+ * Fetch the full forecast through the Power Automate flow, falling back to a
+ * direct call when running outside the Power Apps host.
+ */
+async function fetchForecast(lat: number, lng: number): Promise<any> {
+  try {
+    const result = await FarmTrack_GetWeatherService.Run({ latitude: lat, longitude: lng });
+    if (result.success && result.data?.weather) {
+      const parsed = JSON.parse(result.data.weather);
+      if (parsed?.error) throw new Error(parsed.message ?? "Weather service unavailable");
+      return parsed;
+    }
+    throw new Error(result.error?.message ?? "Weather flow returned no data");
+  } catch (flowError) {
+    const url =
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
+      `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,` +
+      `surface_pressure,precipitation,weather_code,cloud_cover,is_day,uv_index` +
+      `&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,wind_speed_10m` +
+      `&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,` +
+      `wind_speed_10m_max,uv_index_max&timezone=America%2FTegucigalpa&forecast_days=7`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Weather fetch failed");
+      return await res.json();
+    } catch {
+      throw flowError instanceof Error ? flowError : new Error("Weather unavailable");
+    }
+  }
+}
+
 export default function WeatherWidget({ compact = false, className = "" }: WeatherWidgetProps) {
   const [weather, setWeather] = useState<FullWeatherData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [view, setView] = useState<"hourly" | "daily">("hourly");
 
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LNG}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,precipitation,weather_code,cloud_cover,is_day,uv_index&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,wind_speed_10m_max,uv_index_max&timezone=America%2FTegucigalpa&forecast_days=7`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Weather fetch failed");
-        const data = await res.json();
+        // The Power Apps player enforces connect-src 'none', so this widget
+        // cannot call Open-Meteo directly. The flow makes the request; the
+        // direct call is kept only for `npm run dev`, where there is no host.
+        const data = await fetchForecast(LAT, LNG);
         const c = data.current;
 
         // Parse hourly — only next 24h from now
@@ -166,7 +198,7 @@ export default function WeatherWidget({ compact = false, className = "" }: Weath
           hourly: hourlyFiltered,
           daily,
         });
-      } catch { setError(true); }
+      } catch (err) { setError(err instanceof Error ? err.message : "Weather unavailable"); }
       finally { setLoading(false); }
     };
     fetchWeather();
@@ -187,7 +219,9 @@ export default function WeatherWidget({ compact = false, className = "" }: Weath
     return (
       <div className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-sand-50 ${className}`}>
         <CloudRain className="w-3.5 h-3.5 text-navy-400" />
-        <span className="text-[11px] text-navy-400">Weather unavailable</span>
+        <span className="text-[11px] text-navy-400" title={error ?? undefined}>
+          {error ? `Weather: ${error}` : "Weather unavailable"}
+        </span>
       </div>
     );
   }
