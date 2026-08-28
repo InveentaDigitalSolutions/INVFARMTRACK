@@ -92,9 +92,9 @@ export default function Sidebar({
       className="relative flex flex-col bg-navy-900 h-screen shrink-0 border-r border-navy-800/50"
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-4">
-        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-lime-400 to-green-500 shadow-lg shadow-lime-400/20">
-          <Leaf className="w-6 h-6 text-navy-900" />
+      <div className={`flex items-center gap-3 py-4 ${open ? "px-4" : "px-2 justify-center"}`}>
+        <div className={`flex items-center justify-center rounded-xl bg-gradient-to-br from-lime-400 to-green-500 shadow-lg shadow-lime-400/20 shrink-0 ${open ? "w-12 h-12" : "w-10 h-10"}`}>
+          <Leaf className={`text-navy-900 ${open ? "w-6 h-6" : "w-5 h-5"}`} />
         </div>
         {open && (
           <motion.div
@@ -168,7 +168,7 @@ export default function Sidebar({
       <div className="px-3 pb-3 space-y-2">
         {open && <WeatherWidget compact className="w-full" />}
 
-        <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl bg-navy-800/50 ${open ? "" : "justify-center"}`}>
+        <div className={`flex items-center gap-3 rounded-xl bg-navy-800/50 ${open ? "px-3 py-2.5" : "p-1.5 justify-center"}`}>
           {/* The photo when the user has one on their Dataverse record;
               their initials when they do not, which is the usual case since
               the photo most people know lives in Entra; and the generic icon
