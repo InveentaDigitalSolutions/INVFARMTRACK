@@ -93,8 +93,8 @@ export default function Sidebar({
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 py-4">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-lime-400 to-green-500 shadow-lg shadow-lime-400/20">
-          <Leaf className="w-5 h-5 text-navy-900" />
+        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-lime-400 to-green-500 shadow-lg shadow-lime-400/20">
+          <Leaf className="w-6 h-6 text-navy-900" />
         </div>
         {open && (
           <motion.div
@@ -226,7 +226,7 @@ export default function Sidebar({
                 <img
                   src={markLight}
                   alt="Inveenta"
-                  className="h-[18px] w-auto"
+                  className="h-[14px] w-auto opacity-80"
                 />
                 <span className="text-[9px] text-navy-500 font-mono">v0.1.0</span>
               </div>
