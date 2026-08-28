@@ -9,9 +9,9 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 43 |
-| Columns | 529 |
-| Relationships | 54 |
+| Tables | 44 |
+| Columns | 536 |
+| Relationships | 55 |
 
 ## Conventions
 
@@ -31,8 +31,8 @@
 
 | Table | Logical name | ID format | Columns | Purpose |
 |---|---|---|---|---|
-| [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 8 | Physical growing structures in the nursery |
-| [Bed](#bed) | `bv_bed` | `BED-0001` | 12 | Growing beds within batches (Shadehouse > Batch > Bed) |
+| [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 9 | Physical growing structures in the nursery |
+| [Bed](#bed) | `bv_bed` | `BED-0001` | 11 | Growing beds within batches (Shadehouse > Batch > Bed) |
 | [Plant](#plant) | `bv_plant` | `PLT-0001` | 21 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
 | [Field](#field) | `bv_field` | `FLD-0001` | 6 | Production fields of plants within a shadehouse |
@@ -74,6 +74,7 @@
 | [Substrate Material](#substrate-material) | `bv_substratematerial` | `SUB-0001` | 6 | Anything a bed's growing medium is made of — a mineral fraction like sand, or an organic one like coconut coir. |
 | [Bed Composition](#bed-composition) | `bv_bedcomposition` | `BCM-0001` | 6 | One material in a bed's growing medium and how much of it there is. A bed has as many of these as its mix has parts. |
 | [Exchange Rate](#exchange-rate) | `bv_exchangerate` | `FX-0001` | 5 | The Banco Central de Honduras reference rate (TCR) for one day. Kept as history rather than a single current value: an invoice has to be read back at the rate it was converted at, and restating last month at today's rate would silently change reported sales. |
+| [Bed Capacity](#bed-capacity) | `bv_bedcapacity` | `CAP-0001` | 7 | How many plants of one variety at one grade fit in one bed. Capacity is not a property of the bed alone — a bed holds far fewer Extra Large than Petit — so it is recorded per bed and variety rather than as a single number. |
 
 ## Relationships
 
@@ -81,7 +82,6 @@
 |---|---|---|---|
 | Bed | `bv_fieldid` | Field | Restrict |
 | Field | `bv_shadehouseid` | Shadehouse | Restrict |
-| Field | `bv_seasonid` | Season | Remove link |
 | Planting | `bv_plantid` | Plant | Restrict |
 | Planting | `bv_bedid` | Bed | Restrict |
 | Planting | `bv_seasonid` | Season | Restrict |
@@ -133,6 +133,8 @@
 | Bank Statement Line | `bv_paymentid` | Payment | Remove link |
 | Bed Composition | `bv_bedid` | Bed | Restrict |
 | Bed Composition | `bv_substratematerialid` | Substrate Material | Restrict |
+| Bed Capacity | `bv_bedid` | Bed | Restrict |
+| Bed Capacity | `bv_plantid` | Plant | Restrict |
 
 ---
 
@@ -152,8 +154,9 @@ Physical growing structures in the nursery
 | `bv_coordinates` | Coordinates | Text(100) |  | Latitude and longitude, used for the weather lookup. |
 | `bv_length` | Length (m) | Decimal(2) |  | Physical dimension in metres. |
 | `bv_width` | Width (m) | Decimal(2) |  | Physical dimension in metres. |
-| `bv_capacity` | Capacity (beds) | Whole number |  | Maximum the unit can hold. |
+| `bv_capacity` | Bed Capacity | Whole number |  | The most beds this shadehouse can hold. Creating beds beyond it is refused. |
 | `bv_isactive` | Is Active | Yes/No |  | Whether the record is currently in use. |
+| `bv_fieldcapacity` | Field Capacity | Whole number |  | How many fields this shadehouse is laid out for. Creating more is refused. |
 
 **Referenced by:** Field (`bv_shadehouseid`), Packing (`bv_shadehouseid`)
 
@@ -173,7 +176,6 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 | `bv_type` | Type | Choice |  | Whether this is a ground bed planted in soil, or an air bed of hanging pots on a cable. One of: Air, Ground. |
 | `bv_level` | Level | Choice |  | Vertical level: 0 is the ground bed, 1-3 are the cable lines strung above it. One of: 0, 1, 2, 3. |
 | `bv_capacity` | Capacity | Whole number |  | Maximum the unit can hold. |
-| `bv_bedmaterial` | Bed Material | Choice |  | One of: Wood, Concrete, Plastic, Metal. |
 | `bv_soiltype` | Soil Type | Choice |  | Overall classification of the growing medium. The exact mix is recorded as Bed Composition rows, one per material with its percentage; this stays as the one-word summary people use when talking about a bed. One of: Sandy, Loamy, Clay, Peaty, Chalky, Silty. |
 | `bv_drainage` | Drainage | Choice |  | One of: Excellent, Good, Moderate, Poor. |
 | `bv_irrigationtype` | Irrigation Type | Choice |  | One of: Drip, Sprinkler, Manual, None. |
@@ -197,15 +199,6 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 | 121320001 | 1 |
 | 121320002 | 2 |
 | 121320003 | 3 |
-
-**Bed Material** (`bv_bedmaterial`)
-
-| Value | Label |
-|---|---|
-| 121320000 | Wood |
-| 121320001 | Concrete |
-| 121320002 | Plastic |
-| 121320003 | Metal |
 
 **Soil Type** (`bv_soiltype`)
 
@@ -238,7 +231,7 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 
 </details>
 
-**Referenced by:** Planting (`bv_bedid`), Treatment (`bv_bedid`), Irrigation (`bv_bedid`), Harvest (`bv_bedid`), Task (`bv_bedid`), Packing (`bv_bedid`), Timesheet (`bv_bedid`), Pruning (`bv_bedid`), Fertilization (`bv_bedid`), Nutrient Balance (`bv_bedid`), Soil Analysis (`bv_bedid`), Foliar Analysis (`bv_bedid`), Bed Composition (`bv_bedid`)
+**Referenced by:** Planting (`bv_bedid`), Treatment (`bv_bedid`), Irrigation (`bv_bedid`), Harvest (`bv_bedid`), Task (`bv_bedid`), Packing (`bv_bedid`), Timesheet (`bv_bedid`), Pruning (`bv_bedid`), Fertilization (`bv_bedid`), Nutrient Balance (`bv_bedid`), Soil Analysis (`bv_bedid`), Foliar Analysis (`bv_bedid`), Bed Composition (`bv_bedid`), Bed Capacity (`bv_bedid`)
 
 ## Plant
 
@@ -322,7 +315,7 @@ Plant species, varieties, and patent catalog
 
 </details>
 
-**Referenced by:** Planting (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`)
+**Referenced by:** Planting (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`), Bed Capacity (`bv_plantid`)
 
 ## Season
 
@@ -341,7 +334,7 @@ Growing seasons for tracking performance over time
 | `bv_description` | Description | Text area(2000) |  | Long-form text. Description for the Season. |
 | `bv_isactive` | Is Active | Yes/No |  | Whether the record is currently in use. |
 
-**Referenced by:** Field (`bv_seasonid`), Planting (`bv_seasonid`), Plant Price (`bv_seasonid`), Pruning (`bv_seasonid`), Pruning Curve (`bv_seasonid`), Availability (`bv_seasonid`), Nutrient Balance (`bv_seasonid`)
+**Referenced by:** Planting (`bv_seasonid`), Plant Price (`bv_seasonid`), Pruning (`bv_seasonid`), Pruning Curve (`bv_seasonid`), Availability (`bv_seasonid`), Nutrient Balance (`bv_seasonid`)
 
 ## Field
 
@@ -356,9 +349,9 @@ Production fields of plants within a shadehouse
 | `bv_fieldcode` 🔑 | Field Code | Autonumber | ✓ | Auto-generated identifier, format FLD-0001. |
 | `bv_fieldname` | Plot Name | Text(100) | ✓ | Human-readable plot name, e.g. "Plot E3". The primary column is an autonumber, so this is what people actually refer to. |
 | `bv_shadehouseid` | Shadehouse | Lookup → [Shadehouse](#shadehouse) | ✓ | Link to the related Shadehouse record. |
-| `bv_seasonid` | Season | Lookup → [Season](#season) |  | Link to the related Season record. |
 | `bv_position` | Position | Text(100) |  | Short text value. Position for the Field. |
 | `bv_notes` | Notes | Text area(2000) |  | Free-text notes. |
+| `bv_rowcount` | Rows | Whole number |  | How many bed rows this field physically has. Bed numbering runs 01 to this value, so it is what decides which row numbers can be chosen and when the field is full. |
 
 **Referenced by:** Bed (`bv_fieldid`)
 
@@ -1831,5 +1824,39 @@ The Banco Central de Honduras reference rate (TCR) for one day. Kept as history 
 |---|---|
 | 187460000 | BCH |
 | 187460001 | Manual |
+
+</details>
+
+## Bed Capacity
+
+`bv_bedcapacity` · User-owned
+
+How many plants of one variety at one grade fit in one bed. Capacity is not a property of the bed alone — a bed holds far fewer Extra Large than Petit — so it is recorded per bed and variety rather than as a single number.
+
+**Record ID:** `bv_bedcapacitycode` — format `CAP-{SEQNUM:4}`, e.g. `CAP-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_bedcapacitycode` 🔑 | Bed Capacity ID | Autonumber | ✓ | Auto-generated identifier, format CAP-0001. |
+| `bv_bedcapacityname` | Name | Text(100) |  | How the row reads on its own, e.g. "E3-01 · Hawaiian · Medium". |
+| `bv_bedid` | Bed | Lookup → [Bed](#bed) | ✓ | Link to the related Bed record. |
+| `bv_plantid` | Plant | Lookup → [Plant](#plant) | ✓ | Link to the related Plant record. |
+| `bv_size` | Size | Choice |  | The grade this capacity is for. One of: Petit, Mini Petit, Small, Medium, California, Large, Extra Large. |
+| `bv_capacity` | Capacity | Whole number | ✓ | How many plants of this variety and grade the bed holds. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Size** (`bv_size`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Petit |
+| 187460001 | Mini Petit |
+| 187460002 | Small |
+| 187460003 | Medium |
+| 187460004 | California |
+| 187460005 | Large |
+| 187460006 | Extra Large |
 
 </details>

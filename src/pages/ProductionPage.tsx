@@ -10,6 +10,7 @@ import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
+import { nextSeasonName } from "../services/infrastructureRules";
 
 const tabs = [
   { id: "plantings", label: "Plantings" },
@@ -221,7 +222,10 @@ const pruningFields = [
 
 const seasonFormGroups = [
   { title: "Season Details", columns: 2 as const, fields: [
-    { key: "name", label: "Season Name", type: "text" as const, required: true },
+    // Named from the start year and the next free number in it, so 2026-S1 is
+    // followed by 2026-S2 and a 2027 season begins again at S1.
+    { key: "name", label: "Season Name", type: "text" as const, readOnly: true,
+      placeholder: "2026-S2 (from the start date)" },
     { key: "start", label: "Start Date", type: "date" as const, required: true },
     { key: "end", label: "End Date", type: "date" as const, required: true },
     { key: "description", label: "Description", type: "textarea" as const, span: 2 as const },
@@ -546,6 +550,16 @@ export default function ProductionPage() {
   const [fertilization, setFertilization] = useRecords("fertilization", initFertilization);
   const [seasons, setSeasons] = useRecords("seasons", initSeasons);
 
+  /** Names a new season from its start date; an existing one keeps its name. */
+  const saveSeason = (values: Record<string, unknown>) => {
+    const start = String(values.start ?? "");
+    const name = seasonForm.isEdit
+      ? String(values.name ?? "")
+      : nextSeasonName(start, seasons as Array<{ name?: string }>);
+    if (!name) { alert("Give the season a start date so it can be named."); return; }
+    handleSave(seasons, setSeasons, seasonForm, { ...values, name });
+  };
+
   const plantingForm = useFormModal(initPlantings[0]);
   const treatmentForm = useFormModal(initTreatments[0]);
   const irrigationForm = useFormModal(initIrrigation[0]);
@@ -759,7 +773,7 @@ export default function ProductionPage() {
               addLabel="Add Season"
               searchPlaceholder="Search seasons..."
             />
-            <FormModal open={seasonForm.open} onClose={seasonForm.close} title={seasonForm.isEdit ? "Edit Season" : "Add Season"} groups={seasonFormGroups} values={seasonForm.values} onChange={seasonForm.onChange} isEdit={seasonForm.isEdit} onSubmit={(v) => handleSave(seasons, setSeasons, seasonForm, v)} />
+            <FormModal open={seasonForm.open} onClose={seasonForm.close} title={seasonForm.isEdit ? "Edit Season" : "Add Season"} groups={seasonFormGroups} values={seasonForm.values} onChange={seasonForm.onChange} isEdit={seasonForm.isEdit} onSubmit={(v) => saveSeason(v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Season" message="Delete this season?" onConfirm={() => handleDelete(seasons, setSeasons)} />
           </>
         );

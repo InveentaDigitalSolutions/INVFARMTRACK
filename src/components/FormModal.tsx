@@ -42,6 +42,13 @@ interface SelectField extends BaseField {
    * record with the lookup empty.
    */
   optionsFrom?: string;
+  /**
+   * Choices worked out from what the form already holds — the rows still free
+   * in the chosen field, the levels a ground bed may sit at. Returning []
+   * disables the control, which is the honest state when nothing has been
+   * picked yet for it to depend on.
+   */
+  optionsWhen?: (values: Record<string, unknown>) => { value: string; label: string }[];
 }
 
 interface ToggleField extends BaseField {
@@ -113,7 +120,8 @@ function renderField(
   field: FieldDef,
   value: unknown,
   onChange: (key: string, value: unknown) => void,
-  liveOptions: Record<string, { value: string; label: string }[]> = {}
+  liveOptions: Record<string, { value: string; label: string }[]> = {},
+  values: Record<string, unknown> = {}
 ) {
   const v = value ?? "";
 
@@ -124,7 +132,11 @@ function renderField(
   const optionsFor = (f: {
     options: { value: string; label: string }[];
     optionsFrom?: string;
+    optionsWhen?: (values: Record<string, unknown>) => { value: string; label: string }[];
   }) => {
+    // Computed choices win: they depend on the rest of the form, so a stale
+    // list would offer a row that is already taken.
+    if (f.optionsWhen) return f.optionsWhen(values);
     const live = f.optionsFrom ? liveOptions[f.optionsFrom] : undefined;
     return live && live.length > 0 ? live : f.options;
   };
@@ -383,7 +395,7 @@ export default function FormModal({
                             {field.label}
                             {field.required && <span className="text-red-500 ml-0.5">*</span>}
                           </label>
-                          {renderField(field, values[field.key], onChange, liveOptions)}
+                          {renderField(field, values[field.key], onChange, liveOptions, values)}
                         </div>
                       ))}
                     </div>
