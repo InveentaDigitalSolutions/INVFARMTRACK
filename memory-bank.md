@@ -25,11 +25,13 @@
   the rest stay on LocalStore until they have seeded rows
 
 ## Flows
-- **FarmTrack - Get Weather** `e206cf2a-c439-49c0-9b1b-1333df4ead4e` — PowerApps V2
+- **FarmTrack - Get Weather** `3a7f1e64-9c2b-4d18-b5e3-8f60c1a97d42` — PowerApps V2
   trigger (latitude, longitude) -> HTTP GET Open-Meteo -> returns `weather` as a
   JSON **string** (the Respond action only emits flat scalars, so the app must
   JSON.parse it). Uses the premium Http action. No DLP policies in the tenant.
-  Never executed — the first call from the app is the real test.
+  **Verified working in the player 2026-08-28.** Lives inside BrotonVerdeNursery —
+  a personal flow is invisible to a code app, which is how the first attempt failed.
+  A stale personal copy `e206cf2a-c439-49c0-9b1b-1333df4ead4e` is unused and can go.
 
 ## Gotchas
 - `pac` and the CLI need `DOTNET_ROOT=$HOME/.dotnet` on this machine
