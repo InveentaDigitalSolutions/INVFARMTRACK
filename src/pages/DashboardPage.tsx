@@ -13,8 +13,6 @@ import {
   Users,
   Boxes,
   BarChart3,
-  ArrowUpRight,
-  ArrowDownRight,
   Layers,
   CalendarDays,
 } from "lucide-react";
@@ -25,6 +23,7 @@ import InsightPanel, { deriveShadehouseInsight } from "../components/InsightPane
 import BedWaffle from "../components/BedWaffle";
 import WeatherWidget from "../components/WeatherWidget";
 import { useExchangeRate } from "../hooks/useExchangeRate";
+import { useDashboardMetrics } from "../hooks/useDashboardMetrics";
 
 const container = {
   hidden: {},
@@ -36,21 +35,9 @@ const item = {
 };
 
 // Dummy KPI data
-const revenueData = [
-  { month: "Jan", value: 4200 }, { month: "Feb", value: 3800 },
-  { month: "Mar", value: 5100 }, { month: "Apr", value: 6200 },
-  { month: "May", value: 0 }, { month: "Jun", value: 0 },
-];
-const maxRevenue = Math.max(...revenueData.map((d) => d.value), 1);
+/** Varieties are coloured by position, since the set is not known ahead. */
+const VARIETY_COLORS = ["#3d8b40", "#5aaa5d", "#88c48a", "#c4d93e", "#7f9228", "#b8ddb9"];
 
-const harvestByVariety = [
-  { name: "Hawaiian", value: 34000, color: "#3d8b40" },
-  { name: "Marble Queen", value: 26000, color: "#5aaa5d" },
-  { name: "Jade", value: 10000, color: "#88c48a" },
-  { name: "N'Joy", value: 2000, color: "#b8ddb9" },
-  { name: "Golden Glen", value: 4000, color: "#c4d93e" },
-];
-const totalHarvest = harvestByVariety.reduce((s, h) => s + h.value, 0);
 
 const bedUtilization = [
   { name: "Shadehouse 1", used: 10, total: 12 },
@@ -61,13 +48,6 @@ const bedUtilization = [
 const recentShipments = [
   { id: "SHP-015", customer: "The Plant Company", boxes: 38, status: "In Progress", carrier: "DHL" },
   { id: "SHP-014", customer: "Green Gardens Inc.", boxes: 15, status: "Shipped", carrier: "FedEx" },
-];
-
-const workerPerformance = [
-  { name: "Carlos M.", boxes: 142, trend: "+12%" },
-  { name: "Maria L.", boxes: 128, trend: "+8%" },
-  { name: "Juan P.", boxes: 115, trend: "+5%" },
-  { name: "Ana R.", boxes: 98, trend: "-3%" },
 ];
 
 const upcomingTasks = [
@@ -136,6 +116,7 @@ function DonutChart({ segments, total, label }: { segments: { value: number; col
 
 export default function DashboardPage() {
   const [beds] = useState(() => generateBeds());
+  const m = useDashboardMetrics();
   const insight = useMemo(() => deriveShadehouseInsight(beds), [beds]);
   const { rate: exchangeRate, loading: fxLoading, isLive: fxLive, staleDays: fxStaleDays } = useExchangeRate();
   return (
@@ -197,45 +178,56 @@ export default function DashboardPage() {
 
       <motion.div variants={item} className="page-rule mb-5" />
 
-      {/* Top stats row */}
+      {/* Every figure here is recorded, not asserted. A metric that cannot be
+          worked out shows a dash, and a comparison appears only when there is
+          a real prior period — the previous version claimed "+23% vs 2025-S1"
+          for a nursery with no 2025 season on file. */}
       <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-5">
         <StatCard
           variant="hero"
           className="xl:col-span-2"
-          label="Harvest · Season 2026-S1"
-          value="76K"
+          label="Harvest this month"
+          value={m.harvest.value === undefined ? "—" : m.harvest.value.toLocaleString()}
           icon={Scissors}
-          delta={{ value: "+23%", direction: "up", label: "vs 2025-S1" }}
-          context="E3 leads · 31K stems · 41% of output"
+          delta={
+            m.harvest.changePct === undefined
+              ? undefined
+              : {
+                  value: `${m.harvest.changePct > 0 ? "+" : ""}${m.harvest.changePct}%`,
+                  direction: m.harvest.changePct >= 0 ? "up" : "down",
+                  label: m.harvest.against ?? "",
+                }
+          }
+          context={m.harvest.value === undefined ? "no harvests recorded yet" : "stems cut"}
         />
         <StatCard
-          label="Revenue (Apr)"
-          value="$6,200"
-          icon={DollarSign}
-          delta={{ value: "+21%", direction: "up", label: "vs Mar" }}
-          context="18 invoices issued"
-        />
-        <StatCard
-          label="Active Plantings"
-          value="24"
-          icon={Sprout}
-          delta={{ value: "+3", direction: "up", label: "vs Mar" }}
-          context="across 4 fields · 87% bed use"
-        />
-        <StatCard
-          label="Boxes This Week"
-          value="38"
+          label={`Counted for wk ${m.nextWeek}`}
+          value={m.counted.value === undefined ? "—" : m.counted.value.toLocaleString()}
           icon={Boxes}
-          delta={{ value: "-12", direction: "down", label: "vs plan" }}
-          tone="warning"
-          context="50 planned · 2 beds not cut"
+          context={m.counted.value === undefined ? "not counted yet" : "cuttings"}
         />
         <StatCard
-          label="Open Invoices"
-          value="$1,520"
+          label="Active plantings"
+          value={m.activePlantings.value === undefined ? "—" : m.activePlantings.value}
+          icon={Sprout}
+          context={m.totalBeds ? `${m.planted.value ?? 0} of ${m.totalBeds} beds` : undefined}
+        />
+        <StatCard
+          label="Beds planted"
+          value={m.planted.value === undefined ? "—" : `${m.planted.value}/${m.totalBeds}`}
           icon={BarChart3}
-          tone="critical"
-          context="3 overdue · oldest 41 days"
+          context={
+            m.totalBeds
+              ? `${Math.round(((m.planted.value ?? 0) / m.totalBeds) * 100)}% of the nursery`
+              : undefined
+          }
+        />
+        <StatCard
+          label="Receivable"
+          value={m.receivable.value === undefined ? "—" : `$${m.receivable.value.toLocaleString()}`}
+          icon={DollarSign}
+          tone={m.receivable.value && m.receivable.value > 0 ? "warning" : undefined}
+          context={m.receivable.value === undefined ? "no invoices yet" : "unpaid on issued invoices"}
         />
       </motion.div>
 
@@ -246,25 +238,32 @@ export default function DashboardPage() {
 
       {/* Main grid: charts + map */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
-        {/* Revenue chart */}
+        {/* Harvest trend, from what was cut. This card used to show a revenue
+            series that came from a literal array — the numbers, the "$19,300"
+            total and the "+18% YTD" were all asserted. */}
         <motion.div
           variants={item}
           className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm"
         >
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-[13px] font-semibold text-navy-900">Revenue</p>
-              <p className="text-[11px] text-navy-400">Monthly shipment revenue</p>
+              <p className="text-[13px] font-semibold text-navy-900">Harvest</p>
+              <p className="text-[11px] text-navy-400">Stems cut, last six months</p>
             </div>
             <div className="text-right">
-              <p className="text-lg font-bold text-navy-900">$19,300</p>
-              <div className="flex items-center gap-0.5 text-[11px] text-green-600">
-                <ArrowUpRight className="w-3 h-3" />
-                <span>+18% YTD</span>
-              </div>
+              <p className="text-lg font-bold text-navy-900 tabular-nums">
+                {m.months.reduce((t, x) => t + x.value, 0).toLocaleString()}
+              </p>
+              <p className="text-[11px] text-navy-400">total</p>
             </div>
           </div>
-          <MiniBarChart data={revenueData} max={maxRevenue} />
+          {m.months.some((x) => x.value > 0) ? (
+            <MiniBarChart data={m.months} max={Math.max(...m.months.map((x) => x.value), 1)} />
+          ) : (
+            <p className="text-[12px] text-navy-400 py-8 text-center">
+              No harvests recorded in the last six months.
+            </p>
+          )}
         </motion.div>
 
         {/* Harvest by variety donut */}
@@ -273,24 +272,34 @@ export default function DashboardPage() {
           className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm"
         >
           <p className="text-[13px] font-semibold text-navy-900 mb-1">Harvest by Variety</p>
-          <p className="text-[11px] text-navy-400 mb-4">Season 2026-S1</p>
+          <p className="text-[11px] text-navy-400 mb-4">
+            Attributed through the bed each cut came from
+          </p>
+          {m.byVariety.length === 0 ? (
+            <p className="text-[12px] text-navy-400 py-8 text-center">
+              Nothing to attribute yet — harvests appear here once their beds have a planting.
+            </p>
+          ) : (
           <div className="flex items-center gap-4">
             <DonutChart
-              segments={harvestByVariety.map((h) => ({ value: h.value, color: h.color }))}
-              total={totalHarvest}
+              segments={m.byVariety.map((h, i) => ({ value: h.value, color: VARIETY_COLORS[i % VARIETY_COLORS.length] }))}
+              total={m.byVariety.reduce((t, h) => t + h.value, 0)}
               label="stems"
             />
             <div className="flex-1 space-y-1.5">
-              {harvestByVariety.map((h) => (
+              {m.byVariety.map((h, i) => {
+                const total = m.byVariety.reduce((t, x) => t + x.value, 0);
+                return (
                 <div key={h.name} className="flex items-center gap-2 text-[11px]">
-                  <div className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: h.color }} />
+                  <div className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: VARIETY_COLORS[i % VARIETY_COLORS.length] }} />
                   <span className="flex-1 text-navy-700 truncate">{h.name}</span>
-                  <span className="text-navy-400 font-mono">{(h.value / 1000).toFixed(0)}K</span>
-                  <span className="text-navy-300 w-8 text-right">{Math.round((h.value / totalHarvest) * 100)}%</span>
+                  <span className="text-navy-400 font-mono">{h.value.toLocaleString()}</span>
+                  <span className="text-navy-300 w-8 text-right">{Math.round((h.value / total) * 100)}%</span>
                 </div>
-              ))}
+              );})}
             </div>
           </div>
+          )}
         </motion.div>
 
         {/* Bed utilization */}
@@ -404,7 +413,7 @@ export default function DashboardPage() {
             <Users className="w-4 h-4 text-navy-300" />
           </div>
           <div className="space-y-2.5">
-            {workerPerformance.map((w, i) => (
+            {m.byWorker.map((w, i) => (
               <div key={w.name} className="flex items-center gap-3">
                 <span className="text-[11px] text-navy-400 w-4 text-center font-mono">{i + 1}</span>
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 text-[11px] font-bold text-green-700">
@@ -421,12 +430,11 @@ export default function DashboardPage() {
                     />
                   </div>
                 </div>
-                <span className="text-[13px] font-bold text-navy-900 w-10 text-right">{w.boxes}</span>
-                <span className={`text-[10px] font-semibold w-10 text-right flex items-center justify-end gap-0.5 ${
-                  w.trend.startsWith("+") ? "text-green-600" : "text-red-500"
-                }`}>
-                  {w.trend.startsWith("+") ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                  {w.trend}
+                {/* Boxes packed, from timesheets. No trend arrow: comparing a
+                    worker to their own past needs a prior period the sheets do
+                    not yet cover, and the old arrows were literals. */}
+                <span className="text-[13px] font-bold text-navy-900 w-14 text-right tabular-nums">
+                  {w.boxes.toLocaleString()}
                 </span>
               </div>
             ))}
@@ -443,15 +451,17 @@ export default function DashboardPage() {
             <TrendingUp className="w-4 h-4 text-navy-300" />
           </div>
           <div className="grid grid-cols-2 gap-3">
+            {/* Counted, not claimed. The previous version asserted a change
+                against a prior season that does not exist on file. */}
             {[
-              { label: "Total Revenue", value: "$19,300", icon: DollarSign, change: "+18%", positive: true },
-              { label: "Boxes Shipped", value: "483", icon: Boxes, change: "+23%", positive: true },
-              { label: "Stems Harvested", value: "76,000", icon: Scissors, change: "+15%", positive: true },
-              { label: "Active Customers", value: "2", icon: Users, change: "0", positive: true },
-              { label: "Treatments", value: "24", icon: Bug, change: "+4", positive: true },
-              { label: "Irrigation (L)", value: "12,400", icon: Droplets, change: "+8%", positive: true },
-              { label: "Bed Utilization", value: "60%", icon: Layers, change: "-5%", positive: false },
-              { label: "Plantings", value: "24", icon: Leaf, change: "+3", positive: true },
+              { label: "Invoiced", value: `$${m.totals.invoiced.toLocaleString()}`, icon: DollarSign },
+              { label: "Stems Harvested", value: m.totals.harvested.toLocaleString(), icon: Scissors },
+              { label: "Cuttings Counted", value: m.totals.counted.toLocaleString(), icon: Boxes },
+              { label: "Active Customers", value: String(m.totals.customers), icon: Users },
+              { label: "Treatments", value: String(m.totals.treatments), icon: Bug },
+              { label: "Irrigation (L)", value: m.totals.irrigationLitres.toLocaleString(), icon: Droplets },
+              { label: "Beds Planted", value: `${m.totals.bedsPlanted}/${m.totalBeds}`, icon: Layers },
+              { label: "Plantings", value: String(m.totals.plantings), icon: Leaf },
             ].map((kpi) => {
               const Icon = kpi.icon;
               return (
@@ -461,12 +471,10 @@ export default function DashboardPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-[10px] text-navy-400 truncate">{kpi.label}</p>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-[13px] font-bold text-navy-900">{kpi.value}</span>
-                      <span className={`text-[9px] font-semibold ${kpi.positive ? "text-green-600" : "text-red-500"}`}>
-                        {kpi.change}
-                      </span>
-                    </div>
+                    {/* No change indicator: there is no prior season on file
+                        to compare against, and a green "+18%" beside a number
+                        nobody measured is the thing this page was doing. */}
+                    <span className="text-[13px] font-bold text-navy-900 tabular-nums">{kpi.value}</span>
                   </div>
                 </div>
               );
