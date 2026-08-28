@@ -1,10 +1,10 @@
 {
   "version": "1.0",
   "appId": "90ac39b0-04e9-41ef-872e-2718ac678629",
-  "appDisplayName": "INV-FarmTrack",
+  "appDisplayName": "Digital Nursery Intelligence",
   "region": "prod",
   "environmentId": "Default-47176c00-abb5-4125-8ce3-a795dffd8b87",
-  "description": "Ornamental Plant Nursery Management App",
+  "description": "Nursery management for Broton Verde — production, availability, sales and shadehouse operations.",
   "buildPath": "./dist",
   "buildEntryPoint": "index.html",
   "localAppUrl": "http://localhost:5173",

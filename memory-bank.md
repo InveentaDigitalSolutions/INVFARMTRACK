@@ -1,7 +1,7 @@
 # INV FarmTrack — Project Memory
 
 ## Project
-- **Name:** INV-FarmTrack (Broton Verde Nursery)
+- **Name:** Digital Nursery Intelligence (was INV-FarmTrack)
 - **Type:** Power Apps code app (React 19 + Vite 7 + TypeScript)
 - **Repo:** github.com/InveentaDigitalSolutions/INVFARMTRACK
 
