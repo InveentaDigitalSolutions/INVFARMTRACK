@@ -50,8 +50,6 @@ Related: `src/components/ShadehouseScene.tsx`, `ShadehouseView3D.tsx`,
 - **Irrigation layer is simulated** — the 3D/2D irrigation state is generated,
   not read from `bv_irrigation`. Point it at real data and add the write-back
   flow (inside the solution, not personal).
-- **Bed Utilization is the wrong metric** — beds are occupied nearly year-round,
-  so utilisation is flat and uninformative. Replace with a rotation timeline.
 - **Dashboard shows "Shadehouse 1" three times** — duplicate labels.
 - **Code app is not in the solution** — `power-apps push` creates it in the
   environment only. May be a preview limitation; confirm whether the app can be
