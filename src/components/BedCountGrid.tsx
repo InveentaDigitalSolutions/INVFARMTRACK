@@ -13,7 +13,7 @@
  * compared later.
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import { useRecords } from "../hooks/useRecords";
 import { useNurseryBeds } from "../hooks/useNurseryBeds";
@@ -57,6 +57,8 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
 
   // Counting is for a week ahead, so that is where the picker starts.
   const [week, setWeek] = useState(() => isoWeek(new Date()) + 1);
+  // Opens on a single field rather than all of them — a counter walks one
+  // field at a time, and 120 rows is a scroll rather than a list.
   const [field, setField] = useState("");
   const [variety, setVariety] = useState("");
   const [level, setLevel] = useState("");
@@ -73,6 +75,12 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
       .sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
     [beds]
   );
+
+  // Default to the first field once they load, so the dialog never opens on
+  // every bed in the nursery.
+  useEffect(() => {
+    if (!field && fields.length > 0) setField(fields[0]);
+  }, [field, fields]);
   const varieties = useMemo(
     () => [...new Set(beds.map((b) => b.plant).filter(Boolean) as string[])].sort(),
     [beds]
@@ -132,6 +140,22 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
     return list.sort((a, b) => a.bed.localeCompare(b.bed, undefined, { numeric: true }));
   }, [beds, field, variety, level, search, onlyPlanted, onlyUncounted, sort, estimate, existing, draft]);
 
+  /**
+   * How far through each field the count is. On the chip itself, so someone
+   * mid-pass can see where they left off without opening each one.
+   */
+  const progress = useMemo(() => {
+    const out = new Map<string, { done: number; total: number }>();
+    for (const b of beds) {
+      if (onlyPlanted && !b.plant) continue;
+      const p = out.get(b.fieldName) ?? { done: 0, total: 0 };
+      p.total++;
+      if (existing.get(b.name)?.counted !== undefined || draft[b.name] !== undefined) p.done++;
+      out.set(b.fieldName, p);
+    }
+    return out;
+  }, [beds, existing, draft, onlyPlanted]);
+
   /** Running totals per variety, so the counter sees the shape of the week. */
   const byVariety = useMemo(() => {
     const map = new Map<string, number>();
@@ -180,7 +204,13 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
         <div>
           <h3 className="text-[14px] font-semibold text-navy-800">Field Count</h3>
           <p className="text-[12px] text-navy-400 mt-0.5">
-            {rows.length} beds · counted {totalCounted.toLocaleString()}
+            {(() => {
+              const done = rows.filter(
+                (r) => r.recorded !== undefined || draft[r.bed] !== undefined
+              ).length;
+              return `${done} of ${rows.length} counted`;
+            })()}
+            {totalCounted > 0 && ` · ${totalCounted.toLocaleString()} cuttings`}
             {totalEstimated > 0 && ` · pruning estimate ${totalEstimated.toLocaleString()}`}
           </p>
         </div>
@@ -200,10 +230,6 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
             className="w-44 px-2.5 py-1.5 text-[13px] rounded-lg border border-sand-200 bg-white
                        text-navy-900 focus:outline-none focus:ring-2 focus:ring-lime-400/30"
           />
-          <select value={field} onChange={(e) => setField(e.target.value)} className={selectClass}>
-            <option value="">All fields</option>
-            {fields.map((f) => <option key={f} value={f}>{f}</option>)}
-          </select>
           <select value={variety} onChange={(e) => setVariety(e.target.value)} className={selectClass}>
             <option value="">All varieties</option>
             {varieties.map((v) => <option key={v} value={v}>{v}</option>)}
@@ -232,6 +258,50 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
             Still to count
           </label>
         </div>
+      </div>
+
+      {/* Fields as chips rather than a dropdown: one tap instead of three,
+          and each carries how far through it the count is. */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {fields.map((f) => {
+          const p = progress.get(f);
+          const done = p ? p.done >= p.total && p.total > 0 : false;
+          const active = field === f;
+          return (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setField(f)}
+              aria-pressed={active}
+              className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors cursor-pointer
+                          focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
+                active
+                  ? "bg-navy-800 text-white"
+                  : done
+                    ? "bg-lime-50 text-lime-700 border border-lime-200 hover:bg-lime-100"
+                    : "bg-sand-100 text-navy-600 hover:bg-sand-200"
+              }`}
+            >
+              {f}
+              {p && (
+                <span className={`ml-1.5 tabular-nums ${active ? "text-white/60" : "text-navy-400"}`}>
+                  {p.done}/{p.total}
+                </span>
+              )}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => setField("")}
+          aria-pressed={field === ""}
+          className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors cursor-pointer
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
+            field === "" ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-600 hover:bg-sand-200"
+          }`}
+        >
+          All
+        </button>
       </div>
 
       {/* What the week is adding up to, per variety, as it is typed. This is
@@ -284,6 +354,21 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
                         inputMode="numeric"
                         value={value}
                         onChange={(e) => setDraft((d) => ({ ...d, [r.bed]: e.target.value }))}
+                        // Typing down a column of thirty beds should not need
+                        // the mouse between each one.
+                        onKeyDown={(e) => {
+                          if (e.key !== "Enter" && e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+                          e.preventDefault();
+                          const step = e.key === "ArrowUp" ? -1 : 1;
+                          const next = rows[rows.indexOf(r) + step];
+                          if (!next) return;
+                          const el = document.querySelector<HTMLInputElement>(
+                            `input[data-bed="${CSS.escape(next.bed)}"]`
+                          );
+                          el?.focus();
+                          el?.select();
+                        }}
+                        data-bed={r.bed}
                         placeholder="—"
                         aria-label={`Counted for ${r.bed}`}
                         className={`w-24 px-2 py-1 text-[13px] text-right rounded-md border bg-white
