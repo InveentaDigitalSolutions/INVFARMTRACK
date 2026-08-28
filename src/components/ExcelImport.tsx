@@ -18,12 +18,16 @@ interface ImportResult {
   totalRows: number;
   totalQuantity: number;
   fileName: string;
+  /** Whose forecast this is — a sheet means nothing without it. */
+  customer: string;
+  year: number;
 }
 
 interface ExcelImportProps {
   onImport: (data: ImportResult) => void;
   onClose: () => void;
-  customer?: string;
+  /** Required: the forecast belongs to a customer. */
+  customer: string;
   year?: number;
 }
 
@@ -51,7 +55,7 @@ function detectRequestType(val: string): string {
   return val;
 }
 
-export default function ExcelImport({ onImport, onClose, customer = "The Plant Company, LLC", year = 2026 }: ExcelImportProps) {
+export default function ExcelImport({ onImport, onClose, customer, year = new Date().getFullYear() }: ExcelImportProps) {
   const [step, setStep] = useState<"upload" | "preview" | "done">("upload");
   const [result, setResult] = useState<ImportResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -166,6 +170,8 @@ export default function ExcelImport({ onImport, onClose, customer = "The Plant C
           weekNumbers,
           totalRows: rows.length,
           totalQuantity,
+          customer,
+          year,
           fileName: file.name,
         });
         setStep("preview");

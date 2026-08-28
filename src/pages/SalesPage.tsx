@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart,
@@ -23,6 +23,7 @@ import { useRecords } from "../hooks/useRecords";
 import ExcelImport from "../components/ExcelImport";
 import { Upload } from "lucide-react";
 import { useInvoiceNumber } from "../hooks/useInvoiceNumber";
+import { toGrid, toRecords, weeksIn, type ForecastRecord, type ForecastRow } from "../services/demandForecast";
 
 const tabs = [
   { id: "shipments", label: "Shipments" },
@@ -238,14 +239,22 @@ export default function SalesPage() {
     }
   };
 
-  const [forecastData, setForecastData] = useState<Record<string, unknown>[]>([
-    { variety: "Pothos / Hawaiian", size: "9cm HQD Bowls", type: "Current Order", wk14: 10725, wk15: 7000, wk16: 11500, wk17: 12500, wk18: 11800, total: 53525 },
-    { variety: "Pothos / Hawaiian", size: "9cm HQD Specialty", type: "Current Order", wk14: 0, wk15: 0, wk16: 0, wk17: 0, wk18: 1300, total: 1300 },
-    { variety: "Pothos / Jade", size: "9cm HQD Bowls", type: "Current Order", wk14: 12000, wk15: 0, wk16: 14750, wk17: 12500, wk18: 0, total: 39250 },
-    { variety: "Pothos / Marble Queen", size: "9cm HQD Bowls", type: "Current Order", wk14: 4000, wk15: 0, wk16: 21500, wk17: 52000, wk18: 25000, total: 102500 },
-    { variety: "Pothos / N'Joy", size: "12cm Canopy", type: "Current Order", wk14: 0, wk15: 0, wk16: 2526, wk17: 0, wk18: 0, total: 2526 },
-    { variety: "Pothos / Golden Glen", size: "17cm", type: "Current Order", wk14: 0, wk15: 2715, wk16: 0, wk17: 2650, wk18: 1000, total: 6365 },
-  ]);
+  // Stored per variety, size and week — the grain everything else asks about.
+  // The screen shows it as a grid, so it is converted on the way in and out.
+  // It used to live in component state and never reach Dataverse at all,
+  // which meant importing a customer's spreadsheet persisted nothing.
+  const [forecastRecords, setForecastRecords] = useRecords<ForecastRecord>("demandForecasts", []);
+  // Whose forecast is on screen. Defaults to the first customer on file
+  // rather than a hardcoded name — the previous default, "The Plant Company,
+  // LLC", is not a customer that exists, so a sheet imported under it would
+  // have been filed against nobody.
+  const [forecastCustomer, setForecastCustomer] = useState("");
+  const activeCustomer = forecastCustomer || String((customers[0] as { name?: string })?.name ?? "");
+  const forecastData = useMemo(
+    () => toGrid(forecastRecords, activeCustomer || undefined),
+    [forecastRecords, activeCustomer]
+  );
+  const forecastWeeks = useMemo(() => weeksIn(forecastData), [forecastData]);
   const { next: nextInvoice, claim: claimInvoiceNumber } = useInvoiceNumber();
   const shipmentForm = useFormModal({
     customer: "",
@@ -422,8 +431,29 @@ export default function SalesPage() {
             {/* Import button + summary */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-[14px] font-semibold text-navy-900">Q2 2026 — The Plant Company</h3>
-                <p className="text-[12px] text-navy-400">{forecastData.length} order lines · Weeks 14–18</p>
+                {/* Customer and weeks come from the records, not a heading
+                    typed once: this said "Q2 2026 — The Plant Company · Weeks
+                    14–18" whatever was actually loaded. */}
+                <div className="flex items-center gap-2">
+                  <h3 className="text-[14px] font-semibold text-navy-900">Demand forecast</h3>
+                  <select
+                    value={activeCustomer}
+                    onChange={(e) => setForecastCustomer(e.target.value)}
+                    aria-label="Customer"
+                    className="px-2 py-1 text-[12px] rounded-lg border border-sand-200 bg-white
+                               text-navy-800 cursor-pointer focus:outline-none
+                               focus:ring-2 focus:ring-lime-400/30"
+                  >
+                    {(customers as { name?: string }[]).map((c) => (
+                      <option key={c.name} value={String(c.name)}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <p className="text-[12px] text-navy-400">
+                  {forecastData.length} order line{forecastData.length === 1 ? "" : "s"}
+                  {forecastWeeks.length > 0 &&
+                    ` · weeks ${forecastWeeks[0]}–${forecastWeeks[forecastWeeks.length - 1]}`}
+                </p>
               </div>
               <button
                 onClick={() => setShowImport(true)}
@@ -527,8 +557,8 @@ export default function SalesPage() {
             <AnimatePresence>
               {showImport && (
                 <ExcelImport
-                  customer="The Plant Company, LLC"
-                  year={2026}
+                  customer={activeCustomer}
+                  year={new Date().getFullYear()}
                   onImport={(result) => {
                     // Convert imported rows to flat forecast data
                     const newData = result.rows.map((row) => {
@@ -546,7 +576,18 @@ export default function SalesPage() {
                         total,
                       };
                     });
-                    setForecastData(newData);
+                    // Replace this customer's lines for the batch, then add
+                    // the sheet's. A re-import of a corrected sheet should not
+                    // leave the previous version's weeks behind.
+                    const customer = result.customer;
+                    const year = new Date().getFullYear();
+                    const kept = forecastRecords.filter((r) => r.customer !== customer);
+                    const added = toRecords(newData as ForecastRow[], {
+                      customer,
+                      year,
+                      batch: result.fileName,
+                    }).map((r) => ({ ...r, id: "" }) as ForecastRecord);
+                    setForecastRecords([...kept, ...added]);
                   }}
                   onClose={() => setShowImport(false)}
                 />

@@ -10,7 +10,7 @@
   "localAppUrl": "http://localhost:5173",
   "logoPath": "Default",
   "connectionReferences": {
-    "e48793c2-064a-48bd-86fb-f57ce113baea": {
+    "48cfb8e3-70da-484e-afc5-ff70368d52b6": {
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       "displayName": "Logic flows",
       "dataSources": [
@@ -217,6 +217,10 @@
         "inputComponents": {
           "entitySetName": "bv_inputcomponents",
           "logicalName": "bv_inputcomponent"
+        },
+        "demandForecasts": {
+          "entitySetName": "bv_demandforecasts",
+          "logicalName": "bv_demandforecast"
         }
       }
     }
