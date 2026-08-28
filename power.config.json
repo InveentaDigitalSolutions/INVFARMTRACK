@@ -10,7 +10,7 @@
   "localAppUrl": "http://localhost:5173",
   "logoPath": "Default",
   "connectionReferences": {
-    "48cfb8e3-70da-484e-afc5-ff70368d52b6": {
+    "c79f63b4-bd17-485d-92f1-97f1f2030d80": {
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       "displayName": "Logic flows",
       "dataSources": [
@@ -201,10 +201,6 @@
         "exchangeRates": {
           "entitySetName": "bv_exchangerates",
           "logicalName": "bv_exchangerate"
-        },
-        "bedCapacities": {
-          "entitySetName": "bv_bedcapacities",
-          "logicalName": "bv_bedcapacity"
         },
         "systemUsers": {
           "entitySetName": "systemusers",

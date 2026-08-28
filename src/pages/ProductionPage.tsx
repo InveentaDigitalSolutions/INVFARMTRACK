@@ -235,6 +235,9 @@ const plantFields = [
     { key: "variety", label: "Variety", type: "text" as const },
   ]},
   { title: "Growing Cycle", columns: 2 as const, fields: [
+    // Every bed is the same size, so how many fit is a property of the
+    // variety rather than of any particular bed.
+    { key: "plantsPerBed", label: "Plants per Bed", type: "number" as const, min: 0 },
     // Without these the schedule can only report the past: a planting date
     // says when work started, not when stock arrives.
     { key: "weeksToFirstHarvest", label: "Weeks to First Cut", type: "number" as const, min: 0 },
@@ -598,6 +601,7 @@ export default function ProductionPage() {
                 { key: "name", label: "Name" },
                 { key: "latin", label: "Latin Name" },
                 { key: "variety", label: "Variety" },
+                { key: "plantsPerBed", label: "Per Bed" },
                 { key: "weeksToFirstHarvest", label: "Wks to Cut" },
                 { key: "productiveWeeks", label: "Productive" },
                 { key: "patent", label: "Patented", render: (r) => (

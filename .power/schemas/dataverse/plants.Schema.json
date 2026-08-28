@@ -216,6 +216,13 @@
           "required": true,
           "maxLength": 200
         },
+        "bv_plantsperbed": {
+          "type": "string",
+          "title": "Plants per Bed",
+          "x-ms-dataverse-attribute": "bv_plantsperbed",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "bv_PlantsPerBed"
+        },
         "bv_productiveweeks": {
           "type": "string",
           "title": "Productive Weeks",

@@ -65,6 +65,7 @@ export interface Bv_plantsBase {
   bv_plantcode: string;
   bv_plantid: string;
   bv_plantname: string;
+  bv_plantsperbed?: number;
   bv_productiveweeks?: number;
   bv_propagationmethod?: Bv_plantsbv_propagationmethod;
   bv_soiltype?: Bv_plantsbv_soiltype;

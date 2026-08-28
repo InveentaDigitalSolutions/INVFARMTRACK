@@ -12,7 +12,7 @@ import ShadehouseView from "../components/ShadehouseView";
 import ShadehouseView3D from "../components/ShadehouseView3D";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
-import { availableRows, bedName, typeForLevel, planBulkBeds, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
+import { availableRows, bedName, parseBedName, typeForLevel, planBulkBeds, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
 
 const tabs = [
   { id: "shadehouses", label: "Shadehouses" },
@@ -133,12 +133,21 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
     // Free rows at this level. A ground bed in row 7 does not stop an air bed
     // hanging above it, so each level is counted separately.
     { key: "row", label: "Row", type: "select" as const, required: true, options: [],
-      optionsWhen: (values: Record<string, unknown>) =>
-        availableRows(
+      optionsWhen: (values: Record<string, unknown>) => {
+        const free = availableRows(
           fields.find((f) => f.name === values.field),
           beds,
           Number(values.level ?? 0)
-        ).map((row) => ({ value: String(row), label: String(row).padStart(2, "0") })) },
+        );
+        // A bed being edited occupies its own row, so that row is not free —
+        // without adding it back the control would have no option matching
+        // the bed's actual value.
+        const own = Number(values.row);
+        if (Number.isFinite(own) && own > 0 && !free.includes(own)) free.push(own);
+        return free
+          .sort((a, b) => a - b)
+          .map((row) => ({ value: String(row), label: String(row).padStart(2, "0") }));
+      } },
     { key: "name", label: "Bed Name", type: "text" as const, readOnly: true,
       placeholder: "E3-01, or E3-01-2 for an air bed" },
     { key: "soilType", label: "Soil Type", type: "select" as const, options: [
@@ -255,6 +264,27 @@ export default function InfrastructurePage() {
    * and refuses one the shadehouse has no room for. Doing it here rather than
    * in the form means a bed created any other way is named the same.
    */
+  /**
+   * Opens a bed for editing with its row and level filled in.
+   *
+   * Neither is stored: the name carries them, and the form derives the name
+   * from them. Opening an existing bed therefore showed both controls empty,
+   * and saving rebuilt the name from nothing — "Choose a field, a level and a
+   * row" on a bed that plainly had all three.
+   */
+  const openBedEdit = (row: Record<string, unknown>, index: number) => {
+    const parsed = parseBedName(String(row.name ?? ""));
+    bedForm.openEdit(
+      {
+        ...row,
+        field: row.field ?? parsed?.field ?? "",
+        row: parsed ? String(parsed.row) : "",
+        level: parsed ? String(parsed.level) : String(row.level ?? ""),
+      } as never,
+      index
+    );
+  };
+
   const saveBed = (values: Record<string, unknown>) => {
     const fieldName = String(values.field ?? "");
     const row = Number(values.row);
@@ -367,7 +397,7 @@ export default function InfrastructurePage() {
               { key: "level", label: "Level" },
               { key: "soilType", label: "Soil" }, { key: "irrigationType", label: "Irrigation" },
               { key: "active", label: "Status", render: (r) => <Badge variant={r.active ? "green" : "gray"}>{r.active ? "Active" : "Inactive"}</Badge> },
-            ]} data={beds} onAdd={bedForm.openCreate} onEdit={(r, i) => bedForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Bed" searchPlaceholder="Search beds..." />
+            ]} data={beds} onAdd={bedForm.openCreate} onEdit={(r, i) => openBedEdit(r as Record<string, unknown>, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Bed" searchPlaceholder="Search beds..." />
             <div className="flex justify-end -mt-2">
               <button
                 type="button"
