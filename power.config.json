@@ -10,7 +10,7 @@
   "localAppUrl": "http://localhost:5173",
   "logoPath": "Default",
   "connectionReferences": {
-    "78715795-eac7-4f52-939a-34de8cfb7273": {
+    "d1b924da-5423-4705-9d69-7f9ac71698c6": {
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       "displayName": "Logic flows",
       "dataSources": [
@@ -193,6 +193,10 @@
         "bankStatementLines": {
           "entitySetName": "bv_bankstatementlines",
           "logicalName": "bv_bankstatementline"
+        },
+        "caiNumbers": {
+          "entitySetName": "bv_cainumbers",
+          "logicalName": "bv_cainumber"
         }
       }
     }

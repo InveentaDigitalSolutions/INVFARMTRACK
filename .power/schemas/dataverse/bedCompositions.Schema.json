@@ -30,6 +30,14 @@
           "required": true,
           "x-ms-keyType": "primary"
         },
+        "bv_bedcompositionname": {
+          "type": "string",
+          "title": "Name",
+          "x-ms-dataverse-attribute": "bv_bedcompositionname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_BedCompositionName",
+          "maxLength": 100
+        },
         "bv_bedid": {
           "type": "string",
           "title": "Bed",

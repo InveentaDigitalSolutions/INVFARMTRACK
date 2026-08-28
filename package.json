@@ -20,7 +20,8 @@
     "dataverse:token": "node scripts/dev-token.mjs",
     "dataverse:choices": "node scripts/dataverse/generate-choicemap.mjs",
     "dataverse:check": "node scripts/dataverse/check-choices.mjs",
-    "dataverse:seed-fix": "node scripts/dataverse/fix-autonumber-seeds.mjs"
+    "dataverse:seed-fix": "node scripts/dataverse/fix-autonumber-seeds.mjs",
+    "test:math": "tsx scripts/test/invoiceMath.test.mts"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.19.0",

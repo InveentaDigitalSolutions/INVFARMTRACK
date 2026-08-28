@@ -13,6 +13,7 @@ import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
+import { invoiceAmounts, invoiceStatus } from "../services/invoiceMath";
 
 /* -----------------------------------------------------------------
  * Types
@@ -323,6 +324,41 @@ const tabs = [
   { id: "reports",    label: "Reports" },
 ];
 
+/**
+ * Fills in the figures that follow from the ones somebody actually types.
+ *
+ * ISV, total and balance were all hand-entered, so an invoice could be saved
+ * claiming any tax and any total, and nothing recomputed them when the
+ * subtotal changed. Only rows that carry a subtotal are touched, which leaves
+ * payments, bank accounts and statement lines alone.
+ */
+function withDerivedAmounts(values: Record<string, unknown>): Record<string, unknown> {
+  if (typeof values.subtotal !== "number") return values;
+
+  const currency = (values.currency as Currency) ?? "HNL";
+  // Exports carry no ISV. The nursery invoices its export customers in
+  // dollars and sells locally in lempiras, so the currency is the reliable
+  // signal here; an explicit exempt flag overrides it either way.
+  const exempt = values.exempt === true || (values.exempt !== false && currency === "USD");
+
+  const paid = typeof values.paid === "number" ? values.paid : 0;
+  const { subtotal, isv, total, balance } = invoiceAmounts(values.subtotal, {
+    exempt,
+    paid,
+    discounts: typeof values.discounts === "number" ? values.discounts : 0,
+  });
+
+  const dueDate = typeof values.dueDate === "string" ? values.dueDate : "";
+  return {
+    ...values,
+    subtotal,
+    isv,
+    total,
+    balance,
+    ...(dueDate ? { status: invoiceStatus(total, paid, dueDate) } : {}),
+  };
+}
+
 export default function AccountingPage() {
   const [tab, setTab] = useState("dashboard");
 
@@ -383,9 +419,10 @@ export default function AccountingPage() {
   };
 
   const save = <T,>(data: T[], setData: (d: T[]) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
+    const row = withDerivedAmounts(values);
     if (form.isEdit && form.editIndex !== null) {
-      const u = [...data]; u[form.editIndex] = values as T; setData(u);
-    } else { setData([...data, values as T]); }
+      const u = [...data]; u[form.editIndex] = row as T; setData(u);
+    } else { setData([...data, row as T]); }
     form.close();
   };
   const del = <T,>(data: T[], setData: (d: T[]) => void) => {

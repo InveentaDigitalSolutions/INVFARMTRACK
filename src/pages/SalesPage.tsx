@@ -22,7 +22,7 @@ import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import ExcelImport from "../components/ExcelImport";
 import { Upload } from "lucide-react";
-import { getNextInvoiceNumber, allocateInvoiceNumber } from "../services/invoiceNumberService";
+import { useInvoiceNumber } from "../hooks/useInvoiceNumber";
 
 const tabs = [
   { id: "shipments", label: "Shipments" },
@@ -246,7 +246,7 @@ export default function SalesPage() {
     { variety: "Pothos / N'Joy", size: "12cm Canopy", type: "Current Order", wk14: 0, wk15: 0, wk16: 2526, wk17: 0, wk18: 0, total: 2526 },
     { variety: "Pothos / Golden Glen", size: "17cm", type: "Current Order", wk14: 0, wk15: 2715, wk16: 0, wk17: 2650, wk18: 1000, total: 6365 },
   ]);
-  const nextInvoice = getNextInvoiceNumber();
+  const { next: nextInvoice, claim: claimInvoiceNumber } = useInvoiceNumber();
   const shipmentForm = useFormModal({
     customer: "",
     invoiceNumber: nextInvoice?.invoiceNumber || "",
@@ -255,29 +255,29 @@ export default function SalesPage() {
     date: new Date().toISOString().slice(0, 10),
   });
 
-  // Refresh invoice number when form opens
+  // Put the next free number in the form as it opens, and again if the
+  // authorization reloads underneath it.
   useEffect(() => {
-    if (shipmentForm.open && !shipmentForm.isEdit) {
-      const next = getNextInvoiceNumber();
-      if (next) {
-        shipmentForm.onChange("invoiceNumber", next.invoiceNumber);
-      }
+    if (shipmentForm.open && !shipmentForm.isEdit && nextInvoice && !nextInvoice.problem) {
+      shipmentForm.onChange("invoiceNumber", nextInvoice.invoiceNumber);
     }
-  }, [shipmentForm.open]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shipmentForm.open, nextInvoice?.invoiceNumber]);
 
   const currentShipment = shipments.find((s) => s.id === activeShipment);
 
   const handleCreateShipment = (values: Record<string, unknown>) => {
     const invoiceNum = values.invoiceNumber as string;
 
-    // Allocate the invoice number from the CAI range
-    if (invoiceNum) {
-      const allocated = allocateInvoiceNumber(invoiceNum);
-      if (!allocated) {
-        alert(`Invoice number ${invoiceNum} has already been used. Please use a different number.`);
-        return;
-      }
+    // Refuse to ship against an authorization that cannot legally issue a
+    // number — an expired or exhausted CAI is not a formatting problem.
+    if (nextInvoice?.problem) {
+      alert(nextInvoice.problem);
+      return;
     }
+    // Record the number as issued before the shipment exists, so it can never
+    // be handed to a second invoice.
+    if (invoiceNum) claimInvoiceNumber(invoiceNum);
 
     const num = shipments.length + 1;
     const newShipment: Shipment = {

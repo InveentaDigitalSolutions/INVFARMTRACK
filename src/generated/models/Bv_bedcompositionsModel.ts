@@ -16,6 +16,7 @@ export type Bv_bedcompositionsstatuscode = keyof typeof Bv_bedcompositionsstatus
 export interface Bv_bedcompositionsBase {
   bv_bedcompositioncode: string;
   bv_bedcompositionid: string;
+  bv_bedcompositionname?: string;
   "bv_BedId@odata.bind": string;
   bv_notes?: string;
   bv_percentage: number;

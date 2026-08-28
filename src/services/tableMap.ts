@@ -497,6 +497,20 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     },
   },
 
+  caiNumbers: {
+    dataSource: "bv_cainumbers",
+    primaryKey: "bv_cainumberid",
+    fields: {
+      name: "bv_cainumbername",
+      sequence: "bv_sequencenumber",
+      used: "bv_isused",
+      usedDate: "bv_useddate",
+      notes: "bv_notes",
+      fiscalAuth: "_bv_fiscalauthid_value",
+      invoice: "_bv_invoiceid_value",
+    },
+  },
+
   // ---- Bed substrate composition -----------------------------------------
   substrateMaterials: {
     dataSource: "bv_substratematerials",
@@ -596,6 +610,7 @@ export const ENABLED_TABLES = new Set<string>([
   "statements",
   "substrateMaterials",
   "bedCompositions",
+  "caiNumbers",
 ]);
 
 /**
