@@ -79,7 +79,6 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     fields: {
       code: "bv_fieldcode",
       name: "bv_fieldname",
-      position: "bv_position",
       notes: "bv_notes",
       rows: "bv_rowcount",
       shadehouse: "_bv_shadehouseid_value",

@@ -624,14 +624,6 @@
           "description": "Link to the related Shadehouse record."
         },
         {
-          "schemaName": "bv_Position",
-          "displayName": "Position",
-          "type": "string",
-          "maxLength": 100,
-          "required": false,
-          "description": "Short text value. Position for the Field."
-        },
-        {
           "schemaName": "bv_Notes",
           "displayName": "Notes",
           "type": "memo",

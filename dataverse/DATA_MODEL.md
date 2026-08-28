@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 44 |
-| Columns | 536 |
+| Columns | 535 |
 | Relationships | 55 |
 
 ## Conventions
@@ -35,7 +35,7 @@
 | [Bed](#bed) | `bv_bed` | `BED-0001` | 11 | Growing beds within batches (Shadehouse > Batch > Bed) |
 | [Plant](#plant) | `bv_plant` | `PLT-0001` | 21 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
-| [Field](#field) | `bv_field` | `FLD-0001` | 6 | Production fields of plants within a shadehouse |
+| [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
 | [Planting](#planting) | `bv_planting` | `PLG-0001` | 9 | Records of plants placed in beds — central activity hub |
 | [Input](#input) | `bv_input` | `INP-0001` | 14 | Catalog of fertilizers, pesticides, and other inputs |
 | [Treatment](#treatment) | `bv_treatment` | `TRT-0001` | 14 | Treatment/fumigation applications to plantings |
@@ -349,7 +349,6 @@ Production fields of plants within a shadehouse
 | `bv_fieldcode` 🔑 | Field Code | Autonumber | ✓ | Auto-generated identifier, format FLD-0001. |
 | `bv_fieldname` | Plot Name | Text(100) | ✓ | Human-readable plot name, e.g. "Plot E3". The primary column is an autonumber, so this is what people actually refer to. |
 | `bv_shadehouseid` | Shadehouse | Lookup → [Shadehouse](#shadehouse) | ✓ | Link to the related Shadehouse record. |
-| `bv_position` | Position | Text(100) |  | Short text value. Position for the Field. |
 | `bv_notes` | Notes | Text area(2000) |  | Free-text notes. |
 | `bv_rowcount` | Rows | Whole number |  | How many bed rows this field physically has. Bed numbering runs 01 to this value, so it is what decides which row numbers can be chosen and when the field is full. |
 
