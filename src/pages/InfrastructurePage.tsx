@@ -26,10 +26,13 @@ const initShadehouses = [
   { name: "Shadehouse 1", code: "SH-1", location: "El Olvido, Santa Cruz de Yojoa", coordinates: "14.9700, -87.8500", length: 80, width: 80, capacity: 120, active: true },
 ];
 const initFieldes = [
-  { code: "E3", shadehouse: "Shadehouse 1", season: "2026-S1", position: "NW — 33 beds × 1.20m", notes: "" },
-  { code: "E1", shadehouse: "Shadehouse 1", season: "2026-S1", position: "NE — 33 beds × 1.20m", notes: "" },
-  { code: "C3", shadehouse: "Shadehouse 1", season: "2026-S1", position: "SW — 27 beds × 1.80m", notes: "" },
-  { code: "C1", shadehouse: "Shadehouse 1", season: "2026-S1", position: "SE — 27 beds × 1.80m", notes: "" },
+  // No season: a field is infrastructure and does not belong to one. Compass
+  // points are gone too — Santiago's word was that north and south say
+  // nothing about this nursery; the bed width does.
+  { name: "E3", shadehouse: "Shadehouse 1", rows: 33, position: "1.20m beds", notes: "" },
+  { name: "E1", shadehouse: "Shadehouse 1", rows: 33, position: "1.20m beds", notes: "" },
+  { name: "C3", shadehouse: "Shadehouse 1", rows: 27, position: "1.80m beds", notes: "" },
+  { name: "C1", shadehouse: "Shadehouse 1", rows: 27, position: "1.80m beds", notes: "" },
 ];
 const initBeds = [
   { name: "E3-01", field: "E3", type: "Air", level: "1", capacity: 500, material: "Metal", soilType: "Loamy", drainage: "Excellent", irrigation: "Drip", active: true },
@@ -40,7 +43,10 @@ const initBeds = [
 ];
 
 const shOptions = initShadehouses.map((s) => ({ value: s.name, label: s.name }));
-const fieldOptions = initFieldes.map((b) => ({ value: b.code, label: `${b.code} (${b.shadehouse})` }));
+// The value must be the field NAME: that is what a bed's lookup resolves
+// against, and what the bed name is built from. It was the code, which
+// resolves to nothing.
+const fieldOptions = initFieldes.map((f) => ({ value: f.name, label: `${f.name} (${f.shadehouse})` }));
 
 const shadehouseFormGroups = [
   { title: "Shadehouse Details", columns: 2 as const, fields: [
@@ -306,7 +312,8 @@ export default function InfrastructurePage() {
           <>
             <DataTable columns={[
               { key: "name", label: "Name" }, { key: "code", label: "Code" }, { key: "location", label: "Location" },
-              { key: "length", label: "L (m)" }, { key: "width", label: "W (m)" }, { key: "capacity", label: "Capacity" },
+              { key: "length", label: "L (m)" }, { key: "width", label: "W (m)" },
+              { key: "capacity", label: "Bed Positions" }, { key: "fieldCapacity", label: "Fields" },
               { key: "active", label: "Status", render: (r) => <Badge variant={r.active ? "green" : "gray"}>{r.active ? "Active" : "Inactive"}</Badge> },
             ]} data={shadehouses} onAdd={shForm.openCreate} onEdit={(r, i) => shForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Shadehouse" searchPlaceholder="Search shadehouses..." />
             <FormModal open={shForm.open} onClose={shForm.close} title={shForm.isEdit ? "Edit Shadehouse" : "Add Shadehouse"} groups={shadehouseFormGroups} values={shForm.values} onChange={shForm.onChange} isEdit={shForm.isEdit} onSubmit={(v) => save(shadehouses, setShadehouses, shForm, v)} />
@@ -321,8 +328,9 @@ export default function InfrastructurePage() {
         return (
           <>
             <DataTable columns={[
-              { key: "code", label: "Code" }, { key: "shadehouse", label: "Shadehouse" },
-              { key: "season", label: "Season" }, { key: "position", label: "Position" },
+              { key: "name", label: "Field" }, { key: "code", label: "ID" },
+              { key: "shadehouse", label: "Shadehouse" },
+              { key: "rows", label: "Bed Rows" }, { key: "position", label: "Position" },
             ]} data={fields} onAdd={fieldForm.openCreate} onEdit={(r, i) => fieldForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Field" searchPlaceholder="Search fields..." />
             <FormModal open={fieldForm.open} onClose={fieldForm.close} title={fieldForm.isEdit ? "Edit Field" : "Add Field"} groups={fieldFormGroups} values={fieldForm.values} onChange={fieldForm.onChange} isEdit={fieldForm.isEdit} onSubmit={(v) => saveField(v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Field" message="Delete this field?" onConfirm={() => del(fields, setFieldes)} />
