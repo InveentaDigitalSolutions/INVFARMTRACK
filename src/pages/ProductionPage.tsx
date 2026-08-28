@@ -13,6 +13,7 @@ import { useRecords } from "../hooks/useRecords";
 import { nextSeasonName } from "../services/infrastructureRules";
 import ProductionOverview from "../components/ProductionOverview";
 import { useInputNutrients } from "../hooks/useInputNutrients";
+import { expandBeds } from "../services/expandBeds";
 
 /**
  * Ordered the way the work happens: see where you stand, plant, tend, harvest,
@@ -217,10 +218,11 @@ const fertilizerInputOptionsFallback = [
 const pruningFields = [
   { title: "Pruning Event", columns: 2 as const, fields: [
     { key: "date", label: "Date", type: "date" as const, required: true },
-    { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
+    { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
     { key: "week", label: "Week", type: "number" as const, min: 1, max: 52, required: true },
-    { key: "bedsPruned", label: "Beds Pruned", type: "number" as const, min: 1, required: true },
-    { key: "cuttingsEstimated", label: "Cuttings Estimated", type: "number" as const, min: 0 },
+    // No "beds pruned" field: it is however many beds are selected. Typing it
+    // separately meant someone could select five and write three.
+    { key: "cuttingsEstimated", label: "Cuttings Estimated (per bed)", type: "number" as const, min: 0 },
     { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
   ]},
 ];
@@ -374,7 +376,9 @@ export default function ProductionPage() {
       updated[form.editIndex] = values as any;
       setData(updated);
     } else {
-      setData([...data, values]);
+      // One record per bed. A bed is a single lookup, so an array saved as one
+      // record resolved to nothing and the bed was silently dropped.
+      setData([...data, ...expandBeds(values)]);
     }
     form.close();
   };

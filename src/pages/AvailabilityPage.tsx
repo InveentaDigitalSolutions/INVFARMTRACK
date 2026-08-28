@@ -13,6 +13,7 @@ import { useRecords } from "../hooks/useRecords";
 import { PLANT_SIZE_OPTIONS } from "../services/plantSizes";
 import BedCountGrid from "../components/BedCountGrid";
 import AvailabilityOverview from "../components/AvailabilityOverview";
+import { expandBeds } from "../services/expandBeds";
 
 const tabs = [
   // The question the projections exist to answer, before the table of them.
@@ -67,12 +68,12 @@ const initCurve = [
 
 // --- Pruning Log data ---
 const initLog = [
-  { date: "2026-04-07", bed: "E3-31", week: 15, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Carlos M." },
-  { date: "2026-04-06", bed: "E1-18", week: 15, bedsPruned: 2, cuttingsEstimated: 1000, worker: "Maria L." },
-  { date: "2026-04-05", bed: "E3-01", week: 14, bedsPruned: 4, cuttingsEstimated: 2000, worker: "Juan P." },
-  { date: "2026-04-03", bed: "C3-02", week: 14, bedsPruned: 3, cuttingsEstimated: 1400, worker: "Ana R." },
-  { date: "2026-04-01", bed: "E1-26", week: 14, bedsPruned: 5, cuttingsEstimated: 2600, worker: "Carlos M." },
-  { date: "2026-03-30", bed: "E1-33", week: 13, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Maria L." },
+  { date: "2026-04-07", bed: "E3-31", week: 15, bedsPruned: 1, cuttingsEstimated: 1500, worker: "Carlos M." },
+  { date: "2026-04-06", bed: "E1-18", week: 15, bedsPruned: 1, cuttingsEstimated: 1000, worker: "Maria L." },
+  { date: "2026-04-05", bed: "E3-01", week: 14, bedsPruned: 1, cuttingsEstimated: 2000, worker: "Juan P." },
+  { date: "2026-04-03", bed: "C3-02", week: 14, bedsPruned: 1, cuttingsEstimated: 1400, worker: "Ana R." },
+  { date: "2026-04-01", bed: "E1-26", week: 14, bedsPruned: 1, cuttingsEstimated: 2600, worker: "Carlos M." },
+  { date: "2026-03-30", bed: "E1-33", week: 13, bedsPruned: 1, cuttingsEstimated: 1500, worker: "Maria L." },
 ];
 
 // --- Options ---
@@ -129,10 +130,10 @@ const curveFields = [
 const logFields = [
   { title: "Pruning Event", columns: 2 as const, fields: [
     { key: "date", label: "Date", type: "date" as const, required: true },
-    { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
+    { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
     { key: "week", label: "Week", type: "number" as const, min: 1, max: 52, required: true },
-    { key: "bedsPruned", label: "Beds Pruned", type: "number" as const, min: 1, required: true },
-    { key: "cuttingsEstimated", label: "Cuttings Estimated", type: "number" as const, min: 0 },
+    // Beds pruned is however many are selected — see expandBeds.
+    { key: "cuttingsEstimated", label: "Cuttings Estimated (per bed)", type: "number" as const, min: 0 },
     { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
   ]},
 ];
@@ -222,7 +223,11 @@ export default function AvailabilityPage() {
   const save = (data: any[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
     if (form.isEdit && form.editIndex !== null) {
       const u = [...data]; u[form.editIndex] = values; setData(u);
-    } else { setData([...data, values]); }
+    } else {
+      // One record per bed, as in Production — an array cannot bind to a
+      // single bed lookup.
+      setData([...data, ...expandBeds(values)]);
+    }
     form.close();
   };
   const del = (data: any[], setData: (d: any) => void) => {
