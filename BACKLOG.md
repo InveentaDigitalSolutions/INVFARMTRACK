@@ -31,9 +31,10 @@ weather layer.
 
 Rejected alternatives, and why:
 
-- **Host on Azure** — full WebGL, but leaves the Power Platform: separate
-  hosting, sign-in, deployment and running cost. Weighed in August 2026 and
-  declined.
+- **Host on Azure** — no longer available without rebuilding. The standalone
+  path was removed on 2026-08-28 because it duplicated the whole data layer;
+  it is in the history but would need reworking. The isometric fallback is now
+  the realistic route to a 3D-like view.
 - **Drop the tab** — a real option if nobody opens it during module testing.
 
 Related: `src/components/ShadehouseScene.tsx`, `ShadehouseView3D.tsx`,
@@ -45,8 +46,6 @@ Related: `src/components/ShadehouseScene.tsx`, `ShadehouseView3D.tsx`,
 
 - **Stale personal flow** `e206cf2a-c439-49c0-9b1b-1333df4ead4e` — superseded by
   the solution copy `3a7f1e64…`. Provably unused; delete once confirmed.
-- **BCH exchange rate** — likely still showing the hardcoded `26.5543` fallback
-  rather than a live figure. Needs routing through a flow like the weather.
 - **Irrigation layer is simulated** — the 3D/2D irrigation state is generated,
   not read from `bv_irrigation`. Point it at real data and add the write-back
   flow (inside the solution, not personal).
