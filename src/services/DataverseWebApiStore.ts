@@ -26,15 +26,35 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
    * @param primaryKey key column, e.g. "bv_plantid"
    * @param fields     app field -> Dataverse column; unmapped names pass through
    */
+  /** Primary name column to fill on create — see DataverseBinding. */
+  private readonly primaryName?: string;
+  /** App fields joined to build that name. */
+  private readonly nameFrom: string[];
+
   constructor(
     entitySet: string,
     primaryKey: string,
-    fields: Record<string, string> = {}
+    fields: Record<string, string> = {},
+    primaryName?: string,
+    nameFrom: string[] = []
   ) {
     this.entitySet = entitySet;
     this.primaryKey = primaryKey;
     this.toColumn = fields;
     this.toField = Object.fromEntries(Object.entries(fields).map(([k, v]) => [v, k]));
+    this.primaryName = primaryName;
+    this.nameFrom = nameFrom;
+  }
+
+  /** Mirrors DataverseStore.buildName — see the note there. */
+  private buildName(record: Row): string | undefined {
+    if (!this.primaryName) return undefined;
+    const parts = this.nameFrom
+      .map((field) => record[field])
+      .filter((v) => v !== undefined && v !== null && v !== "")
+      .map((v) => String(v));
+    if (parts.length === 0) return undefined;
+    return parts.join(" · ").slice(0, 100);
   }
 
   private async request<R>(path: string, init: RequestInit = {}): Promise<R | null> {
@@ -149,9 +169,14 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
   }
 
   async create(record: Omit<T, "id">): Promise<T> {
+    const payload = this.toDataverse(record as Row);
+    if (this.primaryName && !payload[this.primaryName]) {
+      const name = this.buildName(record as Row);
+      if (name) payload[this.primaryName] = name;
+    }
     const data = await this.request<Row>(this.entitySet, {
       method: "POST",
-      body: JSON.stringify(this.toDataverse(record as Row)),
+      body: JSON.stringify(payload),
     });
     return this.toApp(data ?? {});
   }

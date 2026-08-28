@@ -24,6 +24,24 @@ export interface DataverseBinding {
    * Fields absent from the map pass through untouched.
    */
   fields?: Record<string, string>;
+  /**
+   * The table's primary name column, when no app field already writes to it.
+   *
+   * Every table here declares its name column ApplicationRequired, which the
+   * Web API does not enforce — so a create that omits it succeeds and leaves
+   * the record nameless. That is invisible inside this app, which addresses
+   * rows by id, and very visible everywhere else: Dataverse views, Advanced
+   * Find, and any lookup pointing at the row all display the primary name, so
+   * the row shows up blank.
+   *
+   * Reference tables (plants, customers) already map a `name` field and need
+   * nothing here. Transaction tables (a harvest, an irrigation run) have no
+   * natural name, so `nameFrom` builds one from the fields that identify the
+   * record to a person.
+   */
+  primaryName?: string;
+  /** App fields joined to build `primaryName`; first non-empty values win. */
+  nameFrom?: string[];
 }
 
 export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
@@ -149,6 +167,8 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // _value column, which DataverseStore unwraps.
       plant: "_bv_plantid_value", bed: "_bv_bedid_value", season: "_bv_seasonid_value",
     },
+    primaryName: "bv_plantingdescription",
+    nameFrom: ["plant", "bed", "date"],
   },
   treatments: {
     dataSource: "bv_treatments",
@@ -158,6 +178,8 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       temp: "bv_temperaturec", humidity: "bv_humidity", ph: "bv_ph",
       bed: "_bv_bedid_value", input: "_bv_inputid_value",
     },
+    primaryName: "bv_treatmentname",
+    nameFrom: ["bed", "date", "type"],
   },
   irrigation: {
     dataSource: "bv_irrigations",
@@ -166,6 +188,8 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       date: "bv_date", liters: "bv_amountliters", method: "bv_method",
       bed: "_bv_bedid_value",
     },
+    primaryName: "bv_irrigationname",
+    nameFrom: ["bed", "date", "method"],
   },
   harvest: {
     dataSource: "bv_harvests",
@@ -174,6 +198,8 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       date: "bv_date", qty: "bv_quantityharvested",
       quality: "bv_quality", worker: "bv_worker", bed: "_bv_bedid_value",
     },
+    primaryName: "bv_harvestname",
+    nameFrom: ["bed", "date", "quality"],
   },
   tasks: { dataSource: "bv_tasks", primaryKey: "bv_taskid" },
   pruning: { dataSource: "bv_prunings", primaryKey: "bv_pruningid" },
@@ -197,6 +223,8 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       pieces: "bv_piececount", boxes: "bv_boxespacked", cost: "bv_laborcost",
       notes: "bv_notes", worker: "_bv_workerid_value", bed: "_bv_bedid_value",
     },
+    primaryName: "bv_timesheetname",
+    nameFrom: ["worker", "date", "activity"],
   },
   fiscal: { dataSource: "bv_fiscalauthorizations", primaryKey: "bv_fiscalauthorizationid" },
 };

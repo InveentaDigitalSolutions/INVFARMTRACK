@@ -29,20 +29,49 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
   /** Dataverse column -> app field */
   private readonly toField: Record<string, string>;
 
+  /** Primary name column to fill on create, when no app field writes it. */
+  private readonly primaryName?: string;
+  /** App fields joined to build that name. */
+  private readonly nameFrom: string[];
+
   /**
    * @param dataSourceName as it appears in power.config.json, e.g. "bv_shadehouses"
    * @param primaryKey     the Dataverse key column, e.g. "bv_shadehouseid"
    * @param fields         app field -> Dataverse column; unmapped names pass through
+   * @param primaryName    name column to synthesize on create — see DataverseBinding
+   * @param nameFrom       app fields to build that name from
    */
   constructor(
     dataSourceName: string,
     primaryKey: string,
-    fields: Record<string, string> = {}
+    fields: Record<string, string> = {},
+    primaryName?: string,
+    nameFrom: string[] = []
   ) {
     this.dataSourceName = dataSourceName;
     this.primaryKey = primaryKey;
     this.toColumn = fields;
     this.toField = Object.fromEntries(Object.entries(fields).map(([k, v]) => [v, k]));
+    this.primaryName = primaryName;
+    this.nameFrom = nameFrom;
+  }
+
+  /**
+   * Build the primary name for a new record.
+   *
+   * Lookup fields hold display text in the app (DataverseStore unwraps the
+   * formatted annotation on read), so joining them reads the way a person
+   * would say it: "Bed A-12 · 2026-08-28 · Export". Dataverse caps primary
+   * name at 100 characters and silently rejects longer, so trim.
+   */
+  private buildName(record: Row): string | undefined {
+    if (!this.primaryName) return undefined;
+    const parts = this.nameFrom
+      .map((field) => record[field])
+      .filter((v) => v !== undefined && v !== null && v !== "")
+      .map((v) => String(v));
+    if (parts.length === 0) return undefined;
+    return parts.join(" · ").slice(0, 100);
   }
 
   /** Dataverse record -> app record: rename columns and expose the key as `id`. */
@@ -144,9 +173,18 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
   }
 
   async create(record: Omit<T, "id">): Promise<T> {
+    const payload = this.toDataverse(record as Row);
+
+    // Fill the primary name only when the mapped fields left it empty — a
+    // table that maps its own `name` field has already written it.
+    if (this.primaryName && !payload[this.primaryName]) {
+      const name = this.buildName(record as Row);
+      if (name) payload[this.primaryName] = name;
+    }
+
     const result = await this.client.createRecordAsync<Row, Row>(
       this.dataSourceName,
-      this.toDataverse(record as Row)
+      payload
     );
     return this.toApp(this.unwrap(result));
   }

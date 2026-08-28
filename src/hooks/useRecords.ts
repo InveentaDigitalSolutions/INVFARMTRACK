@@ -39,8 +39,14 @@ function storeFor(table: string, seed: Record<string, unknown>[]): DataStore<Ide
     // the 3D view never learn which one they got.
     store =
       mode === "standalone"
-        ? new DataverseWebApiStore<Identified>(binding.dataSource, binding.primaryKey, binding.fields)
-        : new DataverseStore<Identified>(binding.dataSource, binding.primaryKey, binding.fields);
+        ? new DataverseWebApiStore<Identified>(
+            binding.dataSource, binding.primaryKey, binding.fields,
+            binding.primaryName, binding.nameFrom
+          )
+        : new DataverseStore<Identified>(
+            binding.dataSource, binding.primaryKey, binding.fields,
+            binding.primaryName, binding.nameFrom
+          );
     console.info(`[data] ${table} -> Dataverse (${binding.dataSource}) via ${mode}`);
   } else {
     store = new LocalStore<Identified>(table, seed as Identified[]);
