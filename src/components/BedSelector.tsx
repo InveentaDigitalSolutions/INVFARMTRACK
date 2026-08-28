@@ -1,18 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, Warehouse, Layers } from "lucide-react";
+import { useNurseryBeds, type BedOption } from "../hooks/useNurseryBeds";
 
-export interface BedOption {
-  id: string;
-  name: string;
-  fieldId: string;
-  fieldName: string;
-  shadehouseId: string;
-  shadehouseName: string;
-  type: "Air" | "Ground";
-  level: number;
-  plant?: string;
-}
+export type { BedOption };
+
 
 // Real structure: 1 shadehouse, 4 fields (E3, E1, C3, C1), 120 beds
 const plotConfigs = [
@@ -28,7 +20,12 @@ const varieties = [
   "Pothos / Golden Glen", "Sansevieria / Sansevieria",
 ];
 
-const nurseryData: BedOption[] = plotConfigs.flatMap((field) =>
+/**
+ * Stand-in for demo mode, where there is no Dataverse to read. Everything
+ * about it except the bed names is invented, which is why it is only ever a
+ * fallback — see useNurseryBeds.
+ */
+const demoBeds: BedOption[] = plotConfigs.flatMap((field) =>
   Array.from({ length: field.bedCount }, (_, i) => {
     const num = i + 1;
     const seed = field.id.charCodeAt(0) * 100 + num;
@@ -48,7 +45,7 @@ const nurseryData: BedOption[] = plotConfigs.flatMap((field) =>
 );
 
 export function getAllBeds(): BedOption[] {
-  return nurseryData;
+  return demoBeds;
 }
 
 interface BedSelectorProps {
@@ -59,30 +56,41 @@ interface BedSelectorProps {
 }
 
 export default function BedSelector({ selected, onChange, multiSelect = true, label = "Select Beds" }: BedSelectorProps) {
-  const [shadehouse, setShadehouse] = useState<string>("SH-1");
+  const { beds: nurseryData, countByField } = useNurseryBeds(demoBeds);
+  const [shadehouse, setShadehouse] = useState<string>("");
   const [field, setField] = useState<string>("");
 
   const shadehouses = useMemo(() => {
     const map = new Map<string, string>();
     nurseryData.forEach((b) => map.set(b.shadehouseId, b.shadehouseName));
     return Array.from(map, ([id, name]) => ({ id, name }));
-  }, []);
+  }, [nurseryData]);
+
+  // Start on the first shadehouse rather than a hardcoded "SH-1", which no
+  // longer matches anything once the real records load.
+  useEffect(() => {
+    if (!shadehouse && shadehouses.length > 0) setShadehouse(shadehouses[0].id);
+  }, [shadehouse, shadehouses]);
 
   const fields = useMemo(() => {
     if (!shadehouse) return [];
     const map = new Map<string, { name: string; bedCount: number }>();
-    nurseryData.filter((b) => b.shadehouseId === shadehouse).forEach((b) => {
-      if (!map.has(b.fieldId)) map.set(b.fieldId, { name: b.fieldName, bedCount: nurseryData.filter((bb) => bb.fieldId === b.fieldId).length });
-    });
-    return Array.from(map, ([id, data]) => ({ id, ...data }));
-  }, [shadehouse]);
+    nurseryData
+      .filter((b) => b.shadehouseId === shadehouse)
+      .forEach((b) => {
+        if (!map.has(b.fieldId))
+          map.set(b.fieldId, { name: b.fieldName, bedCount: countByField[b.fieldName] ?? 0 });
+      });
+    return Array.from(map, ([id, data]) => ({ id, ...data }))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+  }, [shadehouse, nurseryData, countByField]);
 
   const availableBeds = useMemo(() => {
     if (!shadehouse) return [];
     let beds = nurseryData.filter((b) => b.shadehouseId === shadehouse);
     if (field) beds = beds.filter((b) => b.fieldId === field);
     return beds;
-  }, [shadehouse, field]);
+  }, [shadehouse, field, nurseryData]);
 
   useEffect(() => { setField(""); }, [shadehouse]);
 
