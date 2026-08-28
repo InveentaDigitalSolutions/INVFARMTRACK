@@ -45,7 +45,12 @@ const selectClass =
   "px-2 py-1.5 text-[13px] rounded-lg border border-sand-200 bg-white text-navy-900 " +
   "cursor-pointer focus:outline-none focus:ring-2 focus:ring-lime-400/30";
 
-export default function BedCountGrid() {
+interface BedCountGridProps {
+  /** Called once a save lands, so a host dialog can close itself. */
+  onSaved?: (count: number) => void;
+}
+
+export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
   const [counts, setCounts] = useRecords<BedCountRow>("bedCounts", []);
   const [pruning] = useRecords<PruningRow>("pruning", []);
   const { beds } = useNurseryBeds();
@@ -159,6 +164,7 @@ export default function BedCountGrid() {
     setDraft({});
     setSaved(dirty.length);
     setSaving(false);
+    onSaved?.(dirty.length);
     window.setTimeout(() => setSaved(0), 4000);
   };
 

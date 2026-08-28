@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { CalendarCheck, TrendingUp, CheckCircle, AlertTriangle, BarChart3 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CalendarCheck, TrendingUp, CheckCircle, AlertTriangle, BarChart3, X } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
@@ -236,23 +236,48 @@ export default function AvailabilityPage() {
   const renderTab = () => {
     switch (tab) {
       case "projections":
-        if (counting) {
-          return (
-            <div className="space-y-4">
-              <button
-                type="button"
-                onClick={() => setCounting(false)}
-                className="text-[12px] text-navy-500 hover:text-navy-800 cursor-pointer
-                           focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 rounded"
-              >
-                ← Back to projections
-              </button>
-              <BedCountGrid />
-            </div>
-          );
-        }
         return (
           <>
+            <AnimatePresence>
+              {counting && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    onClick={() => setCounting(false)}
+                    className="fixed inset-0 bg-navy-950/40 backdrop-blur-sm z-40"
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}
+                    transition={{ duration: 0.18 }}
+                    role="dialog" aria-modal="true" aria-label="Count beds for a shipment week"
+                    className="fixed inset-0 z-50 flex items-start justify-center pt-[5vh] px-4"
+                  >
+                    <div className="w-full max-w-6xl max-h-[90vh] flex flex-col bg-white rounded-2xl
+                                    border border-sand-200 shadow-2xl overflow-hidden">
+                      <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-sand-200">
+                        <div>
+                          <h2 className="text-[16px] font-semibold text-navy-900">New projection</h2>
+                          <p className="text-[12px] text-navy-400 mt-0.5">
+                            Count each bed for the shipment week. The pruning estimate is beside it.
+                          </p>
+                        </div>
+                        <button
+                          type="button" onClick={() => setCounting(false)} aria-label="Close"
+                          className="p-1.5 rounded-lg text-navy-400 hover:text-navy-800 hover:bg-sand-100
+                                     focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40
+                                     transition-colors cursor-pointer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="flex-1 overflow-y-auto px-6 py-5">
+                        <BedCountGrid onSaved={() => setCounting(false)} />
+                      </div>
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
             <DataTable
               columns={[
                 { key: "week", label: "Week" },

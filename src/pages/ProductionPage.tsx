@@ -11,8 +11,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { nextSeasonName } from "../services/infrastructureRules";
-import BedRotation from "../components/BedRotation";
-import ProductionSchedule from "../components/ProductionSchedule";
+import ProductionOverview from "../components/ProductionOverview";
 import { useInputNutrients } from "../hooks/useInputNutrients";
 
 /**
@@ -413,14 +412,7 @@ export default function ProductionPage() {
           </>
         );
       case "overview":
-        return (
-          <div className="space-y-8">
-            <ProductionSchedule />
-            {/* Rotation, not utilisation: the beds are occupied nearly all
-                year, so what varies is how often they turn over. */}
-            <BedRotation />
-          </div>
-        );
+        return <ProductionOverview />;
       case "care":
         return (
           <div className="space-y-4">
