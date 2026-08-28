@@ -322,7 +322,7 @@ function ViewSwitch<T extends string>({ views, value, onChange, label }: {
           aria-pressed={value === v.id}
           className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-colors cursor-pointer
             focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
-            value === v.id ? "bg-white text-navy-800 shadow-sm" : "text-navy-400 hover:text-navy-600"
+            value === v.id ? "segment-active shadow-sm" : "text-navy-400 hover:text-navy-600"
           }`}
         >
           {v.label}

@@ -340,7 +340,7 @@ export default function WeatherWidget({ compact = false, className = "" }: Weath
                     key={v}
                     onClick={() => setView(v)}
                     className={`px-3 py-1.5 text-[11px] font-medium rounded-md transition-colors cursor-pointer ${
-                      view === v ? "bg-white text-navy-800 shadow-sm" : "text-navy-400 hover:text-navy-600"
+                      view === v ? "segment-active shadow-sm" : "text-navy-400 hover:text-navy-600"
                     }`}
                   >
                     {v === "hourly" ? "Today (Hourly)" : "7-Day Forecast"}

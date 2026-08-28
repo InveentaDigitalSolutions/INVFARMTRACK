@@ -363,7 +363,7 @@ export default function InfrastructurePage() {
                       className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-colors cursor-pointer
                         focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
                         shView === id
-                          ? "bg-white text-navy-800 shadow-sm"
+                          ? "segment-active shadow-sm"
                           : "text-navy-400 hover:text-navy-600"
                       }`}
                     >

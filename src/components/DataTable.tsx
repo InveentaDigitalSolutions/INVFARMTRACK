@@ -311,7 +311,7 @@ export default function DataTable<T extends Record<string, unknown>>({
                   onClick={() => setLimit(key)}
                   className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
                     limit === key
-                      ? "bg-navy-800 text-white"
+                      ? "chip-selected"
                       : "text-navy-500 hover:bg-sand-100"
                   }`}
                 >

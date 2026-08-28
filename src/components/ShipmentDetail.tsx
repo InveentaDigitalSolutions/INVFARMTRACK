@@ -323,7 +323,7 @@ export default function ShipmentDetail({
                   {["BNDL", "IND"].map((t) => (
                     <button key={t} onClick={() => setGroupType(t)}
                       className={`flex-1 py-2 text-xs font-medium rounded-lg border cursor-pointer ${
-                        groupType === t ? "bg-navy-700 text-white border-green-700" : "bg-white text-navy-700 border-sand-200"
+                        groupType === t ? "chip-selected border-green-700" : "bg-white text-navy-700 border-sand-200"
                       }`}>{t === "BNDL" ? "Bundle" : "Individual"}</button>
                   ))}
                 </div>
@@ -338,7 +338,7 @@ export default function ShipmentDetail({
                     {[3, 5].map((s) => (
                       <button key={s} onClick={() => setGroupBundle(s)}
                         className={`flex-1 py-2 text-xs font-medium rounded-lg border cursor-pointer ${
-                          groupBundle === s ? "bg-navy-700 text-white border-green-700" : "bg-white text-navy-700 border-sand-200"
+                          groupBundle === s ? "chip-selected border-green-700" : "bg-white text-navy-700 border-sand-200"
                         }`}>x{s}</button>
                     ))}
                   </div>
@@ -382,7 +382,7 @@ export default function ShipmentDetail({
               {[5, 10, 13, 17, 20, 25, 38, 50].map((n) => (
                 <button key={n} onClick={() => setGroupCount(n)}
                   className={`px-2 py-1 text-xs rounded-md border cursor-pointer ${
-                    groupCount === n ? "bg-navy-700 text-white border-green-700" : "bg-white text-navy-500 border-sand-200 hover:border-green-300"
+                    groupCount === n ? "chip-selected border-green-700" : "bg-white text-navy-500 border-sand-200 hover:border-green-300"
                   }`}>{n}</button>
               ))}
             </div>
@@ -391,7 +391,7 @@ export default function ShipmentDetail({
               <button onClick={() => setShowAddGroup(false)} className="text-sm text-navy-500 hover:text-navy-800 cursor-pointer">Cancel</button>
               <button onClick={handleAddBoxes}
                 disabled={!groupPlant || !groupBed || !groupSize}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold bg-navy-700 text-white rounded-lg hover:bg-green-600 disabled:bg-sand-200 disabled:text-green-400 cursor-pointer disabled:cursor-not-allowed">
+                className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold chip-selected rounded-lg hover:bg-green-600 disabled:bg-sand-200 disabled:text-green-400 cursor-pointer disabled:cursor-not-allowed">
                 <Plus className="w-4 h-4" />
                 Add {groupCount} box{groupCount > 1 ? "es" : ""}
               </button>
@@ -423,7 +423,7 @@ export default function ShipmentDetail({
           <UserCheck className="w-5 h-5 text-lime-400 shrink-0" />
           <span className="text-sm font-medium">{selectedBoxes.size} box{selectedBoxes.size > 1 ? "es" : ""} selected</span>
           <select value={assignWorker} onChange={(e) => setAssignWorker(e.target.value)}
-            className="ml-auto px-3 py-1.5 text-sm rounded-lg bg-navy-700 text-white border border-green-600 cursor-pointer focus:outline-none">
+            className="ml-auto px-3 py-1.5 text-sm rounded-lg chip-selected border border-green-600 cursor-pointer focus:outline-none">
             <option value="">Assign to...</option>
             {workers.map((w) => <option key={w.id} value={w.name}>{w.name} ({w.id})</option>)}
           </select>

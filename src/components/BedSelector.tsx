@@ -146,7 +146,7 @@ export default function BedSelector({ selected, onChange, multiSelect = true, la
             const some = ids.some((id) => selected.includes(id));
             return (
               <button type="button" key={f.id} onClick={() => selectField(f.id)}
-                className={`px-3 py-1.5 text-[11px] font-medium rounded-lg border transition-colors cursor-pointer ${all ? "bg-navy-700 text-white border-navy-700" : some ? "bg-lime-50 text-navy-700 border-lime-300" : "bg-white text-navy-600 border-sand-200 hover:border-lime-300"}`}>
+                className={`px-3 py-1.5 text-[11px] font-medium rounded-lg border transition-colors cursor-pointer ${all ? "chip-selected" : some ? "bg-lime-50 text-navy-700 border-lime-300" : "bg-white text-navy-600 border-sand-200 hover:border-lime-300"}`}>
                 {f.name} ({f.bedCount}){all && " ✓"}
               </button>
             );
@@ -166,7 +166,7 @@ export default function BedSelector({ selected, onChange, multiSelect = true, la
                 <motion.button type="button" key={bed.id} whileTap={{ scale: 0.95 }} onClick={() => toggleBed(bed.id)}
                   title={`${bed.id} (${bed.type})${bed.plant ? ` — ${bed.plant}` : " — Empty"}`}
                   className={`relative p-1.5 rounded-md text-[9px] font-mono font-medium border transition-all cursor-pointer ${
-                    isSelected ? "bg-navy-700 text-white border-navy-700 shadow-sm"
+                    isSelected ? "chip-selected shadow-sm"
                     : hasPlant ? "bg-white text-navy-700 border-sand-200 hover:border-lime-400"
                     : "bg-sand-100 text-navy-400 border-sand-200 hover:border-navy-300"}`}>
                   {bed.id}

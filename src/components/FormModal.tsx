@@ -224,7 +224,7 @@ function renderField(
               onClick={() => onChange(field.key, o.value)}
               className={`flex-1 py-2.5 text-[13px] font-medium rounded-lg border transition-colors cursor-pointer ${
                 String(v) === o.value
-                  ? "bg-navy-700 text-white border-navy-700"
+                  ? "chip-selected"
                   : "bg-white text-navy-600 border-sand-200 hover:border-lime-300"
               }`}
             >
@@ -275,7 +275,7 @@ function renderField(
                 }}
                 className={`px-3 py-1.5 text-[12px] font-medium rounded-lg border transition-colors cursor-pointer ${
                   isSelected
-                    ? "bg-navy-700 text-white border-navy-700"
+                    ? "chip-selected"
                     : "bg-white text-navy-600 border-sand-200 hover:border-lime-300"
                 }`}
               >

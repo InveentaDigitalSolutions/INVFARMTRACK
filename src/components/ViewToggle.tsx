@@ -12,7 +12,7 @@ export default function ViewToggle({ view, onChange }: ViewToggleProps) {
         onClick={() => onChange("list")}
         className={`p-1.5 rounded-md transition-colors cursor-pointer ${
           view === "list"
-            ? "bg-white text-navy-800 shadow-sm"
+            ? "segment-active shadow-sm"
             : "text-navy-400 hover:text-navy-600"
         }`}
       >
@@ -22,7 +22,7 @@ export default function ViewToggle({ view, onChange }: ViewToggleProps) {
         onClick={() => onChange("grid")}
         className={`p-1.5 rounded-md transition-colors cursor-pointer ${
           view === "grid"
-            ? "bg-white text-navy-800 shadow-sm"
+            ? "segment-active shadow-sm"
             : "text-navy-400 hover:text-navy-600"
         }`}
       >

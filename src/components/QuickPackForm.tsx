@@ -296,7 +296,7 @@ export default function QuickPackForm({
                     onClick={() => setPackingType(t)}
                     className={`flex-1 py-2.5 text-sm font-medium rounded-lg border transition-colors cursor-pointer ${
                       packingType === t
-                        ? "bg-navy-700 text-white border-navy-700"
+                        ? "chip-selected"
                         : "bg-white text-navy-700 border-sand-200 hover:border-lime-300"
                     }`}
                   >
@@ -317,7 +317,7 @@ export default function QuickPackForm({
                       onClick={() => setBundleSize(s)}
                       className={`flex-1 py-2.5 text-sm font-medium rounded-lg border transition-colors cursor-pointer ${
                         bundleSize === s
-                          ? "bg-navy-700 text-white border-navy-700"
+                          ? "chip-selected"
                           : "bg-white text-navy-700 border-sand-200 hover:border-lime-300"
                       }`}
                     >
@@ -408,7 +408,7 @@ export default function QuickPackForm({
                       onClick={() => setBoxCount(n)}
                       className={`px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer ${
                         boxCount === n
-                          ? "bg-navy-700 text-white border-navy-700"
+                          ? "chip-selected"
                           : "bg-white text-navy-500 border-green-200 hover:border-lime-400"
                       }`}
                     >
@@ -481,7 +481,7 @@ export default function QuickPackForm({
                           generated
                             ? "bg-lime-500 text-white"
                             : isValid
-                            ? "bg-navy-700 text-white hover:bg-navy-600 shadow-sm hover:shadow-md"
+                            ? "chip-selected hover:bg-navy-600 shadow-sm hover:shadow-md"
                             : "bg-sand-200 text-navy-300 cursor-not-allowed"
                         }`}
           >

@@ -99,22 +99,41 @@
   .dark .dark\:ring-d { --tw-ring-color: #2c3e55; }
 }
 
-/* Dark mode auto-apply to common elements */
+/*
+ * Dark mode, applied by what an element is rather than where it sits.
+ *
+ * These rules were scoped to .card-surface, so a panel only went dark if
+ * someone remembered to add that class. Every component built recently missed
+ * it and stayed white in a dark app — a mechanism that depends on remembering
+ * will keep being forgotten, so the scope is now the theme itself.
+ *
+ * Anything that must stay light regardless carries .keep-light.
+ */
 .dark .card-surface {
   background-color: #1b2838 !important;
   border-color: #2c3e55 !important;
 }
-.dark .card-surface .text-navy-900 { color: #f0f3f7; }
-.dark .card-surface .text-navy-800 { color: #d8dfe8; }
-.dark .card-surface .text-navy-700 { color: #b0becf; }
-.dark .card-surface .text-navy-500 { color: #7e92ab; }
-.dark .card-surface .text-navy-400 { color: #566d8a; }
-.dark .card-surface .bg-sand-50 { background-color: #1f2f42; }
-.dark .card-surface .bg-sand-100 { background-color: #2c3e55; }
-.dark .card-surface .bg-white { background-color: #1f2f42; }
-.dark .card-surface .border-sand-200 { border-color: #2c3e55; }
-.dark .card-surface .border-sand-100 { border-color: #1f2f42; }
-.dark .card-surface .ring-sand-200\/60 { --tw-ring-color: rgba(44,62,85,0.6); }
+.dark :not(.keep-light) > .text-navy-900,
+.dark .text-navy-900:not(.keep-light) { color: #f0f3f7; }
+.dark .text-navy-800:not(.keep-light) { color: #d8dfe8; }
+.dark .text-navy-700:not(.keep-light) { color: #b0becf; }
+.dark .text-navy-600:not(.keep-light) { color: #98a9bf; }
+.dark .text-navy-500:not(.keep-light) { color: #7e92ab; }
+.dark .text-navy-400:not(.keep-light) { color: #6b7f97; }
+.dark .text-navy-300:not(.keep-light) { color: #566d8a; }
+.dark .bg-white:not(.keep-light) { background-color: #1b2838; }
+.dark .bg-sand-50:not(.keep-light),
+.dark .bg-sand-50\/50:not(.keep-light),
+.dark .bg-sand-50\/60:not(.keep-light),
+.dark .bg-sand-50\/80:not(.keep-light) { background-color: #1f2f42; }
+.dark .bg-sand-100:not(.keep-light) { background-color: #2c3e55; }
+.dark .bg-sand-200:not(.keep-light) { background-color: #3b4c62; }
+.dark .border-sand-200:not(.keep-light),
+.dark .border-sand-200\/80:not(.keep-light),
+.dark .border-sand-200\/70:not(.keep-light),
+.dark .border-sand-200\/60:not(.keep-light) { border-color: #2c3e55; }
+.dark .border-sand-100:not(.keep-light) { border-color: #1f2f42; }
+.dark .ring-sand-200\/60 { --tw-ring-color: rgba(44,62,85,0.6); }
 
 /* Dark mode on main content area */
 .dark .main-content {
@@ -415,4 +434,45 @@
 .sidebar-nav::-webkit-scrollbar {
   width: 0;
   height: 0;
+}
+
+/*
+ * One selected style, explicit on both grounds.
+ *
+ * Selection was drawn as bg-navy-700 (#1f2f42) on a light ground. In dark mode
+ * the blanket rule above flattens unselected controls to that same #1f2f42, so
+ * selected and unselected became identical — twenty-seven beds could be picked
+ * with no way to see which. A dark fill cannot mean "chosen" on a dark ground.
+ *
+ * The brand lime reads on white and on navy, so it carries selection in both.
+ * Declared here rather than as utilities at each call site: the blanket dark
+ * rules rewrite utility colours, and a class they do not know about survives.
+ */
+.chip-selected,
+.dark .chip-selected,
+.dark .card-surface .chip-selected {
+  background-color: #a3b835;
+  border-color: #a3b835;
+  color: #0e1520;
+}
+.chip-selected:hover,
+.dark .chip-selected:hover {
+  background-color: #b6c94a;
+  border-color: #b6c94a;
+}
+
+/*
+ * The raised pill of a segmented control.
+ *
+ * It was bg-white on a bg-sand-100 track — right on a light ground, and
+ * inverted on a dark one, where the active pill came out darker than the track
+ * it sits in. Both grounds are stated, so "raised" stays raised.
+ */
+.segment-active {
+  background-color: #ffffff;
+  color: #1b2838;
+}
+.dark .segment-active {
+  background-color: #3b4c62;
+  color: #f0f3f7;
 }

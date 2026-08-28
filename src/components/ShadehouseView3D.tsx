@@ -180,7 +180,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
               onClick={() => toggleLevel(level)}
               className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
                 active
-                  ? "bg-navy-800 text-white"
+                  ? "chip-selected"
                   : "bg-sand-100 text-navy-400 hover:bg-sand-200"
               }`}
             >
@@ -195,7 +195,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowPlotLabels((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showPlotLabels ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showPlotLabels ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
           }`}
         >
           <MapIcon className="w-3 h-3" />
@@ -204,7 +204,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowWeather((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showWeather ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showWeather ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
           }`}
         >
           <CloudRain className="w-3 h-3" />
@@ -213,7 +213,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowCompass((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showCompass ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showCompass ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
           }`}
         >
           <Compass className="w-3 h-3" />
@@ -222,7 +222,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowBedNumbers((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showBedNumbers ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showBedNumbers ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
           }`}
         >
           <Tag className="w-3 h-3" />
@@ -258,7 +258,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             onClick={() => setLens(id)}
             className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
               lens === id
-                ? "bg-navy-800 text-white"
+                ? "chip-selected"
                 : "bg-sand-100 text-navy-400 hover:bg-sand-200"
             }`}
           >

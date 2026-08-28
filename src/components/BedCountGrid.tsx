@@ -276,7 +276,7 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
               className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors cursor-pointer
                           focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
                 active
-                  ? "bg-navy-800 text-white"
+                  ? "chip-selected"
                   : done
                     ? "bg-lime-50 text-lime-700 border border-lime-200 hover:bg-lime-100"
                     : "bg-sand-100 text-navy-600 hover:bg-sand-200"
@@ -297,7 +297,7 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
           aria-pressed={field === ""}
           className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors cursor-pointer
                       focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
-            field === "" ? "bg-navy-800 text-white" : "bg-sand-100 text-navy-600 hover:bg-sand-200"
+            field === "" ? "chip-selected" : "bg-sand-100 text-navy-600 hover:bg-sand-200"
           }`}
         >
           All
