@@ -23,9 +23,10 @@
     "dataverse:seed-fix": "node scripts/dataverse/fix-autonumber-seeds.mjs",
     "test:math": "tsx scripts/test/invoiceMath.test.mts",
     "test:rules": "tsx scripts/test/infrastructureRules.test.mts",
-    "test": "npm run test:math && npm run test:rules && npm run test:rotation",
+    "test": "npm run test:math && npm run test:rules && npm run test:rotation && npm run test:schedule",
     "dataverse:photos": "node scripts/dataverse/sync-user-photos.mjs",
-    "test:rotation": "tsx scripts/test/bedRotation.test.mts"
+    "test:rotation": "tsx scripts/test/bedRotation.test.mts",
+    "test:schedule": "tsx scripts/test/productionSchedule.test.mts"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.19.0",

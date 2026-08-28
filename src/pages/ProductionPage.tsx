@@ -12,6 +12,7 @@ import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { nextSeasonName } from "../services/infrastructureRules";
 import BedRotation from "../components/BedRotation";
+import ProductionSchedule from "../components/ProductionSchedule";
 
 /**
  * Ordered the way the work happens: see where you stand, plant, tend, harvest,
@@ -92,18 +93,7 @@ const initSeasons = [
   { name: "2026-S1", start: "2026-01-01", end: "2026-06-30", description: "First season 2026", active: true },
   { name: "2025-S2", start: "2025-07-01", end: "2025-12-31", description: "Second season 2025", active: false },
 ];
-const productionPlanWeeks = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
-const productionPlan = [
-  { variety: "Pothos / Hawaiian",       shadehouse: "SH-0001", bed: "E3",  plant: [10, 11], grow: [12, 15], harvest: [16, 17], ship: [17, 18], qty: 53525 },
-  { variety: "Pothos / Marble Queen",   shadehouse: "SH-0001", bed: "C3",  plant: [11, 12], grow: [13, 16], harvest: [16, 18], ship: [17, 19], qty: 102500 },
-  { variety: "Pothos / Jade",           shadehouse: "SH-0001", bed: "E1",  plant: [10, 11], grow: [12, 15], harvest: [16, 17], ship: [17, 18], qty: 39250 },
-  { variety: "Pothos / N'Joy",          shadehouse: "SH-0001", bed: "C1",  plant: [12, 13], grow: [14, 17], harvest: [18, 19], ship: [19, 20], qty: 2526 },
-  { variety: "Pothos / Golden Glen",    shadehouse: "SH-0001", bed: "E3",  plant: [12, 13], grow: [14, 18], harvest: [18, 20], ship: [19, 21], qty: 6365 },
-  { variety: "Sansevieria",             shadehouse: "SH-0001", bed: "C3",  plant: [10, 12], grow: [13, 19], harvest: [20, 21], ship: [21, 22], qty: 4000 },
-];
 
-const SHADEHOUSES: Record<string, string> = { "SH-0001": "Shadehouse 1" };
-const shadehouseLabel = (id: string) => `${id} · ${SHADEHOUSES[id] ?? "Unknown"}`;
 
 
 const initFertilization = [
@@ -242,6 +232,12 @@ const plantFields = [
     { key: "latin", label: "Latin Name", type: "text" as const },
     { key: "variety", label: "Variety", type: "text" as const },
   ]},
+  { title: "Growing Cycle", columns: 2 as const, fields: [
+    // Without these the schedule can only report the past: a planting date
+    // says when work started, not when stock arrives.
+    { key: "weeksToFirstHarvest", label: "Weeks to First Cut", type: "number" as const, min: 0 },
+    { key: "productiveWeeks", label: "Productive Weeks", type: "number" as const, min: 0 },
+  ]},
   { title: "Patent & Status", columns: 2 as const, fields: [
     { key: "patent", label: "Patented", type: "toggle" as const, options: [{ value: "Yes", label: "Yes" }, { value: "No", label: "No" }] },
     { key: "patentNum", label: "Patent Number", type: "text" as const },
@@ -298,14 +294,7 @@ const statusBadge = (s: string) => {
   return <Badge variant={v}>{s}</Badge>;
 };
 
-const phaseStyles = {
-  plant:   { fill: "bg-lime-300",   ring: "ring-lime-500/30",   text: "text-lime-900",  short: "P", label: "Plant" },
-  grow:    { fill: "bg-green-500",  ring: "ring-green-700/30",  text: "text-white",     short: "G", label: "Grow" },
-  harvest: { fill: "bg-amber-500",  ring: "ring-amber-600/30",  text: "text-amber-950", short: "H", label: "Harvest" },
-  ship:    { fill: "bg-navy-700",   ring: "ring-navy-800/40",   text: "text-lime-300",  short: "S", label: "Ship" },
-} as const;
 
-const CURRENT_WEEK = 15;
 
 /** Switches between the views inside a grouped tab. */
 function ViewSwitch<T extends string>({ views, value, onChange, label }: {
@@ -334,135 +323,6 @@ function ViewSwitch<T extends string>({ views, value, onChange, label }: {
   );
 }
 
-function ProductionPlanGantt() {
-  const minWeek = productionPlanWeeks[0];
-  const maxWeek = productionPlanWeeks[productionPlanWeeks.length - 1];
-  const span = maxWeek - minWeek + 1;
-  const pct = (week: number) => ((week - minWeek) / span) * 100;
-  const widthPct = (start: number, end: number) => ((end - start + 1) / span) * 100;
-  const totalQty = productionPlan.reduce((s, r) => s + r.qty, 0);
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <h3 className="text-[15px] font-bold text-navy-900 tracking-tight">Production Schedule</h3>
-          <p className="text-[12px] text-navy-500 mt-0.5">
-            {[...new Set(productionPlan.map((r) => r.shadehouse))].map(shadehouseLabel).join(", ")} · Q2 2026 · {productionPlan.length} varieties · Weeks {minWeek}–{maxWeek} · <span className="font-mono font-semibold text-navy-700">{totalQty.toLocaleString()}</span> stems
-          </p>
-        </div>
-        <div className="flex items-center gap-3 px-3.5 py-2 rounded-full bg-white border border-sand-200/80 shadow-sm">
-          {(["plant", "grow", "harvest", "ship"] as const).map((k) => (
-            <div key={k} className="flex items-center gap-1.5">
-              <span className={`inline-block w-2.5 h-2.5 rounded-sm ${phaseStyles[k].fill} shadow-sm ring-1 ${phaseStyles[k].ring}`} />
-              <span className="text-[11px] font-medium text-navy-700">{phaseStyles[k].label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-sand-200/80 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <div className="min-w-[960px]">
-            {/* Header */}
-            <div className="flex border-b border-sand-200/80 bg-sand-50/60 sticky top-0 z-10">
-              <div className="w-[240px] shrink-0 px-5 py-3 text-[10px] font-bold text-navy-500 uppercase tracking-[0.12em]">
-                Variety
-              </div>
-              <div className="flex-1 relative">
-                <div className="grid" style={{ gridTemplateColumns: `repeat(${span}, 1fr)` }}>
-                  {productionPlanWeeks.map((w) => (
-                    <div
-                      key={w}
-                      className={`py-3 text-center text-[10px] font-bold uppercase tracking-wider border-l border-sand-100 ${
-                        w === CURRENT_WEEK ? "text-lime-700 bg-lime-50/60" : "text-navy-500"
-                      }`}
-                    >
-                      <span>{w}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="w-[110px] shrink-0 px-4 py-3 text-right text-[10px] font-bold text-navy-500 uppercase tracking-[0.12em]">
-                Qty
-              </div>
-            </div>
-
-            {/* Rows */}
-            <div>
-              {productionPlan.map((row, idx) => (
-                <div
-                  key={row.variety}
-                  className={`flex items-stretch transition-colors ${
-                    idx % 2 === 0 ? "bg-white" : "bg-sand-50/40"
-                  } hover:bg-lime-50/30`}
-                >
-                  <div className="w-[240px] shrink-0 px-5 py-3.5 border-r border-sand-100">
-                    <p className="text-[13px] font-semibold text-navy-900 leading-tight">{row.variety}</p>
-                    <p className="text-[11px] text-navy-400 mt-0.5 font-mono">
-                      {row.shadehouse} · Field {row.bed}
-                    </p>
-                  </div>
-                  <div className="flex-1 relative">
-                    {/* Gridlines */}
-                    <div className="absolute inset-0 grid pointer-events-none" style={{ gridTemplateColumns: `repeat(${span}, 1fr)` }}>
-                      {productionPlanWeeks.map((w) => (
-                        <div
-                          key={w}
-                          className={`border-l ${
-                            w === CURRENT_WEEK ? "border-lime-300/60 bg-lime-50/30" : "border-sand-100/70"
-                          } h-full`}
-                        />
-                      ))}
-                    </div>
-                    {/* Phase bars */}
-                    <div className="relative h-full min-h-[56px] py-3">
-                      {(["plant", "grow", "harvest", "ship"] as const).map((phase) => {
-                        const [s, e] = row[phase];
-                        const ps = phaseStyles[phase];
-                        const w = widthPct(s, e);
-                        const showLabel = w > 7;
-                        return (
-                          <div
-                            key={phase}
-                            title={`${ps.label} · Wk ${s}${e !== s ? `–${e}` : ""}`}
-                            className={`absolute top-1/2 -translate-y-1/2 h-7 rounded-md ${ps.fill} shadow-sm ring-1 ${ps.ring} flex items-center justify-center transition-transform hover:scale-[1.02] hover:z-10 cursor-default`}
-                            style={{ left: `calc(${pct(s)}% + 1px)`, width: `calc(${w}% - 2px)` }}
-                          >
-                            <span className={`text-[10px] font-bold tracking-wide ${ps.text} truncate px-1.5`}>
-                              {showLabel ? ps.label : ps.short}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="w-[110px] shrink-0 px-4 py-3.5 text-right border-l border-sand-100 flex flex-col items-end justify-center">
-                    <span className="text-[13px] font-mono font-bold text-navy-900">
-                      {row.qty.toLocaleString()}
-                    </span>
-                    <span className="text-[9px] text-navy-400 uppercase tracking-wider">stems</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Footer total */}
-            <div className="flex items-center bg-sand-50/80 border-t border-sand-200/80">
-              <div className="w-[240px] shrink-0 px-5 py-3 text-[11px] font-bold text-navy-700 uppercase tracking-[0.12em]">
-                Total
-              </div>
-              <div className="flex-1" />
-              <div className="w-[110px] shrink-0 px-4 py-3 text-right border-l border-sand-100">
-                <span className="text-[13px] font-mono font-bold text-navy-900">{totalQty.toLocaleString()}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 
 
@@ -549,7 +409,7 @@ export default function ProductionPage() {
       case "overview":
         return (
           <div className="space-y-8">
-            <ProductionPlanGantt />
+            <ProductionSchedule />
             {/* Rotation, not utilisation: the beds are occupied nearly all
                 year, so what varies is how often they turn over. */}
             <BedRotation />
@@ -716,6 +576,8 @@ export default function ProductionPage() {
                 { key: "name", label: "Name" },
                 { key: "latin", label: "Latin Name" },
                 { key: "variety", label: "Variety" },
+                { key: "weeksToFirstHarvest", label: "Wks to Cut" },
+                { key: "productiveWeeks", label: "Productive" },
                 { key: "patent", label: "Patented", render: (r) => <Badge variant={r.patent === "Yes" ? "amber" : "gray"}>{r.patent as string}</Badge> },
               ]}
               data={plants}

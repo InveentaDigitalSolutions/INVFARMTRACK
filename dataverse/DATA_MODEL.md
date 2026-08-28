@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 44 |
-| Columns | 534 |
+| Columns | 536 |
 | Relationships | 55 |
 
 ## Conventions
@@ -33,7 +33,7 @@
 |---|---|---|---|---|
 | [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 9 | Physical growing structures in the nursery |
 | [Bed](#bed) | `bv_bed` | `BED-0001` | 11 | Growing beds within batches (Shadehouse > Batch > Bed) |
-| [Plant](#plant) | `bv_plant` | `PLT-0001` | 20 | Plant species, varieties, and patent catalog |
+| [Plant](#plant) | `bv_plant` | `PLT-0001` | 22 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
 | [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
 | [Planting](#planting) | `bv_planting` | `PLG-0001` | 9 | Records of plants placed in beds — central activity hub |
@@ -263,6 +263,8 @@ Plant species, varieties, and patent catalog
 | `bv_characteristics` | Characteristics | Text area(4000) |  | Long-form text. Characteristics for the Plant. |
 | `bv_imageurl` | Image URL | Text(500) |  | Short text value. Image URL for the Plant. |
 | `bv_isactive` | Is Active | Yes/No |  | Whether the record is currently in use. |
+| `bv_weekstofirstharvest` | Weeks to First Cut | Whole number |  | Weeks from planting a bed to its first cut. Without this a planting date says when work started but nothing about when stock arrives, so the schedule can only report the past. |
+| `bv_productiveweeks` | Productive Weeks | Whole number |  | How long a bed keeps yielding after the first cut. A cutting nursery harvests the same bed repeatedly, so the useful answer is a window rather than a date. Leave blank if the bed is cut once. |
 
 <details><summary>Choice values</summary>
 

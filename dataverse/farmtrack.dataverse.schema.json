@@ -522,6 +522,24 @@
           "required": false,
           "defaultValue": true,
           "description": "Whether the record is currently in use."
+        },
+        {
+          "schemaName": "bv_WeeksToFirstHarvest",
+          "displayName": "Weeks to First Cut",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 520,
+          "description": "Weeks from planting a bed to its first cut. Without this a planting date says when work started but nothing about when stock arrives, so the schedule can only report the past."
+        },
+        {
+          "schemaName": "bv_ProductiveWeeks",
+          "displayName": "Productive Weeks",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 520,
+          "description": "How long a bed keeps yielding after the first cut. A cutting nursery harvests the same bed repeatedly, so the useful answer is a window rather than a date. Leave blank if the bed is cut once."
         }
       ]
     },
