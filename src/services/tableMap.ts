@@ -201,7 +201,19 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     primaryName: "bv_harvestname",
     nameFrom: ["bed", "date", "quality"],
   },
-  tasks: { dataSource: "bv_tasks", primaryKey: "bv_taskid" },
+  tasks: {
+    dataSource: "bv_tasks",
+    primaryKey: "bv_taskid",
+    fields: {
+      title: "bv_tasktitle",
+      type: "bv_tasktype",
+      due: "bv_duedate",
+      assigned: "bv_assignedto",
+      priority: "bv_priority",
+      status: "bv_status",
+      notes: "bv_notes",
+    },
+  },
   pruning: {
     dataSource: "bv_prunings",
     primaryKey: "bv_pruningid",
@@ -247,7 +259,24 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     primaryName: "bv_fertilizationname",
     nameFrom: ["bed", "input", "date"],
   },
-  projections: { dataSource: "bv_availabilities", primaryKey: "bv_availabilityid" },
+  projections: {
+    dataSource: "bv_availabilities",
+    primaryKey: "bv_availabilityid",
+    fields: {
+      plant: "_bv_plantid_value",
+      season: "_bv_seasonid_value",
+      week: "bv_shipmentweek",
+      size: "bv_size",
+      projectedQty: "bv_projectedqty",
+      orderedQty: "bv_orderedqty",
+      confirmedQty: "bv_confirmedqty",
+      surplus: "bv_surplusqty",
+      shortfall: "bv_shortfallqty",
+      status: "bv_status",
+    },
+    primaryName: "bv_availabilityname",
+    nameFrom: ["plant", "size", "week"],
+  },
   balance: {
     dataSource: "bv_nutrientbalances",
     primaryKey: "bv_nutrientbalanceid",
@@ -462,6 +491,9 @@ export const ENABLED_TABLES = new Set<string>([
   "soil",
   "foliar",
   "balance",
+  // Batch 3 — planning. Enabled 2026-08-28.
+  "tasks",
+  "projections",
 ]);
 
 /**

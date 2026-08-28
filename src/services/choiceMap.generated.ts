@@ -52,6 +52,295 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_workers"
 ];
 
+/**
+ * Lookup columns: entity set -> _column_value -> how to write it.
+ *
+ * A lookup cannot be set by writing to _bv_bedid_value; Dataverse rejects it
+ * with a 400. The write has to name the navigation property and point at the
+ * target row: "bv_BedId@odata.bind": "/bv_beds(<guid>)". Neither the
+ * navigation property nor the target entity set can be derived from the
+ * column name, so both come from metadata.
+ */
+/**
+ * The column that identifies a row to a person, per entity set. Used both to
+ * show what a lookup points at and to resolve a chosen name back to its row.
+ */
+export const LABEL_COLUMN: Record<string, string> = {
+  "bv_availabilities": "bv_availabilityname",
+  "bv_beds": "bv_bedname",
+  "bv_boxweights": "bv_boxweightname",
+  "bv_cainumbers": "bv_cainumbername",
+  "bv_calendars": "bv_calendarcode",
+  "bv_components": "bv_componentname",
+  "bv_customers": "bv_customername",
+  "bv_demandforecasts": "bv_demandforecastname",
+  "bv_expenses": "bv_expensename",
+  "bv_fertilizations": "bv_fertilizationname",
+  "bv_fields": "bv_fieldname",
+  "bv_fiscalauthorizations": "bv_fiscalauthname",
+  "bv_foliaranalysises": "bv_foliaranalysisname",
+  "bv_harvests": "bv_harvestname",
+  "bv_inputs": "bv_inputname",
+  "bv_inputcomponents": "bv_inputcomponentcode",
+  "bv_invoices": "bv_invoicenumber",
+  "bv_irrigations": "bv_irrigationname",
+  "bv_nutrientbalances": "bv_nutrientbalancename",
+  "bv_orders": "bv_ordernumber",
+  "bv_orderitems": "bv_orderitemname",
+  "bv_packings": "bv_packingcode",
+  "bv_plants": "bv_plantname",
+  "bv_plantings": "bv_plantingcode",
+  "bv_plantprices": "bv_plantpricename",
+  "bv_prunings": "bv_pruningname",
+  "bv_pruningcurves": "bv_pruningcurvename",
+  "bv_purchaseorders": "bv_ponumber",
+  "bv_seasons": "bv_seasonname",
+  "bv_shadehouses": "bv_shadehousename",
+  "bv_soilanalysises": "bv_soilanalysisname",
+  "bv_suppliers": "bv_suppliername",
+  "bv_tasks": "bv_taskcode",
+  "bv_timesheets": "bv_timesheetname",
+  "bv_treatments": "bv_treatmentname",
+  "bv_workers": "bv_workername"
+};
+
+export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
+  "bv_availabilities": {
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    },
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
+    }
+  },
+  "bv_beds": {
+    "_bv_fieldid_value": {
+      "nav": "bv_FieldId",
+      "targetSet": "bv_fields"
+    }
+  },
+  "bv_boxweights": {
+    "_bv_packingid_value": {
+      "nav": "bv_PackingId",
+      "targetSet": "bv_packings"
+    }
+  },
+  "bv_cainumbers": {
+    "_bv_fiscalauthid_value": {
+      "nav": "bv_FiscalAuthId",
+      "targetSet": "bv_fiscalauthorizations"
+    },
+    "_bv_invoiceid_value": {
+      "nav": "bv_InvoiceId",
+      "targetSet": "bv_invoices"
+    }
+  },
+  "bv_demandforecasts": {
+    "_bv_customerid_value": {
+      "nav": "bv_CustomerId",
+      "targetSet": "bv_customers"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
+  },
+  "bv_fertilizations": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_inputid_value": {
+      "nav": "bv_InputId",
+      "targetSet": "bv_inputs"
+    }
+  },
+  "bv_fields": {
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
+    },
+    "_bv_shadehouseid_value": {
+      "nav": "bv_ShadehouseId",
+      "targetSet": "bv_shadehouses"
+    }
+  },
+  "bv_foliaranalysises": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    }
+  },
+  "bv_harvests": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    }
+  },
+  "bv_inputcomponents": {
+    "_bv_componentid_value": {
+      "nav": "bv_ComponentId",
+      "targetSet": "bv_components"
+    },
+    "_bv_inputid_value": {
+      "nav": "bv_InputId",
+      "targetSet": "bv_inputs"
+    }
+  },
+  "bv_invoices": {
+    "_bv_customerid_value": {
+      "nav": "bv_CustomerId",
+      "targetSet": "bv_customers"
+    },
+    "_bv_fiscalauthid_value": {
+      "nav": "bv_FiscalAuthId",
+      "targetSet": "bv_fiscalauthorizations"
+    }
+  },
+  "bv_irrigations": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    }
+  },
+  "bv_nutrientbalances": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
+    }
+  },
+  "bv_orders": {
+    "_bv_customerid_value": {
+      "nav": "bv_CustomerId",
+      "targetSet": "bv_customers"
+    }
+  },
+  "bv_orderitems": {
+    "_bv_orderid_value": {
+      "nav": "bv_OrderId",
+      "targetSet": "bv_orders"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
+  },
+  "bv_packings": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_invoiceid_value": {
+      "nav": "bv_InvoiceId",
+      "targetSet": "bv_invoices"
+    },
+    "_bv_orderid_value": {
+      "nav": "bv_OrderId",
+      "targetSet": "bv_orders"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    },
+    "_bv_shadehouseid_value": {
+      "nav": "bv_ShadehouseId",
+      "targetSet": "bv_shadehouses"
+    }
+  },
+  "bv_plantings": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    },
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
+    }
+  },
+  "bv_plantprices": {
+    "_bv_customerid_value": {
+      "nav": "bv_CustomerId",
+      "targetSet": "bv_customers"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    },
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
+    }
+  },
+  "bv_prunings": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
+    }
+  },
+  "bv_pruningcurves": {
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
+    }
+  },
+  "bv_purchaseorders": {
+    "_bv_supplierid_value": {
+      "nav": "bv_SupplierId",
+      "targetSet": "bv_suppliers"
+    }
+  },
+  "bv_soilanalysises": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    }
+  },
+  "bv_tasks": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_plantingid_value": {
+      "nav": "bv_PlantingId",
+      "targetSet": "bv_plantings"
+    }
+  },
+  "bv_timesheets": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_workerid_value": {
+      "nav": "bv_WorkerId",
+      "targetSet": "bv_workers"
+    }
+  },
+  "bv_treatments": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_inputid_value": {
+      "nav": "bv_InputId",
+      "targetSet": "bv_inputs"
+    }
+  }
+};
+
 /** entity set -> column -> { label: optionValue } */
 export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> = {
   "bv_availabilities": {

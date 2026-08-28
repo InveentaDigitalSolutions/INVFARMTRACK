@@ -444,6 +444,28 @@ const SEED_PLAN = [
       _ref: { bv_BedId: ['bv_bed', 'C1-03'] } },
   ]},
 
+
+  // ---- Batch 3: planning -------------------------------------------------
+
+  { table: 'bv_task', dedupeField: 'bv_tasktitle', nameField: 'bv_tasktitle', rows: [
+    { bv_tasktitle: 'Water Shadehouse 1', bv_tasktype: 187460000, bv_duedate: '2026-08-29T07:00:00Z',
+      bv_status: 187460000, bv_priority: 187460002, bv_assignedto: 'Carlos Martinez' },
+    { bv_tasktitle: 'Apply Neem Oil E3-01', bv_tasktype: 187460004, bv_duedate: '2026-08-29T07:00:00Z',
+      bv_status: 187460000, bv_priority: 187460001, bv_assignedto: 'Maria Lopez',
+      _ref: { bv_BedId: ['bv_bed', 'E3-01'] } },
+    { bv_tasktitle: 'Harvest Pothos Hawaiian E3-14', bv_tasktype: 187460006, bv_duedate: '2026-08-30T07:00:00Z',
+      bv_status: 187460001, bv_priority: 187460003, bv_assignedto: 'Juan Perez',
+      _ref: { bv_BedId: ['bv_bed', 'E3-14'] } },
+    { bv_tasktitle: 'Prune C3-05', bv_tasktype: 187460002, bv_duedate: '2026-09-01T07:00:00Z',
+      bv_status: 187460000, bv_priority: 187460001, bv_assignedto: 'Carlos Martinez',
+      _ref: { bv_BedId: ['bv_bed', 'C3-05'] } },
+    { bv_tasktitle: 'Weekly bed inspection — Plot C1', bv_tasktype: 187460009, bv_duedate: '2026-08-31T07:00:00Z',
+      bv_status: 187460000, bv_priority: 187460000, bv_assignedto: 'Maria Lopez' },
+    { bv_tasktitle: 'Pack order ORD-0001', bv_tasktype: 187460008, bv_duedate: '2026-08-28T07:00:00Z',
+      bv_completeddate: '2026-08-28T15:30:00Z', bv_status: 187460002, bv_priority: 187460002,
+      bv_assignedto: 'Juan Perez' },
+  ]},
+
 ]
 
 

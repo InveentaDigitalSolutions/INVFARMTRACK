@@ -19,14 +19,14 @@ const tabs = [
 
 // --- Weekly Projections data ---
 const initProjections = [
-  { week: "2026-W14", plant: "Pothos / Hawaiian", size: '4.5"', projectedQty: 1200, orderedQty: 1000, confirmedQty: 1000, surplus: 200, shortfall: 0, status: "Over" },
-  { week: "2026-W14", plant: "Pothos / Marble Queen", size: '4.5"', projectedQty: 800, orderedQty: 800, confirmedQty: 800, surplus: 0, shortfall: 0, status: "Equal" },
-  { week: "2026-W15", plant: "Pothos / Hawaiian", size: '4.5"', projectedQty: 1100, orderedQty: 1300, confirmedQty: 1100, surplus: 0, shortfall: 200, status: "Under" },
-  { week: "2026-W15", plant: "Pothos / Jade", size: '2.5"', projectedQty: 600, orderedQty: 500, confirmedQty: 500, surplus: 100, shortfall: 0, status: "Over" },
-  { week: "2026-W16", plant: "Pothos / Marble Queen", size: '4.5"', projectedQty: 900, orderedQty: 900, confirmedQty: 850, surplus: 0, shortfall: 50, status: "Under" },
-  { week: "2026-W16", plant: "Pothos / Hawaiian", size: '2.5"', projectedQty: 500, orderedQty: 500, confirmedQty: 500, surplus: 0, shortfall: 0, status: "Equal" },
-  { week: "2026-W17", plant: "Pothos / Hawaiian", size: '4.5"', projectedQty: 1400, orderedQty: 1200, confirmedQty: 1200, surplus: 200, shortfall: 0, status: "Over" },
-  { week: "2026-W18", plant: "Pothos / Jade", size: '4.5"', projectedQty: 700, orderedQty: 900, confirmedQty: 700, surplus: 0, shortfall: 200, status: "Under" },
+  { week: "2026-W14", plant: "Pothos / Hawaiian", size: '4.5"', projectedQty: 1200, orderedQty: 1000, confirmedQty: 1000, surplus: 200, shortfall: 0, status: "Confirmed - Over" },
+  { week: "2026-W14", plant: "Pothos / Marble Queen", size: '4.5"', projectedQty: 800, orderedQty: 800, confirmedQty: 800, surplus: 0, shortfall: 0, status: "Confirmed - Equal" },
+  { week: "2026-W15", plant: "Pothos / Hawaiian", size: '4.5"', projectedQty: 1100, orderedQty: 1300, confirmedQty: 1100, surplus: 0, shortfall: 200, status: "Confirmed - Under" },
+  { week: "2026-W15", plant: "Pothos / Jade", size: '2.5"', projectedQty: 600, orderedQty: 500, confirmedQty: 500, surplus: 100, shortfall: 0, status: "Confirmed - Over" },
+  { week: "2026-W16", plant: "Pothos / Marble Queen", size: '4.5"', projectedQty: 900, orderedQty: 900, confirmedQty: 850, surplus: 0, shortfall: 50, status: "Confirmed - Under" },
+  { week: "2026-W16", plant: "Pothos / Hawaiian", size: '2.5"', projectedQty: 500, orderedQty: 500, confirmedQty: 500, surplus: 0, shortfall: 0, status: "Confirmed - Equal" },
+  { week: "2026-W17", plant: "Pothos / Hawaiian", size: '4.5"', projectedQty: 1400, orderedQty: 1200, confirmedQty: 1200, surplus: 200, shortfall: 0, status: "Confirmed - Over" },
+  { week: "2026-W18", plant: "Pothos / Jade", size: '4.5"', projectedQty: 700, orderedQty: 900, confirmedQty: 700, surplus: 0, shortfall: 200, status: "Confirmed - Under" },
 ];
 
 // --- Pruning Curve data (weeks 42-52 of 2025 + weeks 1-16 of 2026) ---
@@ -106,7 +106,10 @@ const projectionFields = [
     { key: "surplus", label: "Surplus", type: "number" as const, min: 0 },
     { key: "shortfall", label: "Shortfall", type: "number" as const, min: 0 },
     { key: "status", label: "Status", type: "select" as const, options: [
-      { value: "Under", label: "Under" }, { value: "Equal", label: "Equal" }, { value: "Over", label: "Over" },
+      { value: "Projected", label: "Projected" },
+      { value: "Confirmed - Under", label: "Confirmed - Under" },
+      { value: "Confirmed - Equal", label: "Confirmed - Equal" },
+      { value: "Confirmed - Over", label: "Confirmed - Over" },
     ]},
   ]},
 ];
@@ -134,9 +137,16 @@ const logFields = [
 ];
 
 // --- Badge helpers ---
+// Values are bv_availabilities.bv_status labels verbatim; Dataverse accepts
+// nothing else. The badge drops the "Confirmed - " prefix so the column stays
+// readable — every confirmed state carries it, so it distinguishes nothing.
 const availabilityStatusBadge = (s: string) => {
-  const v = s === "Under" ? "red" : s === "Equal" ? "green" : "amber";
-  return <Badge variant={v}>{s}</Badge>;
+  const variant =
+    s === "Confirmed - Under" ? "red"
+    : s === "Confirmed - Equal" ? "green"
+    : s === "Confirmed - Over" ? "amber"
+    : "gray";
+  return <Badge variant={variant}>{s.replace("Confirmed - ", "")}</Badge>;
 };
 
 // --- Pruning Curve Chart component ---

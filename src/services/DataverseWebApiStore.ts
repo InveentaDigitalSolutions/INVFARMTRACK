@@ -12,7 +12,8 @@
 
 import type { DataStore, Identified, QueryOptions } from "./DataService";
 import { DATAVERSE_URL, getDataverseToken } from "./auth";
-import { CHOICE_MAP, CHOICE_LABELS } from "./choiceMap.generated";
+import { CHOICE_MAP, CHOICE_LABELS, LOOKUP_MAP } from "./choiceMap.generated";
+import { LookupResolver } from "./lookupResolver";
 
 type Row = Record<string, unknown>;
 
@@ -56,6 +57,58 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
       .map((v) => String(v));
     if (parts.length === 0) return undefined;
     return parts.join(" · ").slice(0, 100);
+  }
+
+  /** Shared across instances so each reference table is indexed once. */
+  private static readonly resolver = new LookupResolver(async (entitySet, labelColumns, join) => {
+    const store = new DataverseWebApiStore<never>(entitySet, `${entitySet.replace(/s$/, "")}id`);
+    const rows = await store.request<{ value: Row[] }>(
+      `${entitySet}?$select=${labelColumns.join(",")}`
+    );
+    const keyColumn = `${entitySet.replace(/s$/, "")}id`;
+    return (rows?.value ?? []).map((row) => ({
+      id: String(row[keyColumn] ?? ""),
+      label: labelColumns
+        .map((c) => row[c])
+        .filter((v) => v !== undefined && v !== null && v !== "")
+        .join(join),
+    }));
+  });
+
+  /** The lookup columns this table has. */
+  private lookupFields(): Array<[string, { nav: string; targetSet: string }]> {
+    const columns = LOOKUP_MAP[this.entitySet] ?? {};
+    const out: Array<[string, { nav: string; targetSet: string }]> = [];
+    for (const [field, column] of Object.entries(this.toColumn)) {
+      const meta = columns[column];
+      if (meta) out.push([field, meta]);
+    }
+    return out;
+  }
+
+  /** See DataverseStore.bindLookups — a _value column cannot be written. */
+  private async bindLookups(payload: Row, record: Row): Promise<void> {
+    for (const [field, meta] of this.lookupFields()) {
+      const chosen = record[field];
+      if (chosen === undefined || chosen === null || chosen === "") continue;
+      const id = await DataverseWebApiStore.resolver.idFor(meta.targetSet, chosen);
+      if (id) payload[`${meta.nav}@odata.bind`] = `/${meta.targetSet}(${id})`;
+    }
+  }
+
+  /** See DataverseStore.resolveLookupLabels. */
+  private async resolveLookupLabels(rows: T[]): Promise<void> {
+    const fields = this.lookupFields();
+    if (fields.length === 0) return;
+    await Promise.all(
+      rows.map(async (row) => {
+        const r = row as Row;
+        for (const [field, meta] of fields) {
+          const label = await DataverseWebApiStore.resolver.labelFor(meta.targetSet, r[field]);
+          if (label !== undefined) r[field] = label;
+        }
+      })
+    );
   }
 
   private async request<R>(path: string, init: RequestInit = {}): Promise<R | null> {
@@ -118,8 +171,13 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
         /^(_.+_value|.+)@OData\.Community\.Display\.V1\.FormattedValue$/
       );
       if (formatted) {
-        const field = this.toField[formatted[1]];
-        if (field) out[field] = value;
+        // A lookup's formatted value is the target's autonumber, not its name,
+        // so it is ignored and the id resolved instead. Choices keep theirs.
+        const isLookup = formatted[1].startsWith("_") && formatted[1].endsWith("_value");
+        if (!isLookup) {
+          const field = this.toField[formatted[1]];
+          if (field) out[field] = value;
+        }
         continue;
       }
       if (column.startsWith("@") || column.includes("@odata") || column.includes("@OData")) continue;
@@ -139,6 +197,7 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
       if (value === undefined) continue;
       const column = this.toColumn[field] ?? field;
       if (!column.startsWith("bv_")) continue;
+      if (column.startsWith("_") && column.endsWith("_value")) continue;
       const translated = this.toChoiceValue(column, value);
       if (translated === undefined) continue;
       out[column] = translated;
@@ -172,6 +231,7 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
     const query = params.length ? `?${params.join("&")}` : "";
     const data = await this.request<{ value: Row[] }>(`${this.entitySet}${query}`);
     let rows = (data?.value ?? []).map((r) => this.toApp(r));
+    await this.resolveLookupLabels(rows);
 
     // Free-text search stays client-side: it spans arbitrary columns, which
     // OData cannot express without knowing their types.
@@ -201,17 +261,22 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
       const name = this.buildName(record as Row);
       if (name) payload[this.primaryName] = name;
     }
+    await this.bindLookups(payload, record as Row);
     const data = await this.request<Row>(this.entitySet, {
       method: "POST",
       body: JSON.stringify(payload),
     });
-    return this.toApp(data ?? {});
+    const saved = this.toApp(data ?? {});
+    await this.resolveLookupLabels([saved]);
+    return saved;
   }
 
   async update(id: string, changes: Partial<T>): Promise<T> {
+    const payload = this.toDataverse(changes as Row);
+    await this.bindLookups(payload, changes as Row);
     const data = await this.request<Row>(`${this.entitySet}(${id})`, {
       method: "PATCH",
-      body: JSON.stringify(this.toDataverse(changes as Row)),
+      body: JSON.stringify(payload),
     });
     return this.toApp(data ?? {});
   }

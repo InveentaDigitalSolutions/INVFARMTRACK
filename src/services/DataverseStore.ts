@@ -16,9 +16,30 @@ import { getClient } from "@microsoft/power-apps/data";
 import type { IOperationResult } from "@microsoft/power-apps/data";
 import { dataSourcesInfo } from "../../.power/schemas/appschemas/dataSourcesInfo";
 import type { DataStore, Identified, QueryOptions } from "./DataService";
-import { CHOICE_MAP, CHOICE_LABELS } from "./choiceMap.generated";
+import { CHOICE_MAP, CHOICE_LABELS, LOOKUP_MAP } from "./choiceMap.generated";
+import { LookupResolver } from "./lookupResolver";
 
 type Row = Record<string, unknown>;
+
+/**
+ * One resolver for the whole app so the bed index is fetched once, not once
+ * per screen that references a bed.
+ */
+const resolver = new LookupResolver(async (entitySet, labelColumns, join) => {
+  const client = getClient(dataSourcesInfo);
+  const result = await client.retrieveMultipleRecordsAsync<Row>(entitySet, {
+    select: labelColumns,
+  });
+  if (!result.success) return [];
+  const keyColumn = `${entitySet.replace(/s$/, "")}id`;
+  return result.data.map((row) => ({
+    id: String(row[keyColumn] ?? ""),
+    label: labelColumns
+      .map((c) => row[c])
+      .filter((v) => v !== undefined && v !== null && v !== "")
+      .join(join),
+  }));
+});
 
 export class DataverseStore<T extends Identified> implements DataStore<T> {
   private readonly client = getClient(dataSourcesInfo);
@@ -89,11 +110,10 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
       const formatted = column.match(
         /^(_.+_value)@OData\.Community\.Display\.V1\.FormattedValue$/
       );
-      if (formatted) {
-        const field = this.toField[formatted[1]];
-        if (field) out[field] = value;
-        continue;
-      }
+      // The formatted annotation on a lookup is the target's primary name,
+      // which here is its autonumber — "BED-0001", not "E3-01". The id is kept
+      // instead and resolved to the descriptive name by resolveLookupLabels.
+      if (formatted) continue;
 
       // Everything else annotation-shaped is noise.
       if (column.startsWith("@") || column.includes("@odata") || column.includes("@OData")) continue;
@@ -119,6 +139,8 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
       // Only send columns Dataverse knows about; an unmapped app-only field
       // would be rejected for the whole request.
       if (!column.startsWith("bv_")) continue;
+      // Lookups are bound separately, by navigation property — see bindLookups.
+      if (column.startsWith("_") && column.endsWith("_value")) continue;
       const translated = this.toChoiceValue(column, value);
       if (translated === undefined) continue;
       out[column] = translated;
@@ -158,6 +180,49 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
     return labels[value] ?? value;
   }
 
+  /** The lookup columns this table has, as { appField: column }. */
+  private lookupFields(): Array<[string, string, { nav: string; targetSet: string }]> {
+    const columns = LOOKUP_MAP[this.dataSourceName] ?? {};
+    const out: Array<[string, string, { nav: string; targetSet: string }]> = [];
+    for (const [field, column] of Object.entries(this.toColumn)) {
+      const meta = columns[column];
+      if (meta) out.push([field, column, meta]);
+    }
+    return out;
+  }
+
+  /**
+   * Adds the @odata.bind entries for whichever lookups this record sets.
+   * Writing to the _value column instead fails the whole request with a 400.
+   */
+  private async bindLookups(payload: Row, record: Row): Promise<void> {
+    for (const [field, , meta] of this.lookupFields()) {
+      const chosen = record[field];
+      if (chosen === undefined || chosen === null || chosen === "") continue;
+      const id = await resolver.idFor(meta.targetSet, chosen);
+      if (id) payload[`${meta.nav}@odata.bind`] = `/${meta.targetSet}(${id})`;
+    }
+  }
+
+  /**
+   * Replaces lookup ids with the name the row is known by. Without this every
+   * lookup on screen reads as the target's autonumber, because that is the
+   * primary name on all of these tables.
+   */
+  private async resolveLookupLabels(rows: T[]): Promise<void> {
+    const fields = this.lookupFields();
+    if (fields.length === 0) return;
+    await Promise.all(
+      rows.map(async (row) => {
+        const r = row as Row;
+        for (const [field, , meta] of fields) {
+          const label = await resolver.labelFor(meta.targetSet, r[field]);
+          if (label !== undefined) r[field] = label;
+        }
+      })
+    );
+  }
+
   private unwrap<R>(result: IOperationResult<R>): R {
     if (!result.success) {
       throw result.error ?? new Error(`Dataverse operation failed on ${this.dataSourceName}`);
@@ -185,6 +250,7 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
     });
 
     let rows = this.unwrap(result).map((r) => this.toApp(r));
+    await this.resolveLookupLabels(rows);
 
     if (options?.search) {
       const q = options.search.toLowerCase();
@@ -217,20 +283,29 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
       if (name) payload[this.primaryName] = name;
     }
 
+    await this.bindLookups(payload, record as Row);
+
     const result = await this.client.createRecordAsync<Row, Row>(
       this.dataSourceName,
       payload
     );
-    return this.toApp(this.unwrap(result));
+    const saved = this.toApp(this.unwrap(result));
+    await this.resolveLookupLabels([saved]);
+    return saved;
   }
 
   async update(id: string, changes: Partial<T>): Promise<T> {
+    const payload = this.toDataverse(changes as Row);
+    await this.bindLookups(payload, changes as Row);
+
     const result = await this.client.updateRecordAsync<Row, Row>(
       this.dataSourceName,
       id,
-      this.toDataverse(changes as Row)
+      payload
     );
-    return this.toApp(this.unwrap(result));
+    const saved = this.toApp(this.unwrap(result));
+    await this.resolveLookupLabels([saved]);
+    return saved;
   }
 
   async delete(id: string): Promise<void> {
