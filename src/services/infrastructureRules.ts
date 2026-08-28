@@ -97,33 +97,68 @@ export function fieldCapacityProblem(
 
 /* ------------------------------------------------------------------- beds */
 
-/** Beds are named after their field and row: E3 row 1 is "E3-01". */
-export function bedName(fieldName: string, row: number): string {
+/**
+ * How a bed is named.
+ *
+ * A field's rows are its ground beds: E3 row 1 is "E3-01", always level 0.
+ * Air beds hang on cables above a ground row, up to three levels, and are
+ * named for the row they sit over: "E3-01-1", "E3-01-2", "E3-01-3". Not every
+ * row has air above it — the cables cover part of a field, not all of it — so
+ * which rows do is recorded, never derived.
+ */
+export function bedName(fieldName: string, row: number, level: number = 0): string {
   if (!fieldName || !Number.isFinite(row) || row < 1) return "";
-  return `${fieldName}-${String(row).padStart(2, "0")}`;
+  const ground = `${fieldName}-${String(row).padStart(2, "0")}`;
+  return level > 0 ? `${ground}-${level}` : ground;
 }
 
-/** The row number of "E3-07", or null if the name is not in that shape. */
-export function rowOf(name: string): number | null {
-  const match = /-(\d+)$/.exec(String(name ?? ""));
-  return match ? Number(match[1]) : null;
+export interface ParsedBed {
+  field: string;
+  row: number;
+  /** 0 for a ground bed, 1-3 for an air bed above it. */
+  level: number;
 }
 
 /**
- * The row numbers still free in a field.
+ * Reads a bed name back apart. Both shapes have to be handled by one parser:
+ * treating the trailing "-1" of an air bed as its row would put E3-01-1 in
+ * row 1 and E3-12-3 in row 3, quietly corrupting every count per row.
+ */
+export function parseBedName(name: string): ParsedBed | null {
+  const match = /^(.+?)-(\d{2})(?:-([1-3]))?$/.exec(String(name ?? "").trim());
+  if (!match) return null;
+  return { field: match[1], row: Number(match[2]), level: match[3] ? Number(match[3]) : 0 };
+}
+
+/** The row number of a bed name, ground or air. */
+export function rowOf(name: string): number | null {
+  return parseBedName(name)?.row ?? null;
+}
+
+/** The level of a bed name; 0 means it sits on the ground. */
+export function levelOf(name: string): number | null {
+  return parseBedName(name)?.level ?? null;
+}
+
+/**
+ * The row numbers still free in a field, at the level being added.
  *
  * Bounded by the field's own row count, so a bed cannot be numbered past the
- * end of the field — which is the check that was missing. A field with no row
- * count recorded offers nothing rather than guessing, since inventing a bound
- * would defeat the point of having one.
+ * end of the field. Levels are counted separately: row 7 having a ground bed
+ * does not stop an air bed hanging above it, and an air bed on level 1 does
+ * not block level 2.
  */
-export function availableRows(field: FieldLike | undefined, beds: BedLike[]): number[] {
+export function availableRows(
+  field: FieldLike | undefined,
+  beds: BedLike[],
+  level: number = 0
+): number[] {
   if (!field?.rows || field.rows < 1) return [];
   const taken = new Set(
     beds
-      .filter((b) => b.field === field.name)
-      .map((b) => rowOf(String(b.name ?? "")))
-      .filter((n): n is number => n !== null)
+      .map((b) => parseBedName(String(b.name ?? "")))
+      .filter((p): p is ParsedBed => p !== null && p.field === field.name && p.level === level)
+      .map((p) => p.row)
   );
   const free: number[] = [];
   for (let row = 1; row <= field.rows; row++) if (!taken.has(row)) free.push(row);
@@ -139,6 +174,13 @@ export function availableRows(field: FieldLike | undefined, beds: BedLike[]): nu
  */
 export function levelsFor(type: string | undefined): string[] {
   return type === "Ground" ? ["0"] : ["1", "2", "3"];
+}
+
+/** A bed's type follows from its level, and nothing else. */
+export function typeForLevel(level: number | string | undefined): "Ground" | "Air" | undefined {
+  const value = Number(level);
+  if (!Number.isFinite(value)) return undefined;
+  return value === 0 ? "Ground" : "Air";
 }
 
 /** The level a bed of this type should default to. */

@@ -12,7 +12,7 @@ import ShadehouseView from "../components/ShadehouseView";
 import ShadehouseView3D from "../components/ShadehouseView3D";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
-import { availableRows, levelsFor, defaultLevel, bedName, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
+import { availableRows, bedName, typeForLevel, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
 
 const tabs = [
   { id: "shadehouses", label: "Shadehouses" },
@@ -75,28 +75,34 @@ const fieldFormGroups = [
 interface FieldRow { id?: string; name?: string; shadehouse?: string; rows?: number }
 interface BedRow { id?: string; name?: string; field?: string; type?: string; level?: string }
 
+/**
+ * Built as a function because the controls depend on each other: the level
+ * decides whether this is a ground or an air bed, and the rows on offer are
+ * the ones free in the chosen field at that level.
+ */
 const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
   { title: "Bed Details", columns: 2 as const, fields: [
     { key: "field", label: "Field", type: "select" as const,
       options: fieldOptions, optionsFrom: "fields", required: true },
-    // Only rows this field has and has not already used. A field with no row
-    // count recorded offers none, rather than inventing a range.
-    { key: "row", label: "Row", type: "select" as const, required: true,
-      options: [],
+    // Level first: a field's rows are its ground beds, and air beds hang on
+    // cables above some of them. Type follows from this, not the other way.
+    { key: "level", label: "Level", type: "select" as const, required: true, options: [
+      { value: "0", label: "0 — ground bed" },
+      { value: "1", label: "1 — air bed" },
+      { value: "2", label: "2 — air bed" },
+      { value: "3", label: "3 — air bed" },
+    ] },
+    // Free rows at this level. A ground bed in row 7 does not stop an air bed
+    // hanging above it, so each level is counted separately.
+    { key: "row", label: "Row", type: "select" as const, required: true, options: [],
       optionsWhen: (values: Record<string, unknown>) =>
         availableRows(
           fields.find((f) => f.name === values.field),
-          beds
+          beds,
+          Number(values.level ?? 0)
         ).map((row) => ({ value: String(row), label: String(row).padStart(2, "0") })) },
     { key: "name", label: "Bed Name", type: "text" as const, readOnly: true,
-      placeholder: "E3-01 (from the field and row)" },
-    { key: "type", label: "Type", type: "toggle" as const,
-      options: [{ value: "Air", label: "Air" }, { value: "Ground", label: "Ground" }] },
-    // A ground bed is planted in the earth, so 0 is the only level it can be;
-    // an air bed hangs above it, so 0 is the one level it cannot be.
-    { key: "level", label: "Level", type: "select" as const, options: [],
-      optionsWhen: (values: Record<string, unknown>) =>
-        levelsFor(values.type as string | undefined).map((l) => ({ value: l, label: l })) },
+      placeholder: "E3-01, or E3-01-2 for an air bed" },
     { key: "soilType", label: "Soil Type", type: "select" as const, options: [
       { value: "Sandy", label: "Sandy" }, { value: "Loamy", label: "Loamy" },
       { value: "Clay", label: "Clay" }, { value: "Peaty", label: "Peaty" },
@@ -111,8 +117,8 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
       { value: "Manual", label: "Manual" }, { value: "None", label: "None" },
     ] },
     { key: "active", label: "Active", type: "boolean" as const },
-    // Capacity is not here on purpose: a bed holds far fewer Extra Large than
-    // Petit, so it is recorded per variety and grade in Bed Capacities.
+    // No Type control: it is the level. No Capacity either — a bed holds far
+    // fewer Extra Large than Petit, so that lives in Bed Capacities.
   ]},
 ];
 
@@ -156,7 +162,7 @@ export default function InfrastructurePage() {
   const saveBed = (values: Record<string, unknown>) => {
     const fieldName = String(values.field ?? "");
     const row = Number(values.row);
-    const type = values.type as string | undefined;
+    const level = Number(values.level ?? 0);
 
     const shadehouse = (shadehouses as Array<Record<string, unknown>>).find(
       (h) => h.name === (fields as FieldRow[]).find((f) => f.name === fieldName)?.shadehouse
@@ -166,13 +172,17 @@ export default function InfrastructurePage() {
       if (full) { alert(full); return; }
     }
 
-    const name = bedName(fieldName, row) || String(values.name ?? "");
-    if (!name) { alert("Choose a field and a row so the bed can be named."); return; }
+    const name = bedName(fieldName, row, level);
+    if (!name) { alert("Choose a field, a level and a row so the bed can be named."); return; }
 
     save(beds, setBeds, bedForm, {
       ...values,
       name,
-      level: values.level ?? defaultLevel(type),
+      level: String(level),
+      // Type is not asked for: a bed on the ground is a ground bed and one on
+      // a cable above it is an air bed. Storing it keeps the column usable for
+      // filtering without ever letting it disagree with the level.
+      type: typeForLevel(level),
     });
   };
 

@@ -3,7 +3,8 @@
  */
 import {
   nextSeasonName, fieldNameProblem, fieldCapacityProblem,
-  bedName, rowOf, availableRows, levelsFor, defaultLevel, levelProblem, bedCapacityProblem,
+  bedName, rowOf, levelOf, parseBedName, availableRows, levelsFor, defaultLevel,
+  levelProblem, bedCapacityProblem, typeForLevel,
 } from '../../src/services/infrastructureRules.ts'
 
 let failures = 0
@@ -31,13 +32,32 @@ eq('blank name refused', !!fieldNameProblem('  ','Shadehouse 1',fields), true)
 eq('field capacity reached', !!fieldCapacityProblem({name:'Shadehouse 1',fieldCapacity:2},fields), true)
 eq('field capacity has room', fieldCapacityProblem({name:'Shadehouse 1',fieldCapacity:4},fields), null)
 
-// beds
+// beds — ground
 eq('bed name pads the row', bedName('E3', 1), 'E3-01')
 eq('bed name row 12', bedName('E3', 12), 'E3-12')
 eq('row parsed back out', rowOf('E3-07'), 7)
+eq('a ground bed is level 0', levelOf('E3-07'), 0)
+
+// beds — air, named for the row they hang over
+eq('air bed on level 1', bedName('E3', 1, 1), 'E3-01-1')
+eq('air bed on level 3, row 12', bedName('E3', 12, 3), 'E3-12-3')
+eq('air bed parses to its row, not its level', rowOf('E3-01-1'), 1)
+eq('the trap: E3-12-3 is row 12, not row 3', rowOf('E3-12-3'), 12)
+eq('and its level is 3', levelOf('E3-12-3'), 3)
+eq('full parse', parseBedName('C1-27-2'), {field:'C1', row:27, level:2})
+eq('a name that is not a bed', parseBedName('nonsense'), null)
+eq('type follows the level', typeForLevel(0), 'Ground')
+eq('type follows the level, air', typeForLevel(2), 'Air')
+
 const beds = [{name:'E3-01',field:'E3'},{name:'E3-03',field:'E3'}]
-eq('free rows skip the taken ones', availableRows({name:'E3',rows:5}, beds), [2,4,5])
+eq('free ground rows skip the taken ones', availableRows({name:'E3',rows:5}, beds), [2,4,5])
 eq('no row count -> offer nothing', availableRows({name:'E3'}, beds), [])
+// a ground bed in row 1 does not stop an air bed hanging above it
+eq('levels are counted separately', availableRows({name:'E3',rows:3}, beds, 1), [1,2,3])
+const mixed = [{name:'E3-01'},{name:'E3-01-1'},{name:'E3-02-1'}]
+eq('level 1 free rows', availableRows({name:'E3',rows:3}, mixed, 1), [3])
+eq('level 2 is untouched by level 1', availableRows({name:'E3',rows:3}, mixed, 2), [1,2,3])
+eq('ground free rows ignore air beds', availableRows({name:'E3',rows:3}, mixed, 0), [2,3])
 eq('ground beds are level 0 only', levelsFor('Ground'), ['0'])
 eq('air beds cannot be level 0', levelsFor('Air'), ['1','2','3'])
 eq('ground defaults to 0', defaultLevel('Ground'), '0')
