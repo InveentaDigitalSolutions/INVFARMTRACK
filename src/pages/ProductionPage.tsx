@@ -13,6 +13,7 @@ import { useRecords } from "../hooks/useRecords";
 import { nextSeasonName } from "../services/infrastructureRules";
 import BedRotation from "../components/BedRotation";
 import ProductionSchedule from "../components/ProductionSchedule";
+import { useInputNutrients } from "../hooks/useInputNutrients";
 
 /**
  * Ordered the way the work happens: see where you stand, plant, tend, harvest,
@@ -80,13 +81,13 @@ const initPruning = [
 // app already composes wherever a plant is shown. A duplicate that can only
 // go stale.
 const initPlants = [
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Hawaiian", patent: "Yes", patentNum: "PP32456", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "High Color", patent: "No", patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "N'Joy", patent: "Yes", patentNum: "PP33012", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Neon", patent: "No", patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Jade", patent: "No", patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Marble Queen", patent: "No", patentNum: "", active: true },
-  { code: "SNS", name: "Sansevieria", latin: "Dracaena trifasciata", variety: "Sansevieria", patent: "No", patentNum: "", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Hawaiian", patent: true, patentNum: "PP32456", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "High Color", patent: false, patentNum: "", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "N'Joy", patent: true, patentNum: "PP33012", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Neon", patent: false, patentNum: "", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Jade", patent: false, patentNum: "", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Marble Queen", patent: false, patentNum: "", active: true },
+  { code: "SNS", name: "Sansevieria", latin: "Dracaena trifasciata", variety: "Sansevieria", patent: false, patentNum: "", active: true },
 ];
 
 const initSeasons = [
@@ -239,8 +240,12 @@ const plantFields = [
     { key: "productiveWeeks", label: "Productive Weeks", type: "number" as const, min: 0 },
   ]},
   { title: "Patent & Status", columns: 2 as const, fields: [
-    { key: "patent", label: "Patented", type: "toggle" as const, options: [{ value: "Yes", label: "Yes" }, { value: "No", label: "No" }] },
+    // bv_IsPatented is a boolean; the form used to offer "Yes"/"No" strings,
+    // which is why the column was never bound and the table showed nothing.
+    { key: "patent", label: "Patented", type: "boolean" as const },
     { key: "patentNum", label: "Patent Number", type: "text" as const },
+    { key: "patentHolder", label: "Patent Holder", type: "text" as const },
+    { key: "patentExpiry", label: "Patent Expiry", type: "date" as const },
     { key: "active", label: "Active", type: "boolean" as const },
   ]},
 ];
@@ -340,6 +345,7 @@ export default function ProductionPage() {
   const [pruning, setPruning] = useRecords("pruning", initPruning);
   const [fertilization, setFertilization] = useRecords("fertilization", initFertilization);
   const [seasons, setSeasons] = useRecords("seasons", initSeasons);
+  const { elementsFor, hasCompositions } = useInputNutrients();
   const [plants, setPlants] = useRecords("plants", initPlants);
 
   /** Names a new season from its start date; an existing one keeps its name. */
@@ -543,6 +549,13 @@ export default function ProductionPage() {
       case "fertilization":
         return (
           <>
+            {!hasCompositions && (
+              <div className="text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3 py-2 mb-3">
+                N, P, K and Ca are worked out from what each fertilizer contains.
+                No composition is recorded yet — set it on an input in Inventory
+                and these fill in for every application of it.
+              </div>
+            )}
             <DataTable
               columns={[
                 { key: "date", label: "Date" },
@@ -550,10 +563,23 @@ export default function ProductionPage() {
                 { key: "input", label: "Fertilizer" },
                 { key: "qtyKg", label: "Qty (kg)" },
                 { key: "method", label: "Method", render: (r) => <Badge variant="blue">{r.method as string}</Badge> },
-                { key: "nKg", label: "N" },
-                { key: "pKg", label: "P" },
-                { key: "kKg", label: "K" },
-                { key: "caKg", label: "Ca" },
+                // Computed from the input's composition and how much went on,
+                // not stored: a saved copy would disagree with its own inputs
+                // the first time a composition is corrected. A dash means no
+                // composition is recorded for that input — which is not zero.
+                ...(["N", "P", "K", "Ca"] as const).map((el) => ({
+                  key: `el${el}`,
+                  label: el,
+                  render: (r: Record<string, unknown>) => {
+                    const els = elementsFor(String(r.input ?? ""), Number(r.qtyKg ?? 0));
+                    const v = els?.[el];
+                    return (
+                      <span className="font-mono tabular-nums text-navy-600">
+                        {v === undefined ? <span className="text-navy-300">—</span> : v.toFixed(2)}
+                      </span>
+                    );
+                  },
+                })),
                 { key: "worker", label: "Worker" },
               ]}
               data={fertilization}
@@ -578,7 +604,9 @@ export default function ProductionPage() {
                 { key: "variety", label: "Variety" },
                 { key: "weeksToFirstHarvest", label: "Wks to Cut" },
                 { key: "productiveWeeks", label: "Productive" },
-                { key: "patent", label: "Patented", render: (r) => <Badge variant={r.patent === "Yes" ? "amber" : "gray"}>{r.patent as string}</Badge> },
+                { key: "patent", label: "Patented", render: (r) => (
+                  <Badge variant={r.patent ? "amber" : "gray"}>{r.patent ? "Yes" : "No"}</Badge>
+                ) },
               ]}
               data={plants}
               onAdd={plantForm.openCreate}

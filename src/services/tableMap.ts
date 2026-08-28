@@ -53,7 +53,10 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       name: "bv_plantname",
       latin: "bv_latinname",
       variety: "bv_variety",
+      patent: "bv_ispatented",
       patentNum: "bv_patentnumber",
+      patentHolder: "bv_patentholder",
+      patentExpiry: "bv_patentexpiry",
       weeksToFirstHarvest: "bv_weekstofirstharvest",
       productiveWeeks: "bv_productiveweeks",
       active: "bv_isactive",
@@ -100,6 +103,31 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       field: "_bv_fieldid_value",
       // Capacity is not a property of the bed: it depends on the variety and
       // grade planted, so it lives in bv_BedCapacity, one row per pairing.
+    },
+  },
+  // An input's composition: what it contains and in what proportion. Without
+  // these the nutrient columns on Fertilization can never be anything but
+  // blank, because the numbers are computed from the mix.
+  components: {
+    dataSource: "bv_components",
+    primaryKey: "bv_componentid",
+    fields: {
+      name: "bv_componentname",
+      symbol: "bv_symbol",
+      category: "bv_category",
+      elementSymbol: "bv_elementsymbol",
+      elementalFactor: "bv_elementalfactor",
+      isNutrient: "bv_isnutrient",
+    },
+  },
+  inputComponents: {
+    dataSource: "bv_inputcomponents",
+    primaryKey: "bv_inputcomponentid",
+    fields: {
+      input: "_bv_inputid_value",
+      component: "_bv_componentid_value",
+      percentage: "bv_percentage",
+      notes: "bv_notes",
     },
   },
   bedCounts: {
@@ -663,6 +691,8 @@ export const ENABLED_TABLES = new Set<string>([
   "exchangeRates",
   "bedCapacities",
   "bedCounts",
+  "components",
+  "inputComponents",
 ]);
 
 /**
