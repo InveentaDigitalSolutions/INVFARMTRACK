@@ -209,7 +209,10 @@ export default function AvailabilityPage() {
 
   const [projections, setProjections] = useRecords("projections", initProjections);
   const [curve, setCurve] = useRecords("curve", initCurve);
-  const [log, setLog] = useRecords("log", initLog);
+  // Same records as Production > Crop Care > Pruning. This used the key
+  // "log", which is bound to nothing, so everything entered here went to
+  // browser storage and was lost on reload.
+  const [log, setLog] = useRecords("pruning", initLog);
 
   const projectionForm = useFormModal(initProjections[0]);
   const curveForm = useFormModal(initCurve[0]);
