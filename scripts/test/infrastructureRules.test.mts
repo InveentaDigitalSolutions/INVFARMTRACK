@@ -4,7 +4,7 @@
 import {
   nextSeasonName, fieldNameProblem, fieldCapacityProblem,
   bedName, rowOf, levelOf, parseBedName, availableRows, levelsFor, defaultLevel,
-  levelProblem, bedCapacityProblem, typeForLevel,
+  levelProblem, bedCapacityProblem, typeForLevel, planBulkBeds,
 } from '../../src/services/infrastructureRules.ts'
 
 let failures = 0
@@ -66,6 +66,42 @@ eq('ground at level 2 refused', !!levelProblem('Ground','2'), true)
 eq('air at level 2 fine', levelProblem('Air','2'), null)
 eq('bed capacity reached', !!bedCapacityProblem({name:'Shadehouse 1',capacity:120}, 120), true)
 eq('bed capacity has room', bedCapacityProblem({name:'Shadehouse 1',capacity:120}, 119), null)
+
+// bulk add — how the real layout gets entered
+const E3 = { name: 'E3', rows: 33 }
+const none: { name?: string }[] = []
+eq('a clean run of air beds',
+  planBulkBeds({field:E3, level:1, fromRow:1, toRow:3, existing:none}).create,
+  ['E3-01-1','E3-02-1','E3-03-1'])
+eq('ground beds have no level suffix',
+  planBulkBeds({field:E3, level:0, fromRow:1, toRow:2, existing:none}).create,
+  ['E3-01','E3-02'])
+const some = [{name:'E3-02-1'}]
+eq('rows already filled are skipped',
+  planBulkBeds({field:E3, level:1, fromRow:1, toRow:3, existing:some}).create,
+  ['E3-01-1','E3-03-1'])
+eq('and reported', planBulkBeds({field:E3, level:1, fromRow:1, toRow:3, existing:some}).alreadyThere, [2])
+eq('a ground bed does not block the air above it',
+  planBulkBeds({field:E3, level:1, fromRow:1, toRow:1, existing:[{name:'E3-01'}]}).create, ['E3-01-1'])
+eq('rows past the end of the field are refused',
+  planBulkBeds({field:{name:'C1',rows:27}, level:0, fromRow:26, toRow:30, existing:none}).outOfRange, [28,29,30])
+eq('and only the valid ones created',
+  planBulkBeds({field:{name:'C1',rows:27}, level:0, fromRow:26, toRow:30, existing:none}).create,
+  ['C1-26','C1-27'])
+eq('backwards range refused',
+  !!planBulkBeds({field:E3, level:1, fromRow:9, toRow:2, existing:none}).problem, true)
+eq('no row count -> cannot number the beds',
+  !!planBulkBeds({field:{name:'E3'}, level:1, fromRow:1, toRow:3, existing:none}).problem, true)
+// the whole batch is checked, not one bed at a time
+eq('a batch that would overflow the shadehouse is refused',
+  !!planBulkBeds({field:E3, level:1, fromRow:1, toRow:20, existing:none,
+    totalBeds:115, shadehouse:{name:'Shadehouse 1', capacity:120}}).problem, true)
+eq('and nothing is created when it is',
+  planBulkBeds({field:E3, level:1, fromRow:1, toRow:20, existing:none,
+    totalBeds:115, shadehouse:{name:'Shadehouse 1', capacity:120}}).create, [])
+eq('a batch that fits is allowed',
+  planBulkBeds({field:E3, level:1, fromRow:1, toRow:3, existing:none,
+    totalBeds:115, shadehouse:{name:'Shadehouse 1', capacity:120}}).create.length, 3)
 
 console.log(failures ? `\n  ${failures} failed` : '\n  all passed')
 process.exit(failures ? 1 : 0)

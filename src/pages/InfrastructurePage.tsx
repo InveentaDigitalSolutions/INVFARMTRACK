@@ -12,7 +12,7 @@ import ShadehouseView from "../components/ShadehouseView";
 import ShadehouseView3D from "../components/ShadehouseView3D";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
-import { availableRows, bedName, typeForLevel, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
+import { availableRows, bedName, typeForLevel, planBulkBeds, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
 
 const tabs = [
   { id: "shadehouses", label: "Shadehouses" },
@@ -80,6 +80,41 @@ interface BedRow { id?: string; name?: string; field?: string; type?: string; le
  * decides whether this is a ground or an air bed, and the rows on offer are
  * the ones free in the chosen field at that level.
  */
+/**
+ * Adding beds a run at a time.
+ *
+ * Air beds come in runs — a cable spans rows 1 to 20 of a field — so entering
+ * them one by one is a hundred identical form submissions. Soil and irrigation
+ * are set for the whole batch because in practice a run shares them.
+ */
+const bulkBedFormGroups = [
+  { title: "Add a run of beds", columns: 2 as const, fields: [
+    { key: "field", label: "Field", type: "select" as const,
+      options: fieldOptions, optionsFrom: "fields", required: true },
+    { key: "level", label: "Level", type: "select" as const, required: true, options: [
+      { value: "0", label: "0 — ground beds" },
+      { value: "1", label: "1 — air beds" },
+      { value: "2", label: "2 — air beds" },
+      { value: "3", label: "3 — air beds" },
+    ] },
+    { key: "fromRow", label: "First Row", type: "number" as const, min: 1, required: true },
+    { key: "toRow", label: "Last Row", type: "number" as const, min: 1, required: true },
+    { key: "soilType", label: "Soil Type", type: "select" as const, options: [
+      { value: "Sandy", label: "Sandy" }, { value: "Loamy", label: "Loamy" },
+      { value: "Clay", label: "Clay" }, { value: "Peaty", label: "Peaty" },
+      { value: "Chalky", label: "Chalky" }, { value: "Silty", label: "Silty" },
+    ] },
+    { key: "irrigationType", label: "Irrigation", type: "select" as const, options: [
+      { value: "Drip", label: "Drip" }, { value: "Sprinkler", label: "Sprinkler" },
+      { value: "Manual", label: "Manual" }, { value: "None", label: "None" },
+    ] },
+    { key: "drainage", label: "Drainage", type: "select" as const, options: [
+      { value: "Excellent", label: "Excellent" }, { value: "Good", label: "Good" },
+      { value: "Moderate", label: "Moderate" }, { value: "Poor", label: "Poor" },
+    ] },
+  ]},
+];
+
 const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
   { title: "Bed Details", columns: 2 as const, fields: [
     { key: "field", label: "Field", type: "select" as const,
@@ -128,6 +163,64 @@ export default function InfrastructurePage() {
   const [shadehouses, setShadehouses] = useRecords("shadehouses", initShadehouses);
   const [fields, setFieldes] = useRecords("fields", initFieldes);
   const [beds, setBeds] = useRecords("beds", initBeds);
+
+  const bulkBedForm = useFormModal({
+    field: "", level: "1", fromRow: 1, toRow: 1,
+    soilType: "", irrigationType: "", drainage: "",
+  });
+
+  /**
+   * Creates a run of beds in one go, after saying exactly what it will do.
+   * Rows that already hold a bed at that level are skipped rather than
+   * refused — asking for rows 1 to 20 when 2 and 7 exist should fill the
+   * gaps, not fail.
+   */
+  const saveBulkBeds = (values: Record<string, unknown>) => {
+    const field = (fields as FieldRow[]).find((f) => f.name === values.field);
+    const level = Number(values.level ?? 0);
+    const shadehouse = (shadehouses as Array<Record<string, unknown>>).find(
+      (h) => h.name === field?.shadehouse
+    );
+
+    const plan = planBulkBeds({
+      field,
+      level,
+      fromRow: Number(values.fromRow),
+      toRow: Number(values.toRow),
+      existing: beds as BedRow[],
+      totalBeds: beds.length,
+      shadehouse: shadehouse as never,
+    });
+
+    if (plan.problem) { alert(plan.problem); return; }
+    if (plan.create.length === 0) {
+      alert(`Every row in that range already has a bed at level ${level}.`);
+      return;
+    }
+
+    const notes: string[] = [];
+    if (plan.alreadyThere.length) notes.push(`${plan.alreadyThere.length} already existed and were skipped`);
+    if (plan.outOfRange.length) notes.push(`${plan.outOfRange.length} were past the end of ${field?.name}`);
+    const summary =
+      `Create ${plan.create.length} bed${plan.create.length === 1 ? "" : "s"}, ` +
+      `${plan.create[0]} to ${plan.create[plan.create.length - 1]}?` +
+      (notes.length ? `\n\n${notes.join(". ")}.` : "");
+    if (!window.confirm(summary)) return;
+
+    const created = plan.create.map((name) => ({
+      id: "",
+      name,
+      field: values.field,
+      level: String(level),
+      type: typeForLevel(level),
+      soilType: values.soilType || undefined,
+      irrigationType: values.irrigationType || undefined,
+      drainage: values.drainage || undefined,
+      active: true,
+    }));
+    setBeds([...(beds as unknown[]), ...created] as typeof beds);
+    bulkBedForm.close();
+  };
 
   /**
    * Refuses a field name already used in that shadehouse, and a field the
@@ -240,9 +333,25 @@ export default function InfrastructurePage() {
             <DataTable columns={[
               { key: "name", label: "Name" }, { key: "field", label: "Field" },
               { key: "type", label: "Type", render: (r) => <Badge variant={r.type === "Air" ? "blue" : "green"}>{r.type as string}</Badge> },
-              { key: "level", label: "Level" }, { key: "material", label: "Material" }, { key: "drainage", label: "Drainage" },
+              { key: "level", label: "Level" },
+              { key: "soilType", label: "Soil" }, { key: "irrigationType", label: "Irrigation" },
               { key: "active", label: "Status", render: (r) => <Badge variant={r.active ? "green" : "gray"}>{r.active ? "Active" : "Inactive"}</Badge> },
             ]} data={beds} onAdd={bedForm.openCreate} onEdit={(r, i) => bedForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Bed" searchPlaceholder="Search beds..." />
+            <div className="flex justify-end -mt-2">
+              <button
+                type="button"
+                onClick={bulkBedForm.openCreate}
+                className="px-3 py-2 text-[12px] font-medium rounded-lg border border-sand-200
+                           text-navy-700 hover:bg-sand-50 focus:outline-none
+                           focus:ring-2 focus:ring-lime-400/30 transition-colors cursor-pointer"
+              >
+                Add a run of beds
+              </button>
+            </div>
+            <FormModal open={bulkBedForm.open} onClose={bulkBedForm.close} title="Add a run of beds"
+              subtitle="Creates every bed in the row range at once"
+              groups={bulkBedFormGroups} values={bulkBedForm.values} onChange={bulkBedForm.onChange}
+              submitLabel="Preview" onSubmit={(v) => saveBulkBeds(v)} />
             <FormModal open={bedForm.open} onClose={bedForm.close} title={bedForm.isEdit ? "Edit Bed" : "Add Bed"} groups={bedFormGroups(fields as FieldRow[], beds as BedRow[])} values={bedForm.values} onChange={bedForm.onChange} isEdit={bedForm.isEdit} onSubmit={(v) => saveBed(v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Bed" message="Delete this bed?" onConfirm={() => del(beds, setBeds)} />
           </>

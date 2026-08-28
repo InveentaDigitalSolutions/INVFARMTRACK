@@ -196,6 +196,83 @@ export function levelProblem(type: string | undefined, level: string | number | 
   return null;
 }
 
+export interface BulkBedRequest {
+  field: FieldLike | undefined;
+  level: number;
+  fromRow: number;
+  toRow: number;
+  existing: BedLike[];
+  /** Beds already in the shadehouse, for the capacity check. */
+  totalBeds?: number;
+  shadehouse?: ShadehouseLike;
+}
+
+export interface BulkBedPlan {
+  /** Names that would be created, in row order. */
+  create: string[];
+  /** Rows skipped because a bed is already there at this level. */
+  alreadyThere: number[];
+  /** Rows past the end of the field. */
+  outOfRange: number[];
+  /** Why nothing can be created, when that is the case. */
+  problem?: string;
+}
+
+/**
+ * Works out which beds a bulk request would actually create.
+ *
+ * Air beds come in runs — a cable spans rows 1 to 20 of a field — so entering
+ * them one at a time is a hundred clicks for something better said once. The
+ * plan is returned rather than acted on so the form can show exactly what will
+ * happen before anything is written: which rows are new, which already have a
+ * bed at that level, and which fall off the end of the field.
+ */
+export function planBulkBeds(request: BulkBedRequest): BulkBedPlan {
+  const { field, level, fromRow, toRow, existing, totalBeds = 0, shadehouse } = request;
+
+  const empty: BulkBedPlan = { create: [], alreadyThere: [], outOfRange: [] };
+  if (!field?.name) return { ...empty, problem: "Choose a field." };
+  if (!field.rows || field.rows < 1) {
+    return { ...empty, problem: `${field.name} has no row count recorded, so its beds cannot be numbered.` };
+  }
+  if (!Number.isFinite(fromRow) || !Number.isFinite(toRow) || fromRow < 1 || toRow < 1) {
+    return { ...empty, problem: "Give a first and last row." };
+  }
+  if (toRow < fromRow) return { ...empty, problem: "The last row comes before the first." };
+  if (level < 0 || level > 3) return { ...empty, problem: "Levels run from 0 to 3." };
+
+  const taken = new Set(
+    existing
+      .map((b) => parseBedName(String(b.name ?? "")))
+      .filter((p): p is ParsedBed => p !== null && p.field === field.name && p.level === level)
+      .map((p) => p.row)
+  );
+
+  const create: string[] = [];
+  const alreadyThere: number[] = [];
+  const outOfRange: number[] = [];
+  for (let row = fromRow; row <= toRow; row++) {
+    if (row > field.rows) { outOfRange.push(row); continue; }
+    if (taken.has(row)) { alreadyThere.push(row); continue; }
+    create.push(bedName(field.name, row, level));
+  }
+
+  // Checked against the whole batch, not one bed at a time: adding 20 beds to
+  // a shadehouse with room for 5 should be refused before any are written.
+  if (shadehouse?.capacity && totalBeds + create.length > shadehouse.capacity) {
+    return {
+      create: [], alreadyThere, outOfRange,
+      problem:
+        `${shadehouse.name} holds ${shadehouse.capacity} beds and has ${totalBeds}. ` +
+        `This would add ${create.length}.`,
+    };
+  }
+  if (create.length === 0 && !alreadyThere.length && !outOfRange.length) {
+    return { ...empty, problem: "That range covers no rows." };
+  }
+  return { create, alreadyThere, outOfRange };
+}
+
 /** Whether another bed will fit in the shadehouse. */
 export function bedCapacityProblem(
   shadehouse: ShadehouseLike | undefined,
