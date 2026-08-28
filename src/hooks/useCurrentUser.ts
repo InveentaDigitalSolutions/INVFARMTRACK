@@ -13,6 +13,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { getContext } from "@microsoft/power-apps/app";
 import { getClient } from "@microsoft/power-apps/data";
 import { dataSourcesInfo } from "../../.power/schemas/appschemas/dataSourcesInfo";
 import { hostingMode } from "../services/tableMap";
@@ -61,20 +62,56 @@ const toUser = (id: string, row: UserRow): CurrentUser => ({
   photo: row.entityimage ? `data:image/jpeg;base64,${row.entityimage}` : undefined,
 });
 
+/**
+ * Inside the player the host already knows who is signed in, so the name comes
+ * from it directly. An earlier attempt called WhoAmI through the client's
+ * customapi action, which cannot work: that path looks the operation up in
+ * the data source's own `apis` map, and a plain table has none — so it failed
+ * silently and the sidebar stayed blank.
+ *
+ * Only the photo needs Dataverse, matched on the Entra object id the context
+ * carries. A user with no matching Dataverse record still gets their name.
+ */
 async function loadViaPlayer(): Promise<CurrentUser | null> {
+  const context = await getContext();
+  const identity = context?.user;
+  // Logged rather than swallowed: when the sidebar shows nothing, the useful
+  // question is whether the host gave us an identity at all or the Dataverse
+  // lookup came back empty, and those need telling apart.
+  console.info("[user] host context:", identity ?? "(none)");
+  if (!identity?.objectId && !identity?.fullName) {
+    console.warn("[user] the host supplied no identity");
+    return null;
+  }
+
+  const base: CurrentUser = {
+    id: identity.objectId ?? "",
+    name: identity.fullName ?? "",
+    title: "",
+    email: identity.userPrincipalName ?? "",
+  };
+  if (!identity.objectId) return base;
+
   const client = getClient(dataSourcesInfo);
-
-  const who = await client.executeAsync<unknown, { UserId?: string }>({
-    dataverseRequest: {
-      action: "customapi",
-      parameters: { operationName: "WhoAmI", tableName: "systemuser" },
-    },
+  const found = await client.retrieveMultipleRecordsAsync<UserRow>("systemusers", {
+    select: SELECT,
+    filter: `azureactivedirectoryobjectid eq ${identity.objectId}`,
+    top: 1,
   });
-  const id = who.success ? who.data?.UserId : undefined;
-  if (!id) return null;
+  if (!found.success) console.warn("[user] systemusers lookup failed:", found.error);
+  const row = found.success ? found.data?.[0] : undefined;
+  if (!row) {
+    console.info(`[user] no Dataverse record for object id ${identity.objectId}; using the host name only`);
+    return base;
+  }
+  console.info(`[user] matched ${row.fullname}; photo ${row.entityimage ? "found" : "not stored"}`);
 
-  const record = await client.retrieveRecordAsync<UserRow>("systemusers", id, { select: SELECT });
-  return record.success ? toUser(id, record.data) : null;
+  return {
+    ...toUser(base.id, row),
+    // The host's name is the authoritative one; Dataverse fills in the rest.
+    name: base.name || String(row.fullname ?? ""),
+    email: base.email || String(row.internalemailaddress ?? row.domainname ?? ""),
+  };
 }
 
 async function loadViaWebApi(): Promise<CurrentUser | null> {
