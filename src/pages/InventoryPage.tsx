@@ -41,7 +41,10 @@ const inputFields = [
 ];
 
 export default function InventoryPage() {
-  const [tab, setTab] = useState("plants");
+  // Taken from the tabs themselves rather than named: this said "plants"
+  // after the catalogue moved to Production, so nothing matched and the page
+  // rendered empty with no tab selected.
+  const [tab, setTab] = useState(tabs[0].id);
 
   const [inputs, setInputs] = useRecords("inputs", initInputs);
 
