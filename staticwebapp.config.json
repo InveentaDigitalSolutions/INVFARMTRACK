@@ -1,0 +1,13 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "*.svg", "*.woff2"]
+  },
+  "globalHeaders": {
+    "Cache-Control": "no-cache"
+  },
+  "mimeTypes": {
+    ".woff2": "font/woff2",
+    ".svg": "image/svg+xml"
+  }
+}

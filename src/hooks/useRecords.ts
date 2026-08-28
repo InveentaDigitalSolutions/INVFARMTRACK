@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { LocalStore, type DataStore, type Identified } from "../services/DataService";
 import { DataverseStore } from "../services/DataverseStore";
-import { DATAVERSE_TABLES, ENABLED_TABLES, dataverseConfigured } from "../services/tableMap";
+import { DataverseWebApiStore } from "../services/DataverseWebApiStore";
+import { DATAVERSE_TABLES, ENABLED_TABLES, hostingMode } from "../services/tableMap";
 
 /**
  * Store-backed replacement for `useState(initialArray)`.
@@ -31,9 +32,16 @@ function storeFor(table: string, seed: Record<string, unknown>[]): DataStore<Ide
   if (store) return store;
 
   const binding = DATAVERSE_TABLES[table];
-  if (binding && ENABLED_TABLES.has(table) && dataverseConfigured()) {
-    store = new DataverseStore<Identified>(binding.dataSource, binding.primaryKey, binding.fields);
-    console.info(`[data] ${table} -> Dataverse (${binding.dataSource})`);
+  const mode = hostingMode();
+
+  if (binding && ENABLED_TABLES.has(table) && mode !== "demo") {
+    // Same interface either way; only the transport differs. Pages, hooks and
+    // the 3D view never learn which one they got.
+    store =
+      mode === "standalone"
+        ? new DataverseWebApiStore<Identified>(binding.dataSource, binding.primaryKey, binding.fields)
+        : new DataverseStore<Identified>(binding.dataSource, binding.primaryKey, binding.fields);
+    console.info(`[data] ${table} -> Dataverse (${binding.dataSource}) via ${mode}`);
   } else {
     store = new LocalStore<Identified>(table, seed as Identified[]);
   }

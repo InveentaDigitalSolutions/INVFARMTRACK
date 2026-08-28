@@ -223,7 +223,26 @@ export const ENABLED_TABLES = new Set<string>([
   "timesheets",
 ]);
 
-/** Dataverse is only usable when the app has a session — locally that means dev:dv. */
+/**
+ * Which hosting model this build is running under.
+ *
+ * "player"     — inside the Power Apps host, which supplies the Dataverse
+ *                session. Sandboxed: no WebGL workers, no outbound fetch.
+ * "standalone" — hosted on Azure, signing in with MSAL and calling the
+ *                Dataverse Web API directly. No sandbox.
+ * "demo"       — neither is configured; everything stays on LocalStore.
+ */
+export type HostingMode = "player" | "standalone" | "demo";
+
+export function hostingMode(): HostingMode {
+  if (import.meta.env.VITE_ENTRA_CLIENT_ID && import.meta.env.VITE_ENTRA_TENANT_ID) {
+    return "standalone";
+  }
+  if (import.meta.env.VITE_DATAVERSE_URL) return "player";
+  return "demo";
+}
+
+/** Dataverse is only usable when the app has a session of some kind. */
 export function dataverseConfigured(): boolean {
-  return Boolean(import.meta.env.VITE_DATAVERSE_URL);
+  return hostingMode() !== "demo";
 }
