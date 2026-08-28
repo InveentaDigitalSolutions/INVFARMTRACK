@@ -75,10 +75,6 @@ const toUser = (id: string, row: UserRow): CurrentUser => ({
 async function loadViaPlayer(): Promise<CurrentUser | null> {
   const context = await getContext();
   const identity = context?.user;
-  // Logged rather than swallowed: when the sidebar shows nothing, the useful
-  // question is whether the host gave us an identity at all or the Dataverse
-  // lookup came back empty, and those need telling apart.
-  console.info("[user] host context:", identity ?? "(none)");
   if (!identity?.objectId && !identity?.fullName) {
     console.warn("[user] the host supplied no identity");
     return null;
@@ -100,11 +96,9 @@ async function loadViaPlayer(): Promise<CurrentUser | null> {
   });
   if (!found.success) console.warn("[user] systemusers lookup failed:", found.error);
   const row = found.success ? found.data?.[0] : undefined;
-  if (!row) {
-    console.info(`[user] no Dataverse record for object id ${identity.objectId}; using the host name only`);
-    return base;
-  }
-  console.info(`[user] matched ${row.fullname}; photo ${row.entityimage ? "found" : "not stored"}`);
+  // No Dataverse record is not a fault — the name still comes from the host,
+  // only the title and photo are missing.
+  if (!row) return base;
 
   return {
     ...toUser(base.id, row),
