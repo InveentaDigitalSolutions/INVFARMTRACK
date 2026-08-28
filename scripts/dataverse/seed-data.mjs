@@ -339,6 +339,111 @@ const SEED_PLAN = [
       _ref: { bv_SupplierId: ['bv_supplier', 'TecniAgua'] } },
   ]},
 
+
+  // ---- Batch 2: agronomy -------------------------------------------------
+
+  { table: 'bv_pruning', dedupeField: 'bv_pruningname', nameField: 'bv_pruningname', rows: () => {
+      const beds = ['E3-01', 'E3-14', 'C3-05', 'C1-11', 'E1-22', 'C3-19']
+      return beds.map((bed, i) => ({
+        bv_pruningname: `${bed} · week ${30 + i}`,
+        bv_date: `2026-0${7 + Math.floor(i / 4)}-${String(6 + i * 3).padStart(2, '0')}`,
+        bv_weeknumber: 30 + i,
+        bv_bedspruned: 1,
+        bv_cuttingsestimated: 380 + i * 40,
+        bv_worker: ['Carlos Martinez', 'Maria Lopez', 'Juan Perez'][i % 3],
+        _ref: { bv_BedId: ['bv_bed', bed], bv_SeasonId: ['bv_season', '2026-S1'] },
+      }))
+    },
+  },
+
+  { table: 'bv_pruningcurve', dedupeField: 'bv_pruningcurvename', nameField: 'bv_pruningcurvename', rows: () =>
+      Array.from({ length: 8 }, (_, i) => {
+        const week = 28 + i
+        const planned = 14 + (i % 4) * 3
+        return {
+          bv_pruningcurvename: `2026-S1 · week ${week}`,
+          bv_weeknumber: week,
+          bv_plannedbeds: planned,
+          bv_actualbeds: planned - (i % 3),
+          bv_plannedcuttings: planned * 400,
+          bv_actualcuttings: (planned - (i % 3)) * 385,
+          _ref: { bv_SeasonId: ['bv_season', '2026-S1'] },
+        }
+      }),
+  },
+
+  { table: 'bv_fertilization', dedupeField: 'bv_fertilizationname', nameField: 'bv_fertilizationname', rows: () => {
+      const beds = ['E3-31', 'C3-20', 'E1-08', 'C1-03', 'E3-12']
+      const methods = [187460001, 187460000, 187460003, 187460001, 187460002] // Soil Drench, Foliar Spray, Drip / Fertigation, Soil Drench, Granular
+      return beds.map((bed, i) => ({
+        bv_fertilizationname: `${bed} · NPK · 2026-08-${String(4 + i * 4).padStart(2, '0')}`,
+        bv_date: `2026-08-${String(4 + i * 4).padStart(2, '0')}`,
+        bv_quantity_kg: 4 + (i % 3),
+        bv_method: methods[i],
+        bv_worker: ['Carlos Martinez', 'Juan Perez', 'Maria Lopez'][i % 3],
+        _ref: { bv_BedId: ['bv_bed', bed], bv_InputId: ['bv_input', 'NPK 20-20-20'] },
+      }))
+    },
+  },
+
+  { table: 'bv_nutrientbalance', dedupeField: 'bv_nutrientbalancename', nameField: 'bv_nutrientbalancename', rows: () => {
+      const beds = ['E3-31', 'C3-20', 'E1-08', 'C1-03']
+      return beds.flatMap((bed, i) =>
+        [32, 34].map((week) => ({
+          bv_nutrientbalancename: `${bed} · week ${week}`,
+          bv_weeknumber: week,
+          bv_n_applied: 1.0 + i * 0.2, bv_p_applied: 1.0 + i * 0.2,
+          bv_k_applied: 1.0 + i * 0.2, bv_ca_applied: 0.4,
+          bv_n_extracted: 0.72 + i * 0.1, bv_p_extracted: 0.21,
+          bv_k_extracted: 0.86 + i * 0.1, bv_ca_extracted: 0.31,
+          bv_drymatterpct: 12.4 + i * 0.3,
+          _ref: { bv_BedId: ['bv_bed', bed], bv_SeasonId: ['bv_season', '2026-S1'] },
+        }))
+      )
+    },
+  },
+
+  // Two real lab reports' worth of shape — enough to exercise the screen.
+  { table: 'bv_soilanalysis', dedupeField: 'bv_soilanalysisname', nameField: 'bv_soilanalysisname', rows: [
+    { bv_soilanalysisname: 'E3-31 · 2026-06-18', bv_sampledate: '2026-06-18', bv_reportdate: '2026-07-02',
+      bv_lab: 'Laboratorio Químico Agrícola', bv_labcode: 'LQA', bv_reportnumber: 'S-2026-0418',
+      bv_crop: 'Epipremnum aureum', bv_texture: 'Franco arcilloso',
+      bv_sand_pct: 34, bv_silt_pct: 28, bv_clay_pct: 38, bv_ph: 6.2,
+      bv_organiccarbon_pct: 1.9, bv_organicmatter_pct: 3.3, bv_n_total_pct: 0.17,
+      bv_al_cmol: 0.1, bv_al_saturation_pct: 0.8, bv_ce_ds: 0.42, bv_cic: 18.4,
+      bv_ca_mg: 1840, bv_mg_mg: 310, bv_k_mg: 240, bv_na_mg: 42, bv_cice: 12.6,
+      bv_ca_sat_pct: 62, bv_mg_sat_pct: 17, bv_k_sat_pct: 5.1,
+      bv_camg_ratio: 3.6, bv_mgk_ratio: 3.3, bv_cak_ratio: 12.1, bv_camgk_ratio: 15.7,
+      bv_cu_mg: 3.1, bv_fe_mg: 84, bv_mn_mg: 26, bv_zn_mg: 4.2, bv_b_mg: 0.6,
+      bv_s_mg: 14, bv_p_mg: 32,
+      _ref: { bv_BedId: ['bv_bed', 'E3-31'] } },
+    { bv_soilanalysisname: 'C3-20 · 2026-06-18', bv_sampledate: '2026-06-18', bv_reportdate: '2026-07-02',
+      bv_lab: 'Laboratorio Químico Agrícola', bv_labcode: 'LQA', bv_reportnumber: 'S-2026-0419',
+      bv_crop: 'Epipremnum aureum', bv_texture: 'Franco',
+      bv_sand_pct: 41, bv_silt_pct: 33, bv_clay_pct: 26, bv_ph: 5.8,
+      bv_organiccarbon_pct: 1.6, bv_organicmatter_pct: 2.8, bv_n_total_pct: 0.14,
+      bv_al_cmol: 0.3, bv_al_saturation_pct: 2.4, bv_ce_ds: 0.38, bv_cic: 15.1,
+      bv_ca_mg: 1420, bv_mg_mg: 265, bv_k_mg: 185, bv_na_mg: 38, bv_cice: 10.2,
+      bv_ca_sat_pct: 57, bv_mg_sat_pct: 16, bv_k_sat_pct: 4.4,
+      bv_camg_ratio: 3.3, bv_mgk_ratio: 3.5, bv_cak_ratio: 11.6, bv_camgk_ratio: 14.9,
+      bv_cu_mg: 2.6, bv_fe_mg: 96, bv_mn_mg: 31, bv_zn_mg: 3.4, bv_b_mg: 0.4,
+      bv_s_mg: 11, bv_p_mg: 24,
+      _ref: { bv_BedId: ['bv_bed', 'C3-20'] } },
+  ]},
+
+  { table: 'bv_foliaranalysis', dedupeField: 'bv_foliaranalysisname', nameField: 'bv_foliaranalysisname', rows: [
+    { bv_foliaranalysisname: 'E3-31 · 2026-07-14', bv_sampledate: '2026-07-14', bv_reportdate: '2026-07-25',
+      bv_lab: 'Laboratorio Químico Agrícola', bv_labcode: 'LQA', bv_crop: 'Epipremnum aureum',
+      bv_n_pct: 2.94, bv_p_pct: 0.28, bv_k_pct: 3.12, bv_ca_pct: 1.44, bv_mg_pct: 0.41,
+      bv_fe_ppm: 118, bv_zn_ppm: 34, bv_mn_ppm: 62, bv_cu_ppm: 9, bv_b_ppm: 28, bv_s_ppm: 1900,
+      _ref: { bv_BedId: ['bv_bed', 'E3-31'] } },
+    { bv_foliaranalysisname: 'C1-03 · 2026-07-14', bv_sampledate: '2026-07-14', bv_reportdate: '2026-07-25',
+      bv_lab: 'Laboratorio Químico Agrícola', bv_labcode: 'LQA', bv_crop: 'Dracaena trifasciata',
+      bv_n_pct: 2.41, bv_p_pct: 0.22, bv_k_pct: 2.76, bv_ca_pct: 1.71, bv_mg_pct: 0.38,
+      bv_fe_ppm: 96, bv_zn_ppm: 27, bv_mn_ppm: 54, bv_cu_ppm: 7, bv_b_ppm: 21, bv_s_ppm: 1640,
+      _ref: { bv_BedId: ['bv_bed', 'C1-03'] } },
+  ]},
+
 ]
 
 

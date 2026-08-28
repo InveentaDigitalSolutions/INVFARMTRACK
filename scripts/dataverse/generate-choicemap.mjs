@@ -74,6 +74,14 @@ const body = `/*
  * to a choice column.
  */
 
+/**
+ * Every ${PREFIX}* entity set in the environment. Dataverse pluralises names
+ * itself and does not always agree with English — bv_soilanalysis becomes
+ * bv_soilanalysises — so a hand-written dataSource is easy to get wrong, and
+ * the failure looks like an empty screen rather than an error.
+ */
+export const ENTITY_SETS: readonly string[] = ${JSON.stringify(entities.map((e) => e.EntitySetName).sort(), null, 2)};
+
 /** entity set -> column -> { label: optionValue } */
 export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> = ${JSON.stringify(map, null, 2)};
 

@@ -7,6 +7,51 @@
  * to a choice column.
  */
 
+/**
+ * Every bv_* entity set in the environment. Dataverse pluralises names
+ * itself and does not always agree with English — bv_soilanalysis becomes
+ * bv_soilanalysises — so a hand-written dataSource is easy to get wrong, and
+ * the failure looks like an empty screen rather than an error.
+ */
+export const ENTITY_SETS: readonly string[] = [
+  "bv_availabilities",
+  "bv_beds",
+  "bv_boxweights",
+  "bv_cainumbers",
+  "bv_calendars",
+  "bv_components",
+  "bv_customers",
+  "bv_demandforecasts",
+  "bv_expenses",
+  "bv_fertilizations",
+  "bv_fields",
+  "bv_fiscalauthorizations",
+  "bv_foliaranalysises",
+  "bv_harvests",
+  "bv_inputcomponents",
+  "bv_inputs",
+  "bv_invoices",
+  "bv_irrigations",
+  "bv_nutrientbalances",
+  "bv_orderitems",
+  "bv_orders",
+  "bv_packings",
+  "bv_plantings",
+  "bv_plantprices",
+  "bv_plants",
+  "bv_pruningcurves",
+  "bv_prunings",
+  "bv_purchaseorders",
+  "bv_seasons",
+  "bv_shadehouses",
+  "bv_soilanalysises",
+  "bv_suppliers",
+  "bv_tasks",
+  "bv_timesheets",
+  "bv_treatments",
+  "bv_workers"
+];
+
 /** entity set -> column -> { label: optionValue } */
 export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> = {
   "bv_availabilities": {

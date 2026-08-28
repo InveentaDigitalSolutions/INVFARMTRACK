@@ -91,10 +91,10 @@ const bedUtilization = [
 ];
 
 const initFertilization = [
-  { date: "2026-04-09", bed: "E3-31", input: "NPK 20-20-20", qtyKg: 5, method: "Drench", nKg: 1.0, pKg: 1.0, kKg: 1.0, caKg: 0, worker: "Carlos M." },
-  { date: "2026-04-07", bed: "E3-01", input: "Calcium Nitrate", qtyKg: 3, method: "Foliar", nKg: 0.5, pKg: 0, kKg: 0, caKg: 0.6, worker: "Maria L." },
-  { date: "2026-04-04", bed: "C3-20", input: "NPK 20-20-20", qtyKg: 4, method: "Drench", nKg: 0.8, pKg: 0.8, kKg: 0.8, caKg: 0, worker: "Juan P." },
-  { date: "2026-04-01", bed: "C3-16", input: "MKP (0-52-34)", qtyKg: 2, method: "Foliar", nKg: 0, pKg: 1.04, kKg: 0.68, caKg: 0, worker: "Ana R." },
+  { date: "2026-04-09", bed: "E3-31", input: "NPK 20-20-20", qtyKg: 5, method: "Soil Drench", nKg: 1.0, pKg: 1.0, kKg: 1.0, caKg: 0, worker: "Carlos M." },
+  { date: "2026-04-07", bed: "E3-01", input: "Calcium Nitrate", qtyKg: 3, method: "Foliar Spray", nKg: 0.5, pKg: 0, kKg: 0, caKg: 0.6, worker: "Maria L." },
+  { date: "2026-04-04", bed: "C3-20", input: "NPK 20-20-20", qtyKg: 4, method: "Soil Drench", nKg: 0.8, pKg: 0.8, kKg: 0.8, caKg: 0, worker: "Juan P." },
+  { date: "2026-04-01", bed: "C3-16", input: "MKP (0-52-34)", qtyKg: 2, method: "Foliar Spray", nKg: 0, pKg: 1.04, kKg: 0.68, caKg: 0, worker: "Ana R." },
 ];
 
 const plantOptions = [
@@ -235,9 +235,14 @@ const fertilizationFields = [
     { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
     { key: "input", label: "Fertilizer", type: "select" as const, options: fertilizerInputOptions, required: true },
     { key: "qtyKg", label: "Qty (kg)", type: "number" as const, min: 0, required: true },
+    // Labels must match bv_fertilizations.bv_method exactly — Dataverse takes
+    // its own option labels and nothing else. npm run dataverse:check verifies.
     { key: "method", label: "Method", type: "select" as const, options: [
-      { value: "Drench", label: "Drench" }, { value: "Foliar", label: "Foliar" },
-      { value: "Granular", label: "Granular" }, { value: "Fertigation", label: "Fertigation" },
+      { value: "Foliar Spray", label: "Foliar Spray" },
+      { value: "Soil Drench", label: "Soil Drench" },
+      { value: "Granular", label: "Granular" },
+      { value: "Drip / Fertigation", label: "Drip / Fertigation" },
+      { value: "Broadcast", label: "Broadcast" },
     ]},
     { key: "nKg", label: "N (kg)", type: "number" as const, min: 0 },
     { key: "pKg", label: "P (kg)", type: "number" as const, min: 0 },
