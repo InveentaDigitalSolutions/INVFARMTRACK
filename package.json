@@ -23,7 +23,8 @@
     "dataverse:seed-fix": "node scripts/dataverse/fix-autonumber-seeds.mjs",
     "test:math": "tsx scripts/test/invoiceMath.test.mts",
     "test:rules": "tsx scripts/test/infrastructureRules.test.mts",
-    "test": "npm run test:math && npm run test:rules"
+    "test": "npm run test:math && npm run test:rules",
+    "dataverse:photos": "node scripts/dataverse/sync-user-photos.mjs"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.19.0",
