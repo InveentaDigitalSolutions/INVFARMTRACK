@@ -43,14 +43,41 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<PageId>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [darkMode, setDarkMode] = useState(() =>
+  // Three states, not two. With no stored preference the app follows the
+  // operating system; once someone uses the toggle, that choice is theirs and
+  // sticks — previously it was forgotten on reload and overwritten the next
+  // time the OS switched at sunset.
+  const [themeChoice, setThemeChoice] = useState<"system" | "light" | "dark">(() => {
+    try {
+      const stored = localStorage.getItem("dni_theme");
+      if (stored === "light" || stored === "dark") return stored;
+    } catch {
+      // Private browsing and blocked site data both throw here.
+    }
+    return "system";
+  });
+  const [systemDark, setSystemDark] = useState(() =>
     window.matchMedia("(prefers-color-scheme: dark)").matches
   );
+  const darkMode = themeChoice === "system" ? systemDark : themeChoice === "dark";
+
+  const setDarkMode = (next: boolean) => {
+    const choice = next ? "dark" : "light";
+    setThemeChoice(choice);
+    try {
+      localStorage.setItem("dni_theme", choice);
+    } catch {
+      // Not being able to remember it is not a reason to refuse the change.
+    }
+  };
   const isMobile = useIsMobile();
 
+  // Track the OS setting, but only act on it while nobody has chosen. This
+  // listener used to call setDarkMode directly, which threw away an explicit
+  // choice the moment the system theme changed.
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = (e: MediaQueryListEvent) => setDarkMode(e.matches);
+    const handler = (e: MediaQueryListEvent) => setSystemDark(e.matches);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);
