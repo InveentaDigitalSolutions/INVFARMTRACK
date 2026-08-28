@@ -7,6 +7,7 @@ import {
   Check,
   AlertCircle,
 } from "lucide-react";
+import { PLANT_SIZES } from "../services/plantSizes";
 
 interface PackingEntry {
   id: string;
@@ -51,7 +52,7 @@ const beds = [
   { id: "bed-4b", label: "C1-10", batch: "Plot C1", shadehouse: "Shadehouse 1" },
 ];
 
-const sizes = ["Petit", "Mini Petit", "Small", "Medium", "California", "Large", "Extra Large"];
+const sizes = PLANT_SIZES;
 const workers = [
   { name: "Carlos M.", id: "W001" },
   { name: "Maria L.", id: "W002" },

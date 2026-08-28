@@ -10,6 +10,7 @@ import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
+import { PLANT_SIZE_OPTIONS } from "../services/plantSizes";
 
 const tabs = [
   { id: "projections", label: "Weekly Projections" },
@@ -19,14 +20,14 @@ const tabs = [
 
 // --- Weekly Projections data ---
 const initProjections = [
-  { week: "2026-W14", plant: "Pothos / Hawaiian", size: '4.5"', projectedQty: 1200, orderedQty: 1000, confirmedQty: 1000, surplus: 200, shortfall: 0, status: "Confirmed - Over" },
-  { week: "2026-W14", plant: "Pothos / Marble Queen", size: '4.5"', projectedQty: 800, orderedQty: 800, confirmedQty: 800, surplus: 0, shortfall: 0, status: "Confirmed - Equal" },
-  { week: "2026-W15", plant: "Pothos / Hawaiian", size: '4.5"', projectedQty: 1100, orderedQty: 1300, confirmedQty: 1100, surplus: 0, shortfall: 200, status: "Confirmed - Under" },
-  { week: "2026-W15", plant: "Pothos / Jade", size: '2.5"', projectedQty: 600, orderedQty: 500, confirmedQty: 500, surplus: 100, shortfall: 0, status: "Confirmed - Over" },
-  { week: "2026-W16", plant: "Pothos / Marble Queen", size: '4.5"', projectedQty: 900, orderedQty: 900, confirmedQty: 850, surplus: 0, shortfall: 50, status: "Confirmed - Under" },
-  { week: "2026-W16", plant: "Pothos / Hawaiian", size: '2.5"', projectedQty: 500, orderedQty: 500, confirmedQty: 500, surplus: 0, shortfall: 0, status: "Confirmed - Equal" },
-  { week: "2026-W17", plant: "Pothos / Hawaiian", size: '4.5"', projectedQty: 1400, orderedQty: 1200, confirmedQty: 1200, surplus: 200, shortfall: 0, status: "Confirmed - Over" },
-  { week: "2026-W18", plant: "Pothos / Jade", size: '4.5"', projectedQty: 700, orderedQty: 900, confirmedQty: 700, surplus: 0, shortfall: 200, status: "Confirmed - Under" },
+  { week: "2026-W14", plant: "Pothos / Hawaiian", size: "Medium", projectedQty: 1200, orderedQty: 1000, confirmedQty: 1000, surplus: 200, shortfall: 0, status: "Confirmed - Over" },
+  { week: "2026-W14", plant: "Pothos / Marble Queen", size: "Medium", projectedQty: 800, orderedQty: 800, confirmedQty: 800, surplus: 0, shortfall: 0, status: "Confirmed - Equal" },
+  { week: "2026-W15", plant: "Pothos / Hawaiian", size: "Medium", projectedQty: 1100, orderedQty: 1300, confirmedQty: 1100, surplus: 0, shortfall: 200, status: "Confirmed - Under" },
+  { week: "2026-W15", plant: "Pothos / Jade", size: "Small", projectedQty: 600, orderedQty: 500, confirmedQty: 500, surplus: 100, shortfall: 0, status: "Confirmed - Over" },
+  { week: "2026-W16", plant: "Pothos / Marble Queen", size: "Medium", projectedQty: 900, orderedQty: 900, confirmedQty: 850, surplus: 0, shortfall: 50, status: "Confirmed - Under" },
+  { week: "2026-W16", plant: "Pothos / Hawaiian", size: "Small", projectedQty: 500, orderedQty: 500, confirmedQty: 500, surplus: 0, shortfall: 0, status: "Confirmed - Equal" },
+  { week: "2026-W17", plant: "Pothos / Hawaiian", size: "Medium", projectedQty: 1400, orderedQty: 1200, confirmedQty: 1200, surplus: 200, shortfall: 0, status: "Confirmed - Over" },
+  { week: "2026-W18", plant: "Pothos / Jade", size: "Medium", projectedQty: 700, orderedQty: 900, confirmedQty: 700, surplus: 0, shortfall: 200, status: "Confirmed - Under" },
 ];
 
 // --- Pruning Curve data (weeks 42-52 of 2025 + weeks 1-16 of 2026) ---
@@ -78,11 +79,7 @@ const plantOptionsFallback = [
   { value: "Pothos / N'Joy", label: "Pothos / N'Joy" },
   { value: "Pothos / Neon", label: "Pothos / Neon" },
 ];
-const sizeOptions = [
-  { value: '2.5"', label: '2.5"' },
-  { value: '4.5"', label: '4.5"' },
-  { value: '6"', label: '6"' },
-];
+const sizeOptions = PLANT_SIZE_OPTIONS;
 const seasonOptionsFallback = [
   { value: "2026-S1", label: "2026-S1" },
   { value: "2025-S2", label: "2025-S2" },

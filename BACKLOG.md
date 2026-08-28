@@ -52,14 +52,6 @@ Related: `src/components/ShadehouseScene.tsx`, `ShadehouseView3D.tsx`,
   flow (inside the solution, not personal).
 - **Bed Utilization is the wrong metric** — beds are occupied nearly year-round,
   so utilisation is flat and uninformative. Replace with a rotation timeline.
-- **`bv_Size` domain mismatch — needs a decision from Santiago.** The
-  Availability screen offers pot diameters (2.5", 4.5", 6"); the column
-  `bv_availabilities.bv_size` holds grades (Petit, Mini Petit, Small, Medium,
-  California, Large, Extra Large). They are different things, so neither list
-  is wrong — the question is which one "size" means on a projection. Until it
-  is settled, `npm run dataverse:check` reports it and any size chosen on that
-  screen saves empty. Options: (a) the app switches to grades, (b) a separate
-  pot-size column is added, (c) the grade list is replaced with diameters.
 - **Dashboard shows "Shadehouse 1" three times** — duplicate labels.
 - **Code app is not in the solution** — `power-apps push` creates it in the
   environment only. May be a preview limitation; confirm whether the app can be

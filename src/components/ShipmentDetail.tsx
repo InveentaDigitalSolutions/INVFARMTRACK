@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Badge from "./Badge";
 import InvoiceGenerator from "./InvoiceGenerator";
+import { PLANT_SIZES } from "../services/plantSizes";
 
 // Types
 interface OrderLine {
@@ -60,7 +61,7 @@ const beds = [
   { id: "bed-1b", label: "E1-05", shadehouse: "Shadehouse 1" },
   { id: "bed-5c", label: "C3-12", shadehouse: "Shadehouse 1" },
 ];
-const sizes = ["Petit", "Mini Petit", "Small", "Medium", "California", "Large", "Extra Large"];
+const sizes = PLANT_SIZES;
 const workers = [
   { name: "Carlos M.", id: "W001" },
   { name: "Maria L.", id: "W002" },
