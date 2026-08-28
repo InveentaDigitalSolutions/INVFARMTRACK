@@ -22,8 +22,10 @@ export interface BedOption {
   fieldName: string;
   shadehouseId: string;
   shadehouseName: string;
-  type: "Air" | "Ground";
-  level: number;
+  /** Undefined when the bed has not been told which it is. */
+  type?: "Air" | "Ground";
+  /** Undefined when unknown; 0 is a real answer meaning ground level. */
+  level?: number;
   /** What is growing there now, blank if the bed is empty. */
   plant?: string;
 }
@@ -68,8 +70,10 @@ export function useNurseryBeds(fallback: BedOption[] = []): {
           fieldName,
           shadehouseId: shadehouse,
           shadehouseName: shadehouse,
-          type: (b.type === "Ground" ? "Ground" : "Air") as "Air" | "Ground",
-          level: Number(b.level ?? 0) || 0,
+          // Not defaulted: a bed whose type nobody has recorded is unknown,
+          // and calling it Air would be the same guess that had to be undone.
+          type: (b.type === "Ground" || b.type === "Air" ? b.type : undefined) as BedOption["type"],
+          level: b.level === undefined || b.level === null ? undefined : Number(b.level),
           plant: plantOf.get(name) ?? "",
         };
       })
