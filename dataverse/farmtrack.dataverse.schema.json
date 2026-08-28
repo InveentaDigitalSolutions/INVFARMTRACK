@@ -283,14 +283,6 @@
           "description": "Descriptive name, shown wherever the record is listed."
         },
         {
-          "schemaName": "bv_InvoiceName",
-          "displayName": "Invoice Name",
-          "type": "string",
-          "maxLength": 200,
-          "required": false,
-          "description": "Auto-composed: {Name} / {Variety} \u2014 used on invoices and packing lists"
-        },
-        {
           "schemaName": "bv_PlantCode",
           "displayName": "Plant Code",
           "type": "autonumber",

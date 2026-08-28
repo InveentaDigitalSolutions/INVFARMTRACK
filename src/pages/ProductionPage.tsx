@@ -23,6 +23,9 @@ const tabs = [
   { id: "pruning", label: "Pruning" },
   { id: "fertilization", label: "Fertilization" },
   { id: "seasons", label: "Seasons" },
+  // The catalogue of what the nursery grows belongs with growing it, not with
+  // the raw materials it consumes.
+  { id: "plants", label: "Plant Catalog" },
 ];
 
 // Initial data
@@ -56,6 +59,19 @@ const initPruning = [
   { date: "2026-04-03", bed: "E1-24", week: 14, bedsPruned: 4, cuttingsEstimated: 2100, worker: "Juan P." },
   { date: "2026-04-01", bed: "E3-27", week: 14, bedsPruned: 3, cuttingsEstimated: 1400, worker: "Ana R." },
 ];
+// No invoiceName: it was a stored copy of "{name} / {variety}", which the
+// app already composes wherever a plant is shown. A duplicate that can only
+// go stale.
+const initPlants = [
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Hawaiian", patent: "Yes", patentNum: "PP32456", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "High Color", patent: "No", patentNum: "", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "N'Joy", patent: "Yes", patentNum: "PP33012", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Neon", patent: "No", patentNum: "", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Jade", patent: "No", patentNum: "", active: true },
+  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Marble Queen", patent: "No", patentNum: "", active: true },
+  { code: "SNS", name: "Sansevieria", latin: "Dracaena trifasciata", variety: "Sansevieria", patent: "No", patentNum: "", active: true },
+];
+
 const initSeasons = [
   { name: "2026-S1", start: "2026-01-01", end: "2026-06-30", description: "First season 2026", active: true },
   { name: "2025-S2", start: "2025-07-01", end: "2025-12-31", description: "Second season 2025", active: false },
@@ -217,6 +233,20 @@ const pruningFields = [
     { key: "bedsPruned", label: "Beds Pruned", type: "number" as const, min: 1, required: true },
     { key: "cuttingsEstimated", label: "Cuttings Estimated", type: "number" as const, min: 0 },
     { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
+  ]},
+];
+
+const plantFields = [
+  { title: "Plant Information", columns: 2 as const, fields: [
+    { key: "code", label: "Plant ID", type: "text" as const, readOnly: true, placeholder: "PLT-0001 (auto)" },
+    { key: "name", label: "Common Name", type: "text" as const, required: true },
+    { key: "latin", label: "Latin Name", type: "text" as const },
+    { key: "variety", label: "Variety", type: "text" as const },
+  ]},
+  { title: "Patent & Status", columns: 2 as const, fields: [
+    { key: "patent", label: "Patented", type: "toggle" as const, options: [{ value: "Yes", label: "Yes" }, { value: "No", label: "No" }] },
+    { key: "patentNum", label: "Patent Number", type: "text" as const },
+    { key: "active", label: "Active", type: "boolean" as const },
   ]},
 ];
 
@@ -549,6 +579,7 @@ export default function ProductionPage() {
   const [pruning, setPruning] = useRecords("pruning", initPruning);
   const [fertilization, setFertilization] = useRecords("fertilization", initFertilization);
   const [seasons, setSeasons] = useRecords("seasons", initSeasons);
+  const [plants, setPlants] = useRecords("plants", initPlants);
 
   /** Names a new season from its start date; an existing one keeps its name. */
   const saveSeason = (values: Record<string, unknown>) => {
@@ -567,6 +598,7 @@ export default function ProductionPage() {
   const taskForm = useFormModal(initTasks[0]);
   const pruningForm = useFormModal(initPruning[0]);
   const fertilizationForm = useFormModal(initFertilization[0]);
+  const plantForm = useFormModal(initPlants[0]);
   const seasonForm = useFormModal(initSeasons[0]);
   const confirm = useConfirmDialog();
 
@@ -753,6 +785,28 @@ export default function ProductionPage() {
             />
             <FormModal open={fertilizationForm.open} onClose={fertilizationForm.close} title={fertilizationForm.isEdit ? "Edit Fertilization" : "Log Fertilization"} subtitle="Record a fertilization event" groups={fertilizationFields} values={fertilizationForm.values} onChange={fertilizationForm.onChange} isEdit={fertilizationForm.isEdit} onSubmit={(v) => handleSave(fertilization, setFertilization, fertilizationForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Record" message="Delete this fertilization record?" onConfirm={() => handleDelete(fertilization, setFertilization)} />
+          </>
+        );
+      case "plants":
+        return (
+          <>
+            <DataTable
+              columns={[
+                { key: "code", label: "Code" },
+                { key: "name", label: "Name" },
+                { key: "latin", label: "Latin Name" },
+                { key: "variety", label: "Variety" },
+                { key: "patent", label: "Patented", render: (r) => <Badge variant={r.patent === "Yes" ? "amber" : "gray"}>{r.patent as string}</Badge> },
+              ]}
+              data={plants}
+              onAdd={plantForm.openCreate}
+              onEdit={(row, i) => plantForm.openEdit(row as any, i)}
+              onDelete={(row, i) => confirm.requestDelete(row, i)}
+              addLabel="Add Plant"
+              searchPlaceholder="Search plants..."
+            />
+            <FormModal open={plantForm.open} onClose={plantForm.close} title={plantForm.isEdit ? "Edit Plant" : "Add Plant"} groups={plantFields} values={plantForm.values} onChange={plantForm.onChange} isEdit={plantForm.isEdit} onSubmit={(v) => handleSave(plants, setPlants, plantForm, v)} />
+            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Plant" message="Are you sure you want to delete this plant from the catalog?" onConfirm={() => handleDelete(plants, setPlants)} />
           </>
         );
       case "seasons":

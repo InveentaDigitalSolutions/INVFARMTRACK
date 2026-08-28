@@ -53,7 +53,6 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       name: "bv_plantname",
       latin: "bv_latinname",
       variety: "bv_variety",
-      invoiceName: "bv_invoicename",
       patentNum: "bv_patentnumber",
       active: "bv_isactive",
     },

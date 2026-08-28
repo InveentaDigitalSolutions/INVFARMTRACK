@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 44 |
-| Columns | 535 |
+| Columns | 534 |
 | Relationships | 55 |
 
 ## Conventions
@@ -33,7 +33,7 @@
 |---|---|---|---|---|
 | [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 9 | Physical growing structures in the nursery |
 | [Bed](#bed) | `bv_bed` | `BED-0001` | 11 | Growing beds within batches (Shadehouse > Batch > Bed) |
-| [Plant](#plant) | `bv_plant` | `PLT-0001` | 21 | Plant species, varieties, and patent catalog |
+| [Plant](#plant) | `bv_plant` | `PLT-0001` | 20 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
 | [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
 | [Planting](#planting) | `bv_planting` | `PLG-0001` | 9 | Records of plants placed in beds — central activity hub |
@@ -244,7 +244,6 @@ Plant species, varieties, and patent catalog
 | Column | Display name | Type | Req. | Description |
 |---|---|---|:--:|---|
 | `bv_plantname` | Plant Name | Text(200) | ✓ | Descriptive name, shown wherever the record is listed. |
-| `bv_invoicename` | Invoice Name | Text(200) |  | Auto-composed: {Name} / {Variety} — used on invoices and packing lists |
 | `bv_plantcode` 🔑 | Plant Code | Autonumber | ✓ | Auto-generated identifier, format PLT-0001. |
 | `bv_latinname` | Latin Name | Text(200) |  | Descriptive name, shown wherever the record is listed. |
 | `bv_species` | Species | Text(200) |  | Short text value. Species for the Plant. |

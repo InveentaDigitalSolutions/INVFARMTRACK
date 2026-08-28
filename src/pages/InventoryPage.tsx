@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { PackageSearch, Leaf, FlaskConical } from "lucide-react";
+import { PackageSearch, FlaskConical } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
@@ -12,36 +12,13 @@ import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 
 const tabs = [
-  { id: "plants", label: "Plant Catalog" },
   { id: "inputs", label: "Inputs" },
 ];
 
-const initPlants = [
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Hawaiian", invoiceName: "Pothos / Hawaiian", patent: "Yes", patentNum: "PP32456", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "High Color", invoiceName: "Pothos / High Color", patent: "No", patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "N'Joy", invoiceName: "Pothos / N'Joy", patent: "Yes", patentNum: "PP33012", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Neon", invoiceName: "Pothos / Neon", patent: "No", patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Jade", invoiceName: "Pothos / Jade", patent: "No", patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Marble Queen", invoiceName: "Pothos / Marble Queen", patent: "No", patentNum: "", active: true },
-  { code: "SNS", name: "Sansevieria", latin: "Dracaena trifasciata", variety: "Sansevieria", invoiceName: "Sansevieria / Sansevieria", patent: "No", patentNum: "", active: true },
-];
 const initInputs = [
   { name: "Neem Oil", category: "Pesticide", method: "Foliar Spray", safety: "7", brand: "BioGrow", composition: "Azadirachtin 0.3%" },
   { name: "Copper Fungicide", category: "Fungicide", method: "Soil Drench", safety: "14", brand: "CupraSol", composition: "Copper hydroxide 77%" },
   { name: "NPK 20-20-20", category: "Fertilizer", method: "Drip", safety: "", brand: "NutriMax", composition: "N-P-K balanced" },
-];
-const plantFields = [
-  { title: "Plant Information", columns: 2 as const, fields: [
-    { key: "code", label: "Plant ID", type: "text" as const, readOnly: true, placeholder: "PLT-0001 (auto)" },
-    { key: "name", label: "Common Name", type: "text" as const, required: true },
-    { key: "latin", label: "Latin Name", type: "text" as const },
-    { key: "variety", label: "Variety", type: "text" as const },
-  ]},
-  { title: "Patent & Status", columns: 2 as const, fields: [
-    { key: "patent", label: "Patented", type: "toggle" as const, options: [{ value: "Yes", label: "Yes" }, { value: "No", label: "No" }] },
-    { key: "patentNum", label: "Patent Number", type: "text" as const },
-    { key: "active", label: "Active", type: "boolean" as const },
-  ]},
 ];
 
 const inputFields = [
@@ -66,10 +43,8 @@ const inputFields = [
 export default function InventoryPage() {
   const [tab, setTab] = useState("plants");
 
-  const [plants, setPlants] = useRecords("plants", initPlants);
   const [inputs, setInputs] = useRecords("inputs", initInputs);
 
-  const plantForm = useFormModal(initPlants[0]);
   const inputForm = useFormModal(initInputs[0]);
   const confirm = useConfirmDialog();
 
@@ -93,29 +68,6 @@ export default function InventoryPage() {
 
   const renderTab = () => {
     switch (tab) {
-      case "plants":
-        return (
-          <>
-            <DataTable
-              columns={[
-                { key: "code", label: "Code" },
-                { key: "name", label: "Name" },
-                { key: "latin", label: "Latin Name" },
-                { key: "variety", label: "Variety" },
-                { key: "invoiceName", label: "Invoice Name" },
-                { key: "patent", label: "Patented", render: (r) => <Badge variant={r.patent === "Yes" ? "amber" : "gray"}>{r.patent as string}</Badge> },
-              ]}
-              data={plants}
-              onAdd={plantForm.openCreate}
-              onEdit={(row, i) => plantForm.openEdit(row as any, i)}
-              onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="Add Plant"
-              searchPlaceholder="Search plants..."
-            />
-            <FormModal open={plantForm.open} onClose={plantForm.close} title={plantForm.isEdit ? "Edit Plant" : "Add Plant"} groups={plantFields} values={plantForm.values} onChange={plantForm.onChange} isEdit={plantForm.isEdit} onSubmit={(v) => handleSave(plants, setPlants, plantForm, v)} />
-            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Plant" message="Are you sure you want to delete this plant from the catalog?" onConfirm={() => handleDelete(plants, setPlants)} />
-          </>
-        );
       case "inputs":
         return (
           <>
@@ -142,10 +94,14 @@ export default function InventoryPage() {
   };
 
   return (
-    <PageShell title="Inventory" subtitle="Plant catalog and inputs" icon={PackageSearch}>
+    <PageShell title="Inventory" subtitle="Inputs and raw materials" icon={PackageSearch}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <StatCard variant="hero" label="Plant Varieties" value={plants.length} icon={Leaf} />
-        <StatCard label="Active Inputs" value={inputs.length} icon={FlaskConical} />
+        <StatCard variant="hero" label="Inputs" value={inputs.length} icon={FlaskConical} />
+        <StatCard
+          label="Active"
+          value={inputs.filter((i) => (i as { active?: boolean }).active !== false).length}
+          icon={PackageSearch}
+        />
       </motion.div>
 
       <div className="mb-4">

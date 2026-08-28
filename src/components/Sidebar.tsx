@@ -113,11 +113,11 @@ export default function Sidebar({
       </div>
 
       {/* Navigation */}
-      <nav className="sidebar-nav flex-1 overflow-y-auto py-1 px-3 space-y-2.5">
+      <nav className="sidebar-nav flex-1 overflow-y-auto py-1 px-3 space-y-4">
         {navSections.map((section) => (
           <div key={section.label}>
             {open && (
-              <p className="text-[10px] text-navy-300 uppercase tracking-[0.15em] font-semibold px-3 mb-0.5">
+              <p className="text-[10px] text-navy-300 uppercase tracking-[0.15em] font-semibold px-3 mb-1.5">
                 {section.label}
               </p>
             )}
@@ -130,7 +130,7 @@ export default function Sidebar({
                     key={item.id}
                     onClick={() => onNavigate(item.id)}
                     className={`
-                      relative flex items-center gap-3 w-full px-3 py-1.5 rounded-xl
+                      relative flex items-center gap-3 w-full px-3 py-2.5 rounded-xl
                       transition-all duration-200 cursor-pointer group
                       ${
                         isActive
