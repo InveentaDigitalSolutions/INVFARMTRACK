@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import type { PageId } from "../App";
 import WeatherWidget from "./WeatherWidget";
+import { useCurrentUser, initialsOf } from "../hooks/useCurrentUser";
 
 interface SidebarProps {
   currentPage: PageId;
@@ -83,6 +84,7 @@ export default function Sidebar({
   darkMode,
   onToggleDark,
 }: SidebarProps) {
+  const { user: currentUser } = useCurrentUser();
   return (
     <motion.aside
       animate={{ width: open ? 240 : 72 }}
@@ -184,13 +186,35 @@ export default function Sidebar({
         </button>
 
         <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl bg-navy-800/50 ${open ? "" : "justify-center"}`}>
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-lime-400/20 shrink-0">
-            <User className="w-4 h-4 text-lime-400" />
-          </div>
+          {/* The photo when the user has one on their Dataverse record;
+              their initials when they do not, which is the usual case since
+              the photo most people know lives in Entra; and the generic icon
+              only when we do not know who is signed in at all. */}
+          {currentUser?.photo ? (
+            <img
+              src={currentUser.photo}
+              alt=""
+              className="w-8 h-8 rounded-lg object-cover shrink-0"
+            />
+          ) : (
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-lime-400/20 shrink-0">
+              {currentUser?.name ? (
+                <span className="text-[11px] font-bold text-lime-400 tracking-wide">
+                  {initialsOf(currentUser.name)}
+                </span>
+              ) : (
+                <User className="w-4 h-4 text-lime-400" />
+              )}
+            </div>
+          )}
           {open && (
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] font-semibold text-white truncate">Santiago G.</p>
-              <p className="text-[10px] text-navy-300 truncate">Admin</p>
+              <p className="text-[12px] font-semibold text-white truncate">
+                {currentUser?.name || "Signed in"}
+              </p>
+              <p className="text-[10px] text-navy-300 truncate">
+                {currentUser?.title || currentUser?.email || ""}
+              </p>
             </div>
           )}
         </div>

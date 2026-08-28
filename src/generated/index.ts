@@ -50,6 +50,7 @@ export * as Bv_treatmentsModel from './models/Bv_treatmentsModel';
 export * as Bv_workersModel from './models/Bv_workersModel';
 export * as CommonModels from './models/CommonModels';
 export * as FarmTrack_GetWeatherModel from './models/FarmTrack_GetWeatherModel';
+export * as SystemusersModel from './models/SystemusersModel';
 
 // Services
 export * from './services/Bv_availabilitiesService';
@@ -97,3 +98,4 @@ export * from './services/Bv_timesheetsService';
 export * from './services/Bv_treatmentsService';
 export * from './services/Bv_workersService';
 export * from './services/FarmTrack_GetWeatherService';
+export * from './services/SystemusersService';
