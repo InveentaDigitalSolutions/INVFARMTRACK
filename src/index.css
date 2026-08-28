@@ -400,3 +400,19 @@
 .dark .stat-hero { background-color: #12243a; }
 .stat-hero .text-white,
 .dark .stat-hero .text-white { color: #ffffff; }
+
+/*
+ * The sidebar's own scrollbar.
+ *
+ * The nav is allowed to scroll so nothing is unreachable on a short window,
+ * but the default bar sits against the dark rail and reads as a seam down the
+ * edge of the app. Overlay rather than inline, so it also takes no width and
+ * cannot shift the items when it appears.
+ */
+.sidebar-nav {
+  scrollbar-width: none;
+}
+.sidebar-nav::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

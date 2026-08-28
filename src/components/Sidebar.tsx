@@ -92,7 +92,7 @@ export default function Sidebar({
       className="relative flex flex-col bg-navy-900 h-screen shrink-0 border-r border-navy-800/50"
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-5">
+      <div className="flex items-center gap-3 px-4 py-4">
         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-lime-400 to-green-500 shadow-lg shadow-lime-400/20">
           <Leaf className="w-5 h-5 text-navy-900" />
         </div>
@@ -113,11 +113,11 @@ export default function Sidebar({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-1 px-3 space-y-4">
+      <nav className="sidebar-nav flex-1 overflow-y-auto py-1 px-3 space-y-2.5">
         {navSections.map((section) => (
           <div key={section.label}>
             {open && (
-              <p className="text-[10px] text-navy-300 uppercase tracking-[0.15em] font-semibold px-3 mb-1.5">
+              <p className="text-[10px] text-navy-300 uppercase tracking-[0.15em] font-semibold px-3 mb-0.5">
                 {section.label}
               </p>
             )}
@@ -130,7 +130,7 @@ export default function Sidebar({
                     key={item.id}
                     onClick={() => onNavigate(item.id)}
                     className={`
-                      relative flex items-center gap-3 w-full px-3 py-2.5 rounded-xl
+                      relative flex items-center gap-3 w-full px-3 py-1.5 rounded-xl
                       transition-all duration-200 cursor-pointer group
                       ${
                         isActive
@@ -168,23 +168,6 @@ export default function Sidebar({
       <div className="px-3 pb-3 space-y-2">
         {open && <WeatherWidget compact className="w-full" />}
 
-        <button
-          onClick={onToggleDark}
-          className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-navy-100
-                     hover:text-white hover:bg-navy-800/50 transition-all cursor-pointer"
-        >
-          {darkMode ? (
-            <Sun className="w-[18px] h-[18px] text-amber-400" />
-          ) : (
-            <Moon className="w-[18px] h-[18px]" />
-          )}
-          {open && (
-            <span className="text-[13px] font-semibold">
-              {darkMode ? "Light Mode" : "Dark Mode"}
-            </span>
-          )}
-        </button>
-
         <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl bg-navy-800/50 ${open ? "" : "justify-center"}`}>
           {/* The photo when the user has one on their Dataverse record;
               their initials when they do not, which is the usual case since
@@ -217,14 +200,26 @@ export default function Sidebar({
               </p>
             </div>
           )}
+          {open && (
+            <button
+              type="button"
+              onClick={onToggleDark}
+              title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              className="shrink-0 p-1.5 rounded-lg text-navy-300 hover:text-white
+                         hover:bg-navy-700/50 focus:outline-none focus-visible:ring-2
+                         focus-visible:ring-lime-400/40 transition-colors cursor-pointer"
+            >
+              {darkMode
+                ? <Sun className="w-[16px] h-[16px] text-amber-400" />
+                : <Moon className="w-[16px] h-[16px]" />}
+            </button>
+          )}
         </div>
 
         <div className="pt-2 border-t border-navy-800/50 space-y-2">
           {open && (
-            <div className="px-2 py-1">
-              <p className="text-[8px] text-navy-500 uppercase tracking-[0.18em] mb-1.5">
-                Powered by
-              </p>
+            <div className="px-2">
               <div className="flex items-center justify-between gap-2">
                 {/* Official wordmark from the Inveenta brand set — light
                     variant, for dark backgrounds. Do not re-draw in markup. */}
