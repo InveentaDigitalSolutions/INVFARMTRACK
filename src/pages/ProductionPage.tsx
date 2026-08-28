@@ -569,7 +569,7 @@ function BedUtilizationHeatmap() {
 }
 
 export default function ProductionPage() {
-  const [tab, setTab] = useState("plantings");
+  const [tab, setTab] = useState(tabs[0].id);
 
   const [plantings, setPlantings] = useRecords("plantings", initPlantings);
   const [treatments, setTreatments] = useRecords("treatments", initTreatments);

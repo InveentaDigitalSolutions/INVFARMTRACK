@@ -175,7 +175,7 @@ const foliarFields = [
 ];
 
 export default function NutritionPage() {
-  const [tab, setTab] = useState("weight");
+  const [tab, setTab] = useState(tabs[0].id);
 
   const [weight, setWeight] = useRecords("weight", initWeight);
   const [balance, setBalance] = useRecords("balance", initBalance);

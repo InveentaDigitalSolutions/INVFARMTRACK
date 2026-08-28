@@ -184,7 +184,7 @@ const statusBadge = (s: string) => {
 };
 
 export default function SalesPage() {
-  const [tab, setTab] = useState("shipments");
+  const [tab, setTab] = useState(tabs[0].id);
   const [shipments, setShipments] = useRecords("shipments", initialShipments);
   const [activeShipment, setActiveShipment] = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);

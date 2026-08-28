@@ -16,8 +16,6 @@ import { availableRows, bedName, typeForLevel, planBulkBeds, bedCapacityProblem,
 
 const tabs = [
   { id: "shadehouses", label: "Shadehouses" },
-  { id: "layout", label: "Shadehouse Layout" },
-  { id: "layout3d", label: "3D View" },
   { id: "fields", label: "Fields" },
   { id: "beds", label: "Beds" },
 ];
@@ -163,11 +161,12 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
 ];
 
 export default function InfrastructurePage() {
-  const [tab, setTab] = useState("shadehouses");
+  const [tab, setTab] = useState(tabs[0].id);
 
   const [shadehouses, setShadehouses] = useRecords("shadehouses", initShadehouses);
   const [fields, setFieldes] = useRecords("fields", initFieldes);
   const [beds, setBeds] = useRecords("beds", initBeds);
+  const [shView, setShView] = useState<"plan" | "3d">("plan");
 
   const bulkBedForm = useFormModal({
     field: "", level: "1", fromRow: 1, toRow: 1,
@@ -317,12 +316,36 @@ export default function InfrastructurePage() {
             ]} data={shadehouses} onAdd={shForm.openCreate} onEdit={(r, i) => shForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Shadehouse" searchPlaceholder="Search shadehouses..." />
             <FormModal open={shForm.open} onClose={shForm.close} title={shForm.isEdit ? "Edit Shadehouse" : "Add Shadehouse"} groups={shadehouseFormGroups} values={shForm.values} onChange={shForm.onChange} isEdit={shForm.isEdit} onSubmit={(v) => save(shadehouses, setShadehouses, shForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Shadehouse" message="Delete this shadehouse and all related data?" onConfirm={() => del(shadehouses, setShadehouses)} />
+
+            {/* The layout and the 3D view are two ways of looking at the same
+                shadehouse, so they belong with it rather than as tabs of
+                their own beside it. */}
+            <div className="mt-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-[13px] font-semibold text-navy-700">Layout</h3>
+                <div className="flex bg-sand-100 rounded-lg p-0.5" role="group" aria-label="Layout view">
+                  {([["plan", "Plan"], ["3d", "3D"]] as const).map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setShView(id)}
+                      aria-pressed={shView === id}
+                      className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-colors cursor-pointer
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
+                        shView === id
+                          ? "bg-white text-navy-800 shadow-sm"
+                          : "text-navy-400 hover:text-navy-600"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {shView === "plan" ? <ShadehouseView /> : <ShadehouseView3D />}
+            </div>
           </>
         );
-      case "layout":
-        return <ShadehouseView />;
-      case "layout3d":
-        return <ShadehouseView3D />;
       case "fields":
         return (
           <>

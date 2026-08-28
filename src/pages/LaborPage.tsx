@@ -88,7 +88,7 @@ const activityBadge = (a: string) => {
 };
 
 export default function LaborPage() {
-  const [tab, setTab] = useState("workers");
+  const [tab, setTab] = useState(tabs[0].id);
   const [workers, setWorkers] = useRecords("workers", initWorkers);
   const [timesheets, setTimesheets] = useRecords("timesheets", initTimesheets);
 

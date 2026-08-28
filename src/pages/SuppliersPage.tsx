@@ -82,7 +82,7 @@ const statusBadge = (s: string) => {
 };
 
 export default function SuppliersPage() {
-  const [tab, setTab] = useState("suppliers");
+  const [tab, setTab] = useState(tabs[0].id);
   const [suppliers, setSuppliers] = useRecords("suppliers", initSuppliers);
   const [pos, setPOs] = useRecords("purchaseOrders", initPOs);
 

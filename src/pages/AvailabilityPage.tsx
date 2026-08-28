@@ -200,7 +200,7 @@ function PruningCurveChart({ data }: { data: typeof initCurve }) {
 }
 
 export default function AvailabilityPage() {
-  const [tab, setTab] = useState("projections");
+  const [tab, setTab] = useState(tabs[0].id);
 
   const [projections, setProjections] = useRecords("projections", initProjections);
   const [curve, setCurve] = useRecords("curve", initCurve);

@@ -360,7 +360,7 @@ function withDerivedAmounts(values: Record<string, unknown>): Record<string, unk
 }
 
 export default function AccountingPage() {
-  const [tab, setTab] = useState("dashboard");
+  const [tab, setTab] = useState(tabs[0].id);
 
   const [invoices, setInvoices] = useRecords("invoices", initInvoices);
   const [bills, setBills] = useRecords("bills", initBills);
