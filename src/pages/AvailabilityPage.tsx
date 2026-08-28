@@ -12,8 +12,11 @@ import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { PLANT_SIZE_OPTIONS } from "../services/plantSizes";
 import BedCountGrid from "../components/BedCountGrid";
+import AvailabilityOverview from "../components/AvailabilityOverview";
 
 const tabs = [
+  // The question the projections exist to answer, before the table of them.
+  { id: "overview", label: "Overview" },
   { id: "projections", label: "Weekly Projections" },
   { id: "curve", label: "Pruning Curve" },
   { id: "log", label: "Pruning Log" },
@@ -235,6 +238,8 @@ export default function AvailabilityPage() {
 
   const renderTab = () => {
     switch (tab) {
+      case "overview":
+        return <AvailabilityOverview />;
       case "projections":
         return (
           <>
