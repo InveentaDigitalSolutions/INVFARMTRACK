@@ -149,7 +149,7 @@ const initPrices = [
   { plant: "Sansevieria / Sansevieria", season: "2026-S1", customer: "Base", priceExt: "$0.035", priceInt: "$0.028", from: "2026-01-01", to: "2026-12-31", active: true },
 ];
 
-const plantNameOptions = [
+const plantNameOptionsFallback = [
   { value: "Pothos / Hawaiian", label: "Pothos / Hawaiian" },
   { value: "Pothos / Marble Queen", label: "Pothos / Marble Queen" },
   { value: "Pothos / Jade", label: "Pothos / Jade" },
@@ -158,8 +158,8 @@ const plantNameOptions = [
   { value: "Pothos / High Color", label: "Pothos / High Color" },
   { value: "Sansevieria / Sansevieria", label: "Sansevieria / Sansevieria" },
 ];
-const priceSeasonOptions = [{ value: "2026-S1", label: "2026-S1" }, { value: "2025-S2", label: "2025-S2" }];
-const priceCustomerOptions = [
+const priceSeasonOptionsFallback = [{ value: "2026-S1", label: "2026-S1" }, { value: "2025-S2", label: "2025-S2" }];
+const priceCustomerOptionsFallback = [
   { value: "Base", label: "Base (default)" },
   { value: "The Plant Company", label: "The Plant Company" },
   { value: "Green Gardens", label: "Green Gardens" },
@@ -167,9 +167,9 @@ const priceCustomerOptions = [
 
 const priceFields = [
   { title: "Price Details", columns: 2 as const, fields: [
-    { key: "plant", label: "Plant", type: "select" as const, options: plantNameOptions, required: true },
-    { key: "season", label: "Season", type: "select" as const, options: priceSeasonOptions, required: true },
-    { key: "customer", label: "Customer", type: "select" as const, options: priceCustomerOptions },
+    { key: "plant", label: "Plant", type: "select" as const, options: plantNameOptionsFallback, optionsFrom: "plants", required: true },
+    { key: "season", label: "Season", type: "select" as const, options: priceSeasonOptionsFallback, optionsFrom: "seasons", required: true },
+    { key: "customer", label: "Customer", type: "select" as const, options: priceCustomerOptionsFallback, optionsFrom: "customers" },
     { key: "priceExt", label: "Price (USD)", type: "text" as const, required: true },
     { key: "priceInt", label: "Price (HNL)", type: "text" as const },
     { key: "from", label: "Valid From", type: "date" as const, required: true },

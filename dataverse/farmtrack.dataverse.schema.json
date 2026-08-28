@@ -304,7 +304,7 @@
           "type": "string",
           "maxLength": 200,
           "required": false,
-          "description": "Auto-composed: {Name} / {Variety} — used on invoices and packing lists"
+          "description": "Auto-composed: {Name} / {Variety} \u2014 used on invoices and packing lists"
         },
         {
           "schemaName": "bv_PlantCode",
@@ -669,7 +669,7 @@
       "schemaName": "bv_Planting",
       "displayName": "Planting",
       "displayCollectionName": "Plantings",
-      "description": "Records of plants placed in beds — central activity hub",
+      "description": "Records of plants placed in beds \u2014 central activity hub",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -933,7 +933,7 @@
           "minValue": 0,
           "maxValue": 5,
           "required": false,
-          "description": "Liquids only — converts a dose in litres to kilograms of product."
+          "description": "Liquids only \u2014 converts a dose in litres to kilograms of product."
         }
       ]
     },
@@ -1179,7 +1179,7 @@
           "displayName": "Started On",
           "type": "datetime",
           "required": false,
-          "description": "When the valve opened. DateTime, not Date — live state needs the time."
+          "description": "When the valve opened. DateTime, not Date \u2014 live state needs the time."
         },
         {
           "schemaName": "bv_EndedOn",
@@ -1766,6 +1766,10 @@
             {
               "value": 187460004,
               "label": "Net 30"
+            },
+            {
+              "value": 187460005,
+              "label": "DAP"
             }
           ],
           "description": "One of: CIF, FOB, EXW, DDP, Net 30."
@@ -1856,6 +1860,10 @@
             {
               "value": 187460005,
               "label": "Cancelled"
+            },
+            {
+              "value": 187460006,
+              "label": "Shipped"
             }
           ],
           "description": "Current state of the record. One of: Draft, Confirmed, In Packing, Ready for Pickup, Delivered, Cancelled."
@@ -1945,7 +1953,7 @@
       "schemaName": "bv_Packing",
       "displayName": "Packing",
       "displayCollectionName": "Packing",
-      "description": "Per-box packing records — each record is one box with full traceability",
+      "description": "Per-box packing records \u2014 each record is one box with full traceability",
       "ownershipType": "UserOwned",
       "columns": [
         {
@@ -2044,7 +2052,7 @@
           "displayName": "Bundle Size",
           "type": "integer",
           "required": false,
-          "description": "3 or 5 — only applicable when PackingType = BNDL"
+          "description": "3 or 5 \u2014 only applicable when PackingType = BNDL"
         },
         {
           "schemaName": "bv_Quantity",
@@ -2188,7 +2196,7 @@
       "schemaName": "bv_FiscalAuthorization",
       "displayName": "Fiscal Authorization",
       "displayCollectionName": "Fiscal Authorizations",
-      "description": "Honduras SAR CAI authorizations — invoice number ranges and expiration dates",
+      "description": "Honduras SAR CAI authorizations \u2014 invoice number ranges and expiration dates",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -2215,7 +2223,7 @@
           "type": "string",
           "maxLength": 50,
           "required": true,
-          "description": "Clave de Autorización de Impresión from SAR"
+          "description": "Clave de Autorizaci\u00f3n de Impresi\u00f3n from SAR"
         },
         {
           "schemaName": "bv_RTN",
@@ -2246,7 +2254,7 @@
           "displayName": "Expiration Date",
           "type": "date",
           "required": true,
-          "description": "Fecha límite de emisión"
+          "description": "Fecha l\u00edmite de emisi\u00f3n"
         },
         {
           "schemaName": "bv_TotalAuthorized",
@@ -2606,7 +2614,7 @@
       "schemaName": "bv_PlantPrice",
       "displayName": "Plant Price",
       "displayCollectionName": "Plant Prices",
-      "description": "Price history per plant — export and internal prices, with optional customer-specific overrides",
+      "description": "Price history per plant \u2014 export and internal prices, with optional customer-specific overrides",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -2677,7 +2685,7 @@
           "displayName": "Internal Price (USD)",
           "type": "currency",
           "required": false,
-          "description": "Price per unit for internal/domestic sales (in USD — HNL conversion at invoice time via BCH exchange rate)"
+          "description": "Price per unit for internal/domestic sales (in USD \u2014 HNL conversion at invoice time via BCH exchange rate)"
         },
         {
           "schemaName": "bv_IsActive",
@@ -2701,7 +2709,7 @@
       "schemaName": "bv_CAINumber",
       "displayName": "CAI Number",
       "displayCollectionName": "CAI Numbers",
-      "description": "Individual invoice numbers within a CAI authorization range — tracks used/available status",
+      "description": "Individual invoice numbers within a CAI authorization range \u2014 tracks used/available status",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -3362,7 +3370,7 @@
       "schemaName": "bv_Timesheet",
       "displayName": "Timesheet",
       "displayCollectionName": "Timesheets",
-      "description": "Daily labor records — hours, tasks, piece count, and cost allocation",
+      "description": "Daily labor records \u2014 hours, tasks, piece count, and cost allocation",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -3485,7 +3493,7 @@
       "schemaName": "bv_Pruning",
       "displayName": "Pruning",
       "displayCollectionName": "Prunings",
-      "description": "Pruning (poda) events — drives availability projections",
+      "description": "Pruning (poda) events \u2014 drives availability projections",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -3572,7 +3580,7 @@
       "schemaName": "bv_PruningCurve",
       "displayName": "Pruning Curve",
       "displayCollectionName": "Pruning Curves",
-      "description": "Seasonal pruning plan — planned vs actual beds per week for the whole nursery",
+      "description": "Seasonal pruning plan \u2014 planned vs actual beds per week for the whole nursery",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -3777,7 +3785,7 @@
       "schemaName": "bv_Availability",
       "displayName": "Availability",
       "displayCollectionName": "Availability",
-      "description": "Weekly availability projections — Friday generation, Monday confirmation",
+      "description": "Weekly availability projections \u2014 Friday generation, Monday confirmation",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -3946,7 +3954,7 @@
       "schemaName": "bv_BoxWeight",
       "displayName": "Box Weight",
       "displayCollectionName": "Box Weights",
-      "description": "Per-box weight details linked to AWB — avg leaf weight, net weight, gross weight",
+      "description": "Per-box weight details linked to AWB \u2014 avg leaf weight, net weight, gross weight",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -4009,7 +4017,7 @@
           "displayName": "Dry Matter %",
           "type": "decimal",
           "required": false,
-          "description": "Configurable default 20-30%. Fresh matter × DM% = dry matter extracted"
+          "description": "Configurable default 20-30%. Fresh matter \u00d7 DM% = dry matter extracted"
         },
         {
           "schemaName": "bv_Date",
@@ -4032,7 +4040,7 @@
       "schemaName": "bv_NutrientBalance",
       "displayName": "Nutrient Balance",
       "displayCollectionName": "Nutrient Balances",
-      "description": "Running nutrient balance per bed per season — applied (fertilization) vs extracted (harvest)",
+      "description": "Running nutrient balance per bed per season \u2014 applied (fertilization) vs extracted (harvest)",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -4153,7 +4161,7 @@
       "schemaName": "bv_SoilAnalysis",
       "displayName": "Soil Analysis",
       "displayCollectionName": "Soil Analyses",
-      "description": "Lab soil analysis results — Zamorano format with full chemical and physical parameters",
+      "description": "Lab soil analysis results \u2014 Zamorano format with full chemical and physical parameters",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -4259,7 +4267,7 @@
         },
         {
           "schemaName": "bv_pH",
-          "displayName": "pH (H₂O)",
+          "displayName": "pH (H\u2082O)",
           "type": "decimal",
           "required": false,
           "description": "pH measurement."
@@ -4625,7 +4633,7 @@
       "schemaName": "bv_DemandForecast",
       "displayName": "Demand Forecast",
       "displayCollectionName": "Demand Forecasts",
-      "description": "Quarterly demand forecast from customers — per variety × size × week",
+      "description": "Quarterly demand forecast from customers \u2014 per variety \u00d7 size \u00d7 week",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {

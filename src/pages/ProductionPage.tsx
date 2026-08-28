@@ -97,23 +97,23 @@ const initFertilization = [
   { date: "2026-04-01", bed: "C3-16", input: "MKP (0-52-34)", qtyKg: 2, method: "Foliar Spray", nKg: 0, pKg: 1.04, kKg: 0.68, caKg: 0, worker: "Ana R." },
 ];
 
-const plantOptions = [
+const plantOptionsFallback = [
   { value: "Pothos / Hawaiian", label: "Pothos / Hawaiian" },
   { value: "Pothos / Marble Queen", label: "Pothos / Marble Queen" },
   { value: "Pothos / Jade", label: "Pothos / Jade" },
   { value: "Pothos / N'Joy", label: "Pothos / N'Joy" },
   { value: "Pothos / Neon", label: "Pothos / Neon" },
 ];
-const seasonOptions = [
+const seasonOptionsFallback = [
   { value: "2026-S1", label: "2026-S1" },
   { value: "2025-S2", label: "2025-S2" },
 ];
-const inputOptions = [
+const inputOptionsFallback = [
   { value: "Neem Oil", label: "Neem Oil" },
   { value: "Copper Fungicide", label: "Copper Fungicide" },
   { value: "NPK 20-20-20", label: "NPK 20-20-20" },
 ];
-const workerOptions = [
+const workerOptionsFallback = [
   { value: "Carlos M.", label: "Carlos M. (W001)" },
   { value: "Maria L.", label: "Maria L. (W002)" },
   { value: "Juan P.", label: "Juan P. (W003)" },
@@ -123,9 +123,9 @@ const workerOptions = [
 // Form definitions
 const plantingFields = [
   { title: "Planting Details", columns: 2 as const, fields: [
-    { key: "plant", label: "Plant", type: "select" as const, options: plantOptions, required: true },
+    { key: "plant", label: "Plant", type: "select" as const, options: plantOptionsFallback, optionsFrom: "plants", required: true },
     { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
-    { key: "season", label: "Season", type: "select" as const, options: seasonOptions, required: true },
+    { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons", required: true },
     { key: "date", label: "Planting Date", type: "date" as const, required: true },
     { key: "qty", label: "Quantity", type: "number" as const, min: 1 },
     // Air beds carry hanging pots in two shapes; the 3D view renders each.
@@ -139,13 +139,13 @@ const plantingFields = [
 const treatmentFields = [
   { title: "Treatment Details", columns: 2 as const, fields: [
     { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
-    { key: "input", label: "Input (Chemical)", type: "select" as const, options: inputOptions, required: true },
+    { key: "input", label: "Input (Chemical)", type: "select" as const, options: inputOptionsFallback, optionsFrom: "inputs", required: true },
     { key: "type", label: "Type", type: "select" as const, options: [
       { value: "Insecticide", label: "Insecticide" }, { value: "Fungicide", label: "Fungicide" },
       { value: "Herbicide", label: "Herbicide" }, { value: "Regulator", label: "Regulator" },
     ], required: true },
     { key: "date", label: "Date", type: "date" as const, required: true },
-    { key: "worker", label: "Worker", type: "select" as const, options: workerOptions },
+    { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
     { key: "temp", label: "Temperature", type: "number" as const, suffix: "C" },
     { key: "humidity", label: "Humidity", type: "number" as const, suffix: "%" },
     { key: "ph", label: "pH", type: "number" as const },
@@ -173,7 +173,7 @@ const harvestFields = [
       { value: "Excellent", label: "Excellent" }, { value: "Good", label: "Good" },
       { value: "Average", label: "Average" }, { value: "Poor", label: "Poor" },
     ]},
-    { key: "worker", label: "Harvested By", type: "select" as const, options: workerOptions },
+    { key: "worker", label: "Harvested By", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
   ]},
 ];
 
@@ -187,7 +187,7 @@ const taskFormGroups = [
       { value: "Packing", label: "Packing" }, { value: "General Maintenance", label: "General Maintenance" },
     ], required: true },
     { key: "due", label: "Due Date", type: "date" as const, required: true },
-    { key: "assigned", label: "Assigned To", type: "select" as const, options: workerOptions },
+    { key: "assigned", label: "Assigned To", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
     { key: "priority", label: "Priority", type: "select" as const, options: [
       { value: "Low", label: "Low" }, { value: "Normal", label: "Normal" },
       { value: "High", label: "High" }, { value: "Urgent", label: "Urgent" },
@@ -200,7 +200,7 @@ const taskFormGroups = [
   ]},
 ];
 
-const fertilizerInputOptions = [
+const fertilizerInputOptionsFallback = [
   { value: "NPK 20-20-20", label: "NPK 20-20-20" },
   { value: "Calcium Nitrate", label: "Calcium Nitrate" },
   { value: "MKP (0-52-34)", label: "MKP (0-52-34)" },
@@ -215,7 +215,7 @@ const pruningFields = [
     { key: "week", label: "Week", type: "number" as const, min: 1, max: 52, required: true },
     { key: "bedsPruned", label: "Beds Pruned", type: "number" as const, min: 1, required: true },
     { key: "cuttingsEstimated", label: "Cuttings Estimated", type: "number" as const, min: 0 },
-    { key: "worker", label: "Worker", type: "select" as const, options: workerOptions },
+    { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
   ]},
 ];
 
@@ -233,7 +233,7 @@ const fertilizationFields = [
   { title: "Fertilization Event", columns: 2 as const, fields: [
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
-    { key: "input", label: "Fertilizer", type: "select" as const, options: fertilizerInputOptions, required: true },
+    { key: "input", label: "Fertilizer", type: "select" as const, options: fertilizerInputOptionsFallback, optionsFrom: "inputs", required: true },
     { key: "qtyKg", label: "Qty (kg)", type: "number" as const, min: 0, required: true },
     // Labels must match bv_fertilizations.bv_method exactly — Dataverse takes
     // its own option labels and nothing else. npm run dataverse:check verifies.
@@ -248,7 +248,7 @@ const fertilizationFields = [
     { key: "pKg", label: "P (kg)", type: "number" as const, min: 0 },
     { key: "kKg", label: "K (kg)", type: "number" as const, min: 0 },
     { key: "caKg", label: "Ca (kg)", type: "number" as const, min: 0 },
-    { key: "worker", label: "Worker", type: "select" as const, options: workerOptions },
+    { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
   ]},
 ];
 

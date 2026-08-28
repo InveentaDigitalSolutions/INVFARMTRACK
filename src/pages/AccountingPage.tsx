@@ -109,13 +109,13 @@ const initFiscal = [
 /* -----------------------------------------------------------------
  * Form definitions
  * ----------------------------------------------------------------- */
-const customerOptions = [
+const customerOptionsFallback = [
   { value: "The Plant Company, LLC", label: "The Plant Company, LLC" },
   { value: "Green Gardens Inc.", label: "Green Gardens Inc." },
   { value: "Tropical Imports Co.", label: "Tropical Imports Co." },
 ];
 
-const supplierOptions = [
+const supplierOptionsFallback = [
   { value: "AgroSupply HN", label: "AgroSupply HN" },
   { value: "TecniAgua", label: "TecniAgua" },
   { value: "ENEE", label: "ENEE" },
@@ -130,7 +130,7 @@ const currencyOptions = [{ value: "HNL", label: "HNL" }, { value: "USD", label: 
 const invoiceFormGroups = [
   { title: "Invoice Details", columns: 2 as const, fields: [
     { key: "number", label: "Invoice Number", type: "text" as const, readOnly: true, placeholder: "INV-0001 (auto)" },
-    { key: "customer", label: "Customer", type: "select" as const, options: customerOptions, required: true },
+    { key: "customer", label: "Customer", type: "select" as const, options: customerOptionsFallback, optionsFrom: "customers", required: true },
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "dueDate", label: "Due Date", type: "date" as const, required: true },
     { key: "week", label: "Week", type: "number" as const },
@@ -149,7 +149,7 @@ const invoiceFormGroups = [
 const billFormGroups = [
   { title: "Bill Details", columns: 2 as const, fields: [
     { key: "number", label: "Bill Number", type: "text" as const, readOnly: true, placeholder: "BIL-0001 (auto)" },
-    { key: "supplier", label: "Supplier", type: "select" as const, options: supplierOptions, required: true },
+    { key: "supplier", label: "Supplier", type: "select" as const, options: supplierOptionsFallback, optionsFrom: "suppliers", required: true },
     { key: "poRef", label: "PO Reference", type: "text" as const, placeholder: "PO-2026-…" },
     { key: "rtn", label: "Supplier RTN", type: "text" as const },
     { key: "date", label: "Issue Date", type: "date" as const, required: true },

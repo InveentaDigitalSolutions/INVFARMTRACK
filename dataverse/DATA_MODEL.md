@@ -686,6 +686,7 @@ Nursery customers for orders and invoicing
 | 187460002 | EXW |
 | 187460003 | DDP |
 | 187460004 | Net 30 |
+| 187460005 | DAP |
 
 </details>
 
@@ -721,6 +722,7 @@ Customer orders
 | 187460003 | Ready for Pickup |
 | 187460004 | Delivered |
 | 187460005 | Cancelled |
+| 187460006 | Shipped |
 
 </details>
 

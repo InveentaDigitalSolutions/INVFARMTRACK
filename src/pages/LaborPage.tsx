@@ -35,7 +35,7 @@ const initTimesheets = [
   { entry: "Maria — Packing GG", workerId: "W002", worker: "Maria Lopez", date: "2026-04-09", activity: "Packing", hours: 6, pieces: 0, boxes: 10, bed: "", cost: 252, notes: "Green Gardens shipment" },
 ];
 
-const workerOptions = initWorkers.map((w) => ({ value: w.name, label: `${w.name} (${w.code})` }));
+const workerOptionsFallback = initWorkers.map((w) => ({ value: w.name, label: `${w.name} (${w.code})` }));
 
 const workerFormGroups = [
   { title: "Personal Information", columns: 2 as const, fields: [
@@ -61,7 +61,7 @@ const workerFormGroups = [
 
 const timesheetFormGroups = [
   { title: "Timesheet Entry", columns: 2 as const, fields: [
-    { key: "worker", label: "Worker", type: "select" as const, options: workerOptions, required: true },
+    { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers", required: true },
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "activity", label: "Activity", type: "select" as const, required: true, options: [
       { value: "Planting", label: "Planting" }, { value: "Harvesting", label: "Harvesting" },

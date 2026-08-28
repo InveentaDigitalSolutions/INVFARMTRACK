@@ -308,6 +308,40 @@ async function ensureTable(table) {
   return true
 }
 
+/**
+ * Adds option values present in the schema but missing from the environment.
+ * Additive only — removing a value would break rows already holding it.
+ */
+async function syncOptions(entityLogicalName, col) {
+  const attribute = logical(col.schemaName)
+  let live
+  try {
+    live = await api(
+      'GET',
+      `EntityDefinitions(LogicalName='${entityLogicalName}')/Attributes(LogicalName='${attribute}')/` +
+        `Microsoft.Dynamics.CRM.PicklistAttributeMetadata?$select=LogicalName&$expand=OptionSet($select=Options)`
+    )
+  } catch {
+    return // not a picklist, or not readable — nothing to sync
+  }
+
+  const present = new Set(
+    (live.OptionSet?.Options ?? []).map((o) => o.Label?.UserLocalizedLabel?.Label)
+  )
+  for (const option of col.options) {
+    if (present.has(option.label)) continue
+    await api('POST', 'InsertOptionValue', {
+      AttributeLogicalName: attribute,
+      EntityLogicalName: entityLogicalName,
+      Value: option.value,
+      Label: label(option.label),
+      SolutionUniqueName: schema.solutionName,
+    })
+    console.log(`      + ${col.schemaName}: option "${option.label}" (${option.value})`)
+    stats.columns++
+  }
+}
+
 async function ensureColumns(table) {
   const logicalName = logical(table.schemaName)
 
@@ -325,7 +359,17 @@ async function ensureColumns(table) {
   }
 
   for (const col of pending) {
-    if (existing.has(logical(col.schemaName))) { stats.skipped++; continue }
+    if (existing.has(logical(col.schemaName))) {
+      // The column is there, but its option set may have grown since. A choice
+      // the app offers and Dataverse does not know is rejected on write, so
+      // new labels are added here; nothing is ever removed, because that would
+      // orphan whatever rows already use it.
+      if (col.type === 'choice' && col.options?.length && !DRY_RUN) {
+        await syncOptions(logicalName, col)
+      }
+      stats.skipped++
+      continue
+    }
 
     if (DRY_RUN) { console.log(`      + would add ${col.schemaName} (${col.type})`); stats.columns++; continue }
 

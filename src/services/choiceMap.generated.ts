@@ -423,7 +423,8 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "FOB": 187460001,
       "EXW": 187460002,
       "DDP": 187460003,
-      "Net 30": 187460004
+      "Net 30": 187460004,
+      "DAP": 187460005
     }
   },
   "bv_demandforecasts": {
@@ -556,7 +557,8 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "In Packing": 187460002,
       "Ready for Pickup": 187460003,
       "Delivered": 187460004,
-      "Cancelled": 187460005
+      "Cancelled": 187460005,
+      "Shipped": 187460006
     }
   },
   "bv_packings": {

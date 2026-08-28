@@ -31,7 +31,7 @@ const initPOs = [
   { number: "PO-2026-004", supplier: "TecniAgua", date: "2026-04-10", delivery: "2026-04-20", description: "Drip line replacement — Shadehouse 1 C2", amount: 4200.00, currency: "HNL", status: "Draft", notes: "" },
 ];
 
-const supplierOptions = initSuppliers.map((s) => ({ value: s.name, label: s.name }));
+const supplierOptionsFallback = initSuppliers.map((s) => ({ value: s.name, label: s.name }));
 
 const supplierFormGroups = [
   { title: "Supplier Information", columns: 2 as const, fields: [
@@ -62,7 +62,7 @@ const supplierFormGroups = [
 const poFormGroups = [
   { title: "Purchase Order", columns: 2 as const, fields: [
     { key: "number", label: "PO Number", type: "text" as const, readOnly: true, placeholder: "PO-0001 (auto)" },
-    { key: "supplier", label: "Supplier", type: "select" as const, options: supplierOptions, required: true },
+    { key: "supplier", label: "Supplier", type: "select" as const, options: supplierOptionsFallback, optionsFrom: "suppliers", required: true },
     { key: "date", label: "Order Date", type: "date" as const, required: true },
     { key: "delivery", label: "Expected Delivery", type: "date" as const },
     { key: "amount", label: "Amount", type: "number" as const, min: 0 },

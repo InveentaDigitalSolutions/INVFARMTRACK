@@ -104,6 +104,17 @@ export class LookupResolver {
     return undefined;
   }
 
+  /**
+   * Every name in this table, for offering as choices. Built from the same
+   * index the writes resolve against, so a list can only ever offer a name
+   * that will resolve — which is the failure the hardcoded lists had.
+   */
+  async labels(entitySet: string): Promise<string[]> {
+    return [...(await this.index(entitySet)).byLabel.keys()].sort((a, b) =>
+      a.localeCompare(b, undefined, { numeric: true })
+    );
+  }
+
   /** Drops cached indexes so a newly created reference row becomes selectable. */
   invalidate(entitySet?: string): void {
     if (entitySet) this.indexes.delete(entitySet);

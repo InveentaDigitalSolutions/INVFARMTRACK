@@ -40,7 +40,7 @@ const initBeds = [
 
 const shOptions = initShadehouses.map((s) => ({ value: s.name, label: s.name }));
 const fieldOptions = initFieldes.map((b) => ({ value: b.code, label: `${b.code} (${b.shadehouse})` }));
-const seasonOptions = [{ value: "2026-S1", label: "2026-S1" }, { value: "2025-S2", label: "2025-S2" }];
+const seasonOptionsFallback = [{ value: "2026-S1", label: "2026-S1" }, { value: "2025-S2", label: "2025-S2" }];
 
 const shadehouseFormGroups = [
   { title: "Shadehouse Details", columns: 2 as const, fields: [
@@ -58,7 +58,7 @@ const fieldFormGroups = [
   { title: "Field Details", columns: 2 as const, fields: [
     { key: "code", label: "Field ID", type: "text" as const, readOnly: true, placeholder: "FLD-0001 (auto)" },
     { key: "shadehouse", label: "Shadehouse", type: "select" as const, options: shOptions, required: true },
-    { key: "season", label: "Season", type: "select" as const, options: seasonOptions },
+    { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons" },
     { key: "position", label: "Position", type: "text" as const },
     { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const },
   ]},

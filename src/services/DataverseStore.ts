@@ -25,7 +25,7 @@ type Row = Record<string, unknown>;
  * One resolver for the whole app so the bed index is fetched once, not once
  * per screen that references a bed.
  */
-const resolver = new LookupResolver(async (entitySet, labelColumns, join) => {
+export const dataverseResolver = new LookupResolver(async (entitySet, labelColumns, join) => {
   const client = getClient(dataSourcesInfo);
   const result = await client.retrieveMultipleRecordsAsync<Row>(entitySet, {
     select: labelColumns,
@@ -199,7 +199,7 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
     for (const [field, , meta] of this.lookupFields()) {
       const chosen = record[field];
       if (chosen === undefined || chosen === null || chosen === "") continue;
-      const id = await resolver.idFor(meta.targetSet, chosen);
+      const id = await dataverseResolver.idFor(meta.targetSet, chosen);
       if (id) payload[`${meta.nav}@odata.bind`] = `/${meta.targetSet}(${id})`;
     }
   }
@@ -216,7 +216,7 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
       rows.map(async (row) => {
         const r = row as Row;
         for (const [field, , meta] of fields) {
-          const label = await resolver.labelFor(meta.targetSet, r[field]);
+          const label = await dataverseResolver.labelFor(meta.targetSet, r[field]);
           if (label !== undefined) r[field] = label;
         }
       })

@@ -71,7 +71,7 @@ const initLog = [
 ];
 
 // --- Options ---
-const plantOptions = [
+const plantOptionsFallback = [
   { value: "Pothos / Hawaiian", label: "Pothos / Hawaiian" },
   { value: "Pothos / Marble Queen", label: "Pothos / Marble Queen" },
   { value: "Pothos / Jade", label: "Pothos / Jade" },
@@ -83,11 +83,11 @@ const sizeOptions = [
   { value: '4.5"', label: '4.5"' },
   { value: '6"', label: '6"' },
 ];
-const seasonOptions = [
+const seasonOptionsFallback = [
   { value: "2026-S1", label: "2026-S1" },
   { value: "2025-S2", label: "2025-S2" },
 ];
-const workerOptions = [
+const workerOptionsFallback = [
   { value: "Carlos M.", label: "Carlos M. (W001)" },
   { value: "Maria L.", label: "Maria L. (W002)" },
   { value: "Juan P.", label: "Juan P. (W003)" },
@@ -98,7 +98,7 @@ const workerOptions = [
 const projectionFields = [
   { title: "Projection Details", columns: 2 as const, fields: [
     { key: "week", label: "Week", type: "text" as const, required: true, placeholder: "e.g. 2026-W14" },
-    { key: "plant", label: "Plant", type: "select" as const, options: plantOptions, required: true },
+    { key: "plant", label: "Plant", type: "select" as const, options: plantOptionsFallback, optionsFrom: "plants", required: true },
     { key: "size", label: "Size", type: "select" as const, options: sizeOptions, required: true },
     { key: "projectedQty", label: "Projected Qty", type: "number" as const, min: 0, required: true },
     { key: "orderedQty", label: "Ordered Qty", type: "number" as const, min: 0 },
@@ -116,7 +116,7 @@ const projectionFields = [
 
 const curveFields = [
   { title: "Pruning Curve Entry", columns: 2 as const, fields: [
-    { key: "season", label: "Season", type: "select" as const, options: seasonOptions, required: true },
+    { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons", required: true },
     { key: "week", label: "Week", type: "number" as const, min: 1, max: 52, required: true },
     { key: "plannedBeds", label: "Planned Beds", type: "number" as const, min: 0, required: true },
     { key: "actualBeds", label: "Actual Beds", type: "number" as const, min: 0 },
@@ -132,7 +132,7 @@ const logFields = [
     { key: "week", label: "Week", type: "number" as const, min: 1, max: 52, required: true },
     { key: "bedsPruned", label: "Beds Pruned", type: "number" as const, min: 1, required: true },
     { key: "cuttingsEstimated", label: "Cuttings Estimated", type: "number" as const, min: 0 },
-    { key: "worker", label: "Worker", type: "select" as const, options: workerOptions },
+    { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
   ]},
 ];
 

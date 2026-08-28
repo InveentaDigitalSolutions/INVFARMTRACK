@@ -98,10 +98,23 @@ for (const [, key, dataSource, body] of tableMap.matchAll(
     if (form === null) continue
 
     const used = new Set()
+
+    // Inline: options: [{ value: "Draft", ... }, …]
     for (const block of form.matchAll(
       new RegExp(`key: "${appField}"[\\s\\S]{0,140}?options: \\[([\\s\\S]{0,700}?)\\]`, 'g')
     ))
       for (const opt of block[1].matchAll(/value: "([^"]+)"/g)) used.add(opt[1])
+
+    // By name: options: sizeOptions — the declaration lives elsewhere in the
+    // file. Missing this hid a real mismatch, so both spellings are read.
+    for (const ref of form.matchAll(
+      new RegExp(`key: "${appField}"[\\s\\S]{0,140}?options: (\\w+)`, 'g')
+    )) {
+      const decl = src.match(new RegExp(`const ${ref[1]}[^=]*=\\s*\\[([\\s\\S]*?)\\n\\];`))
+      if (!decl) continue // computed from data rather than written out — nothing to check
+      for (const opt of decl[1].matchAll(/value: ("([^"]+)"|'([^']+)')/g))
+        used.add(opt[2] ?? opt[3])
+    }
 
     if (used.size === 0) continue
 

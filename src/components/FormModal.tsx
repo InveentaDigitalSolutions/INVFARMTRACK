@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronDown, Lock } from "lucide-react";
 import BedSelector from "./BedSelector";
+import { useLookupOptionsFor } from "../hooks/useLookupOptions";
 
 // Field definition types
 interface BaseField {
@@ -31,7 +33,15 @@ interface NumberInputField extends BaseField {
 
 interface SelectField extends BaseField {
   type: "select";
+  /** Fallback choices, used until the live ones load and in demo mode. */
   options: { value: string; label: string }[];
+  /**
+   * App table key whose rows are the real choices ("plants", "customers").
+   * Set this for any field backed by a Dataverse lookup: a hand-written list
+   * drifts from the table, and picking a name that no longer exists saves the
+   * record with the lookup empty.
+   */
+  optionsFrom?: string;
 }
 
 interface ToggleField extends BaseField {
@@ -51,7 +61,15 @@ interface BooleanField extends BaseField {
 
 interface MultiSelectField extends BaseField {
   type: "multiselect";
+  /** Fallback choices, used until the live ones load and in demo mode. */
   options: { value: string; label: string }[];
+  /**
+   * App table key whose rows are the real choices ("plants", "customers").
+   * Set this for any field backed by a Dataverse lookup: a hand-written list
+   * drifts from the table, and picking a name that no longer exists saves the
+   * record with the lookup empty.
+   */
+  optionsFrom?: string;
 }
 
 interface BedSelectorField extends BaseField {
@@ -94,9 +112,22 @@ const spanClass = { 1: "col-span-1", 2: "col-span-2", 3: "col-span-3", 4: "col-s
 function renderField(
   field: FieldDef,
   value: unknown,
-  onChange: (key: string, value: unknown) => void
+  onChange: (key: string, value: unknown) => void,
+  liveOptions: Record<string, { value: string; label: string }[]> = {}
 ) {
   const v = value ?? "";
+
+  /**
+   * The choices to show: the live rows of the table this field points at,
+   * falling back to the declared list before they load or in demo mode.
+   */
+  const optionsFor = (f: {
+    options: { value: string; label: string }[];
+    optionsFrom?: string;
+  }) => {
+    const live = f.optionsFrom ? liveOptions[f.optionsFrom] : undefined;
+    return live && live.length > 0 ? live : f.options;
+  };
 
   switch (field.type) {
     case "text":
@@ -163,7 +194,7 @@ function renderField(
                        focus:outline-none focus:ring-2 focus:ring-lime-400/30 focus:border-lime-400 transition-all"
           >
             <option value="">Select...</option>
-            {field.options.map((o) => (
+            {optionsFor(field).map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
@@ -174,7 +205,7 @@ function renderField(
     case "toggle":
       return (
         <div className="flex gap-1.5">
-          {field.options.map((o) => (
+          {optionsFor(field).map((o) => (
             <button
               key={o.value}
               type="button"
@@ -218,7 +249,7 @@ function renderField(
       const selected = Array.isArray(v) ? (v as string[]) : [];
       return (
         <div className="flex flex-wrap gap-1.5">
-          {field.options.map((o) => {
+          {optionsFor(field).map((o) => {
             const isSelected = selected.includes(o.value);
             return (
               <button
@@ -275,6 +306,21 @@ export default function FormModal({
   submitLabel = "Save",
   isEdit = false,
 }: FormModalProps) {
+  // Every table this form draws choices from. The field list is static, so
+  // this set is stable and safe to drive a hook with.
+  const lookupTables = useMemo(
+    () =>
+      [
+        ...new Set(
+          groups.flatMap((g) =>
+            g.fields.map((f) => ("optionsFrom" in f ? f.optionsFrom : undefined))
+          )
+        ),
+      ].filter((t): t is string => Boolean(t)),
+    [groups]
+  );
+  const liveOptions = useLookupOptionsFor(lookupTables);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(values);
@@ -337,7 +383,7 @@ export default function FormModal({
                             {field.label}
                             {field.required && <span className="text-red-500 ml-0.5">*</span>}
                           </label>
-                          {renderField(field, values[field.key], onChange)}
+                          {renderField(field, values[field.key], onChange, liveOptions)}
                         </div>
                       ))}
                     </div>
