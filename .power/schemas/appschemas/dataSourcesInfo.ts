@@ -89,6 +89,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_exchangerates": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_exchangerateid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_expenses": {
     "tableId": "",
     "version": "",

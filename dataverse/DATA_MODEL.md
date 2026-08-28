@@ -9,8 +9,8 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 42 |
-| Columns | 524 |
+| Tables | 43 |
+| Columns | 529 |
 | Relationships | 54 |
 
 ## Conventions
@@ -73,6 +73,7 @@
 | [Bank Statement Line](#bank-statement-line) | `bv_bankstatementline` | `ST-0001` | 9 | One line as it appears on the bank statement, for reconciling against payments. |
 | [Substrate Material](#substrate-material) | `bv_substratematerial` | `SUB-0001` | 6 | Anything a bed's growing medium is made of — a mineral fraction like sand, or an organic one like coconut coir. |
 | [Bed Composition](#bed-composition) | `bv_bedcomposition` | `BCM-0001` | 6 | One material in a bed's growing medium and how much of it there is. A bed has as many of these as its mix has parts. |
+| [Exchange Rate](#exchange-rate) | `bv_exchangerate` | `FX-0001` | 5 | The Banco Central de Honduras reference rate (TCR) for one day. Kept as history rather than a single current value: an invoice has to be read back at the rate it was converted at, and restating last month at today's rate would silently change reported sales. |
 
 ## Relationships
 
@@ -1805,3 +1806,30 @@ One material in a bed's growing medium and how much of it there is. A bed has as
 | `bv_substratematerialid` | Substrate Material | Lookup → [Substrate Material](#substrate-material) | ✓ | Link to the related Substrate Material record. |
 | `bv_percentage` | Percentage | Decimal(2) | ✓ | Share of the mix by volume. The parts for one bed are expected to total 100. |
 | `bv_notes` | Notes | Text area(2000) |  |  |
+
+## Exchange Rate
+
+`bv_exchangerate` · User-owned
+
+The Banco Central de Honduras reference rate (TCR) for one day. Kept as history rather than a single current value: an invoice has to be read back at the rate it was converted at, and restating last month at today's rate would silently change reported sales.
+
+**Record ID:** `bv_exchangeratecode` — format `FX-{SEQNUM:4}`, e.g. `FX-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_exchangeratecode` 🔑 | Exchange Rate ID | Autonumber | ✓ | Auto-generated identifier, format FX-0001. |
+| `bv_ratedate` | Date | Date only | ✓ | The day the rate was published by the BCH. |
+| `bv_value` | HNL per USD | Decimal(4) | ✓ | Lempiras to one US dollar, to four decimal places as the BCH publishes it. |
+| `bv_source` | Source | Choice |  | Where the figure came from. A manual entry is a stand-in for a day the feed missed, and is worth being able to tell apart. One of: BCH, Manual. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Source** (`bv_source`)
+
+| Value | Label |
+|---|---|
+| 187460000 | BCH |
+| 187460001 | Manual |
+
+</details>

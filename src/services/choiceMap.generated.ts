@@ -26,6 +26,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_components",
   "bv_customers",
   "bv_demandforecasts",
+  "bv_exchangerates",
   "bv_expenses",
   "bv_fertilizations",
   "bv_fields",
@@ -113,7 +114,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_bills": "bv_billcode",
   "bv_bankstatementlines": "bv_bankstatementlinecode",
   "bv_substratematerials": "bv_substratematerialname",
-  "bv_bedcompositions": "bv_bedcompositionname"
+  "bv_bedcompositions": "bv_bedcompositionname",
+  "bv_exchangerates": "bv_exchangeratecode"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -816,6 +818,12 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Low": 187460000,
       "Medium": 187460001,
       "High": 187460002
+    }
+  },
+  "bv_exchangerates": {
+    "bv_source": {
+      "BCH": 187460000,
+      "Manual": 187460001
     }
   }
 };

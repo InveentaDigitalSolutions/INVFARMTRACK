@@ -497,6 +497,17 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     },
   },
 
+  exchangeRates: {
+    dataSource: "bv_exchangerates",
+    primaryKey: "bv_exchangerateid",
+    fields: {
+      code: "bv_exchangeratecode",
+      date: "bv_ratedate",
+      value: "bv_value",
+      source: "bv_source",
+      notes: "bv_notes",
+    },
+  },
   caiNumbers: {
     dataSource: "bv_cainumbers",
     primaryKey: "bv_cainumberid",
@@ -611,6 +622,7 @@ export const ENABLED_TABLES = new Set<string>([
   "substrateMaterials",
   "bedCompositions",
   "caiNumbers",
+  "exchangeRates",
 ]);
 
 /**

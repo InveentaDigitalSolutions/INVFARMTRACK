@@ -10,7 +10,7 @@
   "localAppUrl": "http://localhost:5173",
   "logoPath": "Default",
   "connectionReferences": {
-    "d1b924da-5423-4705-9d69-7f9ac71698c6": {
+    "7ff43bba-5e7c-43f3-9c17-32bb09421809": {
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       "displayName": "Logic flows",
       "dataSources": [
@@ -197,6 +197,10 @@
         "caiNumbers": {
           "entitySetName": "bv_cainumbers",
           "logicalName": "bv_cainumber"
+        },
+        "exchangeRates": {
+          "entitySetName": "bv_exchangerates",
+          "logicalName": "bv_exchangerate"
         }
       }
     }

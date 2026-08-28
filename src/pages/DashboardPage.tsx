@@ -137,7 +137,7 @@ function DonutChart({ segments, total, label }: { segments: { value: number; col
 export default function DashboardPage() {
   const [beds] = useState(() => generateBeds());
   const insight = useMemo(() => deriveShadehouseInsight(beds), [beds]);
-  const { rate: exchangeRate, loading: fxLoading, isLive: fxLive, fetchedAt: fxFetchedAt } = useExchangeRate();
+  const { rate: exchangeRate, loading: fxLoading, isLive: fxLive, staleDays: fxStaleDays } = useExchangeRate();
   return (
     <motion.div
       initial="hidden"
@@ -168,20 +168,21 @@ export default function DashboardPage() {
             {exchangeRate && (
               <span className="flex items-center gap-1.5 pl-2.5 border-l border-white/10">
                 <span
-                  className={`w-1.5 h-1.5 rounded-full shrink-0 ${fxLive ? "bg-green-400" : "bg-amber-400"}`}
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                    !fxLive || fxStaleDays > 4 ? "bg-amber-400" : "bg-green-400"
+                  }`}
                 />
+                {/* The rate's own publication date, not when the app read it.
+                    A figure fetched a minute ago can still be a week old, and
+                    that is what would put the wrong number on an invoice. */}
                 <span className="text-[10px] text-white/50 whitespace-nowrap">
-                  {fxLive ? "BCH live" : "Manual"} ·{" "}
-                  {fxFetchedAt
-                    ? `${fxFetchedAt.toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}, ${fxFetchedAt.toLocaleTimeString("en-GB", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}`
-                    : exchangeRate.dateISO}
+                  {fxLive ? "BCH" : "No rate stored"} ·{" "}
+                  {new Date(exchangeRate.dateISO).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                  {fxStaleDays > 4 ? ` · ${fxStaleDays} days old` : ""}
                 </span>
               </span>
             )}

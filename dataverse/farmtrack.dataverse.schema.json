@@ -5525,6 +5525,65 @@
           "required": false
         }
       ]
+    },
+    {
+      "schemaName": "bv_ExchangeRate",
+      "displayName": "Exchange Rate",
+      "displayCollectionName": "Exchange Rates",
+      "ownershipType": "UserOwned",
+      "description": "The Banco Central de Honduras reference rate (TCR) for one day. Kept as history rather than a single current value: an invoice has to be read back at the rate it was converted at, and restating last month at today's rate would silently change reported sales.",
+      "columns": [
+        {
+          "schemaName": "bv_ExchangeRateCode",
+          "displayName": "Exchange Rate ID",
+          "type": "autonumber",
+          "autoNumberFormat": "FX-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format FX-0001."
+        },
+        {
+          "schemaName": "bv_RateDate",
+          "displayName": "Date",
+          "type": "date",
+          "required": true,
+          "description": "The day the rate was published by the BCH."
+        },
+        {
+          "schemaName": "bv_Value",
+          "displayName": "HNL per USD",
+          "type": "decimal",
+          "required": true,
+          "precision": 4,
+          "minValue": 0,
+          "maxValue": 100000,
+          "description": "Lempiras to one US dollar, to four decimal places as the BCH publishes it."
+        },
+        {
+          "schemaName": "bv_Source",
+          "displayName": "Source",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187460000,
+              "label": "BCH"
+            },
+            {
+              "value": 187460001,
+              "label": "Manual"
+            }
+          ],
+          "description": "Where the figure came from. A manual entry is a stand-in for a day the feed missed, and is worth being able to tell apart. One of: BCH, Manual."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
     }
   ]
 }
