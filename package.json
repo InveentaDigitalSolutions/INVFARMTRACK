@@ -29,7 +29,6 @@
     "test:schedule": "tsx scripts/test/productionSchedule.test.mts"
   },
   "dependencies": {
-    "@azure/msal-browser": "^5.19.0",
     "@fontsource-variable/playfair-display": "^5.3.0",
     "@fontsource/inter": "^5.3.0",
     "@hookform/resolvers": "^5.2.2",

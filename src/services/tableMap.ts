@@ -668,20 +668,21 @@ export const ENABLED_TABLES = new Set<string>([
 /**
  * Which hosting model this build is running under.
  *
- * "player"     — inside the Power Apps host, which supplies the Dataverse
- *                session. Sandboxed: no WebGL workers, no outbound fetch.
- * "standalone" — hosted on Azure, signing in with MSAL and calling the
- *                Dataverse Web API directly. No sandbox.
- * "demo"       — neither is configured; everything stays on LocalStore.
+ * "player" — inside the Power Apps host, which supplies the Dataverse
+ *            session. Sandboxed: no WebGL workers, no outbound fetch.
+ * "demo"   — no Dataverse configured; everything stays on LocalStore, which
+ *            is what `npm run dev` gives you without an environment.
+ *
+ * There was a third, "standalone", for hosting on Azure with an MSAL sign-in
+ * and a direct Web API store. It was removed: it duplicated the whole data
+ * layer, so every lookup, choice and naming fix had to be made twice, and the
+ * decision to stay on the Power Platform made the second copy dead weight.
+ * It is in the history if Azure is ever revisited.
  */
-export type HostingMode = "player" | "standalone" | "demo";
+export type HostingMode = "player" | "demo";
 
 export function hostingMode(): HostingMode {
-  if (import.meta.env.VITE_ENTRA_CLIENT_ID && import.meta.env.VITE_ENTRA_TENANT_ID) {
-    return "standalone";
-  }
-  if (import.meta.env.VITE_DATAVERSE_URL) return "player";
-  return "demo";
+  return import.meta.env.VITE_DATAVERSE_URL ? "player" : "demo";
 }
 
 /** Dataverse is only usable when the app has a session of some kind. */

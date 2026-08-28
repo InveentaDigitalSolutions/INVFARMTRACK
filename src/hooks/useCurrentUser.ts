@@ -17,7 +17,6 @@ import { getContext } from "@microsoft/power-apps/app";
 import { getClient } from "@microsoft/power-apps/data";
 import { dataSourcesInfo } from "../../.power/schemas/appschemas/dataSourcesInfo";
 import { hostingMode } from "../services/tableMap";
-import { DATAVERSE_URL, getDataverseToken } from "../services/auth";
 
 export interface CurrentUser {
   id: string;
@@ -108,21 +107,6 @@ async function loadViaPlayer(): Promise<CurrentUser | null> {
   };
 }
 
-async function loadViaWebApi(): Promise<CurrentUser | null> {
-  const token = await getDataverseToken();
-  if (!token) return null;
-  const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
-  const who = await fetch(`${DATAVERSE_URL}/api/data/v9.2/WhoAmI`, { headers });
-  if (!who.ok) return null;
-  const { UserId: id } = (await who.json()) as { UserId?: string };
-  if (!id) return null;
-
-  const res = await fetch(
-    `${DATAVERSE_URL}/api/data/v9.2/systemusers(${id})?$select=${SELECT.join(",")}`,
-    { headers }
-  );
-  return res.ok ? toUser(id, (await res.json()) as UserRow) : null;
-}
 
 export function useCurrentUser(): { user: CurrentUser | null; loading: boolean } {
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -136,7 +120,7 @@ export function useCurrentUser(): { user: CurrentUser | null; loading: boolean }
     }
 
     let cancelled = false;
-    (mode === "standalone" ? loadViaWebApi() : loadViaPlayer())
+    loadViaPlayer()
       .then((result) => {
         if (!cancelled) setUser(result);
       })
