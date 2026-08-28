@@ -19,7 +19,7 @@ export interface Bv_fieldsBase {
   bv_fieldname: string;
   bv_notes?: string;
   bv_position?: string;
-  "bv_SeasonId@odata.bind"?: string;
+  bv_rowcount?: number;
   "bv_ShadehouseId@odata.bind": string;
   importsequencenumber?: number;
   overriddencreatedon?: string;
@@ -30,7 +30,6 @@ export interface Bv_fieldsBase {
 }
 
 export interface Bv_fields extends Bv_fieldsBase {
-  bv_seasonidname?: string;
   bv_shadehouseidname?: string;
   createdbyname?: string;
   createdbyyominame: string;
@@ -46,8 +45,6 @@ export interface Bv_fields extends Bv_fieldsBase {
   statecodename?: string;
   statuscodename?: string;
   versionnumber?: number;
-  bv_seasonid?: object;
-  _bv_seasonid_value?: string;
   bv_shadehouseid?: object;
   _bv_shadehouseid_value?: string;
   createdby?: object;

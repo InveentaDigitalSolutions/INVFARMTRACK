@@ -116,7 +116,7 @@ export function byElement(applied: AppliedComponent[]): Record<string, number> {
   return out;
 }
 
-/** Sum many applications — per bed, per plot, per season. */
+/** Sum many applications — per bed, per field, per season. */
 export function totalByElement(all: Record<string, number>[]): Record<string, number> {
   const total: Record<string, number> = {};
   for (const one of all) {

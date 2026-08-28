@@ -17,6 +17,7 @@ export interface Bv_shadehousesBase {
   bv_capacity?: number;
   bv_code: string;
   bv_coordinates?: string;
+  bv_fieldcapacity?: number;
   bv_isactive?: boolean;
   bv_length?: number;
   bv_location?: string;

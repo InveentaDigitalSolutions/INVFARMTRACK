@@ -19,14 +19,14 @@ export interface Insight {
 export function deriveShadehouseInsight(beds: ShadehouseBed[]): Insight | null {
   if (!beds.length) return null;
 
-  const byPlot = plotConfigs.map((plot) => {
-    const own = beds.filter((b) => b.plotId === plot.id);
+  const byField = plotConfigs.map((field) => {
+    const own = beds.filter((b) => b.fieldId === field.id);
     const empty = own.filter((b) => b.state === "empty").length;
     const issues = own.filter((b) => b.state === "issue").length;
     const ready = own.filter((b) => b.state === "harvest-ready").length;
     return {
-      id: plot.id,
-      label: plot.label,
+      id: field.id,
+      label: field.label,
       total: own.length,
       empty,
       issues,
@@ -35,9 +35,9 @@ export function deriveShadehouseInsight(beds: ShadehouseBed[]): Insight | null {
     };
   });
 
-  // The plot with the most idle capacity is the one worth acting on.
-  const weakest = [...byPlot].sort((a, b) => a.occupancy - b.occupancy)[0];
-  const strongest = [...byPlot].sort((a, b) => b.occupancy - a.occupancy)[0];
+  // The field with the most idle capacity is the one worth acting on.
+  const weakest = [...byField].sort((a, b) => a.occupancy - b.occupancy)[0];
+  const strongest = [...byField].sort((a, b) => b.occupancy - a.occupancy)[0];
 
   const totalBeds = beds.length;
   const totalEmpty = beds.filter((b) => b.state === "empty").length;

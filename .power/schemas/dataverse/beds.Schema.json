@@ -30,43 +30,6 @@
           "required": true,
           "x-ms-keyType": "primary"
         },
-        "bv_bedmaterial": {
-          "type": "string",
-          "title": "Bed Material",
-          "x-ms-dataverse-attribute": "bv_bedmaterial",
-          "x-ms-dataverse-type": "PicklistType",
-          "x-ms-schema-name": "bv_BedMaterial",
-          "enum": [
-            "Wood",
-            "Concrete",
-            "Plastic",
-            "Metal"
-          ],
-          "x-ms-enum-values": [
-            121320000,
-            121320001,
-            121320002,
-            121320003
-          ],
-          "Color": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "x-ms-optionsetmetadataid": "011a1ec6-3ba2-f111-b8de-002248d8760d",
-          "x-ms-isGlobal": false,
-          "x-ms-optionsetdisplayname": "Bed Material",
-          "x-ms-optionSetType": "Picklist"
-        },
-        "bv_bedmaterialname": {
-          "type": "string",
-          "title": "bv_bedmaterialname",
-          "x-ms-dataverse-attribute": "bv_bedmaterialname",
-          "x-ms-dataverse-type": "VirtualType",
-          "x-ms-schema-name": "bv_bedmaterialName",
-          "x-ms-read-only": true
-        },
         "bv_bedname": {
           "type": "string",
           "title": "Bed Name",

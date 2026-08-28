@@ -17,6 +17,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_availabilities",
   "bv_bankaccounts",
   "bv_bankstatementlines",
+  "bv_bedcapacities",
   "bv_bedcompositions",
   "bv_beds",
   "bv_bills",
@@ -115,7 +116,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_bankstatementlines": "bv_bankstatementlinecode",
   "bv_substratematerials": "bv_substratematerialname",
   "bv_bedcompositions": "bv_bedcompositionname",
-  "bv_exchangerates": "bv_exchangeratecode"
+  "bv_exchangerates": "bv_exchangeratecode",
+  "bv_bedcapacities": "bv_bedcapacityname"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -172,10 +174,6 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     }
   },
   "bv_fields": {
-    "_bv_seasonid_value": {
-      "nav": "bv_SeasonId",
-      "targetSet": "bv_seasons"
-    },
     "_bv_shadehouseid_value": {
       "nav": "bv_ShadehouseId",
       "targetSet": "bv_shadehouses"
@@ -392,6 +390,16 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "nav": "bv_SubstrateMaterialId",
       "targetSet": "bv_substratematerials"
     }
+  },
+  "bv_bedcapacities": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
   }
 };
 
@@ -415,12 +423,6 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
     }
   },
   "bv_beds": {
-    "bv_bedmaterial": {
-      "Wood": 121320000,
-      "Concrete": 121320001,
-      "Plastic": 121320002,
-      "Metal": 121320003
-    },
     "bv_drainage": {
       "Excellent": 121320000,
       "Good": 121320001,
@@ -824,6 +826,17 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
     "bv_source": {
       "BCH": 187460000,
       "Manual": 187460001
+    }
+  },
+  "bv_bedcapacities": {
+    "bv_size": {
+      "Petit": 187460000,
+      "Mini Petit": 187460001,
+      "Small": 187460002,
+      "Medium": 187460003,
+      "California": 187460004,
+      "Large": 187460005,
+      "Extra Large": 187460006
     }
   }
 };

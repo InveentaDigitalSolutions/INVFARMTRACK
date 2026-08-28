@@ -39,7 +39,7 @@ interface ShadehouseData {
 
 const shadehouses: ShadehouseData[] = [
   {
-    id: "SH-N", name: "Plot E3",
+    id: "SH-N", name: "Field E3",
     coordinates: [-87.8505, 14.9705], width: 40, length: 70, rotation: 15,
     fields: [
       { id: "B-N1", name: "Field N1", quadrant: "NW", beds: [
@@ -63,7 +63,7 @@ const shadehouses: ShadehouseData[] = [
     ],
   },
   {
-    id: "SH-S", name: "Plot C3",
+    id: "SH-S", name: "Field C3",
     coordinates: [-87.8493, 14.9693], width: 35, length: 60, rotation: 15,
     fields: [
       { id: "B-S1", name: "Field S1", quadrant: "NW", beds: [
@@ -82,7 +82,7 @@ const shadehouses: ShadehouseData[] = [
     ],
   },
   {
-    id: "SH-E", name: "Plot E1",
+    id: "SH-E", name: "Field E1",
     coordinates: [-87.8486, 14.9701], width: 35, length: 55, rotation: 15,
     fields: [
       { id: "B-E1", name: "Field E1", quadrant: "NW", beds: [

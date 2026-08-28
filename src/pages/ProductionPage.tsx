@@ -74,20 +74,20 @@ const SHADEHOUSES: Record<string, string> = { "SH-0001": "Shadehouse 1" };
 const shadehouseLabel = (id: string) => `${id} · ${SHADEHOUSES[id] ?? "Unknown"}`;
 
 const bedUtilization = [
-  // Bed ids are PLOT-NN, as in the layout. Shadehouse is explicit so the view
+  // Bed ids are FIELD-NN, as in the layout. Shadehouse is explicit so the view
   // still reads correctly once a second house exists.
-  { bed: "E3-04", shadehouse: "SH-0001", area: "Plot E3", weeks: { 14: 60, 15: 75, 16: 95, 17: 100, 18: 110, 19: 80, 20: 40 } },
-  { bed: "E3-12", shadehouse: "SH-0001", area: "Plot E3", weeks: { 14: 80, 15: 90, 16: 100, 17: 105, 18: 95, 19: 70, 20: 50 } },
-  { bed: "E3-21", shadehouse: "SH-0001", area: "Plot E3", weeks: { 14: 50, 15: 60, 16: 75, 17: 90, 18: 100, 19: 95, 20: 70 } },
-  { bed: "E3-30", shadehouse: "SH-0001", area: "Plot E3", weeks: { 14: 40, 15: 55, 16: 70, 17: 95, 18: 115, 19: 100, 20: 65 } },
-  { bed: "C3-02", shadehouse: "SH-0001", area: "Plot C3", weeks: { 14: 30, 15: 40, 16: 60, 17: 80, 18: 90, 19: 95, 20: 100 } },
-  { bed: "C3-11", shadehouse: "SH-0001", area: "Plot C3", weeks: { 14: 70, 15: 85, 16: 100, 17: 110, 18: 120, 19: 80, 20: 30 } },
-  { bed: "C3-19", shadehouse: "SH-0001", area: "Plot C3", weeks: { 14: 65, 15: 70, 16: 80, 17: 95, 18: 100, 19: 70, 20: 40 } },
-  { bed: "E1-06", shadehouse: "SH-0001", area: "Plot E1", weeks: { 14: 45, 15: 60, 16: 75, 17: 85, 18: 90, 19: 65, 20: 35 } },
-  { bed: "E1-17", shadehouse: "SH-0001", area: "Plot E1", weeks: { 14: 30, 15: 40, 16: 55, 17: 70, 18: 85, 19: 100, 20: 95 } },
-  { bed: "E1-28", shadehouse: "SH-0001", area: "Plot E1", weeks: { 14: 25, 15: 35, 16: 50, 17: 65, 18: 80, 19: 95, 20: 105 } },
-  { bed: "C1-09", shadehouse: "SH-0001", area: "Plot C1", weeks: { 14: 20, 15: 30, 16: 45, 17: 60, 18: 75, 19: 90, 20: 100 } },
-  { bed: "C1-20", shadehouse: "SH-0001", area: "Plot C1", weeks: { 14: 55, 15: 65, 16: 80, 17: 90, 18: 100, 19: 85, 20: 60 } },
+  { bed: "E3-04", shadehouse: "SH-0001", area: "Field E3", weeks: { 14: 60, 15: 75, 16: 95, 17: 100, 18: 110, 19: 80, 20: 40 } },
+  { bed: "E3-12", shadehouse: "SH-0001", area: "Field E3", weeks: { 14: 80, 15: 90, 16: 100, 17: 105, 18: 95, 19: 70, 20: 50 } },
+  { bed: "E3-21", shadehouse: "SH-0001", area: "Field E3", weeks: { 14: 50, 15: 60, 16: 75, 17: 90, 18: 100, 19: 95, 20: 70 } },
+  { bed: "E3-30", shadehouse: "SH-0001", area: "Field E3", weeks: { 14: 40, 15: 55, 16: 70, 17: 95, 18: 115, 19: 100, 20: 65 } },
+  { bed: "C3-02", shadehouse: "SH-0001", area: "Field C3", weeks: { 14: 30, 15: 40, 16: 60, 17: 80, 18: 90, 19: 95, 20: 100 } },
+  { bed: "C3-11", shadehouse: "SH-0001", area: "Field C3", weeks: { 14: 70, 15: 85, 16: 100, 17: 110, 18: 120, 19: 80, 20: 30 } },
+  { bed: "C3-19", shadehouse: "SH-0001", area: "Field C3", weeks: { 14: 65, 15: 70, 16: 80, 17: 95, 18: 100, 19: 70, 20: 40 } },
+  { bed: "E1-06", shadehouse: "SH-0001", area: "Field E1", weeks: { 14: 45, 15: 60, 16: 75, 17: 85, 18: 90, 19: 65, 20: 35 } },
+  { bed: "E1-17", shadehouse: "SH-0001", area: "Field E1", weeks: { 14: 30, 15: 40, 16: 55, 17: 70, 18: 85, 19: 100, 20: 95 } },
+  { bed: "E1-28", shadehouse: "SH-0001", area: "Field E1", weeks: { 14: 25, 15: 35, 16: 50, 17: 65, 18: 80, 19: 95, 20: 105 } },
+  { bed: "C1-09", shadehouse: "SH-0001", area: "Field C1", weeks: { 14: 20, 15: 30, 16: 45, 17: 60, 18: 75, 19: 90, 20: 100 } },
+  { bed: "C1-20", shadehouse: "SH-0001", area: "Field C1", weeks: { 14: 55, 15: 65, 16: 80, 17: 90, 18: 100, 19: 85, 20: 60 } },
 ];
 
 const initFertilization = [
@@ -340,7 +340,7 @@ function ProductionPlanGantt() {
                   <div className="w-[240px] shrink-0 px-5 py-3.5 border-r border-sand-100">
                     <p className="text-[13px] font-semibold text-navy-900 leading-tight">{row.variety}</p>
                     <p className="text-[11px] text-navy-400 mt-0.5 font-mono">
-                      {row.shadehouse} · Plot {row.bed}
+                      {row.shadehouse} · Field {row.bed}
                     </p>
                   </div>
                   <div className="flex-1 relative">

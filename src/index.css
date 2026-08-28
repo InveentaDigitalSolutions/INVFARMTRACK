@@ -232,8 +232,8 @@
 .dark .sh-road { fill: #2c3e55 !important; }
 .dark .sh-road-line { stroke: #3a506b !important; }
 .dark .sh-label { fill: #7e92ab !important; }
-.dark .sh-plot-outline { stroke: #2c3e55 !important; }
-.dark .sh-plot-label { fill: #b0becf !important; }
+.dark .sh-field-outline { stroke: #2c3e55 !important; }
+.dark .sh-field-label { fill: #b0becf !important; }
 
 /* Dark mode activity icons in shadehouse */
 .dark .bg-green-50 { background-color: rgba(22, 101, 52, 0.3) !important; }

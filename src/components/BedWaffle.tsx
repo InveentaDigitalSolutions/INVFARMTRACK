@@ -20,18 +20,18 @@ export default function BedWaffle({
   className = "",
 }: {
   beds: ShadehouseBed[];
-  onPlotClick?: (plotId: string) => void;
+  onPlotClick?: (fieldId: string) => void;
   className?: string;
 }) {
-  const plots = useMemo(
+  const fields = useMemo(
     () =>
-      plotConfigs.map((plot) => {
-        const own = beds.filter((b) => b.plotId === plot.id);
+      plotConfigs.map((field) => {
+        const own = beds.filter((b) => b.fieldId === field.id);
         // Group by state so the dot grid reads as bands, not confetti.
         const ordered = ORDER.flatMap((state) => own.filter((b) => b.state === state));
         const filled = own.filter((b) => b.state !== "empty").length;
         return {
-          ...plot,
+          ...field,
           beds: ordered,
           filled,
           total: own.length,
@@ -41,7 +41,7 @@ export default function BedWaffle({
     [beds]
   );
 
-  const ranked = [...plots].sort((a, b) => b.occupancy - a.occupancy);
+  const ranked = [...fields].sort((a, b) => b.occupancy - a.occupancy);
   const rankOf = new Map(ranked.map((p, i) => [p.id, i + 1]));
 
   return (
@@ -54,23 +54,23 @@ export default function BedWaffle({
       </div>
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-5 mt-4">
-        {plots.map((plot) => (
+        {fields.map((field) => (
           <button
-            key={plot.id}
-            onClick={onPlotClick ? () => onPlotClick(plot.id) : undefined}
+            key={field.id}
+            onClick={onPlotClick ? () => onPlotClick(field.id) : undefined}
             className={`text-left rounded-lg p-2 -m-2 transition-colors ${
               onPlotClick ? "cursor-pointer hover:bg-sand-50" : "cursor-default"
             }`}
           >
             <div className="flex items-baseline gap-1.5">
               <span className="text-[11px] font-semibold text-navy-400">
-                #{rankOf.get(plot.id)}
+                #{rankOf.get(field.id)}
               </span>
-              <span className="text-[13px] font-bold text-navy-900">{plot.label}</span>
+              <span className="text-[13px] font-bold text-navy-900">{field.label}</span>
             </div>
 
             <div className="flex flex-wrap gap-[3px] mt-2.5 max-w-[132px]">
-              {plot.beds.map((bed) => (
+              {field.beds.map((bed) => (
                 <span
                   key={bed.bedId}
                   title={`${bed.bedId} — ${stateColors[bed.state].label}`}
@@ -81,11 +81,11 @@ export default function BedWaffle({
             </div>
 
             <p className="font-display text-[26px] leading-none font-semibold text-navy-900 mt-3">
-              {Math.round(plot.occupancy * 100)}%
+              {Math.round(field.occupancy * 100)}%
             </p>
             <p className="text-[11px] text-navy-400 mt-1">
-              <span className="font-semibold text-navy-600">{plot.filled}</span> of{" "}
-              {plot.total} beds planted
+              <span className="font-semibold text-navy-600">{field.filled}</span> of{" "}
+              {field.total} beds planted
             </p>
           </button>
         ))}

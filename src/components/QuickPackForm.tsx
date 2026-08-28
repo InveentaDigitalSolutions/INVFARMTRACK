@@ -45,11 +45,11 @@ const plants = [
 ];
 
 const beds = [
-  { id: "bed-3a", label: "E3-01", batch: "Plot E3", shadehouse: "Shadehouse 1" },
-  { id: "bed-1b", label: "E1-05", batch: "Plot E1", shadehouse: "Shadehouse 1" },
-  { id: "bed-5c", label: "C3-12", batch: "Plot C3", shadehouse: "Shadehouse 1" },
-  { id: "bed-2a", label: "E3-15", batch: "Plot C3", shadehouse: "Shadehouse 1" },
-  { id: "bed-4b", label: "C1-10", batch: "Plot C1", shadehouse: "Shadehouse 1" },
+  { id: "bed-3a", label: "E3-01", batch: "Field E3", shadehouse: "Shadehouse 1" },
+  { id: "bed-1b", label: "E1-05", batch: "Field E1", shadehouse: "Shadehouse 1" },
+  { id: "bed-5c", label: "C3-12", batch: "Field C3", shadehouse: "Shadehouse 1" },
+  { id: "bed-2a", label: "E3-15", batch: "Field C3", shadehouse: "Shadehouse 1" },
+  { id: "bed-4b", label: "C1-10", batch: "Field C1", shadehouse: "Shadehouse 1" },
 ];
 
 const sizes = PLANT_SIZES;

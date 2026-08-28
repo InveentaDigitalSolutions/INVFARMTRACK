@@ -1,43 +1,67 @@
 {
-  "name": "bv_field",
-  "title": "Fields",
+  "name": "bv_bedcapacity",
+  "title": "Bed Capacities",
   "schema": {
     "type": "array",
     "items": {
       "type": "object",
       "x-ms-dataverse-entity": true,
-      "x-ms-dataverse-entityset": "bv_fields",
-      "x-ms-dataverse-primary-id": "bv_fieldid",
-      "x-ms-dataverse-primary-name": "bv_fieldcode",
+      "x-ms-dataverse-entityset": "bv_bedcapacities",
+      "x-ms-dataverse-primary-id": "bv_bedcapacityid",
+      "x-ms-dataverse-primary-name": "bv_bedcapacitycode",
       "properties": {
-        "bv_fieldcode": {
+        "bv_bedcapacitycode": {
           "type": "string",
-          "title": "Field Code",
-          "x-ms-dataverse-attribute": "bv_fieldcode",
+          "title": "Bed Capacity ID",
+          "x-ms-dataverse-attribute": "bv_bedcapacitycode",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_FieldCode",
+          "x-ms-schema-name": "bv_BedCapacityCode",
           "x-ms-dataverse-primary-name": true,
           "required": true,
           "maxLength": 40
         },
-        "bv_fieldid": {
+        "bv_bedcapacityid": {
           "type": "string",
-          "title": "Field",
-          "x-ms-dataverse-attribute": "bv_fieldid",
+          "title": "Bed Capacity",
+          "x-ms-dataverse-attribute": "bv_bedcapacityid",
           "x-ms-dataverse-type": "UniqueidentifierType",
-          "x-ms-schema-name": "bv_FieldId",
+          "x-ms-schema-name": "bv_BedCapacityId",
           "x-ms-dataverse-primary-id": true,
           "required": true,
           "x-ms-keyType": "primary"
         },
-        "bv_fieldname": {
+        "bv_bedcapacityname": {
           "type": "string",
-          "title": "Plot Name",
-          "x-ms-dataverse-attribute": "bv_fieldname",
+          "title": "Name",
+          "x-ms-dataverse-attribute": "bv_bedcapacityname",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_FieldName",
-          "required": true,
+          "x-ms-schema-name": "bv_BedCapacityName",
           "maxLength": 100
+        },
+        "bv_bedid": {
+          "type": "string",
+          "title": "Bed",
+          "x-ms-dataverse-attribute": "bv_bedid",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "bv_BedId",
+          "required": true
+        },
+        "bv_bedidname": {
+          "type": "string",
+          "title": "bv_bedidname",
+          "x-ms-dataverse-attribute": "bv_bedidname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_BedIdName",
+          "x-ms-read-only": true,
+          "maxLength": 40
+        },
+        "bv_capacity": {
+          "type": "string",
+          "title": "Capacity",
+          "x-ms-dataverse-attribute": "bv_capacity",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "bv_Capacity",
+          "required": true
         },
         "bv_notes": {
           "type": "string",
@@ -47,37 +71,68 @@
           "x-ms-schema-name": "bv_Notes",
           "maxLength": 2000
         },
-        "bv_position": {
+        "bv_plantid": {
           "type": "string",
-          "title": "Position",
-          "x-ms-dataverse-attribute": "bv_position",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_Position",
-          "maxLength": 100
-        },
-        "bv_rowcount": {
-          "type": "string",
-          "title": "Rows",
-          "x-ms-dataverse-attribute": "bv_rowcount",
-          "x-ms-dataverse-type": "IntegerType",
-          "x-ms-schema-name": "bv_RowCount"
-        },
-        "bv_shadehouseid": {
-          "type": "string",
-          "title": "Shadehouse",
-          "x-ms-dataverse-attribute": "bv_shadehouseid",
+          "title": "Plant",
+          "x-ms-dataverse-attribute": "bv_plantid",
           "x-ms-dataverse-type": "LookupType",
-          "x-ms-schema-name": "bv_ShadehouseId",
+          "x-ms-schema-name": "bv_PlantId",
           "required": true
         },
-        "bv_shadehouseidname": {
+        "bv_plantidname": {
           "type": "string",
-          "title": "bv_shadehouseidname",
-          "x-ms-dataverse-attribute": "bv_shadehouseidname",
+          "title": "bv_plantidname",
+          "x-ms-dataverse-attribute": "bv_plantidname",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_ShadehouseIdName",
+          "x-ms-schema-name": "bv_PlantIdName",
           "x-ms-read-only": true,
           "maxLength": 40
+        },
+        "bv_size": {
+          "type": "string",
+          "title": "Size",
+          "x-ms-dataverse-attribute": "bv_size",
+          "x-ms-dataverse-type": "PicklistType",
+          "x-ms-schema-name": "bv_Size",
+          "enum": [
+            "Petit",
+            "Mini Petit",
+            "Small",
+            "Medium",
+            "California",
+            "Large",
+            "Extra Large"
+          ],
+          "x-ms-enum-values": [
+            187460000,
+            187460001,
+            187460002,
+            187460003,
+            187460004,
+            187460005,
+            187460006
+          ],
+          "Color": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "x-ms-optionsetmetadataid": "4e65a365-dda2-f111-b8dd-002248d8760d",
+          "x-ms-isGlobal": false,
+          "x-ms-optionsetdisplayname": "Size",
+          "x-ms-optionSetType": "Picklist"
+        },
+        "bv_sizename": {
+          "type": "string",
+          "title": "bv_sizename",
+          "x-ms-dataverse-attribute": "bv_sizename",
+          "x-ms-dataverse-type": "VirtualType",
+          "x-ms-schema-name": "bv_sizeName",
+          "x-ms-read-only": true
         },
         "createdby": {
           "type": "string",
@@ -210,30 +265,82 @@
           "required": true,
           "maxLength": 100
         },
-        "organizationid": {
-          "type": "string",
-          "title": "Organization Id",
-          "x-ms-dataverse-attribute": "organizationid",
-          "x-ms-dataverse-type": "LookupType",
-          "x-ms-schema-name": "OrganizationId",
-          "x-ms-read-only": true
-        },
-        "organizationidname": {
-          "type": "string",
-          "title": "organizationidname",
-          "x-ms-dataverse-attribute": "organizationidname",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "OrganizationIdName",
-          "x-ms-read-only": true,
-          "required": true,
-          "maxLength": 100
-        },
         "overriddencreatedon": {
           "type": "string",
           "title": "Record Created On",
           "x-ms-dataverse-attribute": "overriddencreatedon",
           "x-ms-dataverse-type": "DateTimeType",
           "x-ms-schema-name": "OverriddenCreatedOn"
+        },
+        "ownerid": {
+          "type": "string",
+          "title": "Owner",
+          "x-ms-dataverse-attribute": "ownerid",
+          "x-ms-dataverse-type": "OwnerType",
+          "x-ms-schema-name": "OwnerId",
+          "required": true
+        },
+        "owneridname": {
+          "type": "string",
+          "title": "owneridname",
+          "x-ms-dataverse-attribute": "owneridname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "OwnerIdName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "owneridtype": {
+          "type": "string",
+          "title": "owneridtype",
+          "x-ms-dataverse-attribute": "owneridtype",
+          "x-ms-dataverse-type": "EntityNameType",
+          "x-ms-schema-name": "OwnerIdType",
+          "required": true
+        },
+        "owneridyominame": {
+          "type": "string",
+          "title": "owneridyominame",
+          "x-ms-dataverse-attribute": "owneridyominame",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "OwnerIdYomiName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "owningbusinessunit": {
+          "type": "string",
+          "title": "Owning Business Unit",
+          "x-ms-dataverse-attribute": "owningbusinessunit",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "OwningBusinessUnit",
+          "x-ms-read-only": true
+        },
+        "owningbusinessunitname": {
+          "type": "string",
+          "title": "owningbusinessunitname",
+          "x-ms-dataverse-attribute": "owningbusinessunitname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "OwningBusinessUnitName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "owningteam": {
+          "type": "string",
+          "title": "Owning Team",
+          "x-ms-dataverse-attribute": "owningteam",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "OwningTeam",
+          "x-ms-read-only": true
+        },
+        "owninguser": {
+          "type": "string",
+          "title": "Owning User",
+          "x-ms-dataverse-attribute": "owninguser",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "OwningUser",
+          "x-ms-read-only": true
         },
         "statecode": {
           "type": "string",
@@ -254,7 +361,7 @@
             null,
             null
           ],
-          "x-ms-optionsetmetadataid": "5c015904-3ba2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "6c19bd4d-dda2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
           "x-ms-optionsetdisplayname": "Status",
           "x-ms-optionSetType": "State"
@@ -285,7 +392,7 @@
             null,
             null
           ],
-          "x-ms-optionsetmetadataid": "66015904-3ba2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "7619bd4d-dda2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
           "x-ms-optionsetdisplayname": "Status Reason",
           "x-ms-optionSetType": "Status"
@@ -322,15 +429,20 @@
         }
       },
       "required": [
-        "bv_fieldcode",
-        "bv_fieldid",
-        "bv_fieldname",
-        "bv_shadehouseid",
+        "bv_bedcapacitycode",
+        "bv_bedcapacityid",
+        "bv_bedid",
+        "bv_capacity",
+        "bv_plantid",
         "createdbyyominame",
         "createdonbehalfbyyominame",
         "modifiedbyyominame",
         "modifiedonbehalfbyyominame",
-        "organizationidname",
+        "ownerid",
+        "owneridname",
+        "owneridtype",
+        "owneridyominame",
+        "owningbusinessunitname",
         "statecode"
       ]
     }

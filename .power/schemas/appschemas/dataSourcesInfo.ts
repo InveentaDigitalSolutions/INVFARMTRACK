@@ -26,6 +26,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_bedcapacities": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_bedcapacityid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_bedcompositions": {
     "tableId": "",
     "version": "",

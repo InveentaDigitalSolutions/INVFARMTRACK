@@ -18,7 +18,7 @@ export const potTypeLabels: Record<PotType, string> = {
 
 export interface ShadehouseBed {
   bedId: string;
-  plotId: string;
+  fieldId: string;
   bedNumber: number;
   /** 0 = ground bed; 1-3 = cable lines strung above that same footprint. */
   level: BedLevel;
@@ -58,12 +58,12 @@ export const stateColors: Record<string, { fill: string; label: string }> = {
   issue: { fill: "#fca5a5", label: "Issue / Pest" },
 };
 
-// Real shadehouse config — 1 shadehouse with 4 plots
+// Real shadehouse config — 1 shadehouse with 4 fields
 export const plotConfigs: PlotConfig[] = [
-  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Plot E3" },
-  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Plot C3" },
-  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Plot E1" },
-  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Plot C1" },
+  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Field E3" },
+  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Field C3" },
+  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Field E1" },
+  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Field C1" },
 ];
 
 // Generate 120 beds with sample data
@@ -76,22 +76,22 @@ export function generateBeds(): ShadehouseBed[] {
   const states: ShadehouseBed["state"][] = ["empty", "planted", "growing", "harvest-ready", "issue"];
 
   const beds: ShadehouseBed[] = [];
-  plotConfigs.forEach((plot) => {
-    for (let i = 1; i <= plot.bedCount; i++) {
+  plotConfigs.forEach((field) => {
+    for (let i = 1; i <= field.bedCount; i++) {
       // Deterministic but varied distribution
-      const seed = (plot.id.charCodeAt(0) * 100 + i) % 100;
+      const seed = (field.id.charCodeAt(0) * 100 + i) % 100;
       const stateIdx = seed < 10 ? 0 : seed < 25 ? 1 : seed < 65 ? 2 : seed < 85 ? 3 : 4;
       const state = states[stateIdx];
       const variety = state === "empty" ? "" : varieties[(seed * 3 + i) % varieties.length];
 
       beds.push({
-        bedId: `${plot.id}-${String(i).padStart(2, "0")}`,
-        plotId: plot.id,
+        bedId: `${field.id}-${String(i).padStart(2, "0")}`,
+        fieldId: field.id,
         bedNumber: i,
         level: 0,
         type: "ground",
-        widthM: plot.bedWidth,
-        lengthM: plot.bedLength,
+        widthM: field.bedWidth,
+        lengthM: field.bedLength,
         state,
         variety,
         plantedDate: state !== "empty" ? `2026-0${1 + (i % 4)}-${String(5 + (i % 20)).padStart(2, "0")}` : "",
@@ -106,10 +106,10 @@ export function generateBeds(): ShadehouseBed[] {
 /** Posts stand roughly every 3.6 m, whatever the bed pitch. */
 export const POST_SPACING_M = 3.6;
 
-export function postEveryFor(plotId: string): number {
-  const plot = plotConfigs.find((p) => p.id === plotId);
-  if (!plot) return 3;
-  return Math.max(1, Math.round(POST_SPACING_M / plot.bedWidth));
+export function postEveryFor(fieldId: string): number {
+  const field = plotConfigs.find((p) => p.id === fieldId);
+  if (!field) return 3;
+  return Math.max(1, Math.round(POST_SPACING_M / field.bedWidth));
 }
 
 /**
@@ -117,7 +117,7 @@ export function postEveryFor(plotId: string): number {
  * post line stands — not above every ground bed.
  */
 export function isPostLine(bed: ShadehouseBed): boolean {
-  return (bed.bedNumber - 1) % postEveryFor(bed.plotId) === 0;
+  return (bed.bedNumber - 1) % postEveryFor(bed.fieldId) === 0;
 }
 
 /**
@@ -127,7 +127,7 @@ export function isPostLine(bed: ShadehouseBed): boolean {
  */
 export function airLevelsFor(bed: ShadehouseBed): BedLevel[] {
   if (!isPostLine(bed)) return [];
-  const seed = (bed.plotId.charCodeAt(0) * 31 + bed.bedNumber * 7) % 100;
+  const seed = (bed.fieldId.charCodeAt(0) * 31 + bed.bedNumber * 7) % 100;
   const count = seed < 12 ? 0 : seed < 45 ? 1 : seed < 80 ? 2 : 3;
   return ([1, 2, 3] as BedLevel[]).slice(0, count);
 }
@@ -141,7 +141,7 @@ export function generateAirBeds(groundBeds: ShadehouseBed[]): ShadehouseBed[] {
 
   return groundBeds.flatMap((ground) =>
     airLevelsFor(ground).map((level) => {
-      const seed = (ground.plotId.charCodeAt(0) * 100 + ground.bedNumber * 13 + level * 29) % 100;
+      const seed = (ground.fieldId.charCodeAt(0) * 100 + ground.bedNumber * 13 + level * 29) % 100;
       const stateIdx = seed < 8 ? 0 : seed < 30 ? 1 : seed < 70 ? 2 : seed < 90 ? 3 : 4;
       const state = states[stateIdx];
       // One pot roughly every 45 cm of cable.
@@ -150,7 +150,7 @@ export function generateAirBeds(groundBeds: ShadehouseBed[]): ShadehouseBed[] {
 
       return {
         bedId: `${ground.bedId}-A${level}`,
-        plotId: ground.plotId,
+        fieldId: ground.fieldId,
         bedNumber: ground.bedNumber,
         level,
         type: "air" as const,
@@ -332,7 +332,7 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
   const padding = 30;
   const plotGap = 8;
 
-  // Calculate plot areas
+  // Calculate field areas
   const halfW = (svgWidth - padding * 2 - roadWidth) / 2;
   const halfH = (svgHeight - padding * 2 - roadWidth - 40) / 2; // 40 for labels
 
@@ -349,7 +349,7 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
       <div className="px-4 py-3 border-b border-sand-100 flex items-center justify-between">
         <div>
           <h3 className="text-[14px] font-bold text-navy-900">Shadehouse Layout</h3>
-          <p className="text-[11px] text-navy-400">120 beds across 4 plots — click a bed for details, shift+click to multi-select</p>
+          <p className="text-[11px] text-navy-400">120 beds across 4 fields — click a bed for details, shift+click to multi-select</p>
         </div>
         <div className="flex items-center gap-2">
           {/* State filter */}
@@ -424,31 +424,31 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
           {/* Road labels */}
           <text x={padding + halfW + roadWidth / 2} y={svgHeight - padding + 12} textAnchor="middle" className="sh-label" fill="#9ca3af" fontSize="7">Logistics Road</text>
 
-          {/* Plots and beds */}
-          {plotConfigs.map((plot) => {
-            const area = plotAreas[plot.position];
-            const plotBeds = beds.filter((b) => b.plotId === plot.id);
-            const bedW = (area.w - plotGap * 2) / plot.bedCount;
+          {/* Fields and beds */}
+          {plotConfigs.map((field) => {
+            const area = plotAreas[field.position];
+            const plotBeds = beds.filter((b) => b.fieldId === field.id);
+            const bedW = (area.w - plotGap * 2) / field.bedCount;
             const bedH = area.h - plotGap * 2 - 12;
 
             return (
-              <g key={plot.id}>
-                {/* Plot outline */}
+              <g key={field.id}>
+                {/* Field outline */}
                 <rect
                   x={area.x} y={area.y} width={area.w} height={area.h}
-                  className="sh-plot-outline" fill="none" stroke="#cbd5e1" strokeWidth="1" rx="4"
+                  className="sh-field-outline" fill="none" stroke="#cbd5e1" strokeWidth="1" rx="4"
                 />
-                {/* Plot label */}
+                {/* Field label */}
                 <text
                   x={area.x + area.w / 2}
                   y={area.y + 10}
                   textAnchor="middle"
-                  className="sh-plot-label"
+                  className="sh-field-label"
                   fill="#3a506b"
                   fontSize="9"
                   fontWeight="600"
                 >
-                  {plot.label} ({plot.bedCount} beds · {plot.bedWidth}m wide)
+                  {field.label} ({field.bedCount} beds · {field.bedWidth}m wide)
                 </text>
 
                 {/* Individual beds */}
@@ -482,7 +482,7 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
                         strokeWidth={isSelected ? 2 : isHovered ? 1.5 : 0}
                       />
                       {/* Bed number (show every bed if space, else every 5th) */}
-                      {(bw > 5 || bed.bedNumber % 5 === 0 || bed.bedNumber === 1 || bed.bedNumber === plot.bedCount) && (
+                      {(bw > 5 || bed.bedNumber % 5 === 0 || bed.bedNumber === 1 || bed.bedNumber === field.bedCount) && (
                         <text
                           x={bx + bw / 2}
                           y={by + bedH + 9}
@@ -571,7 +571,7 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
                       {selectedBed.bedId}
                     </h4>
                     <p className="text-[11px] text-navy-400">
-                      Plot {selectedBed.plotId} · Bed #{selectedBed.bedNumber} · {selectedBed.widthM}m × {selectedBed.lengthM}m
+                      Field {selectedBed.fieldId} · Bed #{selectedBed.bedNumber} · {selectedBed.widthM}m × {selectedBed.lengthM}m
                     </p>
                   </div>
                   <button

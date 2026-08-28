@@ -7,6 +7,7 @@
 export * as Bv_availabilitiesModel from './models/Bv_availabilitiesModel';
 export * as Bv_bankaccountsModel from './models/Bv_bankaccountsModel';
 export * as Bv_bankstatementlinesModel from './models/Bv_bankstatementlinesModel';
+export * as Bv_bedcapacitiesModel from './models/Bv_bedcapacitiesModel';
 export * as Bv_bedcompositionsModel from './models/Bv_bedcompositionsModel';
 export * as Bv_bedsModel from './models/Bv_bedsModel';
 export * as Bv_billsModel from './models/Bv_billsModel';
@@ -54,6 +55,7 @@ export * as FarmTrack_GetWeatherModel from './models/FarmTrack_GetWeatherModel';
 export * from './services/Bv_availabilitiesService';
 export * from './services/Bv_bankaccountsService';
 export * from './services/Bv_bankstatementlinesService';
+export * from './services/Bv_bedcapacitiesService';
 export * from './services/Bv_bedcompositionsService';
 export * from './services/Bv_bedsService';
 export * from './services/Bv_billsService';

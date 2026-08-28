@@ -69,6 +69,7 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       length: "bv_length",
       width: "bv_width",
       capacity: "bv_capacity",
+      fieldCapacity: "bv_fieldcapacity",
       active: "bv_isactive",
     },
   },
@@ -80,6 +81,8 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       name: "bv_fieldname",
       position: "bv_position",
       notes: "bv_notes",
+      rows: "bv_rowcount",
+      shadehouse: "_bv_shadehouseid_value",
     },
   },
   beds: {
@@ -87,10 +90,30 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     primaryKey: "bv_bedid",
     fields: {
       name: "bv_bedname",
-      capacity: "bv_capacity",
       active: "bv_isactive",
       location: "bv_location",
+      type: "bv_type",
+      level: "bv_level",
+      soilType: "bv_soiltype",
+      drainage: "bv_drainage",
+      irrigationType: "bv_irrigationtype",
+      field: "_bv_fieldid_value",
+      // Capacity is not a property of the bed: it depends on the variety and
+      // grade planted, so it lives in bv_BedCapacity, one row per pairing.
     },
+  },
+  bedCapacities: {
+    dataSource: "bv_bedcapacities",
+    primaryKey: "bv_bedcapacityid",
+    fields: {
+      bed: "_bv_bedid_value",
+      plant: "_bv_plantid_value",
+      size: "bv_size",
+      capacity: "bv_capacity",
+      notes: "bv_notes",
+    },
+    primaryName: "bv_bedcapacityname",
+    nameFrom: ["bed", "plant", "size"],
   },
   seasons: {
     dataSource: "bv_seasons",
@@ -623,6 +646,7 @@ export const ENABLED_TABLES = new Set<string>([
   "bedCompositions",
   "caiNumbers",
   "exchangeRates",
+  "bedCapacities",
 ]);
 
 /**

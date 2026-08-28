@@ -71,9 +71,9 @@ const workerPerformance = [
 ];
 
 const upcomingTasks = [
-  { title: "Water Shadehouse 1 — Plot E3", due: "Today", priority: "High" },
+  { title: "Water Shadehouse 1 — Field E3", due: "Today", priority: "High" },
   { title: "Apply Neem Oil — E3-01", due: "Today", priority: "Normal" },
-  { title: "Harvest Hawaiian — Plot C1", due: "Tomorrow", priority: "Urgent" },
+  { title: "Harvest Hawaiian — Field C1", due: "Tomorrow", priority: "Urgent" },
 ];
 
 function MiniBarChart({ data, max }: { data: { month: string; value: number }[]; max: number }) {
@@ -220,7 +220,7 @@ export default function DashboardPage() {
           value="24"
           icon={Sprout}
           delta={{ value: "+3", direction: "up", label: "vs Mar" }}
-          context="across 4 plots · 87% bed use"
+          context="across 4 fields · 87% bed use"
         />
         <StatCard
           label="Boxes This Week"

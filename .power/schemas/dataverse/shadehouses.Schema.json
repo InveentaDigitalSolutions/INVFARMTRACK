@@ -35,6 +35,13 @@
           "x-ms-schema-name": "bv_Coordinates",
           "maxLength": 100
         },
+        "bv_fieldcapacity": {
+          "type": "string",
+          "title": "Field Capacity",
+          "x-ms-dataverse-attribute": "bv_fieldcapacity",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "bv_FieldCapacity"
+        },
         "bv_isactive": {
           "type": "string",
           "title": "Is Active",

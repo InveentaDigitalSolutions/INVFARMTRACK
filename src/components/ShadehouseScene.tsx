@@ -39,7 +39,7 @@ export const PLAN_COLORS = {
   roadLabel: "#9ca3af",
 };
 
-/** Gap between the two plot columns — the logistics road in the layout. */
+/** Gap between the two field columns — the logistics road in the layout. */
 const ROAD_M = 3.5;
 const PLOT_GAP_M = 3.5;
 
@@ -49,9 +49,9 @@ export interface RoadLayout {
 }
 
 export function computeRoads(): RoadLayout {
-  const widthOf = (plotId: string) => {
-    const plot = plotConfigs.find((p) => p.id === plotId)!;
-    return plot.bedCount * plot.bedWidth;
+  const widthOf = (fieldId: string) => {
+    const field = plotConfigs.find((p) => p.id === fieldId)!;
+    return field.bedCount * field.bedWidth;
   };
   const westWidth = Math.max(widthOf("E3"), widthOf("E1"));
   const eastWidth = Math.max(widthOf("C3"), widthOf("C1"));
@@ -98,7 +98,7 @@ function RoadDashes({
   );
 }
 
-/** Rounded outline around a plot, matching the plan's rx="4" frame. */
+/** Rounded outline around a field, matching the plan's rx="4" frame. */
 function PlotOutline({
   x,
   z,
@@ -169,13 +169,13 @@ export interface BedPlacement {
 }
 
 /**
- * Lay the plots out 2x2 with a road between, mirroring the 2D layout so the
+ * Lay the fields out 2x2 with a road between, mirroring the 2D layout so the
  * two views stay mentally interchangeable.
  */
 export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
-  const widthOf = (plotId: string) => {
-    const plot = plotConfigs.find((p) => p.id === plotId)!;
-    return plot.bedCount * plot.bedWidth;
+  const widthOf = (fieldId: string) => {
+    const field = plotConfigs.find((p) => p.id === fieldId)!;
+    return field.bedCount * field.bedWidth;
   };
 
   const westWidth = Math.max(widthOf("E3"), widthOf("E1"));
@@ -183,19 +183,19 @@ export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
   const totalWidth = westWidth + ROAD_M + eastWidth;
 
   return beds.map((bed) => {
-    const plot = plotConfigs.find((p) => p.id === bed.plotId)!;
-    const isEast = plot.position === "NE" || plot.position === "SE";
-    const isNorth = plot.position === "NW" || plot.position === "NE";
+    const field = plotConfigs.find((p) => p.id === bed.fieldId)!;
+    const isEast = field.position === "NE" || field.position === "SE";
+    const isNorth = field.position === "NW" || field.position === "NE";
 
     const columnStart = isEast
       ? -totalWidth / 2 + westWidth + ROAD_M
       : -totalWidth / 2;
 
     // Beds run along Z; consecutive beds step along X.
-    const x = columnStart + (bed.bedNumber - 0.5) * plot.bedWidth;
+    const x = columnStart + (bed.bedNumber - 0.5) * field.bedWidth;
     const z = isNorth
-      ? -(plot.bedLength / 2 + PLOT_GAP_M / 2)
-      : plot.bedLength / 2 + PLOT_GAP_M / 2;
+      ? -(field.bedLength / 2 + PLOT_GAP_M / 2)
+      : field.bedLength / 2 + PLOT_GAP_M / 2;
 
     return {
       bed,
@@ -203,8 +203,8 @@ export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
       z,
       y: LEVEL_HEIGHTS_M[bed.level],
       // Leave a sliver between beds so rows stay individually readable.
-      width: plot.bedWidth * 0.86,
-      length: plot.bedLength,
+      width: field.bedWidth * 0.86,
+      length: field.bedLength,
     };
   });
 }
@@ -758,25 +758,25 @@ export default function ShadehouseScene({
   );
 
   const plotAnchors = useMemo(() => {
-    const byPlot = new Map<
+    const byField = new Map<
       string,
       { xs: number[]; z: number; length: number; count: number; bedWidth: number }
     >();
     for (const p of placements) {
       if (p.bed.type !== "ground") continue;
-      const cur = byPlot.get(p.bed.plotId);
+      const cur = byField.get(p.bed.fieldId);
       if (cur) { cur.xs.push(p.x); cur.count++; }
-      else byPlot.set(p.bed.plotId, {
+      else byField.set(p.bed.fieldId, {
         xs: [p.x], z: p.z, length: p.length, count: 1, bedWidth: p.bed.widthM,
       });
     }
-    return [...byPlot.entries()].map(([id, v]) => {
-      const plot = plotConfigs.find((pc) => pc.id === id);
+    return [...byField.entries()].map(([id, v]) => {
+      const field = plotConfigs.find((pc) => pc.id === id);
       const min = Math.min(...v.xs);
       const max = Math.max(...v.xs);
       return {
         id,
-        label: plot?.label ?? id,
+        label: field?.label ?? id,
         x: (min + max) / 2,
         z: v.z,
         count: v.count,
