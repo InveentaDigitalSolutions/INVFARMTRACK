@@ -86,14 +86,6 @@
           "x-ms-schema-name": "bv_ImageUrl",
           "maxLength": 500
         },
-        "bv_invoicename": {
-          "type": "string",
-          "title": "Invoice Name",
-          "x-ms-dataverse-attribute": "bv_invoicename",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_InvoiceName",
-          "maxLength": 200
-        },
         "bv_isactive": {
           "type": "string",
           "title": "Is Active",
@@ -223,6 +215,13 @@
           "x-ms-schema-name": "bv_PlantName",
           "required": true,
           "maxLength": 200
+        },
+        "bv_productiveweeks": {
+          "type": "string",
+          "title": "Productive Weeks",
+          "x-ms-dataverse-attribute": "bv_productiveweeks",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "bv_ProductiveWeeks"
         },
         "bv_propagationmethod": {
           "type": "string",
@@ -390,6 +389,13 @@
           "x-ms-dataverse-type": "VirtualType",
           "x-ms-schema-name": "bv_waterrequirementName",
           "x-ms-read-only": true
+        },
+        "bv_weekstofirstharvest": {
+          "type": "string",
+          "title": "Weeks to First Cut",
+          "x-ms-dataverse-attribute": "bv_weekstofirstharvest",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "bv_WeeksToFirstHarvest"
         },
         "createdby": {
           "type": "string",

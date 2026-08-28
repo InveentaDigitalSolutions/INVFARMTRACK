@@ -1,43 +1,82 @@
 {
-  "name": "bv_field",
-  "title": "Fields",
+  "name": "bv_bedcount",
+  "title": "Bed Counts",
   "schema": {
     "type": "array",
     "items": {
       "type": "object",
       "x-ms-dataverse-entity": true,
-      "x-ms-dataverse-entityset": "bv_fields",
-      "x-ms-dataverse-primary-id": "bv_fieldid",
-      "x-ms-dataverse-primary-name": "bv_fieldcode",
+      "x-ms-dataverse-entityset": "bv_bedcounts",
+      "x-ms-dataverse-primary-id": "bv_bedcountid",
+      "x-ms-dataverse-primary-name": "bv_bedcountcode",
       "properties": {
-        "bv_fieldcode": {
+        "bv_bedcountcode": {
           "type": "string",
-          "title": "Field Code",
-          "x-ms-dataverse-attribute": "bv_fieldcode",
+          "title": "Bed Count ID",
+          "x-ms-dataverse-attribute": "bv_bedcountcode",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_FieldCode",
+          "x-ms-schema-name": "bv_BedCountCode",
           "x-ms-dataverse-primary-name": true,
           "required": true,
           "maxLength": 40
         },
-        "bv_fieldid": {
+        "bv_bedcountid": {
           "type": "string",
-          "title": "Field",
-          "x-ms-dataverse-attribute": "bv_fieldid",
+          "title": "Bed Count",
+          "x-ms-dataverse-attribute": "bv_bedcountid",
           "x-ms-dataverse-type": "UniqueidentifierType",
-          "x-ms-schema-name": "bv_FieldId",
+          "x-ms-schema-name": "bv_BedCountId",
           "x-ms-dataverse-primary-id": true,
           "required": true,
           "x-ms-keyType": "primary"
         },
-        "bv_fieldname": {
+        "bv_bedcountname": {
           "type": "string",
-          "title": "Plot Name",
-          "x-ms-dataverse-attribute": "bv_fieldname",
+          "title": "Name",
+          "x-ms-dataverse-attribute": "bv_bedcountname",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_FieldName",
-          "required": true,
+          "x-ms-schema-name": "bv_BedCountName",
           "maxLength": 100
+        },
+        "bv_bedid": {
+          "type": "string",
+          "title": "Bed",
+          "x-ms-dataverse-attribute": "bv_bedid",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "bv_BedId",
+          "required": true
+        },
+        "bv_bedidname": {
+          "type": "string",
+          "title": "bv_bedidname",
+          "x-ms-dataverse-attribute": "bv_bedidname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_BedIdName",
+          "x-ms-read-only": true,
+          "maxLength": 40
+        },
+        "bv_countdate": {
+          "type": "string",
+          "title": "Counted On",
+          "x-ms-dataverse-attribute": "bv_countdate",
+          "x-ms-dataverse-type": "DateTimeType",
+          "x-ms-schema-name": "bv_CountDate"
+        },
+        "bv_countedby": {
+          "type": "string",
+          "title": "Counted By",
+          "x-ms-dataverse-attribute": "bv_countedby",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_CountedBy",
+          "maxLength": 100
+        },
+        "bv_countedqty": {
+          "type": "string",
+          "title": "Counted",
+          "x-ms-dataverse-attribute": "bv_countedqty",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "bv_CountedQty",
+          "required": true
         },
         "bv_notes": {
           "type": "string",
@@ -47,29 +86,29 @@
           "x-ms-schema-name": "bv_Notes",
           "maxLength": 2000
         },
-        "bv_rowcount": {
+        "bv_seasonid": {
           "type": "string",
-          "title": "Rows",
-          "x-ms-dataverse-attribute": "bv_rowcount",
-          "x-ms-dataverse-type": "IntegerType",
-          "x-ms-schema-name": "bv_RowCount"
-        },
-        "bv_shadehouseid": {
-          "type": "string",
-          "title": "Shadehouse",
-          "x-ms-dataverse-attribute": "bv_shadehouseid",
+          "title": "Season",
+          "x-ms-dataverse-attribute": "bv_seasonid",
           "x-ms-dataverse-type": "LookupType",
-          "x-ms-schema-name": "bv_ShadehouseId",
-          "required": true
+          "x-ms-schema-name": "bv_SeasonId"
         },
-        "bv_shadehouseidname": {
+        "bv_seasonidname": {
           "type": "string",
-          "title": "bv_shadehouseidname",
-          "x-ms-dataverse-attribute": "bv_shadehouseidname",
+          "title": "bv_seasonidname",
+          "x-ms-dataverse-attribute": "bv_seasonidname",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_ShadehouseIdName",
+          "x-ms-schema-name": "bv_SeasonIdName",
           "x-ms-read-only": true,
           "maxLength": 40
+        },
+        "bv_shipmentweek": {
+          "type": "string",
+          "title": "Shipment Week",
+          "x-ms-dataverse-attribute": "bv_shipmentweek",
+          "x-ms-dataverse-type": "IntegerType",
+          "x-ms-schema-name": "bv_ShipmentWeek",
+          "required": true
         },
         "createdby": {
           "type": "string",
@@ -202,30 +241,82 @@
           "required": true,
           "maxLength": 100
         },
-        "organizationid": {
-          "type": "string",
-          "title": "Organization Id",
-          "x-ms-dataverse-attribute": "organizationid",
-          "x-ms-dataverse-type": "LookupType",
-          "x-ms-schema-name": "OrganizationId",
-          "x-ms-read-only": true
-        },
-        "organizationidname": {
-          "type": "string",
-          "title": "organizationidname",
-          "x-ms-dataverse-attribute": "organizationidname",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "OrganizationIdName",
-          "x-ms-read-only": true,
-          "required": true,
-          "maxLength": 100
-        },
         "overriddencreatedon": {
           "type": "string",
           "title": "Record Created On",
           "x-ms-dataverse-attribute": "overriddencreatedon",
           "x-ms-dataverse-type": "DateTimeType",
           "x-ms-schema-name": "OverriddenCreatedOn"
+        },
+        "ownerid": {
+          "type": "string",
+          "title": "Owner",
+          "x-ms-dataverse-attribute": "ownerid",
+          "x-ms-dataverse-type": "OwnerType",
+          "x-ms-schema-name": "OwnerId",
+          "required": true
+        },
+        "owneridname": {
+          "type": "string",
+          "title": "owneridname",
+          "x-ms-dataverse-attribute": "owneridname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "OwnerIdName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "owneridtype": {
+          "type": "string",
+          "title": "owneridtype",
+          "x-ms-dataverse-attribute": "owneridtype",
+          "x-ms-dataverse-type": "EntityNameType",
+          "x-ms-schema-name": "OwnerIdType",
+          "required": true
+        },
+        "owneridyominame": {
+          "type": "string",
+          "title": "owneridyominame",
+          "x-ms-dataverse-attribute": "owneridyominame",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "OwnerIdYomiName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "owningbusinessunit": {
+          "type": "string",
+          "title": "Owning Business Unit",
+          "x-ms-dataverse-attribute": "owningbusinessunit",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "OwningBusinessUnit",
+          "x-ms-read-only": true
+        },
+        "owningbusinessunitname": {
+          "type": "string",
+          "title": "owningbusinessunitname",
+          "x-ms-dataverse-attribute": "owningbusinessunitname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "OwningBusinessUnitName",
+          "x-ms-read-only": true,
+          "required": true,
+          "maxLength": 100
+        },
+        "owningteam": {
+          "type": "string",
+          "title": "Owning Team",
+          "x-ms-dataverse-attribute": "owningteam",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "OwningTeam",
+          "x-ms-read-only": true
+        },
+        "owninguser": {
+          "type": "string",
+          "title": "Owning User",
+          "x-ms-dataverse-attribute": "owninguser",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "OwningUser",
+          "x-ms-read-only": true
         },
         "statecode": {
           "type": "string",
@@ -246,7 +337,7 @@
             null,
             null
           ],
-          "x-ms-optionsetmetadataid": "5c015904-3ba2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "8a956482-f3a2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
           "x-ms-optionsetdisplayname": "Status",
           "x-ms-optionSetType": "State"
@@ -277,7 +368,7 @@
             null,
             null
           ],
-          "x-ms-optionsetmetadataid": "66015904-3ba2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "94956482-f3a2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
           "x-ms-optionsetdisplayname": "Status Reason",
           "x-ms-optionSetType": "Status"
@@ -314,15 +405,20 @@
         }
       },
       "required": [
-        "bv_fieldcode",
-        "bv_fieldid",
-        "bv_fieldname",
-        "bv_shadehouseid",
+        "bv_bedcountcode",
+        "bv_bedcountid",
+        "bv_bedid",
+        "bv_countedqty",
+        "bv_shipmentweek",
         "createdbyyominame",
         "createdonbehalfbyyominame",
         "modifiedbyyominame",
         "modifiedonbehalfbyyominame",
-        "organizationidname",
+        "ownerid",
+        "owneridname",
+        "owneridtype",
+        "owneridyominame",
+        "owningbusinessunitname",
         "statecode"
       ]
     }

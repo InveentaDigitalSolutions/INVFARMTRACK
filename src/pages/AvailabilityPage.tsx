@@ -11,8 +11,13 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { PLANT_SIZE_OPTIONS } from "../services/plantSizes";
+import BedCountGrid from "../components/BedCountGrid";
 
 const tabs = [
+  // Counting comes first because it is the source: the projections customers
+  // see are what was counted, and the pruning curve is the estimate it is
+  // checked against.
+  { id: "count", label: "Field Count" },
   { id: "projections", label: "Weekly Projections" },
   { id: "curve", label: "Pruning Curve" },
   { id: "log", label: "Pruning Log" },
@@ -230,6 +235,8 @@ export default function AvailabilityPage() {
 
   const renderTab = () => {
     switch (tab) {
+      case "count":
+        return <BedCountGrid />;
       case "projections":
         return (
           <>

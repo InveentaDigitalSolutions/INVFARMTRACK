@@ -10,7 +10,7 @@
   "localAppUrl": "http://localhost:5173",
   "logoPath": "Default",
   "connectionReferences": {
-    "c42ccd6a-d30a-4cdb-98b5-b529a6ee34ff": {
+    "40288573-41d6-4e86-a9e7-7196ecb34ee5": {
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       "displayName": "Logic flows",
       "dataSources": [
@@ -209,6 +209,10 @@
         "systemUsers": {
           "entitySetName": "systemusers",
           "logicalName": "systemuser"
+        },
+        "bedCounts": {
+          "entitySetName": "bv_bedcounts",
+          "logicalName": "bv_bedcount"
         }
       }
     }

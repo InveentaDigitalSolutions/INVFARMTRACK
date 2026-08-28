@@ -5665,6 +5665,85 @@
           "required": false
         }
       ]
+    },
+    {
+      "schemaName": "bv_BedCount",
+      "displayName": "Bed Count",
+      "displayCollectionName": "Bed Counts",
+      "ownershipType": "UserOwned",
+      "description": "What one bed is expected to yield for one shipment week, counted in the field. The nursery has two availabilities: one calculated from pruning, and this one, which is someone walking the rows. Where a count exists it is the better number, so it is kept beside the estimate rather than overwriting it.",
+      "columns": [
+        {
+          "schemaName": "bv_BedCountCode",
+          "displayName": "Bed Count ID",
+          "type": "autonumber",
+          "autoNumberFormat": "CNT-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format CNT-0001."
+        },
+        {
+          "schemaName": "bv_BedCountName",
+          "displayName": "Name",
+          "type": "string",
+          "required": false,
+          "description": "How the row reads on its own, e.g. \"E3-01 \u00b7 wk 34\"."
+        },
+        {
+          "schemaName": "bv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "required": true,
+          "relatedTable": "bv_Bed",
+          "description": "Link to the related Bed record."
+        },
+        {
+          "schemaName": "bv_ShipmentWeek",
+          "displayName": "Shipment Week",
+          "type": "integer",
+          "required": true,
+          "minValue": 1,
+          "maxValue": 53,
+          "description": "The week the cuttings are expected to ship, not the week they were counted \u2014 the counter is estimating forward."
+        },
+        {
+          "schemaName": "bv_CountedQty",
+          "displayName": "Counted",
+          "type": "integer",
+          "required": true,
+          "minValue": 0,
+          "maxValue": 1000000,
+          "description": "Cuttings counted as ready for that shipment week."
+        },
+        {
+          "schemaName": "bv_CountDate",
+          "displayName": "Counted On",
+          "type": "date",
+          "required": false,
+          "description": "When the count was made, which is how its age can be judged."
+        },
+        {
+          "schemaName": "bv_CountedBy",
+          "displayName": "Counted By",
+          "type": "string",
+          "required": false
+        },
+        {
+          "schemaName": "bv_SeasonId",
+          "displayName": "Season",
+          "type": "lookup",
+          "required": false,
+          "relatedTable": "bv_Season",
+          "description": "Link to the related Season record."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
     }
   ]
 }

@@ -19,6 +19,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_bankstatementlines",
   "bv_bedcapacities",
   "bv_bedcompositions",
+  "bv_bedcounts",
   "bv_beds",
   "bv_bills",
   "bv_boxweights",
@@ -117,7 +118,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_substratematerials": "bv_substratematerialname",
   "bv_bedcompositions": "bv_bedcompositionname",
   "bv_exchangerates": "bv_exchangeratecode",
-  "bv_bedcapacities": "bv_bedcapacityname"
+  "bv_bedcapacities": "bv_bedcapacityname",
+  "bv_bedcounts": "bv_bedcountname"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -399,6 +401,16 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_plantid_value": {
       "nav": "bv_PlantId",
       "targetSet": "bv_plants"
+    }
+  },
+  "bv_bedcounts": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
     }
   }
 };

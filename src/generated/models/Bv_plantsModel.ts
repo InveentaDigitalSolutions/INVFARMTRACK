@@ -55,7 +55,6 @@ export interface Bv_plantsBase {
   bv_defaultunitprice?: number;
   bv_growthhabit?: Bv_plantsbv_growthhabit;
   bv_imageurl?: string;
-  bv_invoicename?: string;
   bv_isactive?: boolean;
   bv_ispatented?: boolean;
   bv_latinname?: string;
@@ -66,12 +65,14 @@ export interface Bv_plantsBase {
   bv_plantcode: string;
   bv_plantid: string;
   bv_plantname: string;
+  bv_productiveweeks?: number;
   bv_propagationmethod?: Bv_plantsbv_propagationmethod;
   bv_soiltype?: Bv_plantsbv_soiltype;
   bv_species?: string;
   bv_sunlightrequirement?: Bv_plantsbv_sunlightrequirement;
   bv_variety?: string;
   bv_waterrequirement?: Bv_plantsbv_waterrequirement;
+  bv_weekstofirstharvest?: number;
   importsequencenumber?: number;
   overriddencreatedon?: string;
   statecode: Bv_plantsstatecode;

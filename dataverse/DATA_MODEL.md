@@ -9,9 +9,9 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 44 |
-| Columns | 536 |
-| Relationships | 55 |
+| Tables | 45 |
+| Columns | 545 |
+| Relationships | 57 |
 
 ## Conventions
 
@@ -75,6 +75,7 @@
 | [Bed Composition](#bed-composition) | `bv_bedcomposition` | `BCM-0001` | 6 | One material in a bed's growing medium and how much of it there is. A bed has as many of these as its mix has parts. |
 | [Exchange Rate](#exchange-rate) | `bv_exchangerate` | `FX-0001` | 5 | The Banco Central de Honduras reference rate (TCR) for one day. Kept as history rather than a single current value: an invoice has to be read back at the rate it was converted at, and restating last month at today's rate would silently change reported sales. |
 | [Bed Capacity](#bed-capacity) | `bv_bedcapacity` | `CAP-0001` | 7 | How many plants of one variety at one grade fit in one bed. Capacity is not a property of the bed alone — a bed holds far fewer Extra Large than Petit — so it is recorded per bed and variety rather than as a single number. |
+| [Bed Count](#bed-count) | `bv_bedcount` | `CNT-0001` | 9 | What one bed is expected to yield for one shipment week, counted in the field. The nursery has two availabilities: one calculated from pruning, and this one, which is someone walking the rows. Where a count exists it is the better number, so it is kept beside the estimate rather than overwriting it. |
 
 ## Relationships
 
@@ -135,6 +136,8 @@
 | Bed Composition | `bv_substratematerialid` | Substrate Material | Restrict |
 | Bed Capacity | `bv_bedid` | Bed | Restrict |
 | Bed Capacity | `bv_plantid` | Plant | Restrict |
+| Bed Count | `bv_bedid` | Bed | Restrict |
+| Bed Count | `bv_seasonid` | Season | Remove link |
 
 ---
 
@@ -231,7 +234,7 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 
 </details>
 
-**Referenced by:** Planting (`bv_bedid`), Treatment (`bv_bedid`), Irrigation (`bv_bedid`), Harvest (`bv_bedid`), Task (`bv_bedid`), Packing (`bv_bedid`), Timesheet (`bv_bedid`), Pruning (`bv_bedid`), Fertilization (`bv_bedid`), Nutrient Balance (`bv_bedid`), Soil Analysis (`bv_bedid`), Foliar Analysis (`bv_bedid`), Bed Composition (`bv_bedid`), Bed Capacity (`bv_bedid`)
+**Referenced by:** Planting (`bv_bedid`), Treatment (`bv_bedid`), Irrigation (`bv_bedid`), Harvest (`bv_bedid`), Task (`bv_bedid`), Packing (`bv_bedid`), Timesheet (`bv_bedid`), Pruning (`bv_bedid`), Fertilization (`bv_bedid`), Nutrient Balance (`bv_bedid`), Soil Analysis (`bv_bedid`), Foliar Analysis (`bv_bedid`), Bed Composition (`bv_bedid`), Bed Capacity (`bv_bedid`), Bed Count (`bv_bedid`)
 
 ## Plant
 
@@ -335,7 +338,7 @@ Growing seasons for tracking performance over time
 | `bv_description` | Description | Text area(2000) |  | Long-form text. Description for the Season. |
 | `bv_isactive` | Is Active | Yes/No |  | Whether the record is currently in use. |
 
-**Referenced by:** Planting (`bv_seasonid`), Plant Price (`bv_seasonid`), Pruning (`bv_seasonid`), Pruning Curve (`bv_seasonid`), Availability (`bv_seasonid`), Nutrient Balance (`bv_seasonid`)
+**Referenced by:** Planting (`bv_seasonid`), Plant Price (`bv_seasonid`), Pruning (`bv_seasonid`), Pruning Curve (`bv_seasonid`), Availability (`bv_seasonid`), Nutrient Balance (`bv_seasonid`), Bed Count (`bv_seasonid`)
 
 ## Field
 
@@ -1860,3 +1863,23 @@ How many plants of one variety at one grade fit in one bed. Capacity is not a pr
 | 187460006 | Extra Large |
 
 </details>
+
+## Bed Count
+
+`bv_bedcount` · User-owned
+
+What one bed is expected to yield for one shipment week, counted in the field. The nursery has two availabilities: one calculated from pruning, and this one, which is someone walking the rows. Where a count exists it is the better number, so it is kept beside the estimate rather than overwriting it.
+
+**Record ID:** `bv_bedcountcode` — format `CNT-{SEQNUM:4}`, e.g. `CNT-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_bedcountcode` 🔑 | Bed Count ID | Autonumber | ✓ | Auto-generated identifier, format CNT-0001. |
+| `bv_bedcountname` | Name | Text(100) |  | How the row reads on its own, e.g. "E3-01 · wk 34". |
+| `bv_bedid` | Bed | Lookup → [Bed](#bed) | ✓ | Link to the related Bed record. |
+| `bv_shipmentweek` | Shipment Week | Whole number | ✓ | The week the cuttings are expected to ship, not the week they were counted — the counter is estimating forward. |
+| `bv_countedqty` | Counted | Whole number | ✓ | Cuttings counted as ready for that shipment week. |
+| `bv_countdate` | Counted On | Date only |  | When the count was made, which is how its age can be judged. |
+| `bv_countedby` | Counted By | Text(100) |  |  |
+| `bv_seasonid` | Season | Lookup → [Season](#season) |  | Link to the related Season record. |
+| `bv_notes` | Notes | Text area(2000) |  |  |

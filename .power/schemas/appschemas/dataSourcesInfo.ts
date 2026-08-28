@@ -40,6 +40,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_bedcounts": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_bedcountid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_beds": {
     "tableId": "",
     "version": "",

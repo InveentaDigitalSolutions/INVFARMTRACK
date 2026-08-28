@@ -18,7 +18,6 @@ export interface Bv_fieldsBase {
   bv_fieldid: string;
   bv_fieldname: string;
   bv_notes?: string;
-  bv_position?: string;
   bv_rowcount?: number;
   "bv_ShadehouseId@odata.bind": string;
   importsequencenumber?: number;

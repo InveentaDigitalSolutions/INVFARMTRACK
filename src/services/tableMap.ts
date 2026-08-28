@@ -102,6 +102,21 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // grade planted, so it lives in bv_BedCapacity, one row per pairing.
     },
   },
+  bedCounts: {
+    dataSource: "bv_bedcounts",
+    primaryKey: "bv_bedcountid",
+    fields: {
+      bed: "_bv_bedid_value",
+      season: "_bv_seasonid_value",
+      week: "bv_shipmentweek",
+      counted: "bv_countedqty",
+      countDate: "bv_countdate",
+      countedBy: "bv_countedby",
+      notes: "bv_notes",
+    },
+    primaryName: "bv_bedcountname",
+    nameFrom: ["bed", "week"],
+  },
   bedCapacities: {
     dataSource: "bv_bedcapacities",
     primaryKey: "bv_bedcapacityid",
@@ -647,6 +662,7 @@ export const ENABLED_TABLES = new Set<string>([
   "caiNumbers",
   "exchangeRates",
   "bedCapacities",
+  "bedCounts",
 ]);
 
 /**
