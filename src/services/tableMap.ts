@@ -209,12 +209,104 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
   balance: { dataSource: "bv_nutrientbalances", primaryKey: "bv_nutrientbalanceid" },
   soil: { dataSource: "bv_soilanalyses", primaryKey: "bv_soilanalysisid" },
   foliar: { dataSource: "bv_foliaranalyses", primaryKey: "bv_foliaranalysisid" },
-  weight: { dataSource: "bv_boxweights", primaryKey: "bv_boxweightid" },
-  orders: { dataSource: "bv_orders", primaryKey: "bv_orderid" },
-  prices: { dataSource: "bv_plantprices", primaryKey: "bv_plantpriceid" },
-  invoices: { dataSource: "bv_invoices", primaryKey: "bv_invoiceid" },
-  expenses: { dataSource: "bv_expenses", primaryKey: "bv_expenseid" },
-  purchaseOrders: { dataSource: "bv_purchaseorders", primaryKey: "bv_purchaseorderid" },
+  weight: {
+    dataSource: "bv_boxweights",
+    primaryKey: "bv_boxweightid",
+    fields: {
+      date: "bv_date",
+      packingBox: "_bv_packingid_value",
+      awb: "bv_awbnumber",
+      avgLeafWeight: "bv_avgleafweight_g",
+      netWeight: "bv_netweight_kg",
+      grossWeight: "bv_grossweight_kg",
+      dryMatterPct: "bv_drymatterpct",
+      notes: "bv_notes",
+    },
+    primaryName: "bv_boxweightname",
+    nameFrom: ["awb", "date"],
+  },
+  orders: {
+    dataSource: "bv_orders",
+    primaryKey: "bv_orderid",
+    fields: {
+      number: "bv_ordernumber",
+      customer: "_bv_customerid_value",
+      date: "bv_orderdate",
+      delivery: "bv_requesteddeliverydate",
+      status: "bv_status",
+      total: "bv_totalamount",
+      // `items` is a line count. Lines live in bv_OrderItem, which the app
+      // does not read yet, so the number is app-only and does not persist.
+    },
+  },
+  prices: {
+    dataSource: "bv_plantprices",
+    primaryKey: "bv_plantpriceid",
+    fields: {
+      plant: "_bv_plantid_value",
+      season: "_bv_seasonid_value",
+      customer: "_bv_customerid_value",
+      priceExt: "bv_priceext",
+      priceInt: "bv_priceint",
+      from: "bv_effectivefrom",
+      to: "bv_effectiveto",
+      active: "bv_isactive",
+    },
+    primaryName: "bv_plantpricename",
+    nameFrom: ["plant", "customer", "from"],
+  },
+  invoices: {
+    dataSource: "bv_invoices",
+    primaryKey: "bv_invoiceid",
+    fields: {
+      number: "bv_invoicenumber",
+      customer: "_bv_customerid_value",
+      date: "bv_invoicedate",
+      dueDate: "bv_duedate",
+      week: "bv_weeknumber",
+      subtotal: "bv_subtotal",
+      // The app carries one ISV figure; Dataverse separates the 15% and 18%
+      // bands. Honduras applies 15% to this business, so the app's `isv`
+      // maps to the 15% column and bv_isv18 stays unused for now.
+      isv: "bv_isv15",
+      total: "bv_totalamount",
+      balance: "bv_balance",
+      status: "bv_status",
+      // `currency` has no column — bv_Invoice models value in the invoice
+      // currency plus bv_exchangerate and bv_totalamounthnl. Wiring that up
+      // is Phase 2; until then the currency is app-only.
+    },
+  },
+  expenses: {
+    dataSource: "bv_expenses",
+    primaryKey: "bv_expenseid",
+    fields: {
+      name: "bv_expensename",
+      date: "bv_date",
+      category: "bv_category",
+      amount: "bv_amount",
+      currency: "bv_currency",
+      vendor: "bv_vendor",
+      status: "bv_status",
+      notes: "bv_notes",
+      // `bankAccount` has no column — bank accounts are not modelled yet.
+    },
+  },
+  purchaseOrders: {
+    dataSource: "bv_purchaseorders",
+    primaryKey: "bv_purchaseorderid",
+    fields: {
+      number: "bv_ponumber",
+      supplier: "_bv_supplierid_value",
+      date: "bv_orderdate",
+      delivery: "bv_expecteddelivery",
+      description: "bv_description",
+      amount: "bv_amount",
+      currency: "bv_currency",
+      status: "bv_status",
+      notes: "bv_notes",
+    },
+  },
   timesheets: {
     dataSource: "bv_timesheets",
     primaryKey: "bv_timesheetid",
@@ -226,7 +318,22 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     primaryName: "bv_timesheetname",
     nameFrom: ["worker", "date", "activity"],
   },
-  fiscal: { dataSource: "bv_fiscalauthorizations", primaryKey: "bv_fiscalauthorizationid" },
+  fiscal: {
+    dataSource: "bv_fiscalauthorizations",
+    primaryKey: "bv_fiscalauthorizationid",
+    fields: {
+      name: "bv_fiscalauthname",
+      cai: "bv_cai",
+      rtn: "bv_rtn",
+      rangeStart: "bv_rangestart",
+      rangeEnd: "bv_rangeend",
+      expiry: "bv_expirationdate",
+      total: "bv_totalauthorized",
+      next: "bv_nextnumber",
+      requestDate: "bv_requestdate",
+      active: "bv_isactive",
+    },
+  },
 };
 
 /**
@@ -249,6 +356,14 @@ export const ENABLED_TABLES = new Set<string>([
   "treatments",
   "harvest",
   "timesheets",
+  // Batch 1 — commercial. Enabled 2026-08-28.
+  "orders",
+  "prices",
+  "invoices",
+  "fiscal",
+  "expenses",
+  "purchaseOrders",
+  "weight",
 ]);
 
 /**

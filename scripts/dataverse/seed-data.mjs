@@ -271,6 +271,74 @@ const SEED_PLAN = [
       return out
     },
   },
+
+  // ---- Batch 1: commercial ----------------------------------------------
+  // Choice values are the integers Dataverse stores; the label is in the
+  // comment. Regenerate src/services/choiceMap.generated.ts if these move.
+
+  { table: 'bv_plantprice', nameField: 'bv_plantpricename', rows: () => {
+      const varieties = ['Hawaiian', 'Marble Queen', 'Jade', "N'Joy", 'Sansevieria']
+      const ext = [3.20, 3.60, 3.10, 3.85, 4.40]
+      return varieties.map((v, i) => ({
+        bv_plantpricename: `${v} — export 2026`,
+        bv_priceext: ext[i],
+        bv_priceint: Number((ext[i] * 0.82).toFixed(2)),
+        bv_effectivefrom: '2026-01-05',
+        bv_effectiveto: '2026-12-31',
+        bv_isactive: true,
+        _ref: { bv_PlantId: ['bv_plant', v], bv_SeasonId: ['bv_season', '2026-S1'] },
+      }))
+    },
+  },
+
+  { table: 'bv_order', dedupeField: 'bv_orderdate', nameField: 'bv_ordernumber', rows: [
+    { bv_orderdate: '2026-08-03', bv_requesteddeliverydate: '2026-08-17', bv_status: 187460004, bv_totalamount: 4820,
+      bv_notes: 'Mixed pallet — Hawaiian and Marble Queen',
+      _ref: { bv_CustomerId: ['bv_customer', 'The Plant Company'] } },
+    { bv_orderdate: '2026-08-12', bv_requesteddeliverydate: '2026-08-26', bv_status: 187460002, bv_totalamount: 2310,
+      _ref: { bv_CustomerId: ['bv_customer', 'Green Gardens Inc.'] } },
+    { bv_orderdate: '2026-08-24', bv_requesteddeliverydate: '2026-09-07', bv_status: 187460001, bv_totalamount: 6150,
+      _ref: { bv_CustomerId: ['bv_customer', 'The Plant Company'] } },
+  ]},
+
+  { table: 'bv_fiscalauthorization', nameField: 'bv_fiscalauthname', rows: [
+    { bv_fiscalauthname: 'CAI 2026', bv_cai: '4ED113-4AB1C5-B6B9E0-63BE03-090919-95',
+      bv_rtn: '05019011379855', bv_rangestart: '000-001-01-00001461',
+      bv_rangeend: '000-001-01-00001530', bv_expirationdate: '2027-04-06',
+      bv_totalauthorized: 70, bv_nextnumber: 1462, bv_requestdate: '2026-04-06', bv_isactive: true },
+  ]},
+
+  { table: 'bv_invoice', dedupeField: 'bv_invoicedate', nameField: 'bv_invoicenumber', rows: [
+    { bv_invoicedate: '2026-08-05', bv_duedate: '2026-09-04', bv_weeknumber: 32,
+      bv_subtotal: 1520, bv_isv15: 0, bv_totalamount: 1520, bv_balance: 1520, bv_status: 187460001, // Sent
+      _ref: { bv_CustomerId: ['bv_customer', 'The Plant Company'],
+              bv_FiscalAuthId: ['bv_fiscalauthorization', 'CAI 2026'] } },
+    { bv_invoicedate: '2026-07-28', bv_duedate: '2026-08-27', bv_weeknumber: 31,
+      bv_subtotal: 600, bv_isv15: 0, bv_totalamount: 600, bv_paidamount: 600, bv_balance: 0, bv_status: 187460003, // Paid
+      _ref: { bv_CustomerId: ['bv_customer', 'Green Gardens Inc.'],
+              bv_FiscalAuthId: ['bv_fiscalauthorization', 'CAI 2026'] } },
+  ]},
+
+  { table: 'bv_expense', nameField: 'bv_expensename', rows: [
+    { bv_expensename: 'Office supplies — Librería Maya', bv_date: '2026-08-10', bv_category: 187460008, // Office
+      bv_amount: 60, bv_currency: 187460001, bv_vendor: 'Librería Maya', bv_status: 187460003 },      // USD / Paid
+    { bv_expensename: 'Fuel — pickup', bv_date: '2026-08-09', bv_category: 187460003,                 // Transportation
+      bv_amount: 1200, bv_currency: 187460000, bv_vendor: 'UNO', bv_status: 187460003 },
+    { bv_expensename: 'Electricity — ENEE', bv_date: '2026-08-16', bv_category: 187460004,            // Utilities
+      bv_amount: 4250, bv_currency: 187460000, bv_vendor: 'ENEE', bv_status: 187460000 },             // Pending
+    { bv_expensename: 'Irrigation repair', bv_date: '2026-08-04', bv_category: 187460007,             // Maintenance
+      bv_amount: 2500, bv_currency: 187460000, bv_vendor: 'TecniAgua', bv_status: 187460003 },
+  ]},
+
+  { table: 'bv_purchaseorder', dedupeField: 'bv_orderdate', nameField: 'bv_ponumber', rows: [
+    { bv_orderdate: '2026-08-02', bv_expecteddelivery: '2026-08-14', bv_description: 'NPK 20-20-20, 20 sacks',
+      bv_amount: 18000, bv_currency: 187460000, bv_status: 187460003,                                 // HNL / Received
+      _ref: { bv_SupplierId: ['bv_supplier', 'AgroSupply HN'] } },
+    { bv_orderdate: '2026-08-19', bv_expecteddelivery: '2026-09-02', bv_description: 'Drip line replacement',
+      bv_amount: 9400, bv_currency: 187460000, bv_status: 187460001,                                  // Sent
+      _ref: { bv_SupplierId: ['bv_supplier', 'TecniAgua'] } },
+  ]},
+
 ]
 
 
@@ -319,6 +387,11 @@ function bindRefs(row, plannedTable) {
 
 async function seedTable(plan) {
   const { table, nameField } = plan
+  // Tables whose primary column is an autonumber have no descriptive name in
+  // the seed row — every row would key on "undefined", so the first is created
+  // and the rest silently counted as duplicates. Such plans name a real column
+  // to de-duplicate on instead.
+  const dedupeField = plan.dedupeField ?? nameField
   const rows = typeof plan.rows === 'function' ? plan.rows() : plan.rows
   const set = entitySets[table]
   if (!set) {
@@ -328,12 +401,18 @@ async function seedTable(plan) {
 
   // The primary column is an autonumber, so de-duplication uses the
   // descriptive field instead — re-running tops up rather than duplicating.
-  const existing = await indexTable(table, nameField)
+  const existing = await indexTable(table, dedupeField)
 
   let created = 0
   let skipped = 0
   for (const row of rows) {
-    const name = String(row[nameField])
+    const name = String(row[dedupeField])
+    if (name === 'undefined') {
+      throw new Error(
+        `${table}: seed rows carry no ${dedupeField} to de-duplicate on. ` +
+        `Add a dedupeField naming a column the rows actually set.`
+      )
+    }
     if (existing.has(name)) { skipped++; continue }
     if (DRY_RUN) { created++; continue }
     const body = bindRefs({ ...row }, table)

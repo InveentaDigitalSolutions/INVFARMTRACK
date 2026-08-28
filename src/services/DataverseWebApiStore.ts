@@ -12,6 +12,7 @@
 
 import type { DataStore, Identified, QueryOptions } from "./DataService";
 import { DATAVERSE_URL, getDataverseToken } from "./auth";
+import { CHOICE_MAP, CHOICE_LABELS } from "./choiceMap.generated";
 
 type Row = Record<string, unknown>;
 
@@ -84,6 +85,30 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
   }
 
   /** Dataverse record -> app record. Mirrors DataverseStore.toApp. */
+  /**
+   * Choice columns hold integers in Dataverse and readable text in the app.
+   * The Web API rejects the text outright (400), so every write has to be
+   * translated; reads come back as bare numbers without it.
+   */
+  private toChoiceValue(column: string, value: unknown): unknown {
+    const options = CHOICE_MAP[this.entitySet]?.[column];
+    if (!options || typeof value !== "string") return value;
+    const mapped = options[value];
+    if (mapped !== undefined) return mapped;
+    console.error(
+      `[data] ${this.entitySet}.${column}: "${value}" is not one of ` +
+        `${Object.keys(options).join(", ")} — the column was left unset.`
+    );
+    return undefined;
+  }
+
+  /** Option value -> text on the way in. */
+  private toChoiceLabel(column: string, value: unknown): unknown {
+    const labels = CHOICE_LABELS[this.entitySet]?.[column];
+    if (!labels || typeof value !== "number") return value;
+    return labels[value] ?? value;
+  }
+
   private toApp(record: Row): T {
     const out: Row = {};
     for (const [column, value] of Object.entries(record)) {
@@ -100,7 +125,7 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
       if (column.startsWith("@") || column.includes("@odata") || column.includes("@OData")) continue;
 
       const field = this.toField[column] ?? column;
-      if (out[field] === undefined) out[field] = value;
+      if (out[field] === undefined) out[field] = this.toChoiceLabel(column, value);
     }
     out.id = String(record[this.primaryKey] ?? "");
     return out as unknown as T;
@@ -114,7 +139,9 @@ export class DataverseWebApiStore<T extends Identified> implements DataStore<T> 
       if (value === undefined) continue;
       const column = this.toColumn[field] ?? field;
       if (!column.startsWith("bv_")) continue;
-      out[column] = value;
+      const translated = this.toChoiceValue(column, value);
+      if (translated === undefined) continue;
+      out[column] = translated;
     }
     return out;
   }

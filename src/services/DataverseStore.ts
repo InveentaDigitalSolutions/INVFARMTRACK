@@ -16,6 +16,7 @@ import { getClient } from "@microsoft/power-apps/data";
 import type { IOperationResult } from "@microsoft/power-apps/data";
 import { dataSourcesInfo } from "../../.power/schemas/appschemas/dataSourcesInfo";
 import type { DataStore, Identified, QueryOptions } from "./DataService";
+import { CHOICE_MAP, CHOICE_LABELS } from "./choiceMap.generated";
 
 type Row = Record<string, unknown>;
 
@@ -100,7 +101,7 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
       const field = this.toField[column] ?? column;
       // Do not let a raw GUID overwrite a display value already taken from an
       // annotation — order of keys in the payload is not guaranteed.
-      if (out[field] === undefined) out[field] = value;
+      if (out[field] === undefined) out[field] = this.toChoiceLabel(column, value);
     }
 
     out.id = String(record[this.primaryKey] ?? "");
@@ -118,9 +119,43 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
       // Only send columns Dataverse knows about; an unmapped app-only field
       // would be rejected for the whole request.
       if (!column.startsWith("bv_")) continue;
-      out[column] = value;
+      const translated = this.toChoiceValue(column, value);
+      if (translated === undefined) continue;
+      out[column] = translated;
     }
     return out;
+  }
+
+
+  /**
+   * Choice columns hold integers in Dataverse and readable text in the app.
+   * The Web API rejects the text outright (400), so every write has to be
+   * translated; reads come back as bare numbers without it.
+   */
+  private choiceColumns(): Record<string, Record<string, number>> {
+    return CHOICE_MAP[this.dataSourceName] ?? {};
+  }
+
+  /** Text -> option value on the way out. */
+  private toChoiceValue(column: string, value: unknown): unknown {
+    const options = this.choiceColumns()[column];
+    if (!options || typeof value !== "string") return value;
+    const mapped = options[value];
+    if (mapped !== undefined) return mapped;
+    // An unrecognised label would fail the whole request with an opaque
+    // Dataverse error, so drop it and say exactly what was wrong.
+    console.error(
+      `[data] ${this.dataSourceName}.${column}: "${value}" is not one of ` +
+        `${Object.keys(options).join(", ")} — the column was left unset.`
+    );
+    return undefined;
+  }
+
+  /** Option value -> text on the way in. */
+  private toChoiceLabel(column: string, value: unknown): unknown {
+    const labels = CHOICE_LABELS[this.dataSourceName]?.[column];
+    if (!labels || typeof value !== "number") return value;
+    return labels[value] ?? value;
   }
 
   private unwrap<R>(result: IOperationResult<R>): R {
