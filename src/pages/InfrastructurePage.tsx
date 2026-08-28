@@ -188,7 +188,6 @@ export default function InfrastructurePage() {
       fromRow: Number(values.fromRow),
       toRow: Number(values.toRow),
       existing: beds as BedRow[],
-      totalBeds: beds.length,
       shadehouse: shadehouse as never,
     });
 
@@ -257,16 +256,18 @@ export default function InfrastructurePage() {
     const row = Number(values.row);
     const level = Number(values.level ?? 0);
 
+    const name = bedName(fieldName, row, level);
+    if (!name) { alert("Choose a field, a level and a row so the bed can be named."); return; }
+
     const shadehouse = (shadehouses as Array<Record<string, unknown>>).find(
       (h) => h.name === (fields as FieldRow[]).find((f) => f.name === fieldName)?.shadehouse
     );
     if (!bedForm.isEdit) {
-      const full = bedCapacityProblem(shadehouse as never, beds.length);
+      // Positions, not records: an air bed above an existing row needs no new
+      // ground, so it must not be refused because the floor is full.
+      const full = bedCapacityProblem(shadehouse as never, beds as BedRow[], [name]);
       if (full) { alert(full); return; }
     }
-
-    const name = bedName(fieldName, row, level);
-    if (!name) { alert("Choose a field, a level and a row so the bed can be named."); return; }
 
     save(beds, setBeds, bedForm, {
       ...values,

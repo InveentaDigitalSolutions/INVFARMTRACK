@@ -125,7 +125,10 @@ export interface ParsedBed {
  * row 1 and E3-12-3 in row 3, quietly corrupting every count per row.
  */
 export function parseBedName(name: string): ParsedBed | null {
-  const match = /^(.+?)-(\d{2})(?:-([1-3]))?$/.exec(String(name ?? "").trim());
+  // Two digits or more: row numbers are padded to two, but a field with a
+  // hundred rows would produce "E3-100" and a fixed \d{2} would refuse to
+  // parse it — silently dropping every bed past 99 from position counts.
+  const match = /^(.+?)-(\d{2,})(?:-([1-3]))?$/.exec(String(name ?? "").trim());
   if (!match) return null;
   return { field: match[1], row: Number(match[2]), level: match[3] ? Number(match[3]) : 0 };
 }
@@ -202,8 +205,6 @@ export interface BulkBedRequest {
   fromRow: number;
   toRow: number;
   existing: BedLike[];
-  /** Beds already in the shadehouse, for the capacity check. */
-  totalBeds?: number;
   shadehouse?: ShadehouseLike;
 }
 
@@ -228,7 +229,7 @@ export interface BulkBedPlan {
  * bed at that level, and which fall off the end of the field.
  */
 export function planBulkBeds(request: BulkBedRequest): BulkBedPlan {
-  const { field, level, fromRow, toRow, existing, totalBeds = 0, shadehouse } = request;
+  const { field, level, fromRow, toRow, existing, shadehouse } = request;
 
   const empty: BulkBedPlan = { create: [], alreadyThere: [], outOfRange: [] };
   if (!field?.name) return { ...empty, problem: "Choose a field." };
@@ -257,29 +258,71 @@ export function planBulkBeds(request: BulkBedRequest): BulkBedPlan {
     create.push(bedName(field.name, row, level));
   }
 
-  // Checked against the whole batch, not one bed at a time: adding 20 beds to
-  // a shadehouse with room for 5 should be refused before any are written.
-  if (shadehouse?.capacity && totalBeds + create.length > shadehouse.capacity) {
-    return {
-      create: [], alreadyThere, outOfRange,
-      problem:
-        `${shadehouse.name} holds ${shadehouse.capacity} beds and has ${totalBeds}. ` +
-        `This would add ${create.length}.`,
-    };
-  }
+  // Checked against the whole batch, not one bed at a time, and in positions
+  // rather than records — a run of air beds over existing rows takes no new
+  // ground and must not be refused for capacity.
+  const capacity = bedCapacityProblem(shadehouse, existing, create);
+  if (capacity) return { create: [], alreadyThere, outOfRange, problem: capacity };
   if (create.length === 0 && !alreadyThere.length && !outOfRange.length) {
     return { ...empty, problem: "That range covers no rows." };
   }
   return { create, alreadyThere, outOfRange };
 }
 
-/** Whether another bed will fit in the shadehouse. */
+/**
+ * How many bed positions are occupied — field and row pairs, counted once.
+ *
+ * A shadehouse's capacity is a number of positions on the ground, not a number
+ * of bed records. E3 row 33 is one position whether it carries a ground bed
+ * alone or a ground bed with three air beds stacked above it; the cables use
+ * the same floor. Counting records instead made a shadehouse of 120 positions
+ * look full the moment the ground beds existed, refusing every air bed.
+ *
+ * Production treats each level as its own bed — a planting goes in E3-01-2,
+ * not in "E3-01" — which is why they are separate records. Only the capacity
+ * question is about positions.
+ */
+export function positionCount(beds: BedLike[]): number {
+  const positions = new Set<string>();
+  for (const bed of beds) {
+    const parsed = parseBedName(String(bed.name ?? ""));
+    if (parsed) positions.add(`${parsed.field}-${parsed.row}`);
+  }
+  return positions.size;
+}
+
+/** The positions a set of bed names would occupy. */
+export function positionsOf(names: string[]): Set<string> {
+  const positions = new Set<string>();
+  for (const name of names) {
+    const parsed = parseBedName(name);
+    if (parsed) positions.add(`${parsed.field}-${parsed.row}`);
+  }
+  return positions;
+}
+
+/**
+ * Whether another bed will fit. Only a bed on new ground counts against the
+ * shadehouse; one stacked above a row already in use does not.
+ */
 export function bedCapacityProblem(
   shadehouse: ShadehouseLike | undefined,
-  bedCount: number
+  beds: BedLike[],
+  adding: string[] = []
 ): string | null {
   if (!shadehouse?.capacity) return null;
-  return bedCount >= shadehouse.capacity
-    ? `${shadehouse.name} holds ${shadehouse.capacity} beds and already has ${bedCount}.`
+
+  const occupied = new Set<string>();
+  for (const bed of beds) {
+    const parsed = parseBedName(String(bed.name ?? ""));
+    if (parsed) occupied.add(`${parsed.field}-${parsed.row}`);
+  }
+  const newPositions = [...positionsOf(adding)].filter((p) => !occupied.has(p)).length;
+  if (newPositions === 0) return null;
+
+  const after = occupied.size + newPositions;
+  return after > shadehouse.capacity
+    ? `${shadehouse.name} has room for ${shadehouse.capacity} bed positions and ${occupied.size} are in use. ` +
+      `This would need ${newPositions} more.`
     : null;
 }

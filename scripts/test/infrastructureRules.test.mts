@@ -4,7 +4,7 @@
 import {
   nextSeasonName, fieldNameProblem, fieldCapacityProblem,
   bedName, rowOf, levelOf, parseBedName, availableRows, levelsFor, defaultLevel,
-  levelProblem, bedCapacityProblem, typeForLevel, planBulkBeds,
+  levelProblem, bedCapacityProblem, typeForLevel, planBulkBeds, positionCount,
 } from '../../src/services/infrastructureRules.ts'
 
 let failures = 0
@@ -64,8 +64,21 @@ eq('ground defaults to 0', defaultLevel('Ground'), '0')
 eq('air at level 0 refused', !!levelProblem('Air','0'), true)
 eq('ground at level 2 refused', !!levelProblem('Ground','2'), true)
 eq('air at level 2 fine', levelProblem('Air','2'), null)
-eq('bed capacity reached', !!bedCapacityProblem({name:'Shadehouse 1',capacity:120}, 120), true)
-eq('bed capacity has room', bedCapacityProblem({name:'Shadehouse 1',capacity:120}, 119), null)
+// capacity is a number of positions on the ground, not of bed records
+const full120 = Array.from({length:120},(_,i)=>({name:`E3-${String(i+1).padStart(2,'0')}`}))
+eq('120 ground beds occupy 120 positions', positionCount(full120), 120)
+eq('a new ground bed on a full floor is refused',
+  !!bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120, ['C1-01']), true)
+eq('re-adding a row that already exists is not new ground',
+  bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120, ['E3-99']), null)
+// the bug Santiago hit: air beds were refused because the floor looked full
+eq('an air bed above an existing row is allowed on a full floor',
+  bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120, ['E3-01-1']), null)
+eq('a whole run of air beds is allowed too',
+  bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120,
+    ['E3-01-1','E3-02-1','E3-03-1']), null)
+eq('levels stacked on one row are still one position',
+  positionCount([{name:'E3-01'},{name:'E3-01-1'},{name:'E3-01-2'},{name:'E3-01-3'}]), 1)
 
 // bulk add — how the real layout gets entered
 const E3 = { name: 'E3', rows: 33 }
@@ -93,15 +106,19 @@ eq('backwards range refused',
 eq('no row count -> cannot number the beds',
   !!planBulkBeds({field:{name:'E3'}, level:1, fromRow:1, toRow:3, existing:none}).problem, true)
 // the whole batch is checked, not one bed at a time
-eq('a batch that would overflow the shadehouse is refused',
-  !!planBulkBeds({field:E3, level:1, fromRow:1, toRow:20, existing:none,
-    totalBeds:115, shadehouse:{name:'Shadehouse 1', capacity:120}}).problem, true)
+// a run of ground beds that would need more floor than exists
+const nearlyFull = Array.from({length:118},(_,i)=>({name:`C1-${String(i+1).padStart(2,'0')}`}))
+eq('a ground run that overflows the floor is refused',
+  !!planBulkBeds({field:{name:'E3',rows:33}, level:0, fromRow:1, toRow:20, existing:nearlyFull,
+    shadehouse:{name:'Shadehouse 1', capacity:120}}).problem, true)
 eq('and nothing is created when it is',
-  planBulkBeds({field:E3, level:1, fromRow:1, toRow:20, existing:none,
-    totalBeds:115, shadehouse:{name:'Shadehouse 1', capacity:120}}).create, [])
-eq('a batch that fits is allowed',
-  planBulkBeds({field:E3, level:1, fromRow:1, toRow:3, existing:none,
-    totalBeds:115, shadehouse:{name:'Shadehouse 1', capacity:120}}).create.length, 3)
+  planBulkBeds({field:{name:'E3',rows:33}, level:0, fromRow:1, toRow:20, existing:nearlyFull,
+    shadehouse:{name:'Shadehouse 1', capacity:120}}).create, [])
+// air beds over rows that already exist take no new ground
+const groundE3 = Array.from({length:33},(_,i)=>({name:`E3-${String(i+1).padStart(2,'0')}`}))
+eq('a full run of air beds over existing rows is allowed',
+  planBulkBeds({field:E3, level:1, fromRow:1, toRow:33, existing:groundE3,
+    shadehouse:{name:'Shadehouse 1', capacity:33}}).create.length, 33)
 
 console.log(failures ? `\n  ${failures} failed` : '\n  all passed')
 process.exit(failures ? 1 : 0)
