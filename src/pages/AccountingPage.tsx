@@ -193,7 +193,7 @@ const expenseFormGroups = (accounts: BankAccount[]) => [
 
 const paymentFormGroups = (accounts: BankAccount[]) => [
   { title: "Payment Details", columns: 2 as const, fields: [
-    { key: "id", label: "Payment ID", type: "text" as const, readOnly: true, placeholder: "PAY-0001 (auto)" },
+    { key: "code", label: "Payment ID", type: "text" as const, readOnly: true, placeholder: "PMT-0001 (auto)" },
     { key: "type", label: "Type", type: "select" as const, options: [
       { value: "Receipt", label: "Receipt (money in)" },
       { value: "Payment", label: "Payment (money out)" },
@@ -217,7 +217,7 @@ const paymentFormGroups = (accounts: BankAccount[]) => [
 
 const bankAccountFormGroups = [
   { title: "Bank Account", columns: 2 as const, fields: [
-    { key: "id", label: "Account ID", type: "text" as const, readOnly: true, placeholder: "BA-0001 (auto)" },
+    { key: "code", label: "Account ID", type: "text" as const, readOnly: true, placeholder: "BA-0001 (auto)" },
     { key: "name", label: "Display Name", type: "text" as const, required: true },
     { key: "bank", label: "Bank", type: "text" as const, required: true },
     { key: "accountNumber", label: "Account Number", type: "text" as const },
@@ -229,7 +229,7 @@ const bankAccountFormGroups = [
 
 const statementFormGroups = (accounts: BankAccount[]) => [
   { title: "Statement Line", columns: 2 as const, fields: [
-    { key: "id", label: "Line ID", type: "text" as const, readOnly: true, placeholder: "STM-0001 (auto)" },
+    { key: "code", label: "Line ID", type: "text" as const, readOnly: true, placeholder: "ST-0001 (auto)" },
     { key: "bankAccount", label: "Bank Account", type: "select" as const, options: bankAccountOptions(accounts), required: true },
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "description", label: "Description", type: "text" as const, required: true, span: 2 as const },
@@ -607,7 +607,7 @@ export default function AccountingPage() {
           <>
             <DataTable
               columns={[
-                { key: "id", label: "ID" },
+                { key: "code", label: "ID" },
                 { key: "type", label: "Type", render: (r) => paymentTypeBadge(r.type as string) },
                 { key: "date", label: "Date" },
                 { key: "counterparty", label: "Counterparty" },
@@ -662,7 +662,7 @@ export default function AccountingPage() {
             </div>
             <DataTable
               columns={[
-                { key: "id", label: "ID" },
+                { key: "code", label: "ID" },
                 { key: "name", label: "Name" },
                 { key: "bank", label: "Bank" },
                 { key: "accountNumber", label: "Account #" },

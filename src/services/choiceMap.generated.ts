@@ -15,7 +15,11 @@
  */
 export const ENTITY_SETS: readonly string[] = [
   "bv_availabilities",
+  "bv_bankaccounts",
+  "bv_bankstatementlines",
+  "bv_bedcompositions",
   "bv_beds",
+  "bv_bills",
   "bv_boxweights",
   "bv_cainumbers",
   "bv_calendars",
@@ -36,6 +40,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_orderitems",
   "bv_orders",
   "bv_packings",
+  "bv_payments",
   "bv_plantings",
   "bv_plantprices",
   "bv_plants",
@@ -45,6 +50,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_seasons",
   "bv_shadehouses",
   "bv_soilanalysises",
+  "bv_substratematerials",
   "bv_suppliers",
   "bv_tasks",
   "bv_timesheets",
@@ -101,7 +107,13 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_tasks": "bv_taskcode",
   "bv_timesheets": "bv_timesheetname",
   "bv_treatments": "bv_treatmentname",
-  "bv_workers": "bv_workername"
+  "bv_workers": "bv_workername",
+  "bv_bankaccounts": "bv_bankaccountname",
+  "bv_payments": "bv_paymentcode",
+  "bv_bills": "bv_billcode",
+  "bv_bankstatementlines": "bv_bankstatementlinecode",
+  "bv_substratematerials": "bv_substratematerialname",
+  "bv_bedcompositions": "bv_bedcompositionname"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -337,6 +349,46 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_inputid_value": {
       "nav": "bv_InputId",
       "targetSet": "bv_inputs"
+    }
+  },
+  "bv_payments": {
+    "_bv_bankaccountid_value": {
+      "nav": "bv_BankAccountId",
+      "targetSet": "bv_bankaccounts"
+    },
+    "_bv_invoiceid_value": {
+      "nav": "bv_InvoiceId",
+      "targetSet": "bv_invoices"
+    }
+  },
+  "bv_bills": {
+    "_bv_purchaseorderid_value": {
+      "nav": "bv_PurchaseOrderId",
+      "targetSet": "bv_purchaseorders"
+    },
+    "_bv_supplierid_value": {
+      "nav": "bv_SupplierId",
+      "targetSet": "bv_suppliers"
+    }
+  },
+  "bv_bankstatementlines": {
+    "_bv_bankaccountid_value": {
+      "nav": "bv_BankAccountId",
+      "targetSet": "bv_bankaccounts"
+    },
+    "_bv_paymentid_value": {
+      "nav": "bv_PaymentId",
+      "targetSet": "bv_payments"
+    }
+  },
+  "bv_bedcompositions": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_substratematerialid_value": {
+      "nav": "bv_SubstrateMaterialId",
+      "targetSet": "bv_substratematerials"
     }
   }
 };
@@ -709,6 +761,61 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Supervisor": 187460004,
       "Driver": 187460005,
       "General": 187460006
+    }
+  },
+  "bv_bankaccounts": {
+    "bv_currency": {
+      "HNL": 187460000,
+      "USD": 187460001
+    }
+  },
+  "bv_payments": {
+    "bv_currency": {
+      "HNL": 187460000,
+      "USD": 187460001
+    },
+    "bv_method": {
+      "Wire": 187460000,
+      "Check": 187460001,
+      "Cash": 187460002,
+      "Card": 187460003,
+      "ACH": 187460004
+    },
+    "bv_status": {
+      "Pending": 187460000,
+      "Cleared": 187460001,
+      "Voided": 187460002
+    },
+    "bv_type": {
+      "Receipt": 187460000,
+      "Payment": 187460001,
+      "Expense": 187460002
+    }
+  },
+  "bv_bills": {
+    "bv_currency": {
+      "HNL": 187460000,
+      "USD": 187460001
+    },
+    "bv_status": {
+      "Open": 187460000,
+      "Partially Paid": 187460001,
+      "Paid": 187460002,
+      "Overdue": 187460003,
+      "Cancelled": 187460004
+    }
+  },
+  "bv_substratematerials": {
+    "bv_category": {
+      "Mineral": 187460000,
+      "Organic": 187460001,
+      "Amendment": 187460002,
+      "Other": 187460003
+    },
+    "bv_waterretention": {
+      "Low": 187460000,
+      "Medium": 187460001,
+      "High": 187460002
     }
   }
 };

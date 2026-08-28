@@ -466,6 +466,99 @@ const SEED_PLAN = [
       bv_assignedto: 'Juan Perez' },
   ]},
 
+
+  // ---- Bed substrate composition ----------------------------------------
+
+  { table: 'bv_substratematerial', nameField: 'bv_substratematerialname', rows: [
+    { bv_substratematerialname: 'Coconut coir', bv_category: 187460001, bv_waterretention: 187460002, bv_isactive: true,
+      bv_notes: 'Local, holds water well; the bulk of the mix.' },
+    { bv_substratematerialname: 'Rice husk', bv_category: 187460001, bv_waterretention: 187460000, bv_isactive: true,
+      bv_notes: 'Opens the mix up so it drains — widely available in Honduras.' },
+    { bv_substratematerialname: 'River sand', bv_category: 187460000, bv_waterretention: 187460000, bv_isactive: true },
+    { bv_substratematerialname: 'Volcanic pumice', bv_category: 187460000, bv_waterretention: 187460001, bv_isactive: true },
+    { bv_substratematerialname: 'Compost', bv_category: 187460001, bv_waterretention: 187460002, bv_isactive: true },
+    { bv_substratematerialname: 'Pine bark', bv_category: 187460001, bv_waterretention: 187460001, bv_isactive: true },
+    { bv_substratematerialname: 'Perlite', bv_category: 187460000, bv_waterretention: 187460000, bv_isactive: true },
+    { bv_substratematerialname: 'Agricultural lime', bv_category: 187460002, bv_isactive: true,
+      bv_notes: 'Amendment, not a bulk fraction — raises pH.' },
+  ]},
+
+  // Two mixes: a free-draining one for the ground beds and a lighter one for
+  // the hanging pots, each totalling 100%.
+  { table: 'bv_bedcomposition', dedupeField: 'bv_bedcompositionname', nameField: 'bv_bedcompositionname', rows: () => {
+      const GROUND = [['Coconut coir', 45], ['Rice husk', 25], ['Compost', 20], ['River sand', 10]]
+      const AIR    = [['Coconut coir', 55], ['Pine bark', 25], ['Perlite', 20]]
+      const beds = ['E3-01', 'E3-14', 'C3-05', 'C1-03', 'E1-08']
+      return beds.flatMap((bed, i) =>
+        (i % 2 === 0 ? GROUND : AIR).map(([material, pct]) => ({
+          bv_bedcompositionname: `${bed} · ${material}`,
+          bv_percentage: pct,
+          _ref: {
+            bv_BedId: ['bv_bed', bed],
+            bv_SubstrateMaterialId: ['bv_substratematerial', material],
+          },
+        }))
+      )
+    },
+  },
+
+  // ---- Accounting: bank accounts, payments, bills, statement lines -------
+
+  { table: 'bv_bankaccount', dedupeField: 'bv_bankaccountname', nameField: 'bv_bankaccountname', rows: [
+    { bv_bankaccountname: 'BAC USD Operating', bv_bank: 'Banco BAC', bv_accountnumber: '725012345',
+      bv_currency: 187460001, bv_openingbalance: 18500, bv_isactive: true },
+    { bv_bankaccountname: 'Atlántida HNL Operations', bv_bank: 'Banco Atlántida', bv_accountnumber: '11045678',
+      bv_currency: 187460000, bv_openingbalance: 250000, bv_isactive: true },
+    { bv_bankaccountname: 'BAC HNL Cash', bv_bank: 'Banco BAC', bv_accountnumber: '725098765',
+      bv_currency: 187460000, bv_openingbalance: 35000, bv_isactive: true },
+  ]},
+
+  { table: 'bv_bill', dedupeField: 'bv_billnumber', nameField: 'bv_billnumber', rows: [
+    { bv_billnumber: 'B-2026-0042', bv_poref: 'PO-2026-013', bv_rtn: '08019988007632',
+      bv_date: '2026-08-09', bv_duedate: '2026-09-08', bv_subtotal: 380, bv_isv: 57,
+      bv_totalamount: 437, bv_paidamount: 0, bv_balance: 437, bv_currency: 187460001,
+      bv_status: 187460000, bv_notes: 'Neem oil 5L x10',
+      _ref: { bv_SupplierId: ['bv_supplier', 'AgroSupply HN'] } },
+    { bv_billnumber: 'B-2026-0041', bv_date: '2026-08-04', bv_duedate: '2026-09-03',
+      bv_subtotal: 2174, bv_isv: 326, bv_totalamount: 2500, bv_paidamount: 2500, bv_balance: 0,
+      bv_currency: 187460000, bv_status: 187460002,
+      _ref: { bv_SupplierId: ['bv_supplier', 'TecniAgua'] } },
+  ]},
+
+  { table: 'bv_payment', dedupeField: 'bv_reference', nameField: 'bv_reference', rows: [
+    { bv_type: 187460000, bv_date: '2026-08-06', bv_counterparty: 'Green Gardens Inc.',
+      bv_amount: 600, bv_currency: 187460001, bv_reference: '000-001-01-00001460',
+      bv_method: 187460000, bv_status: 187460001,
+      _ref: { bv_BankAccountId: ['bv_bankaccount', 'BAC USD Operating'] } },
+    { bv_type: 187460001, bv_date: '2026-08-04', bv_counterparty: 'TecniAgua',
+      bv_amount: 2500, bv_currency: 187460000, bv_reference: 'B-2026-0041',
+      bv_method: 187460000, bv_status: 187460001,
+      _ref: { bv_BankAccountId: ['bv_bankaccount', 'Atlántida HNL Operations'] } },
+    { bv_type: 187460002, bv_date: '2026-08-10', bv_counterparty: 'Librería Maya',
+      bv_amount: 60, bv_currency: 187460001, bv_reference: 'Office supplies',
+      bv_method: 187460003, bv_status: 187460001,
+      _ref: { bv_BankAccountId: ['bv_bankaccount', 'BAC USD Operating'] } },
+    { bv_type: 187460002, bv_date: '2026-08-09', bv_counterparty: 'UNO',
+      bv_amount: 1200, bv_currency: 187460000, bv_reference: 'Fuel — pickup',
+      bv_method: 187460002, bv_status: 187460001,
+      _ref: { bv_BankAccountId: ['bv_bankaccount', 'BAC HNL Cash'] } },
+  ]},
+
+  { table: 'bv_bankstatementline', dedupeField: 'bv_description', nameField: 'bv_description', rows: [
+    { bv_description: 'WIRE IN GREEN GARDENS', bv_date: '2026-08-06', bv_amount: 600,
+      bv_runningbalance: 19100, bv_isreconciled: true,
+      _ref: { bv_BankAccountId: ['bv_bankaccount', 'BAC USD Operating'] } },
+    { bv_description: 'POS LIBRERIA MAYA', bv_date: '2026-08-10', bv_amount: -60,
+      bv_runningbalance: 19040, bv_isreconciled: true,
+      _ref: { bv_BankAccountId: ['bv_bankaccount', 'BAC USD Operating'] } },
+    { bv_description: 'TRX TECNIAGUA', bv_date: '2026-08-04', bv_amount: -2500,
+      bv_runningbalance: 247500, bv_isreconciled: true,
+      _ref: { bv_BankAccountId: ['bv_bankaccount', 'Atlántida HNL Operations'] } },
+    { bv_description: 'BANK FEE', bv_date: '2026-08-22', bv_amount: -12,
+      bv_runningbalance: 19028, bv_isreconciled: false,
+      _ref: { bv_BankAccountId: ['bv_bankaccount', 'BAC USD Operating'] } },
+  ]},
+
 ]
 
 

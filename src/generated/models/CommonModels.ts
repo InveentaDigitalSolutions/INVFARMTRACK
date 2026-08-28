@@ -5,7 +5,7 @@
 
 export interface IGetOptions {
   select?: string[];
-}
+};
 
 export interface IGetAllOptions {
   maxPageSize?: number;

@@ -1,121 +1,118 @@
 {
-  "name": "bv_customer",
-  "title": "Customers",
+  "name": "bv_bill",
+  "title": "Bills",
   "schema": {
     "type": "array",
     "items": {
       "type": "object",
       "x-ms-dataverse-entity": true,
-      "x-ms-dataverse-entityset": "bv_customers",
-      "x-ms-dataverse-primary-id": "bv_customerid",
-      "x-ms-dataverse-primary-name": "bv_customercode",
+      "x-ms-dataverse-entityset": "bv_bills",
+      "x-ms-dataverse-primary-id": "bv_billid",
+      "x-ms-dataverse-primary-name": "bv_billcode",
       "properties": {
-        "bv_address": {
+        "bv_balance": {
           "type": "string",
-          "title": "Address",
-          "x-ms-dataverse-attribute": "bv_address",
-          "x-ms-dataverse-type": "MemoType",
-          "x-ms-schema-name": "bv_Address",
-          "maxLength": 500
+          "title": "Balance Due",
+          "x-ms-dataverse-attribute": "bv_balance",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_Balance"
         },
-        "bv_contactemail": {
+        "bv_balance_base": {
           "type": "string",
-          "title": "Contact Email",
-          "x-ms-dataverse-attribute": "bv_contactemail",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_ContactEmail",
-          "maxLength": 200
+          "title": "Balance Due (Base)",
+          "x-ms-dataverse-attribute": "bv_balance_base",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_balance_Base",
+          "x-ms-read-only": true
         },
-        "bv_contactname": {
+        "bv_billcode": {
           "type": "string",
-          "title": "Contact Name",
-          "x-ms-dataverse-attribute": "bv_contactname",
+          "title": "Bill Code",
+          "x-ms-dataverse-attribute": "bv_billcode",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_ContactName",
-          "maxLength": 200
-        },
-        "bv_customercode": {
-          "type": "string",
-          "title": "Customer Code",
-          "x-ms-dataverse-attribute": "bv_customercode",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_CustomerCode",
+          "x-ms-schema-name": "bv_BillCode",
           "x-ms-dataverse-primary-name": true,
           "required": true,
           "maxLength": 40
         },
-        "bv_customerid": {
+        "bv_billid": {
           "type": "string",
-          "title": "Customer",
-          "x-ms-dataverse-attribute": "bv_customerid",
+          "title": "Bill",
+          "x-ms-dataverse-attribute": "bv_billid",
           "x-ms-dataverse-type": "UniqueidentifierType",
-          "x-ms-schema-name": "bv_CustomerId",
+          "x-ms-schema-name": "bv_BillId",
           "x-ms-dataverse-primary-id": true,
           "required": true,
           "x-ms-keyType": "primary"
         },
-        "bv_customername": {
+        "bv_billnumber": {
           "type": "string",
-          "title": "Customer Name",
-          "x-ms-dataverse-attribute": "bv_customername",
+          "title": "Bill Number",
+          "x-ms-dataverse-attribute": "bv_billnumber",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_CustomerName",
-          "required": true,
-          "maxLength": 200
+          "x-ms-schema-name": "bv_BillNumber",
+          "maxLength": 100
         },
-        "bv_delivertoaddress": {
+        "bv_currency": {
           "type": "string",
-          "title": "Deliver To (Address)",
-          "x-ms-dataverse-attribute": "bv_delivertoaddress",
-          "x-ms-dataverse-type": "MemoType",
-          "x-ms-schema-name": "bv_DeliverToAddress",
-          "maxLength": 500
-        },
-        "bv_delivertoname": {
-          "type": "string",
-          "title": "Deliver To (Name)",
-          "x-ms-dataverse-attribute": "bv_delivertoname",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_DeliverToName",
-          "maxLength": 200
-        },
-        "bv_email": {
-          "type": "string",
-          "title": "Email",
-          "x-ms-dataverse-attribute": "bv_email",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_Email",
-          "maxLength": 200
-        },
-        "bv_isactive": {
-          "type": "string",
-          "title": "Is Active",
-          "x-ms-dataverse-attribute": "bv_isactive",
-          "x-ms-dataverse-type": "BooleanType",
-          "x-ms-schema-name": "bv_IsActive",
+          "title": "Currency",
+          "x-ms-dataverse-attribute": "bv_currency",
+          "x-ms-dataverse-type": "PicklistType",
+          "x-ms-schema-name": "bv_Currency",
           "enum": [
-            "No",
-            "Yes"
+            "HNL",
+            "USD"
           ],
           "x-ms-enum-values": [
-            0,
-            1
+            187460000,
+            187460001
           ],
           "Color": [
             null,
             null
           ],
-          "x-ms-optionsetmetadataid": "65a6ff30-3ca2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "1cca4507-d4a2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
-          "x-ms-optionsetdisplayname": "Is Active",
-          "x-ms-optionSetType": "Boolean"
+          "x-ms-optionsetdisplayname": "Currency",
+          "x-ms-optionSetType": "Picklist"
         },
-        "bv_isactivename": {
+        "bv_currencyname": {
           "type": "string",
-          "title": "bv_isactivename",
-          "x-ms-dataverse-attribute": "bv_isactivename",
+          "title": "bv_currencyname",
+          "x-ms-dataverse-attribute": "bv_currencyname",
           "x-ms-dataverse-type": "VirtualType",
-          "x-ms-schema-name": "bv_isactiveName",
+          "x-ms-schema-name": "bv_currencyName",
+          "x-ms-read-only": true
+        },
+        "bv_date": {
+          "type": "string",
+          "title": "Date",
+          "x-ms-dataverse-attribute": "bv_date",
+          "x-ms-dataverse-type": "DateTimeType",
+          "x-ms-schema-name": "bv_Date",
+          "required": true
+        },
+        "bv_duedate": {
+          "type": "string",
+          "title": "Due Date",
+          "x-ms-dataverse-attribute": "bv_duedate",
+          "x-ms-dataverse-type": "DateTimeType",
+          "x-ms-schema-name": "bv_DueDate",
+          "required": true
+        },
+        "bv_isv": {
+          "type": "string",
+          "title": "ISV",
+          "x-ms-dataverse-attribute": "bv_isv",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_ISV"
+        },
+        "bv_isv_base": {
+          "type": "string",
+          "title": "ISV (Base)",
+          "x-ms-dataverse-attribute": "bv_isv_base",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_isv_Base",
           "x-ms-read-only": true
         },
         "bv_notes": {
@@ -126,64 +123,141 @@
           "x-ms-schema-name": "bv_Notes",
           "maxLength": 2000
         },
-        "bv_paymentterms": {
+        "bv_paidamount": {
           "type": "string",
-          "title": "Payment Terms",
-          "x-ms-dataverse-attribute": "bv_paymentterms",
+          "title": "Paid",
+          "x-ms-dataverse-attribute": "bv_paidamount",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_PaidAmount"
+        },
+        "bv_paidamount_base": {
+          "type": "string",
+          "title": "Paid (Base)",
+          "x-ms-dataverse-attribute": "bv_paidamount_base",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_paidamount_Base",
+          "x-ms-read-only": true
+        },
+        "bv_poref": {
+          "type": "string",
+          "title": "PO Reference",
+          "x-ms-dataverse-attribute": "bv_poref",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_PORef",
+          "maxLength": 100
+        },
+        "bv_purchaseorderid": {
+          "type": "string",
+          "title": "Purchase Order",
+          "x-ms-dataverse-attribute": "bv_purchaseorderid",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "bv_PurchaseOrderId"
+        },
+        "bv_purchaseorderidname": {
+          "type": "string",
+          "title": "bv_purchaseorderidname",
+          "x-ms-dataverse-attribute": "bv_purchaseorderidname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_PurchaseOrderIdName",
+          "x-ms-read-only": true,
+          "maxLength": 40
+        },
+        "bv_rtn": {
+          "type": "string",
+          "title": "Supplier RTN",
+          "x-ms-dataverse-attribute": "bv_rtn",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_RTN",
+          "maxLength": 100
+        },
+        "bv_status": {
+          "type": "string",
+          "title": "Status",
+          "x-ms-dataverse-attribute": "bv_status",
           "x-ms-dataverse-type": "PicklistType",
-          "x-ms-schema-name": "bv_PaymentTerms",
+          "x-ms-schema-name": "bv_Status",
           "enum": [
-            "CIF",
-            "FOB",
-            "EXW",
-            "DDP",
-            "Net 30",
-            "DAP"
+            "Open",
+            "Partially Paid",
+            "Paid",
+            "Overdue",
+            "Cancelled"
           ],
           "x-ms-enum-values": [
             187460000,
             187460001,
             187460002,
             187460003,
-            187460004,
-            187460005
+            187460004
           ],
           "Color": [
             null,
             null,
             null,
             null,
-            null,
             null
           ],
-          "x-ms-optionsetmetadataid": "bd4efb2a-3ca2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "21ca4507-d4a2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
-          "x-ms-optionsetdisplayname": "Payment Terms",
+          "x-ms-optionsetdisplayname": "Status",
           "x-ms-optionSetType": "Picklist"
         },
-        "bv_paymenttermsname": {
+        "bv_statusname": {
           "type": "string",
-          "title": "bv_paymenttermsname",
-          "x-ms-dataverse-attribute": "bv_paymenttermsname",
+          "title": "bv_statusname",
+          "x-ms-dataverse-attribute": "bv_statusname",
           "x-ms-dataverse-type": "VirtualType",
-          "x-ms-schema-name": "bv_paymenttermsName",
+          "x-ms-schema-name": "bv_statusName",
           "x-ms-read-only": true
         },
-        "bv_phone": {
+        "bv_subtotal": {
           "type": "string",
-          "title": "Phone",
-          "x-ms-dataverse-attribute": "bv_phone",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_Phone",
-          "maxLength": 50
+          "title": "Subtotal",
+          "x-ms-dataverse-attribute": "bv_subtotal",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_Subtotal",
+          "required": true
         },
-        "bv_taxid": {
+        "bv_subtotal_base": {
           "type": "string",
-          "title": "Tax ID",
-          "x-ms-dataverse-attribute": "bv_taxid",
+          "title": "Subtotal (Base)",
+          "x-ms-dataverse-attribute": "bv_subtotal_base",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_subtotal_Base",
+          "x-ms-read-only": true
+        },
+        "bv_supplierid": {
+          "type": "string",
+          "title": "Supplier",
+          "x-ms-dataverse-attribute": "bv_supplierid",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "bv_SupplierId",
+          "required": true
+        },
+        "bv_supplieridname": {
+          "type": "string",
+          "title": "bv_supplieridname",
+          "x-ms-dataverse-attribute": "bv_supplieridname",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_TaxId",
-          "maxLength": 50
+          "x-ms-schema-name": "bv_SupplierIdName",
+          "x-ms-read-only": true,
+          "maxLength": 40
+        },
+        "bv_totalamount": {
+          "type": "string",
+          "title": "Total",
+          "x-ms-dataverse-attribute": "bv_totalamount",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_TotalAmount",
+          "required": true
+        },
+        "bv_totalamount_base": {
+          "type": "string",
+          "title": "Total (Base)",
+          "x-ms-dataverse-attribute": "bv_totalamount_base",
+          "x-ms-dataverse-type": "MoneyType",
+          "x-ms-schema-name": "bv_totalamount_Base",
+          "x-ms-read-only": true
         },
         "createdby": {
           "type": "string",
@@ -246,6 +320,14 @@
           "x-ms-read-only": true,
           "required": true,
           "maxLength": 100
+        },
+        "exchangerate": {
+          "type": "string",
+          "title": "Exchange Rate",
+          "x-ms-dataverse-attribute": "exchangerate",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "ExchangeRate",
+          "x-ms-read-only": true
         },
         "importsequencenumber": {
           "type": "string",
@@ -412,7 +494,7 @@
             null,
             null
           ],
-          "x-ms-optionsetmetadataid": "2c0e7535-3ba2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "5c9945b9-d3a2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
           "x-ms-optionsetdisplayname": "Status",
           "x-ms-optionSetType": "State"
@@ -443,7 +525,7 @@
             null,
             null
           ],
-          "x-ms-optionsetmetadataid": "360e7535-3ba2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "669945b9-d3a2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
           "x-ms-optionsetdisplayname": "Status Reason",
           "x-ms-optionSetType": "Status"
@@ -463,6 +545,22 @@
           "x-ms-dataverse-type": "IntegerType",
           "x-ms-schema-name": "TimeZoneRuleVersionNumber"
         },
+        "transactioncurrencyid": {
+          "type": "string",
+          "title": "Currency",
+          "x-ms-dataverse-attribute": "transactioncurrencyid",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "TransactionCurrencyId"
+        },
+        "transactioncurrencyidname": {
+          "type": "string",
+          "title": "transactioncurrencyidname",
+          "x-ms-dataverse-attribute": "transactioncurrencyidname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "TransactionCurrencyIdName",
+          "x-ms-read-only": true,
+          "maxLength": 100
+        },
         "utcconversiontimezonecode": {
           "type": "string",
           "title": "UTC Conversion Time Zone Code",
@@ -480,9 +578,13 @@
         }
       },
       "required": [
-        "bv_customercode",
-        "bv_customerid",
-        "bv_customername",
+        "bv_billcode",
+        "bv_billid",
+        "bv_date",
+        "bv_duedate",
+        "bv_subtotal",
+        "bv_supplierid",
+        "bv_totalamount",
         "createdbyyominame",
         "createdonbehalfbyyominame",
         "modifiedbyyominame",

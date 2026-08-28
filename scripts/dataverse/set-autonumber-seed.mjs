@@ -12,6 +12,12 @@ import { resolveToken } from './auth.mjs'
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const DV_URL = (process.env.DATAVERSE_URL || 'https://enterprisedev.crm16.dynamics.com').replace(/\/+$/, '')
+// DANGER: this sets every table's seed to the same value regardless of what
+// is already stored. On a table that holds rows it makes the next record
+// repeat an identifier already in use — Dataverse issues the duplicate
+// without complaint. Safe only on empty tables; otherwise use
+// `npm run dataverse:seed-fix`, which continues each table from its own high
+// water mark.
 const SEED = Number(process.env.SEED_VALUE || 1)
 
 const schema = JSON.parse(readFileSync(join(REPO_ROOT, 'dataverse', 'farmtrack.dataverse.schema.json'), 'utf8'))

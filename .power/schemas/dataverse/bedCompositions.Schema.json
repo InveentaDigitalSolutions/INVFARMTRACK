@@ -1,122 +1,51 @@
 {
-  "name": "bv_customer",
-  "title": "Customers",
+  "name": "bv_bedcomposition",
+  "title": "Bed Compositions",
   "schema": {
     "type": "array",
     "items": {
       "type": "object",
       "x-ms-dataverse-entity": true,
-      "x-ms-dataverse-entityset": "bv_customers",
-      "x-ms-dataverse-primary-id": "bv_customerid",
-      "x-ms-dataverse-primary-name": "bv_customercode",
+      "x-ms-dataverse-entityset": "bv_bedcompositions",
+      "x-ms-dataverse-primary-id": "bv_bedcompositionid",
+      "x-ms-dataverse-primary-name": "bv_bedcompositioncode",
       "properties": {
-        "bv_address": {
+        "bv_bedcompositioncode": {
           "type": "string",
-          "title": "Address",
-          "x-ms-dataverse-attribute": "bv_address",
-          "x-ms-dataverse-type": "MemoType",
-          "x-ms-schema-name": "bv_Address",
-          "maxLength": 500
-        },
-        "bv_contactemail": {
-          "type": "string",
-          "title": "Contact Email",
-          "x-ms-dataverse-attribute": "bv_contactemail",
+          "title": "Bed Composition ID",
+          "x-ms-dataverse-attribute": "bv_bedcompositioncode",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_ContactEmail",
-          "maxLength": 200
-        },
-        "bv_contactname": {
-          "type": "string",
-          "title": "Contact Name",
-          "x-ms-dataverse-attribute": "bv_contactname",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_ContactName",
-          "maxLength": 200
-        },
-        "bv_customercode": {
-          "type": "string",
-          "title": "Customer Code",
-          "x-ms-dataverse-attribute": "bv_customercode",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_CustomerCode",
+          "x-ms-schema-name": "bv_BedCompositionCode",
           "x-ms-dataverse-primary-name": true,
           "required": true,
           "maxLength": 40
         },
-        "bv_customerid": {
+        "bv_bedcompositionid": {
           "type": "string",
-          "title": "Customer",
-          "x-ms-dataverse-attribute": "bv_customerid",
+          "title": "Bed Composition",
+          "x-ms-dataverse-attribute": "bv_bedcompositionid",
           "x-ms-dataverse-type": "UniqueidentifierType",
-          "x-ms-schema-name": "bv_CustomerId",
+          "x-ms-schema-name": "bv_BedCompositionId",
           "x-ms-dataverse-primary-id": true,
           "required": true,
           "x-ms-keyType": "primary"
         },
-        "bv_customername": {
+        "bv_bedid": {
           "type": "string",
-          "title": "Customer Name",
-          "x-ms-dataverse-attribute": "bv_customername",
+          "title": "Bed",
+          "x-ms-dataverse-attribute": "bv_bedid",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "bv_BedId",
+          "required": true
+        },
+        "bv_bedidname": {
+          "type": "string",
+          "title": "bv_bedidname",
+          "x-ms-dataverse-attribute": "bv_bedidname",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_CustomerName",
-          "required": true,
-          "maxLength": 200
-        },
-        "bv_delivertoaddress": {
-          "type": "string",
-          "title": "Deliver To (Address)",
-          "x-ms-dataverse-attribute": "bv_delivertoaddress",
-          "x-ms-dataverse-type": "MemoType",
-          "x-ms-schema-name": "bv_DeliverToAddress",
-          "maxLength": 500
-        },
-        "bv_delivertoname": {
-          "type": "string",
-          "title": "Deliver To (Name)",
-          "x-ms-dataverse-attribute": "bv_delivertoname",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_DeliverToName",
-          "maxLength": 200
-        },
-        "bv_email": {
-          "type": "string",
-          "title": "Email",
-          "x-ms-dataverse-attribute": "bv_email",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_Email",
-          "maxLength": 200
-        },
-        "bv_isactive": {
-          "type": "string",
-          "title": "Is Active",
-          "x-ms-dataverse-attribute": "bv_isactive",
-          "x-ms-dataverse-type": "BooleanType",
-          "x-ms-schema-name": "bv_IsActive",
-          "enum": [
-            "No",
-            "Yes"
-          ],
-          "x-ms-enum-values": [
-            0,
-            1
-          ],
-          "Color": [
-            null,
-            null
-          ],
-          "x-ms-optionsetmetadataid": "65a6ff30-3ca2-f111-b8de-002248d8760d",
-          "x-ms-isGlobal": false,
-          "x-ms-optionsetdisplayname": "Is Active",
-          "x-ms-optionSetType": "Boolean"
-        },
-        "bv_isactivename": {
-          "type": "string",
-          "title": "bv_isactivename",
-          "x-ms-dataverse-attribute": "bv_isactivename",
-          "x-ms-dataverse-type": "VirtualType",
-          "x-ms-schema-name": "bv_isactiveName",
-          "x-ms-read-only": true
+          "x-ms-schema-name": "bv_BedIdName",
+          "x-ms-read-only": true,
+          "maxLength": 40
         },
         "bv_notes": {
           "type": "string",
@@ -126,64 +55,30 @@
           "x-ms-schema-name": "bv_Notes",
           "maxLength": 2000
         },
-        "bv_paymentterms": {
+        "bv_percentage": {
           "type": "string",
-          "title": "Payment Terms",
-          "x-ms-dataverse-attribute": "bv_paymentterms",
-          "x-ms-dataverse-type": "PicklistType",
-          "x-ms-schema-name": "bv_PaymentTerms",
-          "enum": [
-            "CIF",
-            "FOB",
-            "EXW",
-            "DDP",
-            "Net 30",
-            "DAP"
-          ],
-          "x-ms-enum-values": [
-            187460000,
-            187460001,
-            187460002,
-            187460003,
-            187460004,
-            187460005
-          ],
-          "Color": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          "x-ms-optionsetmetadataid": "bd4efb2a-3ca2-f111-b8de-002248d8760d",
-          "x-ms-isGlobal": false,
-          "x-ms-optionsetdisplayname": "Payment Terms",
-          "x-ms-optionSetType": "Picklist"
+          "title": "Percentage",
+          "x-ms-dataverse-attribute": "bv_percentage",
+          "x-ms-dataverse-type": "DecimalType",
+          "x-ms-schema-name": "bv_Percentage",
+          "required": true
         },
-        "bv_paymenttermsname": {
+        "bv_substratematerialid": {
           "type": "string",
-          "title": "bv_paymenttermsname",
-          "x-ms-dataverse-attribute": "bv_paymenttermsname",
-          "x-ms-dataverse-type": "VirtualType",
-          "x-ms-schema-name": "bv_paymenttermsName",
-          "x-ms-read-only": true
+          "title": "Substrate Material",
+          "x-ms-dataverse-attribute": "bv_substratematerialid",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "bv_SubstrateMaterialId",
+          "required": true
         },
-        "bv_phone": {
+        "bv_substratematerialidname": {
           "type": "string",
-          "title": "Phone",
-          "x-ms-dataverse-attribute": "bv_phone",
+          "title": "bv_substratematerialidname",
+          "x-ms-dataverse-attribute": "bv_substratematerialidname",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_Phone",
-          "maxLength": 50
-        },
-        "bv_taxid": {
-          "type": "string",
-          "title": "Tax ID",
-          "x-ms-dataverse-attribute": "bv_taxid",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "bv_TaxId",
-          "maxLength": 50
+          "x-ms-schema-name": "bv_SubstrateMaterialIdName",
+          "x-ms-read-only": true,
+          "maxLength": 40
         },
         "createdby": {
           "type": "string",
@@ -412,7 +307,7 @@
             null,
             null
           ],
-          "x-ms-optionsetmetadataid": "2c0e7535-3ba2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "c834b88c-d4a2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
           "x-ms-optionsetdisplayname": "Status",
           "x-ms-optionSetType": "State"
@@ -443,7 +338,7 @@
             null,
             null
           ],
-          "x-ms-optionsetmetadataid": "360e7535-3ba2-f111-b8de-002248d8760d",
+          "x-ms-optionsetmetadataid": "d234b88c-d4a2-f111-b8dd-002248d8760d",
           "x-ms-isGlobal": false,
           "x-ms-optionsetdisplayname": "Status Reason",
           "x-ms-optionSetType": "Status"
@@ -480,9 +375,11 @@
         }
       },
       "required": [
-        "bv_customercode",
-        "bv_customerid",
-        "bv_customername",
+        "bv_bedcompositioncode",
+        "bv_bedcompositionid",
+        "bv_bedid",
+        "bv_percentage",
+        "bv_substratematerialid",
         "createdbyyominame",
         "createdonbehalfbyyominame",
         "modifiedbyyominame",

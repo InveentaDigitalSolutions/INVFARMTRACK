@@ -30,6 +30,15 @@
           "required": true,
           "x-ms-keyType": "primary"
         },
+        "bv_fieldname": {
+          "type": "string",
+          "title": "Plot Name",
+          "x-ms-dataverse-attribute": "bv_fieldname",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "bv_FieldName",
+          "required": true,
+          "maxLength": 100
+        },
         "bv_notes": {
           "type": "string",
           "title": "Notes",
@@ -324,6 +333,7 @@
       "required": [
         "bv_fieldcode",
         "bv_fieldid",
+        "bv_fieldname",
         "bv_shadehouseid",
         "createdbyyominame",
         "createdonbehalfbyyominame",

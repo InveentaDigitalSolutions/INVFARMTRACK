@@ -19,7 +19,8 @@
     "dataverse:seed-reset": "node scripts/dataverse/set-autonumber-seed.mjs",
     "dataverse:token": "node scripts/dev-token.mjs",
     "dataverse:choices": "node scripts/dataverse/generate-choicemap.mjs",
-    "dataverse:check": "node scripts/dataverse/check-choices.mjs"
+    "dataverse:check": "node scripts/dataverse/check-choices.mjs",
+    "dataverse:seed-fix": "node scripts/dataverse/fix-autonumber-seeds.mjs"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.19.0",

@@ -9,9 +9,9 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 36 |
-| Columns | 467 |
-| Relationships | 46 |
+| Tables | 42 |
+| Columns | 524 |
+| Relationships | 54 |
 
 ## Conventions
 
@@ -67,6 +67,12 @@
 | [Demand Forecast](#demand-forecast) | `bv_demandforecast` | `DFC-0001` | 14 | Quarterly demand forecast from customers — per variety × size × week |
 | [Component](#component) | `bv_component` | `CMP-0001` | 8 | Anything an input can contain: a nutrient, an active ingredient, an organic fraction, a carrier. |
 | [Input Component](#input-component) | `bv_inputcomponent` | `ICP-0001` | 5 | One line of an input's guaranteed analysis. An input has as many as it needs. |
+| [Bank Account](#bank-account) | `bv_bankaccount` | `BA-0001` | 8 | A bank account the nursery moves money through. |
+| [Payment](#payment) | `bv_payment` | `PMT-0001` | 12 | Money in or out: a receipt against an invoice, a payment against a bill, or a direct expense. |
+| [Bill](#bill) | `bv_bill` | `BIL-0001` | 16 | A supplier invoice the nursery owes — accounts payable. |
+| [Bank Statement Line](#bank-statement-line) | `bv_bankstatementline` | `ST-0001` | 9 | One line as it appears on the bank statement, for reconciling against payments. |
+| [Substrate Material](#substrate-material) | `bv_substratematerial` | `SUB-0001` | 6 | Anything a bed's growing medium is made of — a mineral fraction like sand, or an organic one like coconut coir. |
+| [Bed Composition](#bed-composition) | `bv_bedcomposition` | `BCM-0001` | 6 | One material in a bed's growing medium and how much of it there is. A bed has as many of these as its mix has parts. |
 
 ## Relationships
 
@@ -118,6 +124,14 @@
 | Demand Forecast | `bv_plantid` | Plant | Restrict |
 | Input Component | `bv_inputid` | Input | Restrict |
 | Input Component | `bv_componentid` | Component | Restrict |
+| Payment | `bv_bankaccountid` | Bank Account | Restrict |
+| Payment | `bv_invoiceid` | Invoice | Remove link |
+| Bill | `bv_supplierid` | Supplier | Restrict |
+| Bill | `bv_purchaseorderid` | Purchase Order | Remove link |
+| Bank Statement Line | `bv_bankaccountid` | Bank Account | Restrict |
+| Bank Statement Line | `bv_paymentid` | Payment | Remove link |
+| Bed Composition | `bv_bedid` | Bed | Restrict |
+| Bed Composition | `bv_substratematerialid` | Substrate Material | Restrict |
 
 ---
 
@@ -159,7 +173,7 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 | `bv_level` | Level | Choice |  | Vertical level: 0 is the ground bed, 1-3 are the cable lines strung above it. One of: 0, 1, 2, 3. |
 | `bv_capacity` | Capacity | Whole number |  | Maximum the unit can hold. |
 | `bv_bedmaterial` | Bed Material | Choice |  | One of: Wood, Concrete, Plastic, Metal. |
-| `bv_soiltype` | Soil Type | Choice |  | One of: Sandy, Loamy, Clay, Peaty, Chalky, Silty. |
+| `bv_soiltype` | Soil Type | Choice |  | Overall classification of the growing medium. The exact mix is recorded as Bed Composition rows, one per material with its percentage; this stays as the one-word summary people use when talking about a bed. One of: Sandy, Loamy, Clay, Peaty, Chalky, Silty. |
 | `bv_drainage` | Drainage | Choice |  | One of: Excellent, Good, Moderate, Poor. |
 | `bv_irrigationtype` | Irrigation Type | Choice |  | One of: Drip, Sprinkler, Manual, None. |
 | `bv_location` | Location | Text(200) |  | Where this sits physically. |
@@ -223,7 +237,7 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 
 </details>
 
-**Referenced by:** Planting (`bv_bedid`), Treatment (`bv_bedid`), Irrigation (`bv_bedid`), Harvest (`bv_bedid`), Task (`bv_bedid`), Packing (`bv_bedid`), Timesheet (`bv_bedid`), Pruning (`bv_bedid`), Fertilization (`bv_bedid`), Nutrient Balance (`bv_bedid`), Soil Analysis (`bv_bedid`), Foliar Analysis (`bv_bedid`)
+**Referenced by:** Planting (`bv_bedid`), Treatment (`bv_bedid`), Irrigation (`bv_bedid`), Harvest (`bv_bedid`), Task (`bv_bedid`), Packing (`bv_bedid`), Timesheet (`bv_bedid`), Pruning (`bv_bedid`), Fertilization (`bv_bedid`), Nutrient Balance (`bv_bedid`), Soil Analysis (`bv_bedid`), Foliar Analysis (`bv_bedid`), Bed Composition (`bv_bedid`)
 
 ## Plant
 
@@ -919,7 +933,7 @@ Export invoices with shipping, fiscal, and payment tracking
 
 </details>
 
-**Referenced by:** Packing (`bv_invoiceid`), CAI Number (`bv_invoiceid`)
+**Referenced by:** Packing (`bv_invoiceid`), CAI Number (`bv_invoiceid`), Payment (`bv_invoiceid`)
 
 ## Plant Price
 
@@ -1084,7 +1098,7 @@ Vendors and suppliers for inputs, materials, and services
 
 </details>
 
-**Referenced by:** Purchase Order (`bv_supplierid`)
+**Referenced by:** Purchase Order (`bv_supplierid`), Bill (`bv_supplierid`)
 
 ## Purchase Order
 
@@ -1127,6 +1141,8 @@ Orders placed to suppliers for inputs, materials, and services
 | 187460004 | Cancelled |
 
 </details>
+
+**Referenced by:** Bill (`bv_purchaseorderid`)
 
 ## Worker
 
@@ -1570,3 +1586,222 @@ One line of an input's guaranteed analysis. An input has as many as it needs.
 | `bv_componentid` | Component | Lookup → [Component](#component) | ✓ | Link to the related Component record. |
 | `bv_percentage` | Percentage (% w/w) | Decimal(4) | ✓ | Percent by weight of product, as printed on the label. |
 | `bv_notes` | Notes | Text area(2000) |  | Free-text notes. |
+
+## Bank Account
+
+`bv_bankaccount` · User-owned
+
+A bank account the nursery moves money through.
+
+**Record ID:** `bv_bankaccountcode` — format `BA-{SEQNUM:4}`, e.g. `BA-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_bankaccountcode` 🔑 | Bank Account Code | Autonumber | ✓ | Auto-generated identifier, format BA-0001. |
+| `bv_bankaccountname` | Name | Text(100) | ✓ | What the account is called day to day, e.g. "BAC USD Operating". |
+| `bv_bank` | Bank | Text(100) | ✓ |  |
+| `bv_accountnumber` | Account Number | Text(100) |  |  |
+| `bv_currency` | Currency | Choice |  | One of: HNL, USD. |
+| `bv_openingbalance` | Opening Balance | Currency(2) |  |  |
+| `bv_isactive` | Active | Yes/No |  |  |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Currency** (`bv_currency`)
+
+| Value | Label |
+|---|---|
+| 187460000 | HNL |
+| 187460001 | USD |
+
+</details>
+
+**Referenced by:** Payment (`bv_bankaccountid`), Bank Statement Line (`bv_bankaccountid`)
+
+## Payment
+
+`bv_payment` · User-owned
+
+Money in or out: a receipt against an invoice, a payment against a bill, or a direct expense.
+
+**Record ID:** `bv_paymentcode` — format `PMT-{SEQNUM:4}`, e.g. `PMT-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_paymentcode` 🔑 | Payment Code | Autonumber | ✓ | Auto-generated identifier, format PMT-0001. |
+| `bv_type` | Type | Choice | ✓ | Receipt is money in against an invoice; Payment settles a bill; Expense is a direct outgoing. |
+| `bv_date` | Date | Date only | ✓ |  |
+| `bv_counterparty` | Counterparty | Text(100) | ✓ | Who the money came from or went to, as written on the transaction. |
+| `bv_amount` | Amount | Currency(2) | ✓ |  |
+| `bv_currency` | Currency | Choice |  | One of: HNL, USD. |
+| `bv_reference` | Reference | Text(100) |  | Invoice number, bill number, or whatever identifies it on the statement. |
+| `bv_method` | Method | Choice |  | One of: Wire, Check, Cash, Card, ACH. |
+| `bv_status` | Status | Choice |  | One of: Pending, Cleared, Voided. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+| `bv_bankaccountid` | Bank Account | Lookup → [Bank Account](#bank-account) | ✓ | Link to the related Bank Account record. |
+| `bv_invoiceid` | Invoice | Lookup → [Invoice](#invoice) |  | Set on a receipt so the invoice balance can be reduced by what was actually paid. |
+
+<details><summary>Choice values</summary>
+
+**Type** (`bv_type`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Receipt |
+| 187460001 | Payment |
+| 187460002 | Expense |
+
+**Currency** (`bv_currency`)
+
+| Value | Label |
+|---|---|
+| 187460000 | HNL |
+| 187460001 | USD |
+
+**Method** (`bv_method`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Wire |
+| 187460001 | Check |
+| 187460002 | Cash |
+| 187460003 | Card |
+| 187460004 | ACH |
+
+**Status** (`bv_status`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Pending |
+| 187460001 | Cleared |
+| 187460002 | Voided |
+
+</details>
+
+**Referenced by:** Bank Statement Line (`bv_paymentid`)
+
+## Bill
+
+`bv_bill` · User-owned
+
+A supplier invoice the nursery owes — accounts payable.
+
+**Record ID:** `bv_billcode` — format `BIL-{SEQNUM:4}`, e.g. `BIL-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_billcode` 🔑 | Bill Code | Autonumber | ✓ | Auto-generated identifier, format BIL-0001. |
+| `bv_billnumber` | Bill Number | Text(100) |  | The supplier's own invoice number, which is what appears on their paperwork. |
+| `bv_poref` | PO Reference | Text(100) |  |  |
+| `bv_rtn` | Supplier RTN | Text(100) |  | Honduran tax id of the supplier, needed to claim the ISV back. |
+| `bv_date` | Date | Date only | ✓ |  |
+| `bv_duedate` | Due Date | Date only | ✓ |  |
+| `bv_subtotal` | Subtotal | Currency(2) | ✓ |  |
+| `bv_isv` | ISV | Currency(2) |  |  |
+| `bv_totalamount` | Total | Currency(2) | ✓ |  |
+| `bv_paidamount` | Paid | Currency(2) |  |  |
+| `bv_balance` | Balance Due | Currency(2) |  |  |
+| `bv_currency` | Currency | Choice |  | One of: HNL, USD. |
+| `bv_status` | Status | Choice |  | One of: Open, Partially Paid, Paid, Overdue, Cancelled. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+| `bv_supplierid` | Supplier | Lookup → [Supplier](#supplier) | ✓ | Link to the related Supplier record. |
+| `bv_purchaseorderid` | Purchase Order | Lookup → [Purchase Order](#purchase-order) |  | Link to the related Purchase Order record. |
+
+<details><summary>Choice values</summary>
+
+**Currency** (`bv_currency`)
+
+| Value | Label |
+|---|---|
+| 187460000 | HNL |
+| 187460001 | USD |
+
+**Status** (`bv_status`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Open |
+| 187460001 | Partially Paid |
+| 187460002 | Paid |
+| 187460003 | Overdue |
+| 187460004 | Cancelled |
+
+</details>
+
+## Bank Statement Line
+
+`bv_bankstatementline` · User-owned
+
+One line as it appears on the bank statement, for reconciling against payments.
+
+**Record ID:** `bv_bankstatementlinecode` — format `ST-{SEQNUM:4}`, e.g. `ST-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_bankstatementlinecode` 🔑 | Statement Line Code | Autonumber | ✓ | Auto-generated identifier, format ST-0001. |
+| `bv_date` | Date | Date only | ✓ |  |
+| `bv_description` | Description | Text(100) | ✓ | The text the bank prints, which is often all there is to match on. |
+| `bv_amount` | Amount | Currency(2) | ✓ | Signed as the bank prints it: negative leaves the account, positive arrives. The range is deliberately allowed to go negative, unlike every other money column here. |
+| `bv_runningbalance` | Balance | Currency(2) |  |  |
+| `bv_isreconciled` | Reconciled | Yes/No |  |  |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+| `bv_bankaccountid` | Bank Account | Lookup → [Bank Account](#bank-account) | ✓ | Link to the related Bank Account record. |
+| `bv_paymentid` | Matched Payment | Lookup → [Payment](#payment) |  | The payment this line settles, once someone has matched them. |
+
+## Substrate Material
+
+`bv_substratematerial` · User-owned
+
+Anything a bed's growing medium is made of — a mineral fraction like sand, or an organic one like coconut coir.
+
+**Record ID:** `bv_substratematerialcode` — format `SUB-{SEQNUM:4}`, e.g. `SUB-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_substratematerialcode` 🔑 | Substrate Material ID | Autonumber | ✓ | Auto-generated identifier, format SUB-0001. |
+| `bv_substratematerialname` | Name | Text(100) | ✓ | What it is called on site, e.g. "Coconut coir". |
+| `bv_category` | Category | Choice |  | Mineral fractions set the texture; organic ones hold water and nutrients. One of: Mineral, Organic, Amendment, Other. |
+| `bv_waterretention` | Water Retention | Choice |  | How much water this fraction holds, which is why the mix is blended the way it is. One of: Low, Medium, High. |
+| `bv_isactive` | Active | Yes/No |  |  |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Category** (`bv_category`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Mineral |
+| 187460001 | Organic |
+| 187460002 | Amendment |
+| 187460003 | Other |
+
+**Water Retention** (`bv_waterretention`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Low |
+| 187460001 | Medium |
+| 187460002 | High |
+
+</details>
+
+**Referenced by:** Bed Composition (`bv_substratematerialid`)
+
+## Bed Composition
+
+`bv_bedcomposition` · User-owned
+
+One material in a bed's growing medium and how much of it there is. A bed has as many of these as its mix has parts.
+
+**Record ID:** `bv_bedcompositioncode` — format `BCM-{SEQNUM:4}`, e.g. `BCM-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_bedcompositioncode` 🔑 | Bed Composition ID | Autonumber | ✓ | Auto-generated identifier, format BCM-0001. |
+| `bv_bedcompositionname` | Name | Text(100) |  | How this line reads on its own, e.g. "E3-01 · Coconut coir". The autonumber identifies the row but says nothing about which bed or material it is. |
+| `bv_bedid` | Bed | Lookup → [Bed](#bed) | ✓ | Link to the related Bed record. |
+| `bv_substratematerialid` | Substrate Material | Lookup → [Substrate Material](#substrate-material) | ✓ | Link to the related Substrate Material record. |
+| `bv_percentage` | Percentage | Decimal(2) | ✓ | Share of the mix by volume. The parts for one bed are expected to total 100. |
+| `bv_notes` | Notes | Text area(2000) |  |  |

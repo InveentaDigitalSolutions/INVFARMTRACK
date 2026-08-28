@@ -16,6 +16,7 @@ export type Bv_fieldsstatuscode = keyof typeof Bv_fieldsstatuscode;
 export interface Bv_fieldsBase {
   bv_fieldcode: string;
   bv_fieldid: string;
+  bv_fieldname: string;
   bv_notes?: string;
   bv_position?: string;
   "bv_SeasonId@odata.bind"?: string;

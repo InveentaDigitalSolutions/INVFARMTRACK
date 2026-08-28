@@ -10,7 +10,7 @@
   "localAppUrl": "http://localhost:5173",
   "logoPath": "Default",
   "connectionReferences": {
-    "8219e171-5b3f-476b-b063-bc7b5ecefebe": {
+    "78715795-eac7-4f52-939a-34de8cfb7273": {
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       "displayName": "Logic flows",
       "dataSources": [
@@ -169,6 +169,30 @@
         "timesheets": {
           "entitySetName": "bv_timesheets",
           "logicalName": "bv_timesheet"
+        },
+        "substrateMaterials": {
+          "entitySetName": "bv_substratematerials",
+          "logicalName": "bv_substratematerial"
+        },
+        "bedCompositions": {
+          "entitySetName": "bv_bedcompositions",
+          "logicalName": "bv_bedcomposition"
+        },
+        "bankAccounts": {
+          "entitySetName": "bv_bankaccounts",
+          "logicalName": "bv_bankaccount"
+        },
+        "bills": {
+          "entitySetName": "bv_bills",
+          "logicalName": "bv_bill"
+        },
+        "payments": {
+          "entitySetName": "bv_payments",
+          "logicalName": "bv_payment"
+        },
+        "bankStatementLines": {
+          "entitySetName": "bv_bankstatementlines",
+          "logicalName": "bv_bankstatementline"
         }
       }
     }

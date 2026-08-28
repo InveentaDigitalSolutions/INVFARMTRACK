@@ -12,10 +12,38 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_bankaccounts": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_bankaccountid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
+  "bv_bankstatementlines": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_bankstatementlineid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
+  "bv_bedcompositions": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_bedcompositionid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_beds": {
     "tableId": "",
     "version": "",
     "primaryKey": "bv_bedid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
+  "bv_bills": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_billid",
     "dataSourceType": "Dataverse",
     "apis": {}
   },
@@ -159,6 +187,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_payments": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_paymentid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_plantings": {
     "tableId": "",
     "version": "",
@@ -219,6 +254,13 @@ export const dataSourcesInfo = {
     "tableId": "",
     "version": "",
     "primaryKey": "bv_soilanalysisid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
+  "bv_substratematerials": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_substratematerialid",
     "dataSourceType": "Dataverse",
     "apis": {}
   },

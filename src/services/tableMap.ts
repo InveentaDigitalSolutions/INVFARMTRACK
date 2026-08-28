@@ -427,6 +427,101 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       notes: "bv_notes",
     },
   },
+  // ---- Accounting, added 2026-08-28 --------------------------------------
+  bankAccounts: {
+    dataSource: "bv_bankaccounts",
+    primaryKey: "bv_bankaccountid",
+    fields: {
+      code: "bv_bankaccountcode",
+      name: "bv_bankaccountname",
+      bank: "bv_bank",
+      accountNumber: "bv_accountnumber",
+      currency: "bv_currency",
+      openingBalance: "bv_openingbalance",
+      active: "bv_isactive",
+      notes: "bv_notes",
+    },
+  },
+  payments: {
+    dataSource: "bv_payments",
+    primaryKey: "bv_paymentid",
+    fields: {
+      code: "bv_paymentcode",
+      type: "bv_type",
+      date: "bv_date",
+      counterparty: "bv_counterparty",
+      amount: "bv_amount",
+      currency: "bv_currency",
+      reference: "bv_reference",
+      method: "bv_method",
+      status: "bv_status",
+      notes: "bv_notes",
+      bankAccount: "_bv_bankaccountid_value",
+      invoice: "_bv_invoiceid_value",
+    },
+  },
+  bills: {
+    dataSource: "bv_bills",
+    primaryKey: "bv_billid",
+    fields: {
+      number: "bv_billnumber",
+      poRef: "bv_poref",
+      rtn: "bv_rtn",
+      date: "bv_date",
+      dueDate: "bv_duedate",
+      subtotal: "bv_subtotal",
+      isv: "bv_isv",
+      total: "bv_totalamount",
+      paid: "bv_paidamount",
+      balance: "bv_balance",
+      currency: "bv_currency",
+      status: "bv_status",
+      notes: "bv_notes",
+      supplier: "_bv_supplierid_value",
+      purchaseOrder: "_bv_purchaseorderid_value",
+    },
+  },
+  statements: {
+    dataSource: "bv_bankstatementlines",
+    primaryKey: "bv_bankstatementlineid",
+    fields: {
+      code: "bv_bankstatementlinecode",
+      date: "bv_date",
+      description: "bv_description",
+      amount: "bv_amount",
+      balance: "bv_runningbalance",
+      reconciled: "bv_isreconciled",
+      notes: "bv_notes",
+      bankAccount: "_bv_bankaccountid_value",
+      matchedTo: "_bv_paymentid_value",
+    },
+  },
+
+  // ---- Bed substrate composition -----------------------------------------
+  substrateMaterials: {
+    dataSource: "bv_substratematerials",
+    primaryKey: "bv_substratematerialid",
+    fields: {
+      name: "bv_substratematerialname",
+      category: "bv_category",
+      waterRetention: "bv_waterretention",
+      active: "bv_isactive",
+      notes: "bv_notes",
+    },
+  },
+  bedCompositions: {
+    dataSource: "bv_bedcompositions",
+    primaryKey: "bv_bedcompositionid",
+    fields: {
+      bed: "_bv_bedid_value",
+      material: "_bv_substratematerialid_value",
+      percentage: "bv_percentage",
+      notes: "bv_notes",
+    },
+    primaryName: "bv_bedcompositionname",
+    nameFrom: ["bed", "material"],
+  },
+
   timesheets: {
     dataSource: "bv_timesheets",
     primaryKey: "bv_timesheetid",
@@ -494,6 +589,13 @@ export const ENABLED_TABLES = new Set<string>([
   // Batch 3 — planning. Enabled 2026-08-28.
   "tasks",
   "projections",
+  // Phase 2 — accounting and bed composition. Enabled 2026-08-28.
+  "bankAccounts",
+  "payments",
+  "bills",
+  "statements",
+  "substrateMaterials",
+  "bedCompositions",
 ]);
 
 /**

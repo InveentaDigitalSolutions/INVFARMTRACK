@@ -242,7 +242,23 @@
           "x-ms-dataverse-attribute": "statecode",
           "x-ms-dataverse-type": "StateType",
           "x-ms-schema-name": "statecode",
-          "required": true
+          "required": true,
+          "enum": [
+            "Active",
+            "Inactive"
+          ],
+          "x-ms-enum-values": [
+            0,
+            1
+          ],
+          "Color": [
+            null,
+            null
+          ],
+          "x-ms-optionsetmetadataid": "fb241db9-3ba2-f111-b8de-002248d8760d",
+          "x-ms-isGlobal": false,
+          "x-ms-optionsetdisplayname": "Status",
+          "x-ms-optionSetType": "State"
         },
         "statecodename": {
           "type": "string",
@@ -257,7 +273,23 @@
           "title": "Status Reason",
           "x-ms-dataverse-attribute": "statuscode",
           "x-ms-dataverse-type": "StatusType",
-          "x-ms-schema-name": "statuscode"
+          "x-ms-schema-name": "statuscode",
+          "enum": [
+            "Active",
+            "Inactive"
+          ],
+          "x-ms-enum-values": [
+            1,
+            2
+          ],
+          "Color": [
+            null,
+            null
+          ],
+          "x-ms-optionsetmetadataid": "05251db9-3ba2-f111-b8de-002248d8760d",
+          "x-ms-isGlobal": false,
+          "x-ms-optionsetdisplayname": "Status Reason",
+          "x-ms-optionSetType": "Status"
         },
         "statuscodename": {
           "type": "string",

@@ -83,7 +83,8 @@
             "In Packing",
             "Ready for Pickup",
             "Delivered",
-            "Cancelled"
+            "Cancelled",
+            "Shipped"
           ],
           "x-ms-enum-values": [
             187460000,
@@ -91,9 +92,11 @@
             187460002,
             187460003,
             187460004,
-            187460005
+            187460005,
+            187460006
           ],
           "Color": [
+            null,
             null,
             null,
             null,
