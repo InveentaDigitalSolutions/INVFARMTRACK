@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Leaf } from "lucide-react";
+import markLight from "../assets/brand/mark-light.svg";
 
 interface LoadingScreenProps {
   onComplete: () => void;
@@ -89,9 +90,11 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           className="mt-16 flex items-center gap-1.5"
         >
           <span className="text-[9px] text-navy-600 tracking-wider uppercase">Powered by</span>
-          <span className="text-[11px] text-navy-500 font-medium tracking-wide">
-            <span className="text-lime-500">.</span>inveenta
-          </span>
+          {/* Official wordmark from the Inveenta brand set — light variant, for
+              dark backgrounds. This was a hand-built imitation in markup: a
+              lime full stop and the word in a system font, which is neither
+              the right letterforms nor the right mark. Do not re-draw it. */}
+          <img src={markLight} alt="Inveenta" className="h-[16px] w-auto opacity-90" />
         </motion.div>
       </motion.div>
     </motion.div>
