@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Sprout, Leaf, Bug, Droplets, Scissors} from "lucide-react";
 import PageShell from "../components/PageShell";
@@ -11,22 +11,38 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { nextSeasonName } from "../services/infrastructureRules";
+import BedRotation from "../components/BedRotation";
 
+/**
+ * Ordered the way the work happens: see where you stand, plant, tend, harvest,
+ * with the work list and the reference data at the end.
+ *
+ * Eleven tabs became six by grouping what is the same kind of thing. The four
+ * care activities share a shape — an operation on a bed, on a date, by a
+ * worker — and are what a grower records daily, so they sit together rather
+ * than four tabs apart.
+ */
 const tabs = [
+  { id: "overview", label: "Overview" },
   { id: "plantings", label: "Plantings" },
-  { id: "plan", label: "Production Plan" },
-  { id: "utilization", label: "Bed Utilization" },
-  { id: "treatments", label: "Treatments" },
-  { id: "irrigation", label: "Irrigation" },
+  { id: "care", label: "Crop Care" },
   { id: "harvest", label: "Harvest" },
   { id: "tasks", label: "Tasks" },
-  { id: "pruning", label: "Pruning" },
-  { id: "fertilization", label: "Fertilization" },
-  { id: "seasons", label: "Seasons" },
-  // The catalogue of what the nursery grows belongs with growing it, not with
-  // the raw materials it consumes.
-  { id: "plants", label: "Plant Catalog" },
+  { id: "catalog", label: "Catalog" },
 ];
+
+/** The activities inside Crop Care, in the order they recur. */
+const careViews = [
+  { id: "irrigation", label: "Irrigation" },
+  { id: "fertilization", label: "Fertilization" },
+  { id: "treatments", label: "Treatments" },
+  { id: "pruning", label: "Pruning" },
+] as const;
+
+const catalogViews = [
+  { id: "plants", label: "Plants" },
+  { id: "seasons", label: "Seasons" },
+] as const;
 
 // Initial data
 const initPlantings = [
@@ -86,26 +102,9 @@ const productionPlan = [
   { variety: "Sansevieria",             shadehouse: "SH-0001", bed: "C3",  plant: [10, 12], grow: [13, 19], harvest: [20, 21], ship: [21, 22], qty: 4000 },
 ];
 
-const utilizationWeeks = [14, 15, 16, 17, 18, 19, 20];
 const SHADEHOUSES: Record<string, string> = { "SH-0001": "Shadehouse 1" };
 const shadehouseLabel = (id: string) => `${id} · ${SHADEHOUSES[id] ?? "Unknown"}`;
 
-const bedUtilization = [
-  // Bed ids are FIELD-NN, as in the layout. Shadehouse is explicit so the view
-  // still reads correctly once a second house exists.
-  { bed: "E3-04", shadehouse: "SH-0001", area: "Field E3", weeks: { 14: 60, 15: 75, 16: 95, 17: 100, 18: 110, 19: 80, 20: 40 } },
-  { bed: "E3-12", shadehouse: "SH-0001", area: "Field E3", weeks: { 14: 80, 15: 90, 16: 100, 17: 105, 18: 95, 19: 70, 20: 50 } },
-  { bed: "E3-21", shadehouse: "SH-0001", area: "Field E3", weeks: { 14: 50, 15: 60, 16: 75, 17: 90, 18: 100, 19: 95, 20: 70 } },
-  { bed: "E3-30", shadehouse: "SH-0001", area: "Field E3", weeks: { 14: 40, 15: 55, 16: 70, 17: 95, 18: 115, 19: 100, 20: 65 } },
-  { bed: "C3-02", shadehouse: "SH-0001", area: "Field C3", weeks: { 14: 30, 15: 40, 16: 60, 17: 80, 18: 90, 19: 95, 20: 100 } },
-  { bed: "C3-11", shadehouse: "SH-0001", area: "Field C3", weeks: { 14: 70, 15: 85, 16: 100, 17: 110, 18: 120, 19: 80, 20: 30 } },
-  { bed: "C3-19", shadehouse: "SH-0001", area: "Field C3", weeks: { 14: 65, 15: 70, 16: 80, 17: 95, 18: 100, 19: 70, 20: 40 } },
-  { bed: "E1-06", shadehouse: "SH-0001", area: "Field E1", weeks: { 14: 45, 15: 60, 16: 75, 17: 85, 18: 90, 19: 65, 20: 35 } },
-  { bed: "E1-17", shadehouse: "SH-0001", area: "Field E1", weeks: { 14: 30, 15: 40, 16: 55, 17: 70, 18: 85, 19: 100, 20: 95 } },
-  { bed: "E1-28", shadehouse: "SH-0001", area: "Field E1", weeks: { 14: 25, 15: 35, 16: 50, 17: 65, 18: 80, 19: 95, 20: 105 } },
-  { bed: "C1-09", shadehouse: "SH-0001", area: "Field C1", weeks: { 14: 20, 15: 30, 16: 45, 17: 60, 18: 75, 19: 90, 20: 100 } },
-  { bed: "C1-20", shadehouse: "SH-0001", area: "Field C1", weeks: { 14: 55, 15: 65, 16: 80, 17: 90, 18: 100, 19: 85, 20: 60 } },
-];
 
 const initFertilization = [
   { date: "2026-04-09", bed: "E3-31", input: "NPK 20-20-20", qtyKg: 5, method: "Soil Drench", nKg: 1.0, pKg: 1.0, kKg: 1.0, caKg: 0, worker: "Carlos M." },
@@ -308,6 +307,33 @@ const phaseStyles = {
 
 const CURRENT_WEEK = 15;
 
+/** Switches between the views inside a grouped tab. */
+function ViewSwitch<T extends string>({ views, value, onChange, label }: {
+  views: readonly { id: T; label: string }[];
+  value: T;
+  onChange: (id: T) => void;
+  label: string;
+}) {
+  return (
+    <div className="flex bg-sand-100 rounded-lg p-0.5 w-fit" role="group" aria-label={label}>
+      {views.map((v) => (
+        <button
+          key={v.id}
+          type="button"
+          onClick={() => onChange(v.id)}
+          aria-pressed={value === v.id}
+          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-colors cursor-pointer
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
+            value === v.id ? "bg-white text-navy-800 shadow-sm" : "text-navy-400 hover:text-navy-600"
+          }`}
+        >
+          {v.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function ProductionPlanGantt() {
   const minWeek = productionPlanWeeks[0];
   const maxWeek = productionPlanWeeks[productionPlanWeeks.length - 1];
@@ -438,138 +464,13 @@ function ProductionPlanGantt() {
   );
 }
 
-function utilizationColor(pct: number): string {
-  if (pct === 0) return "bg-sand-100 text-navy-300";
-  if (pct < 40) return "bg-lime-100 text-lime-800";
-  if (pct < 70) return "bg-lime-300 text-lime-900";
-  if (pct < 95) return "bg-green-500 text-white";
-  if (pct <= 100) return "bg-green-700 text-white";
-  return "bg-red-500 text-white ring-2 ring-red-300";
-}
 
-const legendStops = [
-  { color: "bg-sand-100", label: "0%" },
-  { color: "bg-lime-100", label: "<40" },
-  { color: "bg-lime-300", label: "<70" },
-  { color: "bg-green-500", label: "<95" },
-  { color: "bg-green-700", label: "100" },
-  { color: "bg-red-500", label: ">100" },
-];
 
-function BedUtilizationHeatmap() {
-  const groups = Array.from(new Set(bedUtilization.map((b) => b.area)));
-  const overCount = bedUtilization.reduce(
-    (n, b) => n + utilizationWeeks.filter((w) => (b.weeks[w as keyof typeof b.weeks] ?? 0) > 100).length,
-    0,
-  );
-  const allValues = bedUtilization.flatMap((b) =>
-    utilizationWeeks.map((w) => b.weeks[w as keyof typeof b.weeks] ?? 0),
-  );
-  const avgAll = Math.round(allValues.reduce((s, v) => s + v, 0) / allValues.length);
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <h3 className="text-[15px] font-bold text-navy-900 tracking-tight">Bed Utilization</h3>
-          <p className="text-[12px] text-navy-500 mt-0.5">
-            {[...new Set(bedUtilization.map((b) => b.shadehouse))].map(shadehouseLabel).join(", ")} · Weeks {utilizationWeeks[0]}–{utilizationWeeks[utilizationWeeks.length - 1]} · {bedUtilization.length} beds · avg <span className="font-mono font-semibold text-navy-700">{avgAll}%</span>
-            {overCount > 0 && (
-              <> · <span className="text-red-600 font-semibold">{overCount} over-capacity cell{overCount === 1 ? "" : "s"}</span></>
-            )}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-sand-200/80 shadow-sm">
-          <span className="text-[10px] font-medium text-navy-500 uppercase tracking-wider">Capacity</span>
-          <div className="flex items-center gap-1">
-            {legendStops.map((s) => (
-              <div key={s.label} className="flex flex-col items-center">
-                <span className={`inline-block w-5 h-3 rounded-sm ${s.color} shadow-sm`} />
-                <span className="text-[9px] font-mono text-navy-500 mt-0.5">{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-sand-200/80 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-[12px]" style={{ minWidth: "max-content" }}>
-            <thead>
-              <tr className="bg-sand-50/60 border-b border-sand-200/80 sticky top-0 z-20">
-                <th className="px-5 py-3 text-left text-[10px] font-bold text-navy-500 uppercase tracking-[0.12em] sticky left-0 bg-sand-50/60 z-30 min-w-[140px]">
-                  Bed
-                </th>
-                {utilizationWeeks.map((w) => (
-                  <th key={w} className="px-3 py-3 text-center text-[10px] font-bold text-navy-500 uppercase tracking-wider min-w-[72px] border-l border-sand-100">
-                    Wk {w}
-                  </th>
-                ))}
-                <th className="px-3 py-3 text-center text-[10px] font-bold text-navy-700 uppercase tracking-wider min-w-[72px] bg-sand-100/60 border-l border-sand-200">
-                  Avg
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {groups.map((area) => (
-                <Fragment key={area}>
-                  <tr className="bg-sand-100/70 border-y border-sand-200/60">
-                    <td
-                      colSpan={utilizationWeeks.length + 2}
-                      className="px-5 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-navy-700 sticky left-0 bg-sand-100/70 z-20"
-                    >
-                      <span className="text-navy-400 font-mono">
-                        {bedUtilization.find((b) => b.area === area)?.shadehouse}
-                      </span>
-                      <span className="mx-1.5 text-navy-300">·</span>
-                      {area}
-                    </td>
-                  </tr>
-                  {bedUtilization.filter((b) => b.area === area).map((b, idx) => {
-                    const values = utilizationWeeks.map((w) => b.weeks[w as keyof typeof b.weeks] ?? 0);
-                    const avg = Math.round(values.reduce((s, v) => s + v, 0) / values.length);
-                    return (
-                      <tr key={b.bed} className={`group hover:bg-lime-50/30 transition-colors ${idx % 2 === 0 ? "bg-white" : "bg-sand-50/30"}`}>
-                        <td className={`px-5 py-1.5 font-mono text-[11px] font-semibold text-navy-800 sticky left-0 z-10 border-r border-sand-100 ${idx % 2 === 0 ? "bg-white" : "bg-sand-50/30"} group-hover:bg-lime-50/30`}>
-                          {b.bed}
-                        </td>
-                        {utilizationWeeks.map((w) => {
-                          const v = b.weeks[w as keyof typeof b.weeks] ?? 0;
-                          return (
-                            <td key={w} className="px-1.5 py-1.5 border-l border-sand-100/60">
-                              <div
-                                title={`${b.bed} · Wk ${w} · ${v}%`}
-                                className={`mx-auto flex items-center justify-center rounded-md text-[11px] font-mono font-bold shadow-sm transition-transform hover:scale-110 cursor-default ${utilizationColor(v)}`}
-                                style={{ width: 60, height: 30 }}
-                              >
-                                {v}%
-                              </div>
-                            </td>
-                          );
-                        })}
-                        <td className="px-1.5 py-1.5 bg-sand-50/40 border-l border-sand-200">
-                          <div
-                            className={`mx-auto flex items-center justify-center rounded-md text-[11px] font-mono font-bold shadow-sm ${utilizationColor(avg)}`}
-                            style={{ width: 60, height: 30 }}
-                          >
-                            {avg}%
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function ProductionPage() {
   const [tab, setTab] = useState(tabs[0].id);
+  const [careView, setCareView] = useState<(typeof careViews)[number]["id"]>("irrigation");
+  const [catalogView, setCatalogView] = useState<(typeof catalogViews)[number]["id"]>("plants");
 
   const [plantings, setPlantings] = useRecords("plantings", initPlantings);
   const [treatments, setTreatments] = useRecords("treatments", initTreatments);
@@ -620,8 +521,8 @@ export default function ProductionPage() {
     }
   };
 
-  const renderTab = () => {
-    switch (tab) {
+  const renderTab = (which: string = tab) => {
+    switch (which) {
       case "plantings":
         return (
           <>
@@ -645,10 +546,29 @@ export default function ProductionPage() {
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Planting" message="Are you sure you want to delete this planting record? This cannot be undone." onConfirm={() => handleDelete(plantings, setPlantings)} />
           </>
         );
-      case "plan":
-        return <ProductionPlanGantt />;
-      case "utilization":
-        return <BedUtilizationHeatmap />;
+      case "overview":
+        return (
+          <div className="space-y-8">
+            <ProductionPlanGantt />
+            {/* Rotation, not utilisation: the beds are occupied nearly all
+                year, so what varies is how often they turn over. */}
+            <BedRotation />
+          </div>
+        );
+      case "care":
+        return (
+          <div className="space-y-4">
+            <ViewSwitch views={careViews} value={careView} onChange={setCareView} label="Crop care activity" />
+            {renderTab(careView)}
+          </div>
+        );
+      case "catalog":
+        return (
+          <div className="space-y-4">
+            <ViewSwitch views={catalogViews} value={catalogView} onChange={setCatalogView} label="Catalog" />
+            {renderTab(catalogView)}
+          </div>
+        );
       case "treatments":
         return (
           <>
