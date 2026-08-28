@@ -41,6 +41,10 @@ function isoWeek(d: Date): number {
   return 1 + Math.round((t.getTime() - first.getTime()) / (7 * 86_400_000));
 }
 
+const selectClass =
+  "px-2 py-1.5 text-[13px] rounded-lg border border-sand-200 bg-white text-navy-900 " +
+  "cursor-pointer focus:outline-none focus:ring-2 focus:ring-lime-400/30";
+
 export default function BedCountGrid() {
   const [counts, setCounts] = useRecords<BedCountRow>("bedCounts", []);
   const [pruning] = useRecords<PruningRow>("pruning", []);
@@ -49,7 +53,12 @@ export default function BedCountGrid() {
   // Counting is for a week ahead, so that is where the picker starts.
   const [week, setWeek] = useState(() => isoWeek(new Date()) + 1);
   const [field, setField] = useState("");
+  const [variety, setVariety] = useState("");
+  const [level, setLevel] = useState("");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<"bed" | "variety" | "estimate">("bed");
   const [onlyPlanted, setOnlyPlanted] = useState(true);
+  const [onlyUncounted, setOnlyUncounted] = useState(false);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(0);
@@ -57,6 +66,15 @@ export default function BedCountGrid() {
   const fields = useMemo(
     () => [...new Set(beds.map((b) => b.fieldName).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+    [beds]
+  );
+  const varieties = useMemo(
+    () => [...new Set(beds.map((b) => b.plant).filter(Boolean) as string[])].sort(),
+    [beds]
+  );
+  const levels = useMemo(
+    () => [...new Set(beds.map((b) => b.level).filter((l) => l !== undefined) as number[])]
+      .sort((a, b) => a - b),
     [beds]
   );
 
@@ -77,21 +95,48 @@ export default function BedCountGrid() {
     return map;
   }, [pruning, week]);
 
-  const rows = useMemo(
-    () =>
-      beds
-        .filter((b) => (!field || b.fieldName === field))
-        .filter((b) => (!onlyPlanted || b.plant))
-        .map((b) => ({
-          bed: b.name,
-          field: b.fieldName,
-          plant: b.plant ?? "",
-          level: b.level,
-          estimated: estimate.get(b.name),
-          recorded: existing.get(b.name)?.counted,
-        })),
-    [beds, field, onlyPlanted, estimate, existing]
-  );
+  const rows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const list = beds
+      .filter((b) => !field || b.fieldName === field)
+      .filter((b) => !variety || b.plant === variety)
+      .filter((b) => level === "" || String(b.level ?? "") === level)
+      .filter((b) => !onlyPlanted || b.plant)
+      .filter((b) => !q || b.name.toLowerCase().includes(q) || (b.plant ?? "").toLowerCase().includes(q))
+      .map((b) => ({
+        bed: b.name,
+        field: b.fieldName,
+        plant: b.plant ?? "",
+        level: b.level,
+        estimated: estimate.get(b.name),
+        recorded: existing.get(b.name)?.counted,
+      }))
+      // Beds still to walk, which is what someone mid-count wants to see.
+      .filter((r) => !onlyUncounted || (r.recorded === undefined && draft[r.bed] === undefined));
+
+    if (sort === "variety") {
+      return list.sort((a, b) =>
+        a.plant === b.plant
+          ? a.bed.localeCompare(b.bed, undefined, { numeric: true })
+          : a.plant.localeCompare(b.plant)
+      );
+    }
+    if (sort === "estimate") {
+      return list.sort((a, b) => (b.estimated ?? -1) - (a.estimated ?? -1));
+    }
+    return list.sort((a, b) => a.bed.localeCompare(b.bed, undefined, { numeric: true }));
+  }, [beds, field, variety, level, search, onlyPlanted, onlyUncounted, sort, estimate, existing, draft]);
+
+  /** Running totals per variety, so the counter sees the shape of the week. */
+  const byVariety = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const r of rows) {
+      const v = Number(draft[r.bed] ?? r.recorded ?? 0) || 0;
+      if (!v || !r.plant) continue;
+      map.set(r.plant, (map.get(r.plant) ?? 0) + v);
+    }
+    return [...map.entries()].sort((a, b) => b[1] - a[1]);
+  }, [rows, draft]);
 
   const dirty = Object.entries(draft).filter(([bed, v]) => {
     const n = Number(v);
@@ -137,35 +182,63 @@ export default function BedCountGrid() {
           <label className="flex items-center gap-1.5 text-[12px] text-navy-600">
             Shipment week
             <input
-              type="number"
-              min={1}
-              max={53}
-              value={week}
+              type="number" min={1} max={53} value={week}
               onChange={(e) => { setWeek(Number(e.target.value)); setDraft({}); }}
               className="w-16 px-2 py-1.5 text-[13px] rounded-lg border border-sand-200 bg-white
                          text-navy-900 focus:outline-none focus:ring-2 focus:ring-lime-400/30"
             />
           </label>
-          <select
-            value={field}
-            onChange={(e) => setField(e.target.value)}
-            className="px-2 py-1.5 text-[13px] rounded-lg border border-sand-200 bg-white
-                       text-navy-900 cursor-pointer focus:outline-none focus:ring-2 focus:ring-lime-400/30"
-          >
+          <input
+            type="search" value={search} placeholder="Find a bed or variety"
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-44 px-2.5 py-1.5 text-[13px] rounded-lg border border-sand-200 bg-white
+                       text-navy-900 focus:outline-none focus:ring-2 focus:ring-lime-400/30"
+          />
+          <select value={field} onChange={(e) => setField(e.target.value)} className={selectClass}>
             <option value="">All fields</option>
             {fields.map((f) => <option key={f} value={f}>{f}</option>)}
           </select>
+          <select value={variety} onChange={(e) => setVariety(e.target.value)} className={selectClass}>
+            <option value="">All varieties</option>
+            {varieties.map((v) => <option key={v} value={v}>{v}</option>)}
+          </select>
+          <select value={level} onChange={(e) => setLevel(e.target.value)} className={selectClass}>
+            <option value="">All levels</option>
+            {levels.map((l) => (
+              <option key={l} value={String(l)}>{l === 0 ? "Ground" : `Air ${l}`}</option>
+            ))}
+          </select>
+          <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className={selectClass}>
+            <option value="bed">Sort by bed</option>
+            <option value="variety">Sort by variety</option>
+            <option value="estimate">Sort by estimate</option>
+          </select>
           <label className="flex items-center gap-1.5 text-[12px] text-navy-600 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={onlyPlanted}
+            <input type="checkbox" checked={onlyPlanted}
               onChange={(e) => setOnlyPlanted(e.target.checked)}
-              className="accent-lime-500 cursor-pointer"
-            />
+              className="accent-lime-500 cursor-pointer" />
             Planted only
+          </label>
+          <label className="flex items-center gap-1.5 text-[12px] text-navy-600 cursor-pointer">
+            <input type="checkbox" checked={onlyUncounted}
+              onChange={(e) => setOnlyUncounted(e.target.checked)}
+              className="accent-lime-500 cursor-pointer" />
+            Still to count
           </label>
         </div>
       </div>
+
+      {/* What the week is adding up to, per variety, as it is typed. This is
+          the shape the projections roll up into. */}
+      {byVariety.length > 0 && (
+        <div className="flex flex-wrap gap-x-5 gap-y-1.5 px-3 py-2 rounded-lg bg-sand-50 border border-sand-200">
+          {byVariety.map(([v, qty]) => (
+            <span key={v} className="text-[11px] text-navy-600">
+              {v} <span className="font-mono font-semibold text-navy-800 tabular-nums">{qty.toLocaleString()}</span>
+            </span>
+          ))}
+        </div>
+      )}
 
       {rows.length === 0 ? (
         <div className="text-[13px] text-navy-400 py-8 text-center">

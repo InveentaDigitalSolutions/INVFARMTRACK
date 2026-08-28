@@ -14,10 +14,6 @@ import { PLANT_SIZE_OPTIONS } from "../services/plantSizes";
 import BedCountGrid from "../components/BedCountGrid";
 
 const tabs = [
-  // Counting comes first because it is the source: the projections customers
-  // see are what was counted, and the pruning curve is the estimate it is
-  // checked against.
-  { id: "count", label: "Field Count" },
   { id: "projections", label: "Weekly Projections" },
   { id: "curve", label: "Pruning Curve" },
   { id: "log", label: "Pruning Log" },
@@ -206,6 +202,7 @@ function PruningCurveChart({ data }: { data: typeof initCurve }) {
 
 export default function AvailabilityPage() {
   const [tab, setTab] = useState(tabs[0].id);
+  const [counting, setCounting] = useState(false);
 
   const [projections, setProjections] = useRecords("projections", initProjections);
   const [curve, setCurve] = useRecords("curve", initCurve);
@@ -238,9 +235,22 @@ export default function AvailabilityPage() {
 
   const renderTab = () => {
     switch (tab) {
-      case "count":
-        return <BedCountGrid />;
       case "projections":
+        if (counting) {
+          return (
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={() => setCounting(false)}
+                className="text-[12px] text-navy-500 hover:text-navy-800 cursor-pointer
+                           focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40 rounded"
+              >
+                ← Back to projections
+              </button>
+              <BedCountGrid />
+            </div>
+          );
+        }
         return (
           <>
             <DataTable
@@ -256,7 +266,7 @@ export default function AvailabilityPage() {
                 { key: "shortfall", label: "Shortfall" },
               ]}
               data={projections}
-              onAdd={projectionForm.openCreate}
+              onAdd={() => setCounting(true)}
               onEdit={(row, i) => projectionForm.openEdit(row as any, i)}
               onDelete={(row, i) => confirm.requestDelete(row, i)}
               addLabel="New Projection"
