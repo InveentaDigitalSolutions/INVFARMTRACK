@@ -25,6 +25,7 @@ import WeatherWidget from "../components/WeatherWidget";
 import { useExchangeRate } from "../hooks/useExchangeRate";
 import { useDashboardMetrics } from "../hooks/useDashboardMetrics";
 import RankedBars from "../components/RankedBars";
+import VarietyFulfilment from "../components/VarietyFulfilment";
 
 const container = {
   hidden: {},
@@ -233,6 +234,13 @@ export default function DashboardPage() {
       {/* Weather */}
       <motion.div variants={item} className="mb-5">
         <WeatherWidget />
+      </motion.div>
+
+      {/* Can we keep our promises, by variety. The three numbers behind
+          each one are not interchangeable — forecast, count, demand — so the
+          bar shows which of them it rests on. */}
+      <motion.div variants={item} className="mb-5">
+        <VarietyFulfilment />
       </motion.div>
 
       {/* Main grid: charts + map */}
