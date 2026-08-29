@@ -14,7 +14,7 @@
 
 import { useMemo } from "react";
 import { useRecords } from "../hooks/useRecords";
-import { varietyCoverage, coverageVerdict } from "../services/varietySupply";
+import { varietyCoverage } from "../services/varietySupply";
 
 interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; status?: string }
 interface CountRow { id: string; bed?: string; week?: number; counted?: number }
@@ -38,23 +38,67 @@ export default function VarietyFulfilment() {
     [plantings, counts, pruning, demand]
   );
 
-  const verdict = useMemo(() => coverageVerdict(rows), [rows]);
   const max = Math.max(...rows.flatMap((r) => [r.supply, r.demand]), 1);
 
-  const accent =
-    verdict.tone === "bad" ? "border-l-red-500"
-    : verdict.tone === "warn" ? "border-l-amber-500"
-    : verdict.tone === "good" ? "border-l-lime-600"
-    : "border-l-navy-300";
+  /**
+   * The figures the headline used to say in prose. Four of them, because
+   * "covered" alone hides both how far short we are and how much of the answer
+   * rests on a forecast rather than a count.
+   */
+  const kpi = useMemo(() => {
+    const asked = rows.filter((r) => r.demand > 0);
+    const demand = asked.reduce((s, r) => s + r.demand, 0);
+    const supply = asked.reduce((s, r) => s + Math.min(r.supply, r.demand), 0);
+    const short = asked.filter((r) => r.balance < 0);
+    return {
+      asked: asked.length,
+      covered: asked.length - short.length,
+      coveredPct: asked.length ? Math.round(((asked.length - short.length) / asked.length) * 100) : 0,
+      demandPct: demand ? Math.round((supply / demand) * 100) : 0,
+      shortBy: short.reduce((s, r) => s + Math.abs(r.balance), 0),
+      shortCount: short.length,
+      assumed: asked.filter((r) => r.assumed).length,
+      assumedPct: asked.length
+        ? Math.round((asked.filter((r) => r.assumed).length / asked.length) * 100)
+        : 0,
+    };
+  }, [rows]);
 
   return (
-    <div className={`bg-white rounded-xl border border-sand-200/80 border-l-4 ${accent} p-5 shadow-sm`}>
-      <div className="flex items-start justify-between gap-3 mb-1">
-        <p className="text-[13px] font-semibold text-navy-900">{verdict.headline}</p>
-      </div>
+    <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
+      <p className="text-[13px] font-semibold text-navy-900">Client fulfilment by variety</p>
       <p className="text-[11px] text-navy-400 mb-4">
         Supply against demand per variety · a hollow bar rests on the pruning forecast, not a count
       </p>
+
+      {kpi.asked > 0 && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-sand-200 rounded-lg
+                        overflow-hidden mb-5">
+          <Stat
+            label="Varieties covered"
+            value={`${kpi.covered}/${kpi.asked}`}
+            note={`${kpi.coveredPct}% of what was asked for`}
+          />
+          <Stat
+            label="Demand met"
+            value={`${kpi.demandPct}%`}
+            note="of the quantity requested"
+            tone={kpi.demandPct >= 100 ? "good" : kpi.demandPct >= 80 ? "warn" : "bad"}
+          />
+          <Stat
+            label="Short by"
+            value={kpi.shortBy.toLocaleString()}
+            note={kpi.shortCount ? `across ${kpi.shortCount} varieties` : "nothing outstanding"}
+            tone={kpi.shortBy > 0 ? "bad" : "good"}
+          />
+          <Stat
+            label="On forecast only"
+            value={`${kpi.assumedPct}%`}
+            note={`${kpi.assumed} not yet counted`}
+            tone={kpi.assumedPct > 50 ? "warn" : "default"}
+          />
+        </div>
+      )}
 
       {rows.length === 0 ? (
         <p className="text-[12px] text-navy-400 py-8 text-center">
@@ -128,6 +172,29 @@ export default function VarietyFulfilment() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+/** One figure in the strip above the bars. Colour carries the reading. */
+function Stat({
+  label, value, note, tone = "default",
+}: {
+  label: string;
+  value: string;
+  note?: string;
+  tone?: "default" | "good" | "warn" | "bad";
+}) {
+  const colour =
+    tone === "good" ? "text-lime-700"
+    : tone === "warn" ? "text-amber-700"
+    : tone === "bad" ? "text-red-700"
+    : "text-navy-900";
+  return (
+    <div className="bg-white px-3.5 py-3">
+      <p className="text-[10px] uppercase tracking-wide text-navy-400">{label}</p>
+      <p className={`text-[19px] font-semibold tabular-nums leading-tight ${colour}`}>{value}</p>
+      {note && <p className="text-[10px] text-navy-400 mt-0.5">{note}</p>}
     </div>
   );
 }

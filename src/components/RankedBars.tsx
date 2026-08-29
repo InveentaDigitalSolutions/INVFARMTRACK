@@ -63,8 +63,11 @@ export default function RankedBars({
               {row.name}
             </span>
             <div className="relative flex-1 h-3.5 rounded bg-sand-100 overflow-hidden">
+              {/* Brand navy for every bar, the accent for the picked one.
+                  Grey was in no part of the palette and read as disabled
+                  rather than neutral. */}
               <div
-                className={`absolute inset-y-0 left-0 rounded ${picked ? "bg-lime-600" : "bg-navy-200"}`}
+                className={`absolute inset-y-0 left-0 rounded ${picked ? "bar-accent" : "bar-fill"}`}
                 style={{ width: `${Math.max((row.value / ceiling) * 100, 1)}%` }}
               />
               {showAverage && sorted.length > 1 && (

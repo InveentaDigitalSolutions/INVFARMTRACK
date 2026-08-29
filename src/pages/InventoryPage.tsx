@@ -1,16 +1,21 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { PackageSearch, FlaskConical } from "lucide-react";
+import { PackageSearch, FlaskConical, Wallet, TriangleAlert, Layers } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
 import Badge from "../components/Badge";
 import StatCard from "../components/StatCard";
+import RankedBars from "../components/RankedBars";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { stockLevels, lowStock, direction, type Movement } from "../services/stock";
+
+/** Lempira, the way Accounting writes it, so one number reads like the next. */
+const lempira = (v: number) =>
+  `L ${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
 const tabs = [
   // What is on hand comes first: it is the question the store gets asked.
@@ -119,6 +124,44 @@ export default function InventoryPage() {
   );
   const low = useMemo(() => lowStock(levels, reorder), [levels, reorder]);
 
+  /**
+   * What the store is worth and where it sits.
+   *
+   * A sentence listing four short items answered "which" and nothing else —
+   * not how much money is on the shelf, not how much of the store is short.
+   * Value comes from the last price paid per item, so an item never bought
+   * carries no value rather than a zero.
+   */
+  const stockKpi = useMemo(() => {
+    const categoryOf = new Map(
+      (materials as { name?: string; category?: string }[])
+        .map((m) => [String(m.name ?? ""), String(m.category ?? "Other")])
+    );
+    const value = levels.reduce((s, l) => s + (l.value ?? 0), 0);
+    const valued = levels.filter((l) => l.value !== undefined).length;
+
+    const byCategory = new Map<string, number>();
+    for (const l of levels) {
+      if (!l.value) continue;
+      const c = categoryOf.get(l.item) ?? "Uncategorised";
+      byCategory.set(c, (byCategory.get(c) ?? 0) + l.value);
+    }
+    const ranked = [...byCategory.entries()]
+      .map(([name, v]) => ({ name, value: Math.round(v) }))
+      .sort((a, b) => b.value - a.value);
+
+    return {
+      value,
+      valued,
+      tracked: levels.length,
+      unpriced: levels.length - valued,
+      lowPct: levels.length ? Math.round((low.length / levels.length) * 100) : 0,
+      shortBy: low.reduce((s, l) => s + l.short, 0),
+      ranked,
+      topShare: value && ranked[0] ? Math.round((ranked[0].value / value) * 100) : 0,
+    };
+  }, [levels, materials, low]);
+
   const inputForm = useFormModal(initInputs[0]);
   const confirm = useConfirmDialog();
 
@@ -145,15 +188,58 @@ export default function InventoryPage() {
       case "stock":
         return (
           <div className="space-y-4">
-            {low.length > 0 && (
-              <div className="bg-white rounded-xl border border-sand-200/80 border-l-4 border-l-amber-500 p-4 shadow-sm">
-                <h4 className="text-[13px] font-semibold text-navy-900 mb-1">
-                  {low.length} {low.length === 1 ? "item is" : "items are"} at or below the reorder level
-                </h4>
-                <p className="text-[12px] text-navy-500">
-                  {low.slice(0, 4).map((l) => `${l.item} (${l.onHand} left, short ${l.short})`).join(" · ")}
-                  {low.length > 4 && ` and ${low.length - 4} more`}
+            {levels.length > 0 && (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <StatCard
+                  label="Stock on hand"
+                  value={lempira(stockKpi.value)}
+                  icon={Wallet}
+                  context={stockKpi.unpriced
+                    ? `${stockKpi.unpriced} items have no price yet`
+                    : "valued at the last price paid"}
+                />
+                <StatCard
+                  label="Items tracked"
+                  value={String(stockKpi.tracked)}
+                  icon={PackageSearch}
+                  context={`${stockKpi.valued} carry a value`}
+                />
+                <StatCard
+                  label="Below reorder"
+                  value={`${low.length}`}
+                  icon={TriangleAlert}
+                  tone={low.length > 0 ? "warning" : "neutral"}
+                  context={low.length ? `${stockKpi.lowPct}% of the store · short ${stockKpi.shortBy.toLocaleString()}` : "nothing to reorder"}
+                />
+                <StatCard
+                  label="Largest category"
+                  value={stockKpi.ranked[0]?.name ?? "—"}
+                  icon={Layers}
+                  context={stockKpi.ranked[0] ? `${stockKpi.topShare}% of the value on the shelf` : "no priced stock yet"}
+                />
+              </div>
+            )}
+
+            {stockKpi.ranked.length > 1 && (
+              <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
+                <h4 className="text-[13px] font-semibold text-navy-900">Where the money sits</h4>
+                <p className="text-[11px] text-navy-400 mb-4">
+                  Value on hand by material category
                 </p>
+                <RankedBars rows={stockKpi.ranked} format={lempira} />
+              </div>
+            )}
+
+            {low.length > 0 && (
+              <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
+                <h4 className="text-[13px] font-semibold text-navy-900">To reorder</h4>
+                <p className="text-[11px] text-navy-400 mb-4">
+                  How far each item sits below its reorder level
+                </p>
+                <RankedBars
+                  rows={low.map((l) => ({ name: l.item, value: l.short }))}
+                  showAverage={false}
+                />
               </div>
             )}
             <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">

@@ -3,8 +3,8 @@
  *
  * Availability had a table of projections and nothing that answered the
  * question the table exists for: can we cover what has been asked for, and
- * when can we not. Following the reports Santiago shared — a verdict first,
- * figures that carry a comparison, then the detail.
+ * when can we not. Figures first, each carrying its own comparison, then the
+ * detail — a paragraph restating the tiles was only saying it twice.
  *
  * The chart draws three things because the nursery has three: what pruning
  * assumed, what someone counted, and what customers asked for. A week resting
@@ -19,7 +19,7 @@ import { useRecords } from "../hooks/useRecords";
 import MetricTile from "./MetricTile";
 import RankedBars from "./RankedBars";
 import {
-  weeklySupply, supplyVerdict, shortfallByVariety, countedShare,
+  weeklySupply, shortfallByVariety, countedShare,
   type WeekSupply,
 } from "../services/availabilityInsight";
 
@@ -36,8 +36,6 @@ export default function AvailabilityOverview() {
     () => weeklySupply({ counts, pruning, demand }),
     [counts, pruning, demand]
   );
-  const verdict = useMemo(() => supplyVerdict(weeks), [weeks]);
-
   const shortfalls = useMemo(() => {
     // Supply per variety is not yet attributable — counts are per bed and the
     // bed's variety comes from its planting — so this compares what was asked
@@ -59,25 +57,12 @@ export default function AvailabilityOverview() {
     };
   }, [weeks]);
 
-  const accent =
-    verdict.tone === "bad" ? "border-l-red-500"
-    : verdict.tone === "warn" ? "border-l-amber-500"
-    : verdict.tone === "good" ? "border-l-lime-500"
-    : "border-l-navy-300";
-
   return (
     <div className="space-y-5">
       <motion.div
         initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-        className={`bg-white rounded-xl border border-sand-200/80 border-l-4 ${accent} p-5 shadow-sm`}
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3"
       >
-        <h3 className="text-[15px] font-semibold text-navy-900 mb-1">{verdict.headline}</h3>
-        {verdict.detail && (
-          <p className="text-[13px] text-navy-600 leading-relaxed max-w-3xl">{verdict.detail}</p>
-        )}
-      </motion.div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricTile
           label="Available across the period"
           value={totals.supply ? totals.supply.toLocaleString() : "—"}
@@ -118,7 +103,7 @@ export default function AvailabilityOverview() {
             value: String(weeks.filter((w) => w.assumed).length),
           }}
         />
-      </div>
+      </motion.div>
 
       <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
         <h4 className="text-[13px] font-semibold text-navy-900">Supply against demand</h4>

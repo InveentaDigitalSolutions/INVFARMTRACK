@@ -38,7 +38,9 @@ const item = {
 
 // Dummy KPI data
 /** Varieties are coloured by position, since the set is not known ahead. */
-const VARIETY_COLORS = ["#3d8b40", "#5aaa5d", "#88c48a", "#c4d93e", "#7f9228", "#b8ddb9"];
+// One ramp, navy through lime, so the donut reads as part of the same design
+// as every bar in the app rather than a second palette of assorted greens.
+const VARIETY_COLORS = ["#1f2f42", "#33465e", "#4a6280", "#667f57", "#8aa832", "#a3b835"];
 
 
 

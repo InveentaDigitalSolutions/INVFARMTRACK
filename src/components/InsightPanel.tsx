@@ -5,6 +5,10 @@ import { plotConfigs } from "./ShadehouseView";
 /**
  * The insight is *derived*, never authored. Every figure below traces back to
  * the bed set, so it cannot drift out of step with what the layout shows.
+ *
+ * It used to close with a paragraph that spelled the same numbers out in
+ * prose. Santiago's read was that the prose earned none of the space it took —
+ * so the figures stand on their own, four of them, read at a glance.
  */
 export interface Insight {
   eyebrow: string;
@@ -12,7 +16,8 @@ export interface Insight {
   standfirst: string;
   figure: string;
   figureNote: string;
-  body: React.ReactNode;
+  /** The supporting figures, in the order they are worth reading. */
+  stats: { label: string; value: string; tone?: "good" | "bad" }[];
   delta?: { value: string; direction: "up" | "down"; good: boolean; label: string };
 }
 
@@ -53,44 +58,21 @@ export function deriveShadehouseInsight(beds: ShadehouseBed[]): Insight | null {
     standfirst: `${weakest.empty} of ${weakest.total} beds sitting idle`,
     figure: pct(weakest.occupancy),
     figureNote: "bed occupancy",
+    stats: [
+      { label: "Planted overall", value: pct(occupancy) },
+      { label: "Idle beds", value: `${totalEmpty}`, tone: totalEmpty > 0 ? "bad" : "good" },
+      { label: "Harvest-ready", value: `${totalReady}`, tone: totalReady > 0 ? "good" : undefined },
+      { label: "Needs attention", value: `${totalIssues}`, tone: totalIssues > 0 ? "bad" : "good" },
+      { label: "Best field", value: `${strongest.label} · ${pct(strongest.occupancy)}` },
+      { label: "Beds in total", value: `${totalBeds}` },
+    ],
     delta: {
       value: `${Math.round((weakest.occupancy - occupancy) * 100)} pts`,
       direction: weakest.occupancy < occupancy ? "down" : "up",
       good: weakest.occupancy >= occupancy,
       label: "vs shadehouse average",
     },
-    body: (
-      <>
-        <Metric>{strongest.label}</Metric> leads at{" "}
-        <Metric>{pct(strongest.occupancy)}</Metric>, while{" "}
-        <Metric>{weakest.label}</Metric> is the drag on season volume.{" "}
-        {totalReady > 0 && (
-          <>
-            <Metric>{totalReady}</Metric> beds are harvest-ready across the
-            shadehouse
-            {totalIssues > 0 ? ", " : ". "}
-          </>
-        )}
-        {totalIssues > 0 && (
-          <>
-            and <Alarm>{totalIssues}</Alarm>{" "}
-            {totalIssues === 1 ? "bed needs" : "beds need"} attention for pest or
-            disease.{" "}
-          </>
-        )}
-        Overall occupancy is <Metric>{pct(occupancy)}</Metric> across{" "}
-        {totalBeds} beds.
-      </>
-    ),
   };
-}
-
-function Metric({ children }: { children: React.ReactNode }) {
-  return <span className="font-semibold text-lime-300">{children}</span>;
-}
-
-function Alarm({ children }: { children: React.ReactNode }) {
-  return <span className="font-semibold text-red-300">{children}</span>;
 }
 
 export default function InsightPanel({
@@ -129,9 +111,21 @@ export default function InsightPanel({
         </span>
       </div>
 
-      <p className="text-[12.5px] leading-relaxed text-white/70 mt-4">
-        {insight.body}
-      </p>
+      <div className="grid grid-cols-2 gap-x-5 gap-y-3.5 mt-5 pt-5 border-t border-white/10">
+        {insight.stats.map((s) => (
+          <div key={s.label}>
+            <p className="text-[10px] uppercase tracking-[0.1em] text-white/45">{s.label}</p>
+            <p
+              className={`text-[17px] font-semibold tabular-nums leading-tight truncate ${
+                s.tone === "bad" ? "text-red-300" : s.tone === "good" ? "text-lime-300" : "text-white"
+              }`}
+              title={s.value}
+            >
+              {s.value}
+            </p>
+          </div>
+        ))}
+      </div>
 
       {insight.delta && (
         <span className="inline-flex items-center gap-1.5 self-start mt-5 px-3 py-1.5 rounded-full bg-white/6 ring-1 ring-white/10">

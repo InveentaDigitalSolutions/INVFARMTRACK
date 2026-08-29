@@ -180,9 +180,9 @@ export default function ProductionOverview() {
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
         <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
-          <h4 className="text-[13px] font-semibold text-navy-900">{model.variety.headline}</h4>
+          <h4 className="text-[13px] font-semibold text-navy-900">Harvest by variety</h4>
           <p className="text-[11px] text-navy-400 mb-4">
-            {model.variety.detail ?? "Harvest attributed through the bed each cut came from"}
+            {model.variety.detail ?? "Attributed through the bed each cut came from"}
           </p>
           <RankedBars rows={model.byVariety.map((v) => ({ name: v.label, value: v.value }))} />
         </div>

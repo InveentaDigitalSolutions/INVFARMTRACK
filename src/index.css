@@ -502,3 +502,29 @@
   background-color: #3b4c62;
   color: #f0f3f7;
 }
+
+/*
+ * Chart fills.
+ *
+ * Bars were bg-navy-200, a grey that read as disabled rather than neutral and
+ * belonged to no part of the palette. Navy is the brand's own on a light
+ * ground; on a dark one it is the ground, so the fill lifts instead.
+ */
+.bar-fill { background-color: #566d8a; }
+.dark .bar-fill { background-color: #7e92ab; }
+.bar-accent { background-color: #1f2f42; }
+.dark .bar-accent { background-color: #a3b835; }
+
+/*
+ * Semantic text on the dark ground.
+ *
+ * The 600/700 weights are chosen against white; on #1b2838 they sink into the
+ * card and a shortfall stops reading as one. Lifted here rather than at each
+ * call site so a figure means the same thing on both grounds.
+ */
+.dark .text-red-600:not(.keep-light),
+.dark .text-red-700:not(.keep-light) { color: #f08d80; }
+.dark .text-amber-600:not(.keep-light),
+.dark .text-amber-700:not(.keep-light) { color: #e3b357; }
+.dark .text-lime-700:not(.keep-light) { color: #b9cf46; }
+.dark .text-green-600:not(.keep-light) { color: #6fc27a; }
