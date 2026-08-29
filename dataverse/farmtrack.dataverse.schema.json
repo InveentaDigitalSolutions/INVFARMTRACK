@@ -1963,14 +1963,6 @@
           "description": "Auto-generated identifier, format PCK-0001."
         },
         {
-          "schemaName": "bv_PackingId",
-          "displayName": "ID",
-          "type": "string",
-          "maxLength": 50,
-          "required": true,
-          "description": "Short text value. ID for the Packing."
-        },
-        {
           "schemaName": "bv_Barcode",
           "displayName": "Barcode",
           "type": "string",
@@ -2185,6 +2177,14 @@
           "type": "date",
           "required": false,
           "description": "Date the event took place."
+        },
+        {
+          "schemaName": "bv_ShipmentId",
+          "displayName": "Shipment",
+          "type": "lookup",
+          "required": false,
+          "relatedTable": "bv_Shipment",
+          "description": "The consignment this box went in. Without it a box has full traceability to a bed and no way to say which shipment carried it."
         }
       ]
     },
@@ -5939,6 +5939,119 @@
           "displayName": "Notes",
           "type": "memo",
           "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "bv_Shipment",
+      "displayName": "Shipment",
+      "displayCollectionName": "Shipments",
+      "ownershipType": "UserOwned",
+      "description": "One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed \u2014 so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went.",
+      "columns": [
+        {
+          "schemaName": "bv_ShipmentCode",
+          "displayName": "Shipment ID",
+          "type": "autonumber",
+          "autoNumberFormat": "SHP-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format SHP-0001."
+        },
+        {
+          "schemaName": "bv_ShipDate",
+          "displayName": "Ship Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "bv_Carrier",
+          "displayName": "Carrier",
+          "type": "string",
+          "required": false
+        },
+        {
+          "schemaName": "bv_AWBNumber",
+          "displayName": "AWB",
+          "type": "string",
+          "required": false,
+          "description": "Air waybill, which is how the freight forwarder and the customer refer to it."
+        },
+        {
+          "schemaName": "bv_Status",
+          "displayName": "Status",
+          "type": "choice",
+          "required": true,
+          "options": [
+            {
+              "value": 187460000,
+              "label": "Draft"
+            },
+            {
+              "value": 187460001,
+              "label": "Packing"
+            },
+            {
+              "value": 187460002,
+              "label": "Packed"
+            },
+            {
+              "value": 187460003,
+              "label": "Shipped"
+            },
+            {
+              "value": 187460004,
+              "label": "Delivered"
+            },
+            {
+              "value": 187460005,
+              "label": "Cancelled"
+            }
+          ],
+          "description": "Where the consignment has got to. One of: Draft, Packing, Packed, Shipped, Delivered, Cancelled."
+        },
+        {
+          "schemaName": "bv_ETD",
+          "displayName": "ETD",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "bv_ETA",
+          "displayName": "ETA",
+          "type": "date",
+          "required": false
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        },
+        {
+          "schemaName": "bv_CustomerId",
+          "displayName": "Customer",
+          "type": "lookup",
+          "required": true,
+          "relatedTable": "bv_Customer",
+          "description": "Link to the related Customer record."
+        },
+        {
+          "schemaName": "bv_OrderId",
+          "displayName": "Order",
+          "type": "lookup",
+          "required": false,
+          "relatedTable": "bv_Order",
+          "description": "The order this fulfils. Order, then shipment, then invoice for what actually went."
+        },
+        {
+          "schemaName": "bv_InvoiceId",
+          "displayName": "Invoice",
+          "type": "lookup",
+          "required": false,
+          "relatedTable": "bv_Invoice",
+          "description": "Link to the related Invoice record."
         }
       ]
     }

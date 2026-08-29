@@ -52,6 +52,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_purchaseorders",
   "bv_seasons",
   "bv_shadehouses",
+  "bv_shipments",
   "bv_soilanalysises",
   "bv_stockmovements",
   "bv_substratematerials",
@@ -121,7 +122,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_treatments": "bv_treatmentname",
   "bv_workers": "bv_workername",
   "bv_materials": "bv_materialname",
-  "bv_stockmovements": "bv_stockmovementname"
+  "bv_stockmovements": "bv_stockmovementname",
+  "bv_shipments": "bv_shipmentcode"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -307,6 +309,10 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_shadehouseid_value": {
       "nav": "bv_ShadehouseId",
       "targetSet": "bv_shadehouses"
+    },
+    "_bv_shipmentid_value": {
+      "nav": "bv_ShipmentId",
+      "targetSet": "bv_shipments"
     }
   },
   "bv_payments": {
@@ -427,6 +433,20 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_purchaseorderid_value": {
       "nav": "bv_PurchaseOrderId",
       "targetSet": "bv_purchaseorders"
+    }
+  },
+  "bv_shipments": {
+    "_bv_customerid_value": {
+      "nav": "bv_CustomerId",
+      "targetSet": "bv_customers"
+    },
+    "_bv_invoiceid_value": {
+      "nav": "bv_InvoiceId",
+      "targetSet": "bv_invoices"
+    },
+    "_bv_orderid_value": {
+      "nav": "bv_OrderId",
+      "targetSet": "bv_orders"
     }
   }
 };
@@ -887,6 +907,16 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Written off": 187460003,
       "Adjustment up": 187460004,
       "Adjustment down": 187460005
+    }
+  },
+  "bv_shipments": {
+    "bv_status": {
+      "Draft": 187460000,
+      "Packing": 187460001,
+      "Packed": 187460002,
+      "Shipped": 187460003,
+      "Delivered": 187460004,
+      "Cancelled": 187460005
     }
   }
 };

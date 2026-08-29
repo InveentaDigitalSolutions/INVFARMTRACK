@@ -9,9 +9,9 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 46 |
-| Columns | 561 |
-| Relationships | 60 |
+| Tables | 47 |
+| Columns | 572 |
+| Relationships | 64 |
 
 ## Conventions
 
@@ -77,6 +77,7 @@
 | [Bed Count](#bed-count) | `bv_bedcount` | `CNT-0001` | 9 | What one bed is expected to yield for one shipment week, counted in the field. The nursery has two availabilities: one calculated from pruning, and this one, which is someone walking the rows. Where a count exists it is the better number, so it is kept beside the estimate rather than overwriting it. |
 | [Material](#material) | `bv_material` | `MAT-0001` | 10 | Something the nursery buys and stores rather than applies to a plant — drip line, boxes, plastic baskets, plumbing, shade cloth. Kept apart from Inputs because an input has a composition and a safety interval and a box of fittings has neither. |
 | [Stock Movement](#stock-movement) | `bv_stockmovement` | `STK-0001` | 12 | One receipt, issue or correction. Stock on hand is the sum of these rather than a number somebody edits: a stored total drifts silently, and nothing afterwards can say why it changed. Points at a Material or an Input — a sack of fertilizer is stock in the same way a box of fittings is. |
+| [Shipment](#shipment) | `bv_shipment` | `SHP-0001` | 11 | One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed — so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went. |
 
 ## Relationships
 
@@ -101,6 +102,7 @@
 | Packing | `bv_shadehouseid` | Shadehouse | Remove link |
 | Packing | `bv_orderid` | Order | Remove link |
 | Packing | `bv_invoiceid` | Invoice | Remove link |
+| Packing | `bv_shipmentid` | Shipment | Remove link |
 | Invoice | `bv_fiscalauthid` | Fiscal Authorization | Remove link |
 | Invoice | `bv_customerid` | Customer | Restrict |
 | Plant Price | `bv_plantid` | Plant | Restrict |
@@ -142,6 +144,9 @@
 | Stock Movement | `bv_inputid` | Input | Remove link |
 | Stock Movement | `bv_purchaseorderid` | Purchase Order | Remove link |
 | Stock Movement | `bv_bedid` | Bed | Remove link |
+| Shipment | `bv_customerid` | Customer | Restrict |
+| Shipment | `bv_orderid` | Order | Remove link |
+| Shipment | `bv_invoiceid` | Invoice | Remove link |
 
 ---
 
@@ -706,7 +711,7 @@ Nursery customers for orders and invoicing
 
 </details>
 
-**Referenced by:** Order (`bv_customerid`), Invoice (`bv_customerid`), Plant Price (`bv_customerid`), Demand Forecast (`bv_customerid`)
+**Referenced by:** Order (`bv_customerid`), Invoice (`bv_customerid`), Plant Price (`bv_customerid`), Demand Forecast (`bv_customerid`), Shipment (`bv_customerid`)
 
 ## Order
 
@@ -742,7 +747,7 @@ Customer orders
 
 </details>
 
-**Referenced by:** Order Item (`bv_orderid`), Packing (`bv_orderid`)
+**Referenced by:** Order Item (`bv_orderid`), Packing (`bv_orderid`), Shipment (`bv_orderid`)
 
 ## Order Item
 
@@ -773,7 +778,6 @@ Per-box packing records — each record is one box with full traceability
 | Column | Display name | Type | Req. | Description |
 |---|---|---|:--:|---|
 | `bv_packingcode` 🔑 | Packing ID | Autonumber | ✓ | Auto-generated identifier, format PCK-0001. |
-| `bv_packingid` | ID | Text(50) | ✓ | Short text value. ID for the Packing. |
 | `bv_barcode` | Barcode | Text(100) |  | Short text value. Barcode for the Packing. |
 | `bv_boxnumber` | Box Number | Whole number |  | Whole number. Box Number for the Packing. |
 | `bv_plantid` | Product (Plant) | Lookup → [Plant](#plant) | ✓ | Link to the related Plant record. |
@@ -796,6 +800,7 @@ Per-box packing records — each record is one box with full traceability
 | `bv_size` | Size | Choice |  | One of: Petit, Mini Petit, Small, Medium, California, Large, Extra Large. |
 | `bv_packingcompleted` | Packing Completed | Yes/No |  | Yes/no flag. Packing Completed for the Packing. |
 | `bv_packingdate` | Packing Date | Date only |  | Date the event took place. |
+| `bv_shipmentid` | Shipment | Lookup → [Shipment](#shipment) |  | The consignment this box went in. Without it a box has full traceability to a bed and no way to say which shipment carried it. |
 
 <details><summary>Choice values</summary>
 
@@ -935,7 +940,7 @@ Export invoices with shipping, fiscal, and payment tracking
 
 </details>
 
-**Referenced by:** Packing (`bv_invoiceid`), CAI Number (`bv_invoiceid`), Payment (`bv_invoiceid`)
+**Referenced by:** Packing (`bv_invoiceid`), CAI Number (`bv_invoiceid`), Payment (`bv_invoiceid`), Shipment (`bv_invoiceid`)
 
 ## Plant Price
 
@@ -1946,3 +1951,42 @@ One receipt, issue or correction. Stock on hand is the sum of these rather than 
 | 187460005 | Adjustment down |
 
 </details>
+
+## Shipment
+
+`bv_shipment` · User-owned
+
+One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed — so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went.
+
+**Record ID:** `bv_shipmentcode` — format `SHP-{SEQNUM:4}`, e.g. `SHP-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_shipmentcode` 🔑 | Shipment ID | Autonumber | ✓ | Auto-generated identifier, format SHP-0001. |
+| `bv_shipdate` | Ship Date | Date only | ✓ |  |
+| `bv_carrier` | Carrier | Text(100) |  |  |
+| `bv_awbnumber` | AWB | Text(100) |  | Air waybill, which is how the freight forwarder and the customer refer to it. |
+| `bv_status` | Status | Choice | ✓ | Where the consignment has got to. One of: Draft, Packing, Packed, Shipped, Delivered, Cancelled. |
+| `bv_etd` | ETD | Date only |  |  |
+| `bv_eta` | ETA | Date only |  |  |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+| `bv_customerid` | Customer | Lookup → [Customer](#customer) | ✓ | Link to the related Customer record. |
+| `bv_orderid` | Order | Lookup → [Order](#order) |  | The order this fulfils. Order, then shipment, then invoice for what actually went. |
+| `bv_invoiceid` | Invoice | Lookup → [Invoice](#invoice) |  | Link to the related Invoice record. |
+
+<details><summary>Choice values</summary>
+
+**Status** (`bv_status`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Draft |
+| 187460001 | Packing |
+| 187460002 | Packed |
+| 187460003 | Shipped |
+| 187460004 | Delivered |
+| 187460005 | Cancelled |
+
+</details>
+
+**Referenced by:** Packing (`bv_shipmentid`)

@@ -278,6 +278,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_shipments": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_shipmentid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_soilanalysises": {
     "tableId": "",
     "version": "",

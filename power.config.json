@@ -10,7 +10,7 @@
   "localAppUrl": "http://localhost:5173",
   "logoPath": "Default",
   "connectionReferences": {
-    "31afeb3a-735d-4c0f-b493-b7a94dea4fd6": {
+    "e0d26b41-3421-4595-939d-33971dfcaada": {
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       "displayName": "Logic flows",
       "dataSources": [
@@ -225,6 +225,10 @@
         "stockMovements": {
           "entitySetName": "bv_stockmovements",
           "logicalName": "bv_stockmovement"
+        },
+        "shipments": {
+          "entitySetName": "bv_shipments",
+          "logicalName": "bv_shipment"
         }
       }
     }

@@ -81,6 +81,8 @@ for (const { key, set } of bindings) {
   const body = {}
   for (const col of table.columns) {
     if (col.type === 'autonumber' || col.type === 'lookup') continue
+    // The table's own primary key is a system GUID; writing to it fails.
+    if (col.schemaName.toLowerCase() === `${table.schemaName.toLowerCase()}id`) continue
     if (!col.required && !col.isPrimaryName) continue
     const v = valueFor(col, set)
     if (v !== undefined) body[col.schemaName.toLowerCase()] = v
@@ -101,8 +103,11 @@ for (const { key, set } of bindings) {
     continue
   }
   const row = await created.json()
-  const idKey = Object.keys(row).find((k) => k.endsWith('id') && !k.startsWith('_') && k.startsWith('bv_'))
-  const id = row[idKey]
+  // The primary key follows from the table name; guessing it from the
+  // response picked whichever bv_*id key happened to come first, and a wrong
+  // guess sends the patch to (undefined) and reads as a query-syntax error.
+  const id = row[`${table.schemaName.toLowerCase()}id`]
+  if (!id) { console.log(`  ${key.padEnd(20)} create ok · NO ID RETURNED`); fail++; continue }
 
   // patch something that exists on every table
   const patchable = table.columns.find((c) => c.type === 'memo')
@@ -113,7 +118,12 @@ for (const { key, set } of bindings) {
     const r = await fetch(`${ORG}/api/data/v9.2/${set}(${id})`, {
       method: 'PATCH', headers: H, body: JSON.stringify({ [ln]: 'patched' }),
     })
-    patched = r.ok && (await r.json())[ln] === 'patched' ? 'ok' : `FAILED ${r.status}`
+    if (r.ok) {
+      patched = (await r.json())[ln] === 'patched' ? 'ok' : `wrote but did not read back (${ln})`
+    } else {
+      const why = (await r.text()).match(/"message":"([^"]{0,90})/)?.[1] ?? ''
+      patched = `FAILED ${r.status} on ${ln} — ${why}`
+    }
   }
 
   await fetch(`${ORG}/api/data/v9.2/${set}(${id})`, { method: 'DELETE', headers: H })
