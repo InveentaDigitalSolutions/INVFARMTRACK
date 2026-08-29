@@ -313,8 +313,20 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       code: "bv_customercode",
       name: "bv_customername",
       contact: "bv_contactname",
+      contactEmail: "bv_contactemail",
       email: "bv_email",
+      // The invoice needs these to name the buying party correctly. They
+      // existed in Dataverse and were unmapped, so the printed invoice had no
+      // address, no tax id and no phone to draw on — which is how another
+      // company's details ended up hardcoded there instead.
+      phone: "bv_phone",
+      address: "bv_address",
+      taxId: "bv_taxid",
+      deliverToName: "bv_delivertoname",
+      deliverToAddress: "bv_delivertoaddress",
       terms: "bv_paymentterms",
+      notes: "bv_notes",
+      active: "bv_isactive",
     },
   },
   plantings: {

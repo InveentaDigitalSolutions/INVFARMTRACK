@@ -212,13 +212,14 @@ export default function InvoiceGenerator({
         caiRange: auth?.rangeStart && auth?.rangeEnd ? `${auth.rangeStart} hasta ${auth.rangeEnd}` : "",
         rtn: String(auth?.rtn ?? ""),
         customerName: String(shipment.customer ?? ""),
-        // The customer table has no address, tax id or phone yet. Blank is the
-        // honest answer; inventing one puts a false party on a tax document.
-        customerAddress: "",
-        customerTaxId: "",
+        // Straight off the customer record. Anything the record does not hold
+        // prints blank rather than being invented — a tax document naming the
+        // wrong party is worse than one with a gap in it.
+        customerAddress: String(customer?.address ?? ""),
+        customerTaxId: String(customer?.taxId ?? ""),
         customerContact: String(customer?.contact ?? ""),
-        customerPhone: "",
-        customerEmail: String(customer?.email ?? ""),
+        customerPhone: String(customer?.phone ?? ""),
+        customerEmail: String(customer?.contactEmail ?? customer?.email ?? ""),
         invoiceDate: String(shipment.date ?? ""),
         weekNumber: getWeekNumber(String(shipment.date ?? "")),
         etd: String(shipment.etd ?? shipment.date ?? ""),

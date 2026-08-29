@@ -77,7 +77,19 @@ const customerFields = [
     { key: "name", label: "Company Name", type: "text" as const, required: true, span: 2 as const },
     { key: "contact", label: "Contact Person", type: "text" as const },
     { key: "email", label: "Email", type: "text" as const, placeholder: "name@company.com" },
+    { key: "contactEmail", label: "Invoicing Email", type: "text" as const, placeholder: "invoices@company.com" },
+    { key: "phone", label: "Phone", type: "text" as const },
     { key: "terms", label: "Incoterms", type: "select" as const, options: termsOptions },
+    { key: "active", label: "Active", type: "boolean" as const },
+  ]},
+  // The invoice prints these. Without them it has to leave the buying party's
+  // address and tax id blank.
+  { title: "Billing", columns: 2 as const, fields: [
+    { key: "taxId", label: "Tax ID / RTN", type: "text" as const },
+    { key: "address", label: "Billing Address", type: "textarea" as const, span: 2 as const },
+    { key: "deliverToName", label: "Deliver To", type: "text" as const },
+    { key: "deliverToAddress", label: "Delivery Address", type: "textarea" as const, span: 2 as const },
+    { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const },
   ]},
 ];
 

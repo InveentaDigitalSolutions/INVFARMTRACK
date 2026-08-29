@@ -135,8 +135,16 @@ export interface CustomersRow {
   code?: string;
   name?: string;
   contact?: string;
+  contactEmail?: string;
   email?: string;
+  phone?: string;
+  address?: string;
+  taxId?: string;
+  deliverToName?: string;
+  deliverToAddress?: string;
   terms?: string;
+  notes?: string;
+  active?: boolean;
   [key: string]: unknown;
 }
 
