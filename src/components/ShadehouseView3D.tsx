@@ -41,6 +41,7 @@ const LENSES: { id: LensMode; label: string }[] = [
   { id: "harvest", label: "Days to harvest" },
   { id: "irrigated", label: "Last irrigated" },
   { id: "issues", label: "Issues" },
+  { id: "shade", label: "Shade" },
 ];
 
 const LENS_SCALES: Record<Exclude<LensMode, "state">, { low: string; high: string; gradient: string }> = {
@@ -48,6 +49,7 @@ const LENS_SCALES: Record<Exclude<LensMode, "state">, { low: string; high: strin
   harvest: { low: "Overdue", high: "90+ days out", gradient: "linear-gradient(90deg,#c2410c,#fbbf24,#3d8b40)" },
   irrigated: { low: "Just watered", high: "12h+ dry", gradient: "linear-gradient(90deg,#38bdf8,#d6c7a0)" },
   issues: { low: "Healthy", high: "Needs attention", gradient: "linear-gradient(90deg,#c8cec4,#dc2626)" },
+  shade: { low: "Single", high: "Triple", gradient: "linear-gradient(90deg,#c2cfc4,#7d9384,#3f5348)" },
 };
 
 function Row({ label, value }: { label: string; value: string }) {
@@ -72,6 +74,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const [showPlotLabels, setShowPlotLabels] = useState(true);
   const [showBedNumbers, setShowBedNumbers] = useState(false);
   const [showCompass, setShowCompass] = useState(true);
+  // The cloth is the point of a shadehouse, so it is on by default.
+  const [showShade, setShowShade] = useState(true);
   const [showWeather, setShowWeather] = useState(true);
   const webgl = useWebgl();
   useEffect(() => {
@@ -224,6 +228,15 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           Compass
         </button>
         <button
+          onClick={() => setShowShade((v) => !v)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+            showShade ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+          }`}
+        >
+          <Layers className="w-3 h-3" />
+          Shade
+        </button>
+        <button
           onClick={() => setShowBedNumbers((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
             showBedNumbers ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
@@ -296,6 +309,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             visibleLevels={visibleLevels}
             showIrrigation={showIrrigation}
             showRoof={false}
+            showShade={showShade}
             lens={lens}
             nowMs={now}
             showPlotLabels={showPlotLabels}

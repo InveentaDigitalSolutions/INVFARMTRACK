@@ -62,6 +62,9 @@ export function useShadehouseBeds(): {
           // rather than to zero, which would draw the map as a hairline.
           widthM: geometry?.bedWidth ?? 1.2,
           lengthM: geometry?.bedLength ?? 37.2,
+          // Recorded per bed, though it is strung over whole runs.
+          shade: (b.shade === "Single" || b.shade === "Double" || b.shade === "Triple"
+            ? b.shade : undefined) as ShadehouseBed["shade"],
           state: s?.state ?? "empty",
           variety: s?.variety ?? "",
           plantedDate: s?.plantedDate ?? "",

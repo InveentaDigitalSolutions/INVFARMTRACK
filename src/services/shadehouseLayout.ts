@@ -38,12 +38,34 @@ export interface ShadehouseBed {
   potCount?: number;
   /** Air beds only — pot shape chosen when the planting is created. */
   potType?: PotType;
+  /** Layers of shade cloth strung over the bed; undefined when not recorded. */
+  shade?: ShadeLevel;
   state: "empty" | "planted" | "growing" | "harvest-ready" | "issue";
   variety: string;
   plantedDate: string;
   expectedHarvest: string;
   notes: string;
 }
+
+export type ShadeLevel = "Single" | "Double" | "Triple";
+
+/**
+ * How much light each layer of cloth takes out, as panel opacity.
+ *
+ * Not linear: the second layer over an already-shaded bed removes less light
+ * than the first did, and drawing it linearly made triple read as near-black.
+ */
+export const SHADE_OPACITY: Record<ShadeLevel, number> = {
+  Single: 0.16,
+  Double: 0.30,
+  Triple: 0.42,
+};
+
+/** The cloth itself, on a bright day. Real shade netting is close to this. */
+export const SHADE_COLOR = "#20302a";
+
+/** Cloth sits above the highest cable line, clear of every bed. */
+export const SHADE_HEIGHT_M = 3.1;
 
 /** Cable heights above the ground bed, in metres. Measured off the photos. */
 export const LEVEL_HEIGHTS_M: Record<BedLevel, number> = { 0: 0, 1: 1.15, 2: 1.75, 3: 2.35 };

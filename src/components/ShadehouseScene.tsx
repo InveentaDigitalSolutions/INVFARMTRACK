@@ -9,6 +9,10 @@ import {
   LEVEL_HEIGHTS_M,
   stateColors,
   plotConfigs,
+  SHADE_COLOR,
+  SHADE_HEIGHT_M,
+  SHADE_OPACITY,
+  type ShadeLevel,
   type BedLevel,
   type ShadehouseBed,
 } from "../services/shadehouseLayout";
@@ -269,7 +273,7 @@ export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
  * idea God's Eye View uses for its sensor modes. Only this function changes
  * per lens; the scene, layers and selection are untouched.
  */
-export type LensMode = "state" | "age" | "harvest" | "irrigated" | "issues";
+export type LensMode = "state" | "age" | "harvest" | "irrigated" | "issues" | "shade";
 
 /** Sequential ramp, pale to saturated, for a normalised 0-1 value. */
 function ramp(t: number, from: [number, number, number], to: [number, number, number]) {
@@ -320,6 +324,14 @@ export function colorForLens(
       if (!reading || !Number.isFinite(reading.lastRunAgeMs)) return NO_DATA;
       const hours = reading.lastRunAgeMs / 3_600_000;
       return ramp(Math.min(1, hours / 12), [56, 189, 248], [214, 199, 160]);
+    }
+
+    case "shade": {
+      // Darker cloth, darker bed — the same reading as looking up at it.
+      if (!bed.shade) return NO_DATA;
+      return new THREE.Color(
+        bed.shade === "Triple" ? "#3f5348" : bed.shade === "Double" ? "#7d9384" : "#c2cfc4"
+      );
     }
 
     case "issues":
@@ -608,27 +620,58 @@ function Structure({
   span: number;
   depth: number;
   showRoof: boolean;
-  /** x position and z extent of each post line the cables run through. */
-  postLines: { x: number; z: number; length: number }[];
+  /** x position, z extent and cable levels of each post line. */
+  postLines: { x: number; z: number; length: number; levels: BedLevel[] }[];
 }) {
+  /** Posts every 6 m along each line, tall enough to carry its top cable. */
   const posts = useMemo(() => {
-    const out: [number, number][] = [];
+    const out: { x: number; z: number; height: number }[] = [];
     const step = 6;
     for (const line of postLines) {
+      const top = Math.max(...line.levels.map((l) => LEVEL_HEIGHTS_M[l]), 0);
+      // A post stands proud of the cable it carries, as a real one does.
+      const height = top + 0.45;
       const start = line.z - line.length / 2;
       for (let z = start; z <= line.z + line.length / 2 + 0.01; z += step) {
-        out.push([line.x, z]);
+        out.push({ x: line.x, z, height });
       }
     }
     return out;
   }, [postLines]);
 
+  /** One cable per level per line, running the length of the row. */
+  const cables = useMemo(
+    () =>
+      postLines.flatMap((line) =>
+        line.levels.map((level) => ({
+          key: `${line.x.toFixed(2)}:${line.z.toFixed(2)}:${level}`,
+          x: line.x,
+          z: line.z,
+          y: LEVEL_HEIGHTS_M[level],
+          length: line.length,
+        }))
+      ),
+    [postLines]
+  );
+
   return (
     <group>
-      {posts.map(([x, z], i) => (
-        <mesh key={i} position={[x, 1.55, z]} castShadow>
-          <cylinderGeometry args={[0.075, 0.095, 3.1, 14]} />
+      {posts.map((post, i) => (
+        <mesh key={i} position={[post.x, post.height / 2, post.z]} castShadow>
+          <cylinderGeometry args={[0.075, 0.095, post.height, 14]} />
           <meshStandardMaterial color="#7a6048" roughness={0.85} />
+        </mesh>
+      ))}
+
+      {/* The cables themselves — thin, and along the row, which is Z. */}
+      {cables.map((cable) => (
+        <mesh
+          key={cable.key}
+          position={[cable.x, cable.y, cable.z]}
+          rotation={[Math.PI / 2, 0, 0]}
+        >
+          <cylinderGeometry args={[0.016, 0.016, cable.length, 6]} />
+          <meshStandardMaterial color="#5b6670" roughness={0.5} metalness={0.6} />
         </mesh>
       ))}
       {showRoof && (
@@ -765,12 +808,95 @@ function Compass({ span, depth }: { span: number; depth: number }) {
   );
 }
 
+/**
+ * The shade cloth, drawn where it actually is.
+ *
+ * Cloth is strung in strips over runs of beds, so this groups the beds by
+ * field and shade level and draws one panel per contiguous run rather than one
+ * per bed — four panels instead of thirty-three, and it reads as cloth rather
+ * than as tiling.
+ *
+ * A bed with no shade recorded gets no panel. Drawing a default over it would
+ * put cloth in the model that nobody has said is there.
+ */
+function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
+  const panels = useMemo(() => {
+    // Ground beds carry the run's identity; an air bed above one sits under
+    // the same cloth, so counting both would draw the panel twice.
+    const ground = placements
+      .filter((p) => p.bed.type === "ground" && p.bed.shade)
+      .sort((a, b) => a.bed.fieldId.localeCompare(b.bed.fieldId) || a.bed.bedNumber - b.bed.bedNumber);
+
+    const out: {
+      key: string; x: number; z: number; width: number; length: number; shade: ShadeLevel;
+    }[] = [];
+
+    let run: BedPlacement[] = [];
+    const flush = () => {
+      if (run.length === 0) return;
+      const first = run[0];
+      const xs = run.map((p) => p.x);
+      const halfWidth = first.width / 2;
+      const left = Math.min(...xs) - halfWidth;
+      const right = Math.max(...xs) + halfWidth;
+      out.push({
+        key: `${first.bed.fieldId}-${first.bed.bedNumber}-${first.bed.shade}`,
+        x: (left + right) / 2,
+        z: first.z,
+        // A little wider than the beds, the way cloth overhangs its posts.
+        width: right - left + 0.4,
+        length: first.length + 0.6,
+        shade: first.bed.shade as ShadeLevel,
+      });
+      run = [];
+    };
+
+    for (const p of ground) {
+      const prev = run[run.length - 1];
+      const continues =
+        prev &&
+        prev.bed.fieldId === p.bed.fieldId &&
+        prev.bed.shade === p.bed.shade &&
+        p.bed.bedNumber === prev.bed.bedNumber + 1;
+      if (!continues) flush();
+      run.push(p);
+    }
+    flush();
+    return out;
+  }, [placements]);
+
+  if (panels.length === 0) return null;
+
+  return (
+    <group>
+      {panels.map((panel) => (
+        <mesh
+          key={panel.key}
+          position={[panel.x, SHADE_HEIGHT_M, panel.z]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <planeGeometry args={[panel.width, panel.length]} />
+          <meshStandardMaterial
+            color={SHADE_COLOR}
+            transparent
+            opacity={SHADE_OPACITY[panel.shade]}
+            side={THREE.DoubleSide}
+            depthWrite={false}
+            roughness={1}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 export default function ShadehouseScene({
   placements,
   readings,
   visibleLevels,
   showIrrigation,
   showRoof,
+  showShade,
   lens,
   nowMs,
   showPlotLabels,
@@ -785,6 +911,7 @@ export default function ShadehouseScene({
   visibleLevels: Set<BedLevel>;
   showIrrigation: boolean;
   showRoof: boolean;
+  showShade: boolean;
   lens: LensMode;
   nowMs: number;
   showPlotLabels: boolean;
@@ -842,14 +969,26 @@ export default function ShadehouseScene({
     });
   }, [placements]);
 
-  // One post line per distinct x/z where a cable runs.
+  /**
+   * One post line per distinct x/z where cables run, with the levels on it.
+   *
+   * The levels were being thrown away, so the scene knew where the posts stood
+   * but not what ran between them — and drew bare poles. A cable line without
+   * its cable is not a shadehouse.
+   */
   const postLines = useMemo(() => {
-    const seen = new Map<string, { x: number; z: number; length: number }>();
+    const seen = new Map<string, { x: number; z: number; length: number; levels: BedLevel[] }>();
     for (const p of placements) {
       if (p.bed.type !== "air") continue;
       const key = `${p.x.toFixed(2)}:${p.z.toFixed(2)}`;
-      if (!seen.has(key)) seen.set(key, { x: p.x, z: p.z, length: p.length });
+      const line = seen.get(key);
+      if (line) {
+        if (!line.levels.includes(p.bed.level)) line.levels.push(p.bed.level);
+      } else {
+        seen.set(key, { x: p.x, z: p.z, length: p.length, levels: [p.bed.level] });
+      }
     }
+    for (const line of seen.values()) line.levels.sort((a, b) => a - b);
     return [...seen.values()];
   }, [placements]);
 
@@ -873,6 +1012,7 @@ export default function ShadehouseScene({
       <directionalLight position={[-24, 18, -16]} intensity={0.3} color="#cfe3ff" />
 
       <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} />
+      {showShade && <ShadeCloth placements={placements} />}
       <Roads />
       <WeatherLayer conditions={weather} span={span} depth={depth} />
 
