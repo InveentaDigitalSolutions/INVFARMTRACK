@@ -1,3 +1,19 @@
+> **Not in use, and not currently possible.** The `standalone` hosting mode this
+> document describes — MSAL sign-in calling the Dataverse Web API directly — was
+> removed from the code on 2026-08-28 because it duplicated the whole data layer.
+> `hostingMode()` now returns only `player` or `demo`.
+>
+> The GitHub Actions workflow that deployed to Azure Static Web Apps on every
+> push to `main` was **deleted on 2026-08-29**: it was building an app whose
+> sign-in path no longer exists, and firing on every commit. The app is deployed
+> to Power Apps with `npx power-apps push`, and nothing else.
+>
+> This document is kept as the record of how standalone hosting worked. Reviving
+> it means restoring the MSAL data path first — see BACKLOG.md, PRK-1, where an
+> isometric SVG view is the recommended route to a 3D-like plan instead.
+
+---
+
 # Standalone hosting on Azure
 
 Why: the Power Apps player sandboxes the app — `connect-src 'none'`,
