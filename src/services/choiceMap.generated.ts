@@ -17,7 +17,6 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_availabilities",
   "bv_bankaccounts",
   "bv_bankstatementlines",
-  "bv_bedcapacities",
   "bv_bedcompositions",
   "bv_bedcounts",
   "bv_beds",
@@ -39,6 +38,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_inputs",
   "bv_invoices",
   "bv_irrigations",
+  "bv_materials",
   "bv_nutrientbalances",
   "bv_orderitems",
   "bv_orders",
@@ -53,6 +53,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_seasons",
   "bv_shadehouses",
   "bv_soilanalysises",
+  "bv_stockmovements",
   "bv_substratematerials",
   "bv_suppliers",
   "bv_tasks",
@@ -76,13 +77,19 @@ export const ENTITY_SETS: readonly string[] = [
  */
 export const LABEL_COLUMN: Record<string, string> = {
   "bv_availabilities": "bv_availabilityname",
+  "bv_bankaccounts": "bv_bankaccountname",
+  "bv_bankstatementlines": "bv_bankstatementlinecode",
   "bv_beds": "bv_bedname",
+  "bv_bedcompositions": "bv_bedcompositionname",
+  "bv_bedcounts": "bv_bedcountname",
+  "bv_bills": "bv_billcode",
   "bv_boxweights": "bv_boxweightname",
   "bv_cainumbers": "bv_cainumbername",
   "bv_calendars": "bv_calendarcode",
   "bv_components": "bv_componentname",
   "bv_customers": "bv_customername",
   "bv_demandforecasts": "bv_demandforecastname",
+  "bv_exchangerates": "bv_exchangeratecode",
   "bv_expenses": "bv_expensename",
   "bv_fertilizations": "bv_fertilizationname",
   "bv_fields": "bv_fieldname",
@@ -97,6 +104,7 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_orders": "bv_ordernumber",
   "bv_orderitems": "bv_orderitemname",
   "bv_packings": "bv_packingcode",
+  "bv_payments": "bv_paymentcode",
   "bv_plants": "bv_plantname",
   "bv_plantings": "bv_plantingcode",
   "bv_plantprices": "bv_plantpricename",
@@ -106,20 +114,14 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_seasons": "bv_seasonname",
   "bv_shadehouses": "bv_shadehousename",
   "bv_soilanalysises": "bv_soilanalysisname",
+  "bv_substratematerials": "bv_substratematerialname",
   "bv_suppliers": "bv_suppliername",
   "bv_tasks": "bv_taskcode",
   "bv_timesheets": "bv_timesheetname",
   "bv_treatments": "bv_treatmentname",
   "bv_workers": "bv_workername",
-  "bv_bankaccounts": "bv_bankaccountname",
-  "bv_payments": "bv_paymentcode",
-  "bv_bills": "bv_billcode",
-  "bv_bankstatementlines": "bv_bankstatementlinecode",
-  "bv_substratematerials": "bv_substratematerialname",
-  "bv_bedcompositions": "bv_bedcompositionname",
-  "bv_exchangerates": "bv_exchangeratecode",
-  "bv_bedcapacities": "bv_bedcapacityname",
-  "bv_bedcounts": "bv_bedcountname"
+  "bv_materials": "bv_materialname",
+  "bv_stockmovements": "bv_stockmovementname"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -133,10 +135,50 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "targetSet": "bv_seasons"
     }
   },
+  "bv_bankstatementlines": {
+    "_bv_bankaccountid_value": {
+      "nav": "bv_BankAccountId",
+      "targetSet": "bv_bankaccounts"
+    },
+    "_bv_paymentid_value": {
+      "nav": "bv_PaymentId",
+      "targetSet": "bv_payments"
+    }
+  },
   "bv_beds": {
     "_bv_fieldid_value": {
       "nav": "bv_FieldId",
       "targetSet": "bv_fields"
+    }
+  },
+  "bv_bedcompositions": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_substratematerialid_value": {
+      "nav": "bv_SubstrateMaterialId",
+      "targetSet": "bv_substratematerials"
+    }
+  },
+  "bv_bedcounts": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
+    }
+  },
+  "bv_bills": {
+    "_bv_purchaseorderid_value": {
+      "nav": "bv_PurchaseOrderId",
+      "targetSet": "bv_purchaseorders"
+    },
+    "_bv_supplierid_value": {
+      "nav": "bv_SupplierId",
+      "targetSet": "bv_suppliers"
     }
   },
   "bv_boxweights": {
@@ -267,6 +309,16 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "targetSet": "bv_shadehouses"
     }
   },
+  "bv_payments": {
+    "_bv_bankaccountid_value": {
+      "nav": "bv_BankAccountId",
+      "targetSet": "bv_bankaccounts"
+    },
+    "_bv_invoiceid_value": {
+      "nav": "bv_InvoiceId",
+      "targetSet": "bv_invoices"
+    }
+  },
   "bv_plantings": {
     "_bv_bedid_value": {
       "nav": "bv_BedId",
@@ -353,64 +405,28 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "targetSet": "bv_inputs"
     }
   },
-  "bv_payments": {
-    "_bv_bankaccountid_value": {
-      "nav": "bv_BankAccountId",
-      "targetSet": "bv_bankaccounts"
-    },
-    "_bv_invoiceid_value": {
-      "nav": "bv_InvoiceId",
-      "targetSet": "bv_invoices"
-    }
-  },
-  "bv_bills": {
-    "_bv_purchaseorderid_value": {
-      "nav": "bv_PurchaseOrderId",
-      "targetSet": "bv_purchaseorders"
-    },
+  "bv_materials": {
     "_bv_supplierid_value": {
       "nav": "bv_SupplierId",
       "targetSet": "bv_suppliers"
     }
   },
-  "bv_bankstatementlines": {
-    "_bv_bankaccountid_value": {
-      "nav": "bv_BankAccountId",
-      "targetSet": "bv_bankaccounts"
-    },
-    "_bv_paymentid_value": {
-      "nav": "bv_PaymentId",
-      "targetSet": "bv_payments"
-    }
-  },
-  "bv_bedcompositions": {
+  "bv_stockmovements": {
     "_bv_bedid_value": {
       "nav": "bv_BedId",
       "targetSet": "bv_beds"
     },
-    "_bv_substratematerialid_value": {
-      "nav": "bv_SubstrateMaterialId",
-      "targetSet": "bv_substratematerials"
-    }
-  },
-  "bv_bedcapacities": {
-    "_bv_bedid_value": {
-      "nav": "bv_BedId",
-      "targetSet": "bv_beds"
+    "_bv_inputid_value": {
+      "nav": "bv_InputId",
+      "targetSet": "bv_inputs"
     },
-    "_bv_plantid_value": {
-      "nav": "bv_PlantId",
-      "targetSet": "bv_plants"
-    }
-  },
-  "bv_bedcounts": {
-    "_bv_bedid_value": {
-      "nav": "bv_BedId",
-      "targetSet": "bv_beds"
+    "_bv_materialid_value": {
+      "nav": "bv_MaterialId",
+      "targetSet": "bv_materials"
     },
-    "_bv_seasonid_value": {
-      "nav": "bv_SeasonId",
-      "targetSet": "bv_seasons"
+    "_bv_purchaseorderid_value": {
+      "nav": "bv_PurchaseOrderId",
+      "targetSet": "bv_purchaseorders"
     }
   }
 };
@@ -432,6 +448,12 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Confirmed - Under": 187460001,
       "Confirmed - Equal": 187460002,
       "Confirmed - Over": 187460003
+    }
+  },
+  "bv_bankaccounts": {
+    "bv_currency": {
+      "HNL": 187460000,
+      "USD": 187460001
     }
   },
   "bv_beds": {
@@ -464,6 +486,19 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
     "bv_type": {
       "Air": 121320000,
       "Ground": 121320001
+    }
+  },
+  "bv_bills": {
+    "bv_currency": {
+      "HNL": 187460000,
+      "USD": 187460001
+    },
+    "bv_status": {
+      "Open": 187460000,
+      "Partially Paid": 187460001,
+      "Paid": 187460002,
+      "Overdue": 187460003,
+      "Cancelled": 187460004
     }
   },
   "bv_cainumbers": {
@@ -506,6 +541,12 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Confirmed": 187460001,
       "Adjusted": 187460002,
       "Cancelled": 187460003
+    }
+  },
+  "bv_exchangerates": {
+    "bv_source": {
+      "BCH": 187460000,
+      "Manual": 187460001
     }
   },
   "bv_expenses": {
@@ -650,6 +691,29 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Extra Large": 187460006
     }
   },
+  "bv_payments": {
+    "bv_currency": {
+      "HNL": 187460000,
+      "USD": 187460001
+    },
+    "bv_method": {
+      "Wire": 187460000,
+      "Check": 187460001,
+      "Cash": 187460002,
+      "Card": 187460003,
+      "ACH": 187460004
+    },
+    "bv_status": {
+      "Pending": 187460000,
+      "Cleared": 187460001,
+      "Voided": 187460002
+    },
+    "bv_type": {
+      "Receipt": 187460000,
+      "Payment": 187460001,
+      "Expense": 187460002
+    }
+  },
   "bv_plants": {
     "bv_growthhabit": {
       "Upright": 121320000,
@@ -694,6 +758,19 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Confirmed": 187460002,
       "Received": 187460003,
       "Cancelled": 187460004
+    }
+  },
+  "bv_substratematerials": {
+    "bv_category": {
+      "Mineral": 187460000,
+      "Organic": 187460001,
+      "Amendment": 187460002,
+      "Other": 187460003
+    },
+    "bv_waterretention": {
+      "Low": 187460000,
+      "Medium": 187460001,
+      "High": 187460002
     }
   },
   "bv_suppliers": {
@@ -779,76 +856,37 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "General": 187460006
     }
   },
-  "bv_bankaccounts": {
-    "bv_currency": {
-      "HNL": 187460000,
-      "USD": 187460001
-    }
-  },
-  "bv_payments": {
-    "bv_currency": {
-      "HNL": 187460000,
-      "USD": 187460001
-    },
-    "bv_method": {
-      "Wire": 187460000,
-      "Check": 187460001,
-      "Cash": 187460002,
-      "Card": 187460003,
-      "ACH": 187460004
-    },
-    "bv_status": {
-      "Pending": 187460000,
-      "Cleared": 187460001,
-      "Voided": 187460002
-    },
-    "bv_type": {
-      "Receipt": 187460000,
-      "Payment": 187460001,
-      "Expense": 187460002
-    }
-  },
-  "bv_bills": {
-    "bv_currency": {
-      "HNL": 187460000,
-      "USD": 187460001
-    },
-    "bv_status": {
-      "Open": 187460000,
-      "Partially Paid": 187460001,
-      "Paid": 187460002,
-      "Overdue": 187460003,
-      "Cancelled": 187460004
-    }
-  },
-  "bv_substratematerials": {
+  "bv_materials": {
     "bv_category": {
-      "Mineral": 187460000,
-      "Organic": 187460001,
-      "Amendment": 187460002,
-      "Other": 187460003
+      "Irrigation": 187460000,
+      "Packaging": 187460001,
+      "Structure & Shade": 187460002,
+      "Plumbing": 187460003,
+      "Tools & Equipment": 187460004,
+      "Substrate & Pots": 187460005,
+      "Consumables": 187460006,
+      "Other": 187460007
     },
-    "bv_waterretention": {
-      "Low": 187460000,
-      "Medium": 187460001,
-      "High": 187460002
+    "bv_unit": {
+      "Each": 187460000,
+      "Metre": 187460001,
+      "Roll": 187460002,
+      "Box": 187460003,
+      "Sack": 187460004,
+      "Kilogram": 187460005,
+      "Litre": 187460006,
+      "Pair": 187460007,
+      "Set": 187460008
     }
   },
-  "bv_exchangerates": {
-    "bv_source": {
-      "BCH": 187460000,
-      "Manual": 187460001
-    }
-  },
-  "bv_bedcapacities": {
-    "bv_size": {
-      "Petit": 187460000,
-      "Mini Petit": 187460001,
-      "Small": 187460002,
-      "Medium": 187460003,
-      "California": 187460004,
-      "Large": 187460005,
-      "Extra Large": 187460006
+  "bv_stockmovements": {
+    "bv_type": {
+      "Received": 187460000,
+      "Issued": 187460001,
+      "Returned": 187460002,
+      "Written off": 187460003,
+      "Adjustment up": 187460004,
+      "Adjustment down": 187460005
     }
   }
 };

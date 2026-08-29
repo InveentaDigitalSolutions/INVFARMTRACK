@@ -180,6 +180,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_materials": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_materialid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_nutrientbalances": {
     "tableId": "",
     "version": "",
@@ -275,6 +282,13 @@ export const dataSourcesInfo = {
     "tableId": "",
     "version": "",
     "primaryKey": "bv_soilanalysisid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
+  "bv_stockmovements": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_stockmovementid",
     "dataSourceType": "Dataverse",
     "apis": {}
   },

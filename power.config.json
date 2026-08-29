@@ -10,7 +10,7 @@
   "localAppUrl": "http://localhost:5173",
   "logoPath": "Default",
   "connectionReferences": {
-    "c79f63b4-bd17-485d-92f1-97f1f2030d80": {
+    "31afeb3a-735d-4c0f-b493-b7a94dea4fd6": {
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       "displayName": "Logic flows",
       "dataSources": [
@@ -217,6 +217,14 @@
         "demandForecasts": {
           "entitySetName": "bv_demandforecasts",
           "logicalName": "bv_demandforecast"
+        },
+        "materials": {
+          "entitySetName": "bv_materials",
+          "logicalName": "bv_material"
+        },
+        "stockMovements": {
+          "entitySetName": "bv_stockmovements",
+          "logicalName": "bv_stockmovement"
         }
       }
     }

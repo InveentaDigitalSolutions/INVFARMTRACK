@@ -9,9 +9,9 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 44 |
-| Columns | 539 |
-| Relationships | 55 |
+| Tables | 46 |
+| Columns | 561 |
+| Relationships | 60 |
 
 ## Conventions
 
@@ -75,6 +75,8 @@
 | [Bed Composition](#bed-composition) | `bv_bedcomposition` | `BCM-0001` | 6 | One material in a bed's growing medium and how much of it there is. A bed has as many of these as its mix has parts. |
 | [Exchange Rate](#exchange-rate) | `bv_exchangerate` | `FX-0001` | 5 | The Banco Central de Honduras reference rate (TCR) for one day. Kept as history rather than a single current value: an invoice has to be read back at the rate it was converted at, and restating last month at today's rate would silently change reported sales. |
 | [Bed Count](#bed-count) | `bv_bedcount` | `CNT-0001` | 9 | What one bed is expected to yield for one shipment week, counted in the field. The nursery has two availabilities: one calculated from pruning, and this one, which is someone walking the rows. Where a count exists it is the better number, so it is kept beside the estimate rather than overwriting it. |
+| [Material](#material) | `bv_material` | `MAT-0001` | 10 | Something the nursery buys and stores rather than applies to a plant — drip line, boxes, plastic baskets, plumbing, shade cloth. Kept apart from Inputs because an input has a composition and a safety interval and a box of fittings has neither. |
+| [Stock Movement](#stock-movement) | `bv_stockmovement` | `STK-0001` | 12 | One receipt, issue or correction. Stock on hand is the sum of these rather than a number somebody edits: a stored total drifts silently, and nothing afterwards can say why it changed. Points at a Material or an Input — a sack of fertilizer is stock in the same way a box of fittings is. |
 
 ## Relationships
 
@@ -135,6 +137,11 @@
 | Bed Composition | `bv_substratematerialid` | Substrate Material | Restrict |
 | Bed Count | `bv_bedid` | Bed | Restrict |
 | Bed Count | `bv_seasonid` | Season | Remove link |
+| Material | `bv_supplierid` | Supplier | Remove link |
+| Stock Movement | `bv_materialid` | Material | Remove link |
+| Stock Movement | `bv_inputid` | Input | Remove link |
+| Stock Movement | `bv_purchaseorderid` | Purchase Order | Remove link |
+| Stock Movement | `bv_bedid` | Bed | Remove link |
 
 ---
 
@@ -231,7 +238,7 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 
 </details>
 
-**Referenced by:** Planting (`bv_bedid`), Treatment (`bv_bedid`), Irrigation (`bv_bedid`), Harvest (`bv_bedid`), Task (`bv_bedid`), Packing (`bv_bedid`), Timesheet (`bv_bedid`), Pruning (`bv_bedid`), Fertilization (`bv_bedid`), Nutrient Balance (`bv_bedid`), Soil Analysis (`bv_bedid`), Foliar Analysis (`bv_bedid`), Bed Composition (`bv_bedid`), Bed Count (`bv_bedid`)
+**Referenced by:** Planting (`bv_bedid`), Treatment (`bv_bedid`), Irrigation (`bv_bedid`), Harvest (`bv_bedid`), Task (`bv_bedid`), Packing (`bv_bedid`), Timesheet (`bv_bedid`), Pruning (`bv_bedid`), Fertilization (`bv_bedid`), Nutrient Balance (`bv_bedid`), Soil Analysis (`bv_bedid`), Foliar Analysis (`bv_bedid`), Bed Composition (`bv_bedid`), Bed Count (`bv_bedid`), Stock Movement (`bv_bedid`)
 
 ## Plant
 
@@ -438,7 +445,7 @@ Catalog of fertilizers, pesticides, and other inputs
 
 </details>
 
-**Referenced by:** Treatment (`bv_inputid`), Fertilization (`bv_inputid`), Input Component (`bv_inputid`)
+**Referenced by:** Treatment (`bv_inputid`), Fertilization (`bv_inputid`), Input Component (`bv_inputid`), Stock Movement (`bv_inputid`)
 
 ## Treatment
 
@@ -1093,7 +1100,7 @@ Vendors and suppliers for inputs, materials, and services
 
 </details>
 
-**Referenced by:** Purchase Order (`bv_supplierid`), Bill (`bv_supplierid`)
+**Referenced by:** Purchase Order (`bv_supplierid`), Bill (`bv_supplierid`), Material (`bv_supplierid`)
 
 ## Purchase Order
 
@@ -1137,7 +1144,7 @@ Orders placed to suppliers for inputs, materials, and services
 
 </details>
 
-**Referenced by:** Bill (`bv_purchaseorderid`)
+**Referenced by:** Bill (`bv_purchaseorderid`), Stock Movement (`bv_purchaseorderid`)
 
 ## Worker
 
@@ -1847,3 +1854,95 @@ What one bed is expected to yield for one shipment week, counted in the field. T
 | `bv_countedby` | Counted By | Text(100) |  |  |
 | `bv_seasonid` | Season | Lookup → [Season](#season) |  | Link to the related Season record. |
 | `bv_notes` | Notes | Text area(2000) |  |  |
+
+## Material
+
+`bv_material` · User-owned
+
+Something the nursery buys and stores rather than applies to a plant — drip line, boxes, plastic baskets, plumbing, shade cloth. Kept apart from Inputs because an input has a composition and a safety interval and a box of fittings has neither.
+
+**Record ID:** `bv_materialcode` — format `MAT-{SEQNUM:4}`, e.g. `MAT-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_materialcode` 🔑 | Material ID | Autonumber | ✓ | Auto-generated identifier, format MAT-0001. |
+| `bv_materialname` | Name | Text(100) | ✓ | What it is called when someone asks for it in the store. |
+| `bv_category` | Category | Choice | ✓ | One of: Irrigation, Packaging, Structure & Shade, Plumbing, Tools & Equipment, Substrate & Pots, Consumables, Other. |
+| `bv_unit` | Unit | Choice | ✓ | How it is counted. Buying drip line by the metre and baskets by the each is the difference between a stock figure that means something and one that does not. |
+| `bv_partnumber` | Part Number | Text(100) |  | The supplier's reference, for reordering the same thing again. |
+| `bv_reorderlevel` | Reorder Level | Decimal(2) |  | Stock at or below this is low. Left blank means nothing is flagged, which is honest for something nobody reorders on a schedule. |
+| `bv_lastunitcost` | Last Unit Cost | Currency(2) |  | What it cost last time, for valuing what is on hand. |
+| `bv_supplierid` | Usual Supplier | Lookup → [Supplier](#supplier) |  | Link to the related Supplier record. |
+| `bv_isactive` | Active | Yes/No |  |  |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Category** (`bv_category`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Irrigation |
+| 187460001 | Packaging |
+| 187460002 | Structure & Shade |
+| 187460003 | Plumbing |
+| 187460004 | Tools & Equipment |
+| 187460005 | Substrate & Pots |
+| 187460006 | Consumables |
+| 187460007 | Other |
+
+**Unit** (`bv_unit`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Each |
+| 187460001 | Metre |
+| 187460002 | Roll |
+| 187460003 | Box |
+| 187460004 | Sack |
+| 187460005 | Kilogram |
+| 187460006 | Litre |
+| 187460007 | Pair |
+| 187460008 | Set |
+
+</details>
+
+**Referenced by:** Stock Movement (`bv_materialid`)
+
+## Stock Movement
+
+`bv_stockmovement` · User-owned
+
+One receipt, issue or correction. Stock on hand is the sum of these rather than a number somebody edits: a stored total drifts silently, and nothing afterwards can say why it changed. Points at a Material or an Input — a sack of fertilizer is stock in the same way a box of fittings is.
+
+**Record ID:** `bv_stockmovementcode` — format `STK-{SEQNUM:4}`, e.g. `STK-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_stockmovementcode` 🔑 | Movement ID | Autonumber | ✓ | Auto-generated identifier, format STK-0001. |
+| `bv_stockmovementname` | Name | Text(100) |  | How the row reads on its own, e.g. "Drip line 16mm · received 200". |
+| `bv_date` | Date | Date only | ✓ |  |
+| `bv_type` | Type | Choice | ✓ | What happened, and which way stock moved. Quantity is always positive; the type carries the direction, so a signed number can never contradict its own label. |
+| `bv_quantity` | Quantity | Decimal(2) | ✓ | Always positive. Direction comes from the type. |
+| `bv_unitcost` | Unit Cost | Currency(2) |  |  |
+| `bv_issuedto` | Issued To | Text(100) |  | Who took it or what it was for, when that is worth recording. |
+| `bv_materialid` | Material | Lookup → [Material](#material) |  | Link to the related Material record. |
+| `bv_inputid` | Input | Lookup → [Input](#input) |  | Link to the related Input record. |
+| `bv_purchaseorderid` | Purchase Order | Lookup → [Purchase Order](#purchase-order) |  | Link to the related Purchase Order record. |
+| `bv_bedid` | Bed | Lookup → [Bed](#bed) |  | Link to the related Bed record. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Type** (`bv_type`)
+
+| Value | Label |
+|---|---|
+| 187460000 | Received |
+| 187460001 | Issued |
+| 187460002 | Returned |
+| 187460003 | Written off |
+| 187460004 | Adjustment up |
+| 187460005 | Adjustment down |
+
+</details>

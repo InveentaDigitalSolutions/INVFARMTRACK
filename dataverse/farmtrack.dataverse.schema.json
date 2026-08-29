@@ -5659,6 +5659,288 @@
           "required": false
         }
       ]
+    },
+    {
+      "schemaName": "bv_Material",
+      "displayName": "Material",
+      "displayCollectionName": "Materials",
+      "ownershipType": "UserOwned",
+      "description": "Something the nursery buys and stores rather than applies to a plant \u2014 drip line, boxes, plastic baskets, plumbing, shade cloth. Kept apart from Inputs because an input has a composition and a safety interval and a box of fittings has neither.",
+      "columns": [
+        {
+          "schemaName": "bv_MaterialCode",
+          "displayName": "Material ID",
+          "type": "autonumber",
+          "autoNumberFormat": "MAT-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format MAT-0001."
+        },
+        {
+          "schemaName": "bv_MaterialName",
+          "displayName": "Name",
+          "type": "string",
+          "required": true,
+          "description": "What it is called when someone asks for it in the store."
+        },
+        {
+          "schemaName": "bv_Category",
+          "displayName": "Category",
+          "type": "choice",
+          "required": true,
+          "options": [
+            {
+              "value": 187460000,
+              "label": "Irrigation"
+            },
+            {
+              "value": 187460001,
+              "label": "Packaging"
+            },
+            {
+              "value": 187460002,
+              "label": "Structure & Shade"
+            },
+            {
+              "value": 187460003,
+              "label": "Plumbing"
+            },
+            {
+              "value": 187460004,
+              "label": "Tools & Equipment"
+            },
+            {
+              "value": 187460005,
+              "label": "Substrate & Pots"
+            },
+            {
+              "value": 187460006,
+              "label": "Consumables"
+            },
+            {
+              "value": 187460007,
+              "label": "Other"
+            }
+          ],
+          "description": "One of: Irrigation, Packaging, Structure & Shade, Plumbing, Tools & Equipment, Substrate & Pots, Consumables, Other."
+        },
+        {
+          "schemaName": "bv_Unit",
+          "displayName": "Unit",
+          "type": "choice",
+          "required": true,
+          "options": [
+            {
+              "value": 187460000,
+              "label": "Each"
+            },
+            {
+              "value": 187460001,
+              "label": "Metre"
+            },
+            {
+              "value": 187460002,
+              "label": "Roll"
+            },
+            {
+              "value": 187460003,
+              "label": "Box"
+            },
+            {
+              "value": 187460004,
+              "label": "Sack"
+            },
+            {
+              "value": 187460005,
+              "label": "Kilogram"
+            },
+            {
+              "value": 187460006,
+              "label": "Litre"
+            },
+            {
+              "value": 187460007,
+              "label": "Pair"
+            },
+            {
+              "value": 187460008,
+              "label": "Set"
+            }
+          ],
+          "description": "How it is counted. Buying drip line by the metre and baskets by the each is the difference between a stock figure that means something and one that does not."
+        },
+        {
+          "schemaName": "bv_PartNumber",
+          "displayName": "Part Number",
+          "type": "string",
+          "required": false,
+          "description": "The supplier's reference, for reordering the same thing again."
+        },
+        {
+          "schemaName": "bv_ReorderLevel",
+          "displayName": "Reorder Level",
+          "type": "decimal",
+          "required": false,
+          "precision": 2,
+          "minValue": 0,
+          "maxValue": 1000000,
+          "description": "Stock at or below this is low. Left blank means nothing is flagged, which is honest for something nobody reorders on a schedule."
+        },
+        {
+          "schemaName": "bv_LastUnitCost",
+          "displayName": "Last Unit Cost",
+          "type": "currency",
+          "required": false,
+          "description": "What it cost last time, for valuing what is on hand."
+        },
+        {
+          "schemaName": "bv_SupplierId",
+          "displayName": "Usual Supplier",
+          "type": "lookup",
+          "required": false,
+          "relatedTable": "bv_Supplier",
+          "description": "Link to the related Supplier record."
+        },
+        {
+          "schemaName": "bv_IsActive",
+          "displayName": "Active",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "bv_StockMovement",
+      "displayName": "Stock Movement",
+      "displayCollectionName": "Stock Movements",
+      "ownershipType": "UserOwned",
+      "description": "One receipt, issue or correction. Stock on hand is the sum of these rather than a number somebody edits: a stored total drifts silently, and nothing afterwards can say why it changed. Points at a Material or an Input \u2014 a sack of fertilizer is stock in the same way a box of fittings is.",
+      "columns": [
+        {
+          "schemaName": "bv_StockMovementCode",
+          "displayName": "Movement ID",
+          "type": "autonumber",
+          "autoNumberFormat": "STK-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format STK-0001."
+        },
+        {
+          "schemaName": "bv_StockMovementName",
+          "displayName": "Name",
+          "type": "string",
+          "required": false,
+          "description": "How the row reads on its own, e.g. \"Drip line 16mm \u00b7 received 200\"."
+        },
+        {
+          "schemaName": "bv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "schemaName": "bv_Type",
+          "displayName": "Type",
+          "type": "choice",
+          "required": true,
+          "options": [
+            {
+              "value": 187460000,
+              "label": "Received"
+            },
+            {
+              "value": 187460001,
+              "label": "Issued"
+            },
+            {
+              "value": 187460002,
+              "label": "Returned"
+            },
+            {
+              "value": 187460003,
+              "label": "Written off"
+            },
+            {
+              "value": 187460004,
+              "label": "Adjustment up"
+            },
+            {
+              "value": 187460005,
+              "label": "Adjustment down"
+            }
+          ],
+          "description": "What happened, and which way stock moved. Quantity is always positive; the type carries the direction, so a signed number can never contradict its own label."
+        },
+        {
+          "schemaName": "bv_Quantity",
+          "displayName": "Quantity",
+          "type": "decimal",
+          "required": true,
+          "precision": 2,
+          "minValue": 0,
+          "maxValue": 10000000,
+          "description": "Always positive. Direction comes from the type."
+        },
+        {
+          "schemaName": "bv_UnitCost",
+          "displayName": "Unit Cost",
+          "type": "currency",
+          "required": false
+        },
+        {
+          "schemaName": "bv_IssuedTo",
+          "displayName": "Issued To",
+          "type": "string",
+          "required": false,
+          "description": "Who took it or what it was for, when that is worth recording."
+        },
+        {
+          "schemaName": "bv_MaterialId",
+          "displayName": "Material",
+          "type": "lookup",
+          "required": false,
+          "relatedTable": "bv_Material",
+          "description": "Link to the related Material record."
+        },
+        {
+          "schemaName": "bv_InputId",
+          "displayName": "Input",
+          "type": "lookup",
+          "required": false,
+          "relatedTable": "bv_Input",
+          "description": "Link to the related Input record."
+        },
+        {
+          "schemaName": "bv_PurchaseOrderId",
+          "displayName": "Purchase Order",
+          "type": "lookup",
+          "required": false,
+          "relatedTable": "bv_PurchaseOrder",
+          "description": "Link to the related Purchase Order record."
+        },
+        {
+          "schemaName": "bv_BedId",
+          "displayName": "Bed",
+          "type": "lookup",
+          "required": false,
+          "relatedTable": "bv_Bed",
+          "description": "Link to the related Bed record."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
     }
   ]
 }

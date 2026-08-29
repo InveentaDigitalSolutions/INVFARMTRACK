@@ -120,9 +120,10 @@ const SEED_PLAN = [
     PLOTS.map((p) => ({
       bv_fieldname: `Plot ${p.code}`,
       bv_fieldcode: undefined,
+      // No season: a field is infrastructure. The lookup was removed from
+      // bv_Field; this reference outlived it and failed every seed run.
       _ref: {
         bv_ShadehouseId: ['bv_shadehouse', 'Shadehouse 1'],
-        bv_SeasonId: ['bv_season', '2026-S1'],
       },
     })),
   },
@@ -557,6 +558,52 @@ const SEED_PLAN = [
     { bv_description: 'BANK FEE', bv_date: '2026-08-22', bv_amount: -12,
       bv_runningbalance: 19028, bv_isreconciled: false,
       _ref: { bv_BankAccountId: ['bv_bankaccount', 'BAC USD Operating'] } },
+  ]},
+
+
+  // ---- Warehouse materials ------------------------------------------------
+  { table: 'bv_material', nameField: 'bv_materialname', rows: [
+    { bv_materialname: 'Drip line 16mm', bv_category: 187460000, bv_unit: 187460001,
+      bv_partnumber: 'DL16-100', bv_reorderlevel: 400, bv_lastunitcost: 1.2, bv_isactive: true,
+      _ref: { bv_SupplierId: ['bv_supplier', 'TecniAgua'] } },
+    { bv_materialname: 'Drip emitter 2L/h', bv_category: 187460000, bv_unit: 187460000,
+      bv_reorderlevel: 500, bv_lastunitcost: 0.15, bv_isactive: true,
+      _ref: { bv_SupplierId: ['bv_supplier', 'TecniAgua'] } },
+    { bv_materialname: 'Export box 40x30', bv_category: 187460001, bv_unit: 187460000,
+      bv_reorderlevel: 200, bv_lastunitcost: 0.85, bv_isactive: true },
+    { bv_materialname: 'Plastic basket', bv_category: 187460001, bv_unit: 187460000,
+      bv_reorderlevel: 100, bv_lastunitcost: 0.9, bv_isactive: true },
+    { bv_materialname: 'Shade cloth 50%', bv_category: 187460002, bv_unit: 187460002,
+      bv_reorderlevel: 4, bv_lastunitcost: 180, bv_isactive: true },
+    { bv_materialname: 'PVC pipe 2"', bv_category: 187460003, bv_unit: 187460001,
+      bv_reorderlevel: 60, bv_lastunitcost: 3.4, bv_isactive: true,
+      _ref: { bv_SupplierId: ['bv_supplier', 'TecniAgua'] } },
+    { bv_materialname: 'Pruning shears', bv_category: 187460004, bv_unit: 187460000,
+      bv_reorderlevel: 5, bv_lastunitcost: 12, bv_isactive: true },
+  ]},
+
+  { table: 'bv_stockmovement', dedupeField: 'bv_stockmovementname', nameField: 'bv_stockmovementname', rows: [
+    { bv_stockmovementname: 'Drip line 16mm · received 500', bv_date: '2026-08-04',
+      bv_type: 187460000, bv_quantity: 500, bv_unitcost: 1.2,
+      _ref: { bv_MaterialId: ['bv_material', 'Drip line 16mm'] } },
+    { bv_stockmovementname: 'Drip line 16mm · issued 120', bv_date: '2026-08-12',
+      bv_type: 187460001, bv_quantity: 120, bv_issuedto: 'Carlos Martinez — E3 repairs',
+      _ref: { bv_MaterialId: ['bv_material', 'Drip line 16mm'] } },
+    { bv_stockmovementname: 'Export box 40x30 · received 400', bv_date: '2026-08-06',
+      bv_type: 187460000, bv_quantity: 400, bv_unitcost: 0.85,
+      _ref: { bv_MaterialId: ['bv_material', 'Export box 40x30'] } },
+    { bv_stockmovementname: 'Export box 40x30 · issued 260', bv_date: '2026-08-20',
+      bv_type: 187460001, bv_quantity: 260, bv_issuedto: 'Packing house',
+      _ref: { bv_MaterialId: ['bv_material', 'Export box 40x30'] } },
+    { bv_stockmovementname: 'Plastic basket · received 300', bv_date: '2026-08-05',
+      bv_type: 187460000, bv_quantity: 300, bv_unitcost: 0.9,
+      _ref: { bv_MaterialId: ['bv_material', 'Plastic basket'] } },
+    { bv_stockmovementname: 'NPK 20-20-20 · received 40', bv_date: '2026-08-06',
+      bv_type: 187460000, bv_quantity: 40, bv_unitcost: 25,
+      _ref: { bv_InputId: ['bv_input', 'NPK 20-20-20'] } },
+    { bv_stockmovementname: 'NPK 20-20-20 · issued 12', bv_date: '2026-08-18',
+      bv_type: 187460001, bv_quantity: 12, bv_issuedto: 'Fertilization E3',
+      _ref: { bv_InputId: ['bv_input', 'NPK 20-20-20'] } },
   ]},
 
 ]
