@@ -19,12 +19,13 @@ import { paidAgainst, money } from "../services/invoiceMath";
 interface HarvestRow { id: string; date?: string; qty?: number; quality?: string; bed?: string }
 interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; qty?: number; status?: string }
 interface InvoiceRow { id: string; total?: number; balance?: number; status?: string; dueDate?: string; currency?: string }
-interface BedRow { id: string; name?: string; active?: boolean }
+interface BedRow { id: string; name?: string; active?: boolean; field?: string }
 interface CountRow { id: string; bed?: string; week?: number; counted?: number }
 interface TreatmentRow { id: string }
 interface IrrigationRow { id: string; liters?: number }
 interface CustomerRow { id: string }
 interface TimesheetRow { id: string; worker?: string; boxes?: number; hours?: number }
+interface TaskRow { id: string; title?: string; due?: string; status?: string; priority?: string }
 
 export interface Metric {
   value?: number;
@@ -55,6 +56,7 @@ export function useDashboardMetrics() {
   const [irrigation] = useRecords<IrrigationRow>("irrigation", []);
   const [customers] = useRecords<CustomerRow>("customers", []);
   const [timesheets] = useRecords<TimesheetRow>("timesheets", []);
+  const [tasks] = useRecords<TaskRow>("tasks", []);
 
   return useMemo(() => {
     const now = new Date();
@@ -157,6 +159,40 @@ export function useDashboardMetrics() {
         bedsPlanted: latestByBed.size,
       },
 
+      /**
+       * Harvest by field. With one shadehouse a per-shadehouse split says
+       * nothing — it was three hardcoded rows all called "Shadehouse 1" —
+       * whereas which of four fields is producing varies and can be acted on.
+       */
+      byField: (() => {
+        const fieldOfBed = new Map<string, string>();
+        for (const b of beds) if (b.name && b.field) fieldOfBed.set(b.name, b.field);
+        const out = new Map<string, number>();
+        for (const h of harvests) {
+          const f = h.bed ? fieldOfBed.get(h.bed) : undefined;
+          if (f) out.set(f, (out.get(f) ?? 0) + (h.qty ?? 0));
+        }
+        return [...out.entries()]
+          .map(([name, value]) => ({ name, value }))
+          .sort((a, b) => b.value - a.value);
+      })(),
+
+      /** Work still open, and what of it is already late. */
+      openTasks: (() => {
+        const today = new Date().toISOString().slice(0, 10);
+        const open = tasks.filter((t) => t.status !== "Done" && t.status !== "Skipped");
+        return {
+          count: open.length,
+          overdue: open.filter((t) => t.due && String(t.due).slice(0, 10) < today).length,
+          next: open
+            .filter((t) => t.due)
+            .sort((a, b) => String(a.due).localeCompare(String(b.due)))
+            .slice(0, 4)
+            .map((t) => ({ title: String(t.title ?? ""), due: String(t.due).slice(0, 10),
+                           late: String(t.due).slice(0, 10) < today })),
+        };
+      })(),
+
       /** Boxes packed per worker, from their timesheets. */
       byWorker: [...timesheets.reduce((map, t) => {
         if (!t.worker) return map;
@@ -171,5 +207,5 @@ export function useDashboardMetrics() {
       /** True when nothing has been recorded yet, so the page can say so. */
       empty: harvests.length === 0 && plantings.length === 0 && invoices.length === 0,
     };
-  }, [harvests, plantings, invoices, payments, beds, counts, treatments, irrigation, customers, timesheets]);
+  }, [harvests, plantings, invoices, payments, beds, counts, treatments, irrigation, customers, timesheets, tasks]);
 }

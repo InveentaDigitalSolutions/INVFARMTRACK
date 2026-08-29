@@ -458,7 +458,7 @@ export default function SalesPage() {
               <button
                 onClick={() => setShowImport(true)}
                 className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-navy-900
-                           bg-lime-400 rounded-lg hover:bg-lime-300 cursor-pointer shadow-sm"
+                           btn-primary rounded-lg cursor-pointer shadow-sm"
               >
                 <Upload className="w-4 h-4" />
                 Import Excel

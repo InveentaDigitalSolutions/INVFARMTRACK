@@ -264,7 +264,7 @@ export default function ExcelImport({ onImport, onClose, customer, year = new Da
               />
               <button
                 onClick={() => fileRef.current?.click()}
-                className="px-4 py-2 text-[13px] font-semibold text-navy-900 bg-lime-400 rounded-lg hover:bg-lime-300 cursor-pointer"
+                className="px-4 py-2 text-[13px] font-semibold text-navy-900 btn-primary rounded-lg cursor-pointer"
               >
                 Browse Files
               </button>
@@ -378,7 +378,7 @@ export default function ExcelImport({ onImport, onClose, customer, year = new Da
               </button>
               <button
                 onClick={handleConfirm}
-                className="flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-navy-900 bg-lime-400 rounded-lg hover:bg-lime-300 cursor-pointer shadow-sm"
+                className="flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-navy-900 btn-primary rounded-lg cursor-pointer shadow-sm"
               >
                 <FileSpreadsheet className="w-4 h-4" />
                 Import {result?.totalRows} Lines

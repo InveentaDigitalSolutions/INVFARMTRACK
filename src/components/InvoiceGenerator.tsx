@@ -530,7 +530,7 @@ export default function InvoiceGenerator({
             <div className="flex w-full justify-end">
               <button
                 onClick={onClose}
-                className="px-5 py-2.5 text-[13px] font-semibold text-navy-900 bg-lime-400 rounded-lg hover:bg-lime-300 cursor-pointer"
+                className="px-5 py-2.5 text-[13px] font-semibold text-navy-900 btn-primary rounded-lg cursor-pointer"
               >
                 Done
               </button>

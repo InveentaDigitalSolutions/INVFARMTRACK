@@ -202,7 +202,7 @@ export default function ShipmentDetail({
           <button
             onClick={() => setShowInvoice(true)}
             className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-navy-900
-                       bg-lime-400 rounded-lg hover:bg-lime-300 transition-colors cursor-pointer shadow-sm shrink-0"
+                       btn-primary rounded-lg transition-colors cursor-pointer shadow-sm shrink-0"
           >
             <FileText className="w-4 h-4" />
             Generate Invoice

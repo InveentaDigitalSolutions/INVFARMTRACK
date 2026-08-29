@@ -479,7 +479,7 @@ export default function QuickPackForm({
             className={`flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg
                         transition-all cursor-pointer ${
                           generated
-                            ? "bg-lime-500 text-white"
+                            ? "btn-primary"
                             : isValid
                             ? "chip-selected hover:bg-navy-600 shadow-sm hover:shadow-md"
                             : "bg-sand-200 text-navy-300 cursor-not-allowed"

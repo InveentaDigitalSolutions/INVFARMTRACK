@@ -399,7 +399,7 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
           type="button"
           onClick={save}
           disabled={dirty.length === 0 || saving}
-          className="px-4 py-2 text-[13px] font-medium rounded-lg bg-lime-600 text-white
+          className="px-4 py-2 text-[13px] font-medium rounded-lg btn-primary
                      hover:bg-lime-700 disabled:opacity-40 disabled:cursor-not-allowed
                      focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/40
                      transition-colors cursor-pointer"

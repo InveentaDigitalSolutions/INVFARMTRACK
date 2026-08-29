@@ -24,6 +24,7 @@ import BedWaffle from "../components/BedWaffle";
 import WeatherWidget from "../components/WeatherWidget";
 import { useExchangeRate } from "../hooks/useExchangeRate";
 import { useDashboardMetrics } from "../hooks/useDashboardMetrics";
+import RankedBars from "../components/RankedBars";
 
 const container = {
   hidden: {},
@@ -39,11 +40,6 @@ const item = {
 const VARIETY_COLORS = ["#3d8b40", "#5aaa5d", "#88c48a", "#c4d93e", "#7f9228", "#b8ddb9"];
 
 
-const bedUtilization = [
-  { name: "Shadehouse 1", used: 10, total: 12 },
-  { name: "Shadehouse 1", used: 5, total: 8 },
-  { name: "Shadehouse 1", used: 3, total: 10 },
-];
 
 const recentShipments = [
   { id: "SHP-015", customer: "The Plant Company", boxes: 38, status: "In Progress", carrier: "DHL" },
@@ -212,14 +208,17 @@ export default function DashboardPage() {
           icon={Sprout}
           context={m.totalBeds ? `${m.planted.value ?? 0} of ${m.totalBeds} beds` : undefined}
         />
+        {/* Work due, not beds planted. Occupancy barely moves in a nursery
+            whose beds run year-round; what is late changes daily. */}
         <StatCard
-          label="Beds planted"
-          value={m.planted.value === undefined ? "—" : `${m.planted.value}/${m.totalBeds}`}
+          label="Open tasks"
+          value={m.openTasks.count}
           icon={BarChart3}
+          tone={m.openTasks.overdue > 0 ? "critical" : undefined}
           context={
-            m.totalBeds
-              ? `${Math.round(((m.planted.value ?? 0) / m.totalBeds) * 100)}% of the nursery`
-              : undefined
+            m.openTasks.overdue > 0
+              ? `${m.openTasks.overdue} overdue`
+              : m.openTasks.count > 0 ? "none overdue" : undefined
           }
         />
         <StatCard
@@ -302,42 +301,25 @@ export default function DashboardPage() {
           )}
         </motion.div>
 
-        {/* Bed utilization */}
+        {/* Harvest by field. This was bed utilisation: three hardcoded rows
+            all called "Shadehouse 1", which with one shadehouse could only
+            ever say the same thing three times. Which field is producing
+            varies and can be acted on. */}
         <motion.div
           variants={item}
           className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm"
         >
-          <p className="text-[13px] font-semibold text-navy-900 mb-1">Bed Utilization</p>
-          <p className="text-[11px] text-navy-400 mb-4">Active beds / capacity</p>
-          <div className="space-y-3">
-            {bedUtilization.map((sh, shIndex) => {
-              const pct = Math.round((sh.used / sh.total) * 100);
-              return (
-                <div key={`${sh.name}-${shIndex}`}>
-                  <div className="flex items-center justify-between text-[12px] mb-1">
-                    <span className="text-navy-700 font-medium">{sh.name}</span>
-                    <span className="text-navy-400">{sh.used}/{sh.total} <span className="font-semibold text-navy-700">{pct}%</span></span>
-                  </div>
-                  <div className="h-2 rounded-full bg-sand-100 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pct}%` }}
-                      transition={{ duration: 0.6, delay: 0.3 }}
-                      className={`h-full rounded-full ${
-                        pct >= 80 ? "bg-green-500" : pct >= 50 ? "bg-lime-400" : "bg-amber-400"
-                      }`}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between">
-            <span className="text-[11px] text-navy-400">Overall</span>
-            <span className="text-[13px] font-bold text-navy-900">
-              {Math.round(bedUtilization.reduce((s, b) => s + b.used, 0) / bedUtilization.reduce((s, b) => s + b.total, 0) * 100)}%
-            </span>
-          </div>
+          <p className="text-[13px] font-semibold text-navy-900 mb-1">Harvest by Field</p>
+          <p className="text-[11px] text-navy-400 mb-4">
+            Attributed through the bed each cut came from
+          </p>
+          {m.byField.length === 0 ? (
+            <p className="text-[12px] text-navy-400 py-6 text-center">
+              No harvest attributed to a field yet.
+            </p>
+          ) : (
+            <RankedBars rows={m.byField} />
+          )}
         </motion.div>
       </div>
 

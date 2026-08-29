@@ -1,18 +1,17 @@
 /**
- * What the season looks like, said before it is shown.
+ * The season in figures.
  *
- * The Overview held a schedule and a rotation chart and no answer to "how is
- * it going". The reports Santiago shared all open the same way — a sentence
- * with a verdict, then figures that each carry a comparison, then the detail —
- * so that is the order here.
+ * An earlier version opened with a generated paragraph restating the tiles in
+ * prose, above two full-height charts. Santiago's read was that the visuals
+ * crowded out the numbers and the paragraph said nothing the figures did not —
+ * so the figures lead, each carrying its own comparison, and the charts sit
+ * below as reference someone can open.
  *
- * Every figure comes from records. Where there is nothing to say the page says
- * so, which is the discipline the old dashboard lacked when it asserted "+23%
- * vs 2025-S1" for a season that does not exist.
+ * Every figure comes from records. Where a comparison does not exist it is
+ * omitted rather than invented.
  */
 
 import { useMemo } from "react";
-import { motion } from "framer-motion";
 import { Scissors, Sprout, Layers, Boxes, CalendarClock } from "lucide-react";
 import { useRecords } from "../hooks/useRecords";
 import { useNurseryBeds } from "../hooks/useNurseryBeds";
@@ -21,7 +20,7 @@ import RankedBars from "./RankedBars";
 import ProductionSchedule from "./ProductionSchedule";
 import BedRotation from "./BedRotation";
 import {
-  harvestInsight, varietyInsight, occupancyInsight, summary,
+  harvestInsight, varietyInsight, occupancyInsight,
 } from "../services/productionInsight";
 import { cohorts, missingCycles } from "../services/productionSchedule";
 
@@ -108,38 +107,13 @@ export default function ProductionOverview() {
     };
   }, [harvests, plantings, plants, counts, beds]);
 
-  const paragraph = summary({
-    harvest: model.harvest,
-    variety: model.variety,
-    occupancy: model.occupancy,
-    waves: model.waves.length,
-    unscheduled: model.unscheduled,
-  });
-
   const changePct =
     model.lastMonth > 0
       ? Math.round(((model.thisMonth - model.lastMonth) / model.lastMonth) * 100)
       : undefined;
 
-  const accent =
-    model.harvest.tone === "good" ? "border-l-lime-500"
-    : model.harvest.tone === "warn" ? "border-l-amber-500"
-    : "border-l-navy-300";
-
   return (
     <div className="space-y-5">
-      {/* The verdict, before the numbers. */}
-      <motion.div
-        initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-        className={`bg-white rounded-xl border border-sand-200/80 border-l-4 ${accent} p-5 shadow-sm`}
-      >
-        <h3 className="text-[15px] font-semibold text-navy-900 mb-1">{model.harvest.headline}</h3>
-        <p className="text-[13px] text-navy-600 leading-relaxed max-w-3xl">{paragraph}</p>
-        {model.harvest.detail && (
-          <p className="text-[12px] text-navy-400 mt-2">{model.harvest.detail}</p>
-        )}
-      </motion.div>
-
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
         <MetricTile
           label="Harvest this month"
@@ -222,12 +196,23 @@ export default function ProductionOverview() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
-        <ProductionSchedule />
-      </div>
-      <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
-        <BedRotation />
-      </div>
+      {/* Detail below the figures, collapsed. They are worth having and not
+          worth the top of the screen — Santiago's point was that big visuals
+          crowd out the numbers they exist to support. */}
+      <details className="bg-white rounded-xl border border-sand-200/80 shadow-sm">
+        <summary className="px-5 py-3 text-[13px] font-semibold text-navy-900 cursor-pointer
+                            select-none hover:bg-sand-50/60 rounded-xl">
+          Planting schedule
+        </summary>
+        <div className="px-5 pb-5"><ProductionSchedule /></div>
+      </details>
+      <details className="bg-white rounded-xl border border-sand-200/80 shadow-sm">
+        <summary className="px-5 py-3 text-[13px] font-semibold text-navy-900 cursor-pointer
+                            select-none hover:bg-sand-50/60 rounded-xl">
+          Bed rotation
+        </summary>
+        <div className="px-5 pb-5"><BedRotation /></div>
+      </details>
     </div>
   );
 }

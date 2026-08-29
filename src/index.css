@@ -448,18 +448,44 @@
  * Declared here rather than as utilities at each call site: the blanket dark
  * rules rewrite utility colours, and a class they do not know about survives.
  */
-.chip-selected,
+.chip-selected {
+  background-color: #1f2f42;
+  border-color: #1f2f42;
+  color: #ffffff;
+}
+.chip-selected:hover {
+  background-color: #2c3e55;
+  border-color: #2c3e55;
+}
+/* On a dark ground navy is the ground, so the accent carries selection. */
 .dark .chip-selected,
 .dark .card-surface .chip-selected {
   background-color: #a3b835;
   border-color: #a3b835;
   color: #0e1520;
 }
-.chip-selected:hover,
 .dark .chip-selected:hover {
   background-color: #b6c94a;
   border-color: #b6c94a;
 }
+
+/*
+ * The primary action of a screen — Save, Create, Apply.
+ *
+ * Lime on white reads as a highlighter rather than a button; the deep navy is
+ * the brand's own and carries authority on a light ground. On a dark ground
+ * navy is the ground itself, so the accent takes over.
+ */
+.btn-primary {
+  background-color: #1f2f42;
+  color: #ffffff;
+}
+.btn-primary:hover:not(:disabled) { background-color: #2c3e55; }
+.dark .btn-primary {
+  background-color: #a3b835;
+  color: #0e1520;
+}
+.dark .btn-primary:hover:not(:disabled) { background-color: #b6c94a; }
 
 /*
  * The raised pill of a segmented control.

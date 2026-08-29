@@ -74,7 +74,7 @@ export default function DataGrid({
             <button
               onClick={onAdd}
               className="flex items-center gap-1.5 px-3.5 py-2 text-[13px] font-semibold text-navy-900
-                         bg-lime-400 rounded-lg hover:bg-lime-300 transition-colors cursor-pointer shadow-sm"
+                         btn-primary rounded-lg transition-colors cursor-pointer shadow-sm"
             >
               <Plus className="w-3.5 h-3.5" />
               {addLabel}
