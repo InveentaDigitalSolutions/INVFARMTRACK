@@ -43,7 +43,8 @@
     "test:sync": "tsx scripts/test/syncPlan.test.mts",
     "test:payload": "tsx scripts/test/payload.test.mts",
     "dataverse:check-blank-saves": "tsx scripts/dataverse/check-blank-saves.mts",
-    "test:smoke": "npm run build && node scripts/test/smoke.mjs"
+    "test:smoke": "npm run build && node scripts/test/smoke.mjs",
+    "test:sandbox": "node scripts/test/check-sandbox-safe.mjs"
   },
   "dependencies": {
     "@fontsource-variable/playfair-display": "^5.3.0",

@@ -7,7 +7,7 @@ is parked for want of analysis.
 A shareable version of this document lives at
 <https://claude.ai/code/artifact/7e8688fe-22df-41e0-9658-f3838177f593>.
 
-**Counts:** 7 blocked on Santiago · 7 decisions · 6 builds · 4 watching.
+**Counts:** 6 blocked on Santiago · 7 decisions · 6 builds · 3 watching.
 
 ---
 
@@ -168,30 +168,22 @@ model stops implying it matters.
 
 ## Parked, waiting on something
 
-### PRK-1 · The 3D shadehouse view — **blocked on one observation**
+### PRK-1 · The 3D shadehouse view — **fixed 2026-08-29**
 
-Now draws the real bed set instead of an invented one, including only the cable
-levels that actually exist. Whether it renders in the Power Apps player is still
-unknown.
+Moved to Closed. The cause was found by serving the build under the player's
+Content-Security-Policy rather than by guessing: drei's `<Text>` is
+troika-three-text, which fetches a unicode font index from `cdn.jsdelivr.net`
+at render time. `connect-src 'none'` refuses it, the rejection lands inside
+typesetting, and the **whole scene** fails — which is why the tab was blank
+rather than merely unlabelled.
 
-**The one diagnostic that unblocks it:** open *Infrastructure → Shadehouse → 3D*
-in the player and note what appears.
+Pointing troika at a self-hosted font would not have helped: it still has to
+`fetch` the file. Labels are now drawn on a 2D canvas and used as textures —
+no network, no worker, no font loading. `npm run test:sandbox` fails the build
+if any CDN reference returns.
 
-| Observation | Meaning | Response |
-| --- | --- | --- |
-| "3D view unavailable" | WebGL genuinely walled off by the player sandbox | Build the isometric fallback |
-| Blank white box | WebGL works, the scene fails after init | Ordinary debugging |
-
-If WebGL is walled off, the recommended answer is an isometric 2.5D view in SVG —
-no WebGL, so it cannot be blocked. Beds drawn at an angle with real height, air
-levels stacked above ground, the existing `PLAN_COLORS` palette. Loses free
-rotation; keeps labels, compass, irrigation state and the weather layer.
-
-Rejected alternatives: hosting on Azure (the standalone path was removed on
-2026-08-28 because it duplicated the whole data layer — it is in the history but
-would need reworking); dropping the tab (a real option if nobody opens it).
-
-Files: `ShadehouseScene.tsx`, `ShadehouseView3D.tsx`, `WebglGuard.tsx`.
+The isometric SVG fallback is no longer needed. WebGL itself was never the
+problem.
 
 ### PRK-2 · Bed counts do not roll into customer projections — **build**
 
@@ -246,3 +238,10 @@ irrigation layout is recorded.
   any console error. Verified by reintroducing the fault: the test catches it.
 - **A circular import** between `ShadehouseView` and `useShadehouseBeds`; the
   shared geometry now lives in `services/shadehouseLayout.ts`.
+- **The 3D view renders in the player.** Reproduced the sandbox by serving the
+  build under the player's CSP, which found the CDN font fetch that was taking
+  the scene down. Labels are canvas textures now. Two further faults fixed
+  alongside it: `Math.max()` over no beds made the ground plane infinite and
+  every vertex NaN, and a field absent from the measured plan geometry threw
+  inside `placeBeds` — so adding one new field would have blanked the view
+  again. Unfamiliar fields are now laid out in their own band.

@@ -141,7 +141,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <div>
           <h3 className="text-[15px] font-bold text-navy-900">Shadehouse — 3D</h3>
           <p className="text-[11px] text-navy-400">
-            {beds.length} beds across 4 fields · ground rows plus cable lines above · drag to orbit
+            {beds.length} beds across {new Set(beds.map((b) => b.fieldId)).size} fields ·
+            ground rows plus cable lines above · drag to orbit
           </p>
         </div>
 

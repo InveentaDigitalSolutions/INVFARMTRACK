@@ -1,6 +1,9 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Billboard, Text } from "@react-three/drei";
+import { Billboard } from "@react-three/drei";
+// drei's <Text> fetches a font index from a CDN, which the player blocks —
+// and the failure blanks the whole scene. See SceneText.
+import SceneText from "./SceneText";
 import * as THREE from "three";
 import {
   precipitationKind,
@@ -144,18 +147,16 @@ function WindIndicator({
       </group>
 
       <Billboard position={[0, 5.6, 0]}>
-        <Text
+        <SceneText
           fontSize={0.85}
           color="#1f2f42"
-          anchorX="center"
-          anchorY="middle"
           outlineWidth={0.06}
           outlineColor="#ffffff"
         >
           {calm
             ? "Calm"
             : `${conditions.windSpeed.toFixed(0)} km/h ${windDirectionLabel(conditions.windDirection)}`}
-        </Text>
+        </SceneText>
       </Billboard>
     </group>
   );

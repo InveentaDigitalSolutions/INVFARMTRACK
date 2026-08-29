@@ -105,8 +105,14 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   `npm run build` runs, the deployed app silently falls back to LocalStore.
 - The player enforces `connect-src 'none'`, `worker-src 'none'` and
   `style-src 'self'`: no outbound fetch, no web workers, no external styles.
-  External data must come through a flow; troika text needs useWorker:false;
-  fonts must be inlined as data URIs (served as files they arrive corrupted)
+  External data must come through a flow; fonts must be inlined as data URIs
+  (served as files they arrive corrupted).
+- **Reproduce the player sandbox locally** by serving `dist/` with those headers
+  — that is how the blank 3D tab was finally diagnosed. drei's `<Text>` is
+  troika-three-text, which fetches a unicode font index from cdn.jsdelivr.net at
+  render time; the refusal killed the whole scene, not just the labels. Scene
+  text is now drawn on a 2D canvas (`components/SceneText.tsx`).
+  `npm run test:sandbox` fails if any CDN reference returns to the bundle.
 - Code apps must be enabled per environment in the Power Platform Admin Center;
   the first push failed with `CodeAppOperationNotAllowedInEnvironment`
 - Lookups cannot be written as `_bv_bedid_value`; they need

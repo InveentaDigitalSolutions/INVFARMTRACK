@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Billboard, RoundedBox, Text } from "@react-three/drei";
+import { Billboard, RoundedBox } from "@react-three/drei";
+// Not drei's <Text>: troika fetches a font index from a CDN, which the player
+// blocks, and the failure takes the whole scene down. See SceneText.
+import SceneText from "./SceneText";
 import * as THREE from "three";
 import {
   LEVEL_HEIGHTS_M,
@@ -50,13 +53,13 @@ export interface RoadLayout {
 
 export function computeRoads(): RoadLayout {
   const widthOf = (fieldId: string) => {
-    const field = plotConfigs.find((p) => p.id === fieldId)!;
-    return field.bedCount * field.bedWidth;
+    const field = plotConfigs.find((p) => p.id === fieldId);
+    return field ? field.bedCount * field.bedWidth : 0;
   };
   const westWidth = Math.max(widthOf("E3"), widthOf("E1"));
   const eastWidth = Math.max(widthOf("C3"), widthOf("C1"));
   const totalWidth = westWidth + ROAD_M + eastWidth;
-  const bedLength = plotConfigs[0].bedLength;
+  const bedLength = plotConfigs[0]?.bedLength ?? 37.2;
   const depth = 2 * (bedLength + PLOT_GAP_M / 2);
 
   return {
@@ -145,16 +148,14 @@ function Roads() {
       </mesh>
       <RoadDashes along="x" fixed={roads.horizontal.z} length={roads.horizontal.length} />
 
-      <Text
+      <SceneText
         position={[roads.vertical.x, 0.05, roads.vertical.length / 2 + 1.8]}
         rotation={[-Math.PI / 2, 0, 0]}
         fontSize={1.05}
         color={PLAN_COLORS.roadLabel}
-        anchorX="center"
-        anchorY="middle"
       >
         Logistics Road
-      </Text>
+      </SceneText>
     </group>
   );
 }
@@ -172,9 +173,43 @@ export interface BedPlacement {
  * Lay the fields out 2x2 with a road between, mirroring the 2D layout so the
  * two views stay mentally interchangeable.
  */
+/**
+ * Where a field sits and how wide its beds are.
+ *
+ * `plotConfigs` only knows the four fields measured off the farm plan. A field
+ * added under Infrastructure has no entry, and the old code asserted the
+ * lookup was non-null — so one new field threw inside placeBeds and blanked the
+ * whole 3D view. Unknown fields are placed deterministically instead, using
+ * the bed's own recorded width and length.
+ */
+function fieldLayout(fieldId: string, beds: ShadehouseBed[]) {
+  const known = plotConfigs.find((p) => p.id === fieldId);
+  if (known) return known;
+
+  const sample = beds.find((b) => b.fieldId === fieldId);
+  return {
+    id: fieldId,
+    // Every unknown field sits south of the measured block — see NEW_FIELD_BAND
+    // in placeBeds. Dropping them into one of the four quadrants laid them on
+    // top of a field that is already there.
+    position: "SOUTH" as const,
+    bedCount: beds.filter((b) => b.fieldId === fieldId).length || 1,
+    bedWidth: sample?.widthM || 1.2,
+    bedLength: sample?.lengthM || 37.2,
+    label: `Field ${fieldId}`,
+  };
+}
+
+/** Fields with no plan geometry, in a stable order. */
+function unknownFields(beds: ShadehouseBed[]): string[] {
+  return [...new Set(beds.map((b) => b.fieldId))]
+    .filter((id) => id && !plotConfigs.some((p) => p.id === id))
+    .sort();
+}
+
 export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
   const widthOf = (fieldId: string) => {
-    const field = plotConfigs.find((p) => p.id === fieldId)!;
+    const field = fieldLayout(fieldId, beds);
     return field.bedCount * field.bedWidth;
   };
 
@@ -182,10 +217,30 @@ export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
   const eastWidth = Math.max(widthOf("C3"), widthOf("C1"));
   const totalWidth = westWidth + ROAD_M + eastWidth;
 
+  // Where the south band for unfamiliar fields starts, and how they stack.
+  const NEW_FIELD_BAND = plotConfigs[0]?.bedLength ?? 37.2;
+  const extra = unknownFields(beds);
+
   return beds.map((bed) => {
-    const field = plotConfigs.find((p) => p.id === bed.fieldId)!;
+    const field = fieldLayout(bed.fieldId, beds);
+    const isSouth = field.position === "SOUTH";
     const isEast = field.position === "NE" || field.position === "SE";
     const isNorth = field.position === "NW" || field.position === "NE";
+
+    if (isSouth) {
+      // One band per unfamiliar field, laid out below the measured block so it
+      // can never sit on top of a field that is already there.
+      const seat = extra.indexOf(bed.fieldId);
+      const rowStart = NEW_FIELD_BAND + PLOT_GAP_M * 1.5;
+      return {
+        bed,
+        x: -totalWidth / 2 + (bed.bedNumber - 0.5) * field.bedWidth,
+        z: rowStart + seat * (field.bedLength + PLOT_GAP_M) + field.bedLength / 2,
+        y: LEVEL_HEIGHTS_M[bed.level],
+        width: field.bedWidth * 0.86,
+        length: field.bedLength,
+      };
+    }
 
     const columnStart = isEast
       ? -totalWidth / 2 + westWidth + ROAD_M
@@ -614,19 +669,16 @@ function BedLabel({
 
   return (
     <Billboard position={[placement.x, y, z]}>
-      <Text
+      <SceneText
         fontSize={compact ? 0.3 : 0.42}
         color={isGround ? "#1f2f42" : "#3f6b4a"}
-        anchorX="center"
-        anchorY="middle"
         outlineWidth={0.035}
         outlineColor="#ffffff"
         renderOrder={999}
-        material-depthTest={false}
-        material-transparent
+        depthTest={false}
       >
         {compact ? `A${placement.bed.level}` : String(placement.bed.bedNumber).padStart(2, "0")}
-      </Text>
+      </SceneText>
     </Billboard>
   );
 }
@@ -646,33 +698,29 @@ function PlotLabel({
 }) {
   return (
     <Billboard position={[x, 4.6, z]}>
-      <Text
+      <SceneText
         fontSize={1.5}
         color="#151f2d"
-        anchorX="center"
-        anchorY="middle"
+        weight={700}
         outlineWidth={0.09}
         outlineColor="#ffffff"
         renderOrder={1000}
-        material-depthTest={false}
-        material-transparent
+        depthTest={false}
       >
         {label}
-      </Text>
-      <Text
+      </SceneText>
+      <SceneText
         position={[0, -1.05, 0]}
         fontSize={0.62}
         color="#566d8a"
-        anchorX="center"
-        anchorY="middle"
+        weight={500}
         outlineWidth={0.05}
         outlineColor="#ffffff"
         renderOrder={1000}
-        material-depthTest={false}
-        material-transparent
+        depthTest={false}
       >
         {`${count} beds`}
-      </Text>
+      </SceneText>
       <mesh position={[0, -1.75, 0]} key={id} renderOrder={1000}>
         <boxGeometry args={[3.4, 0.06, 0.06]} />
         <meshBasicMaterial color="#a3b835" depthTest={false} transparent />
@@ -694,17 +742,16 @@ function Compass({ span, depth }: { span: number; depth: number }) {
     <group>
       {marks.map((m) => (
         <group key={m.label} position={m.pos}>
-          <Text
+          <SceneText
             rotation={[-Math.PI / 2, 0, 0]}
             fontSize={m.primary ? 4 : 3}
             color={m.primary ? "#3d8b40" : "#8a9aae"}
-            anchorX="center"
-            anchorY="middle"
+            weight={700}
             outlineWidth={0.16}
             outlineColor="#ffffff"
           >
             {m.label}
-          </Text>
+          </SceneText>
           {m.primary && (
             // Arrow pointing north, as on the plan.
             <mesh position={[0, 0, -3.4]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -748,12 +795,21 @@ export default function ShadehouseScene({
   selectedBedId: string | null;
   onSelect: (bedId: string) => void;
 }) {
+  /**
+   * Math.max of nothing is -Infinity, which made the ground plane infinite and
+   * every vertex NaN — three.js then logged "Computed radius is NaN" and drew
+   * nothing. A nursery with no beds yet still needs a floor to stand on.
+   */
   const span = useMemo(
-    () => Math.max(...placements.map((p) => Math.abs(p.x))) * 2 + 4,
+    () => (placements.length
+      ? Math.max(...placements.map((p) => Math.abs(p.x))) * 2 + 4
+      : 40),
     [placements]
   );
   const depth = useMemo(
-    () => Math.max(...placements.map((p) => Math.abs(p.z) + p.length / 2)) * 2,
+    () => (placements.length
+      ? Math.max(...placements.map((p) => Math.abs(p.z) + p.length / 2)) * 2
+      : 40),
     [placements]
   );
 
