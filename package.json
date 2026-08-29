@@ -31,7 +31,8 @@
     "test:forecast": "tsx scripts/test/demandForecast.test.mts",
     "test:insight": "tsx scripts/test/productionInsight.test.mts",
     "test:availability": "tsx scripts/test/availabilityInsight.test.mts",
-    "test:beds": "tsx scripts/test/expandBeds.test.mts"
+    "test:beds": "tsx scripts/test/expandBeds.test.mts",
+    "dataverse:verify-writes": "node scripts/dataverse/verify-writes.mjs"
   },
   "dependencies": {
     "@fontsource-variable/playfair-display": "^5.3.0",
