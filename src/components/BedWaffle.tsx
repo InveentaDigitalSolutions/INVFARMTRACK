@@ -37,7 +37,7 @@ export default function BedWaffle({
         const filled = own.filter((b) => b.state !== "empty").length;
         return {
           id,
-          label: field?.label ?? `Field ${id}`,
+          label: field?.label ?? id,
           beds: ordered,
           filled,
           total: own.length,

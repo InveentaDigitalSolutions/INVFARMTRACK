@@ -200,7 +200,7 @@ function fieldLayout(fieldId: string, beds: ShadehouseBed[]) {
     bedCount: beds.filter((b) => b.fieldId === fieldId).length || 1,
     bedWidth: sample?.widthM || 1.2,
     bedLength: sample?.lengthM || 37.2,
-    label: `Field ${fieldId}`,
+    label: fieldId,
   };
 }
 

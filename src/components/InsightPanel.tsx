@@ -34,7 +34,7 @@ export function deriveShadehouseInsight(beds: ShadehouseBed[]): Insight | null {
     const ready = own.filter((b) => b.state === "harvest-ready").length;
     return {
       id,
-      label: field?.label ?? `Field ${id}`,
+      label: field?.label ?? id,
       total: own.length,
       empty,
       issues,

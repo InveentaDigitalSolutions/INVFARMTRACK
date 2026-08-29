@@ -1,0 +1,19 @@
+[
+  { "field": "E3", "from": 1,  "to": 4,  "shade": "Double" },
+  { "field": "E3", "from": 5,  "to": 8,  "shade": "Single" },
+  { "field": "E3", "from": 9,  "to": 12, "shade": "Double" },
+  { "field": "E3", "from": 13, "to": 16, "shade": "Single" },
+  { "field": "E3", "from": 17, "to": 21, "shade": "Double" },
+  { "field": "E3", "from": 22, "to": 25, "shade": "Single" },
+  { "field": "E3", "from": 26, "to": 29, "shade": "Double" },
+  { "field": "E3", "from": 30, "to": 33, "shade": "Single" },
+
+  { "field": "E1", "from": 1,  "to": 4,  "shade": "Double" },
+  { "field": "E1", "from": 5,  "to": 8,  "shade": "Single" },
+  { "field": "E1", "from": 9,  "to": 12, "shade": "Double" },
+  { "field": "E1", "from": 13, "to": 16, "shade": "Single" },
+  { "field": "E1", "from": 17, "to": 21, "shade": "Double" },
+  { "field": "E1", "from": 22, "to": 25, "shade": "Single" },
+  { "field": "E1", "from": 26, "to": 29, "shade": "Double" },
+  { "field": "E1", "from": 30, "to": 33, "shade": "Single" }
+]

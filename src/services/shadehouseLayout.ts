@@ -90,10 +90,10 @@ export const stateColors: Record<string, { fill: string; label: string }> = {
 
 // Real shadehouse config — 1 shadehouse with 4 fields
 export const plotConfigs: PlotConfig[] = [
-  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Field E3" },
-  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Field C3" },
-  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "Field E1" },
-  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Field C1" },
+  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "E3" },
+  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "C3" },
+  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "E1" },
+  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "C1" },
 ];
 
 /** Posts stand roughly every 3.6 m, whatever the bed pitch. */
