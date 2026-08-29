@@ -61,23 +61,33 @@ function draw(
 
   const strokePx = outlineEm * RESOLUTION;
   // Real glyph bounds where the browser reports them; the em box is a safe
-  // fallback for engines that do not.
-  const ascent = metrics.actualBoundingBoxAscent || RESOLUTION * 0.8;
-  const descent = metrics.actualBoundingBoxDescent || RESOLUTION * 0.2;
+  // fallback for engines that do not. Descent matters as much as ascent — a
+  // canvas sized to the ascent alone cuts the tails off g, y and p.
+  const ascent = metrics.actualBoundingBoxAscent || RESOLUTION * 0.82;
+  const descent = metrics.actualBoundingBoxDescent || RESOLUTION * 0.24;
+  // Some glyphs paint outside the advance width (italics, overhangs), so take
+  // the wider of the two rather than trusting `width`.
+  const left = metrics.actualBoundingBoxLeft ?? 0;
+  const right = metrics.actualBoundingBoxRight ?? metrics.width;
+  const inkWidth = Math.max(metrics.width, left + right);
 
-  const pad = strokePx + RESOLUTION * 0.12;
-  canvas.width = Math.ceil(metrics.width + pad * 2);
+  const pad = strokePx + RESOLUTION * 0.16;
+  canvas.width = Math.ceil(inkWidth + pad * 2);
   canvas.height = Math.ceil(ascent + descent + pad * 2);
 
   // Setting width/height resets the context.
   ctx.font = font;
   ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+  ctx.textBaseline = "alphabetic";
   ctx.lineJoin = "round";
   ctx.miterLimit = 2;
 
   const cx = canvas.width / 2;
-  const cy = pad + ascent - (ascent + descent) / 2 + (ascent + descent) / 2;
+  // The alphabetic baseline sits exactly `ascent` below the top of the ink, so
+  // the glyphs land inside the box they were measured for. Drawing from the
+  // "middle" baseline put them half the ascent-descent difference too low and
+  // clipped the bottom of every label.
+  const cy = pad + ascent;
 
   if (strokePx > 0) {
     ctx.strokeStyle = outlineColor;
