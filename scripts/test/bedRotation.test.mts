@@ -26,8 +26,8 @@ eq('only the last is current', spans.filter(s => s.current).map(s => s.bed).sort
 eq('days are counted', spans.find(s => s.from === '2026-01-10')?.days, 90)
 
 // an inactive planting is not an occupancy
-eq('inactive plantings are ignored',
-  occupancies([...plantings, { bed:'E3-02', plant:'X', date:'2026-03-01', status:'Inactive' }], END)
+eq('a cleared seeding is ignored',
+  occupancies([...plantings, { bed:'E3-02', plant:'X', date:'2026-03-01', current:false }], END)
     .some(s => s.bed === 'E3-02'), false)
 
 const summary = rotationSummary(plantings, END)

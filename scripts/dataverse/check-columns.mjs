@@ -26,7 +26,13 @@ for (const m of tableMap.matchAll(/^ {2}(\w+): \{\s*\n\s*dataSource: "(\w+)",([\
 
 // Fields the app computes rather than stores are legitimately absent from a
 // binding; listing them keeps the check honest rather than noisy.
-const DERIVED = new Set(['actions', 'status', 'total', 'count', 'items', 'progress'])
+//
+// `status` used to be on this list, and that is how a Status control on the
+// seeding form shipped bound to no column at all: it was written on every save
+// and dropped, so "Active Seedings" read zero for every real record. Status is
+// a genuine column on invoices, orders and shipments — allowlisting the name
+// everywhere hid the one place it was a fiction.
+const DERIVED = new Set(['actions', 'total', 'count', 'items', 'progress'])
 
 let problems = 0
 for (const file of readdirSync('src/pages').filter((f) => f.endsWith('.tsx'))) {

@@ -1291,6 +1291,14 @@
           "description": "Which bed was harvested"
         },
         {
+          "schemaName": "bv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "bv_Plant",
+          "required": false,
+          "description": "What was cut. A bed may carry more than one variety."
+        },
+        {
           "schemaName": "bv_Date",
           "displayName": "Date",
           "type": "date",
@@ -3540,6 +3548,14 @@
           "description": "Link to the related Bed record."
         },
         {
+          "schemaName": "bv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "bv_Plant",
+          "required": false,
+          "description": "What was pruned. A bed may carry more than one variety."
+        },
+        {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
@@ -5633,6 +5649,14 @@
           "required": true,
           "relatedTable": "bv_Bed",
           "description": "Link to the related Bed record."
+        },
+        {
+          "schemaName": "bv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "bv_Plant",
+          "required": false,
+          "description": "What was counted. A bed may carry more than one variety."
         },
         {
           "schemaName": "bv_ShipmentWeek",

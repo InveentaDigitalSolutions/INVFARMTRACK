@@ -168,6 +168,10 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "nav": "bv_BedId",
       "targetSet": "bv_beds"
     },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    },
     "_bv_seasonid_value": {
       "nav": "bv_SeasonId",
       "targetSet": "bv_seasons"
@@ -235,6 +239,10 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_bedid_value": {
       "nav": "bv_BedId",
       "targetSet": "bv_beds"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
     }
   },
   "bv_inputcomponents": {
@@ -357,6 +365,10 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_bedid_value": {
       "nav": "bv_BedId",
       "targetSet": "bv_beds"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
     },
     "_bv_seasonid_value": {
       "nav": "bv_SeasonId",

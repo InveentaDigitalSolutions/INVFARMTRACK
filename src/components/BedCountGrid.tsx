@@ -21,6 +21,8 @@ import { useNurseryBeds } from "../hooks/useNurseryBeds";
 interface BedCountRow {
   id: string;
   bed?: string;
+  /** What was counted. A bed may carry more than one variety. */
+  plant?: string;
   week?: number;
   counted?: number;
   countDate?: string;
@@ -82,7 +84,7 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
     if (!field && fields.length > 0) setField(fields[0]);
   }, [field, fields]);
   const varieties = useMemo(
-    () => [...new Set(beds.map((b) => b.plant).filter(Boolean) as string[])].sort(),
+    () => [...new Set(beds.flatMap((b) => b.plants ?? []))].sort(),
     [beds]
   );
   const levels = useMemo(
@@ -92,9 +94,20 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
   );
 
   /** What is already recorded for this week, so the grid opens on it. */
+  /**
+   * Counts already recorded for this week, keyed by bed and variety.
+   *
+   * A bed carrying 4,000 of one variety and 200 of another is two numbers to
+   * count, not one. Keyed on the bed alone, the second overwrote the first.
+   */
+  const keyOf = (bed: string, plant: string) => `${bed}|${plant}`;
+
   const existing = useMemo(() => {
     const map = new Map<string, BedCountRow>();
-    for (const c of counts) if (c.week === week && c.bed) map.set(c.bed, c);
+    for (const c of counts) {
+      if (c.week !== week || !c.bed) continue;
+      map.set(keyOf(String(c.bed), String(c.plant ?? "")), c);
+    }
     return map;
   }, [counts, week]);
 
@@ -112,20 +125,26 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
     const q = search.trim().toLowerCase();
     const list = beds
       .filter((b) => !field || b.fieldName === field)
-      .filter((b) => !variety || b.plant === variety)
       .filter((b) => level === "" || String(b.level ?? "") === level)
-      .filter((b) => !onlyPlanted || b.plant)
-      .filter((b) => !q || b.name.toLowerCase().includes(q) || (b.plant ?? "").toLowerCase().includes(q))
-      .map((b) => ({
+      .filter((b) => !onlyPlanted || (b.plants?.length ?? 0) > 0)
+      // One row per variety on the bed, so each can be counted on its own.
+      .flatMap((b) => {
+        const here = b.plants?.length ? b.plants : [""];
+        return here.map((plant) => ({ bed: b, plant }));
+      })
+      .filter((r) => !variety || r.plant === variety)
+      .filter((r) => !q || r.bed.name.toLowerCase().includes(q) || r.plant.toLowerCase().includes(q))
+      .map(({ bed: b, plant }) => ({
+        key: keyOf(b.name, plant),
         bed: b.name,
         field: b.fieldName,
-        plant: b.plant ?? "",
+        plant,
         level: b.level,
         estimated: estimate.get(b.name),
-        recorded: existing.get(b.name)?.counted,
+        recorded: existing.get(keyOf(b.name, plant))?.counted,
       }))
       // Beds still to walk, which is what someone mid-count wants to see.
-      .filter((r) => !onlyUncounted || (r.recorded === undefined && draft[r.bed] === undefined));
+      .filter((r) => !onlyUncounted || (r.recorded === undefined && draft[r.key] === undefined));
 
     if (sort === "variety") {
       return list.sort((a, b) =>
@@ -137,7 +156,8 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
     if (sort === "estimate") {
       return list.sort((a, b) => (b.estimated ?? -1) - (a.estimated ?? -1));
     }
-    return list.sort((a, b) => a.bed.localeCompare(b.bed, undefined, { numeric: true }));
+    return list.sort((a, b) =>
+      a.bed.localeCompare(b.bed, undefined, { numeric: true }) || a.plant.localeCompare(b.plant));
   }, [beds, field, variety, level, search, onlyPlanted, onlyUncounted, sort, estimate, existing, draft]);
 
   /**
@@ -147,10 +167,14 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
   const progress = useMemo(() => {
     const out = new Map<string, { done: number; total: number }>();
     for (const b of beds) {
-      if (onlyPlanted && !b.plant) continue;
+      const here = b.plants?.length ? b.plants : [""];
+      if (onlyPlanted && here[0] === "") continue;
       const p = out.get(b.fieldName) ?? { done: 0, total: 0 };
-      p.total++;
-      if (existing.get(b.name)?.counted !== undefined || draft[b.name] !== undefined) p.done++;
+      for (const plant of here) {
+        p.total++;
+        const k = keyOf(b.name, plant);
+        if (existing.get(k)?.counted !== undefined || draft[k] !== undefined) p.done++;
+      }
       out.set(b.fieldName, p);
     }
     return out;
@@ -160,17 +184,17 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
   const byVariety = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of rows) {
-      const v = Number(draft[r.bed] ?? r.recorded ?? 0) || 0;
+      const v = Number(draft[r.key] ?? r.recorded ?? 0) || 0;
       if (!v || !r.plant) continue;
       map.set(r.plant, (map.get(r.plant) ?? 0) + v);
     }
     return [...map.entries()].sort((a, b) => b[1] - a[1]);
   }, [rows, draft]);
 
-  const dirty = Object.entries(draft).filter(([bed, v]) => {
+  const dirty = Object.entries(draft).filter(([key, v]) => {
     const n = Number(v);
     if (v === "" || !Number.isFinite(n)) return false;
-    return n !== existing.get(bed)?.counted;
+    return n !== existing.get(key)?.counted;
   });
 
   const save = () => {
@@ -178,11 +202,18 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
     setSaving(true);
     const today = new Date().toISOString().slice(0, 10);
     const next = [...counts];
-    for (const [bed, value] of dirty) {
+    for (const [key, value] of dirty) {
       const qty = Number(value);
-      const found = next.findIndex((c) => c.bed === bed && c.week === week);
+      const [bed, plant] = key.split("|");
+      const found = next.findIndex(
+        (c) => c.bed === bed && String(c.plant ?? "") === plant && c.week === week
+      );
       if (found >= 0) next[found] = { ...next[found], counted: qty, countDate: today };
-      else next.push({ id: "", bed, week, counted: qty, countDate: today } as BedCountRow);
+      else {
+        // The variety goes on the record. Without it a count against a bed
+        // carrying two could never be attributed to either.
+        next.push({ id: "", bed, plant: plant || undefined, week, counted: qty, countDate: today } as BedCountRow);
+      }
     }
     setCounts(next);
     setDraft({});
@@ -193,7 +224,7 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
   };
 
   const totalCounted = rows.reduce(
-    (sum, r) => sum + (Number(draft[r.bed] ?? r.recorded ?? 0) || 0),
+    (sum, r) => sum + (Number(draft[r.key] ?? r.recorded ?? 0) || 0),
     0
   );
   const totalEstimated = rows.reduce((sum, r) => sum + (r.estimated ?? 0), 0);
@@ -206,7 +237,7 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
           <p className="text-[12px] text-navy-400 mt-0.5">
             {(() => {
               const done = rows.filter(
-                (r) => r.recorded !== undefined || draft[r.bed] !== undefined
+                (r) => r.recorded !== undefined || draft[r.key] !== undefined
               ).length;
               return `${done} of ${rows.length} counted`;
             })()}
@@ -333,10 +364,10 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
             </thead>
             <tbody>
               {rows.map((r) => {
-                const value = draft[r.bed] ?? (r.recorded === undefined ? "" : String(r.recorded));
-                const changed = draft[r.bed] !== undefined && Number(draft[r.bed]) !== r.recorded;
+                const value = draft[r.key] ?? (r.recorded === undefined ? "" : String(r.recorded));
+                const changed = draft[r.key] !== undefined && Number(draft[r.key]) !== r.recorded;
                 return (
-                  <tr key={r.bed} className="border-t border-sand-200/70 hover:bg-sand-50/60">
+                  <tr key={r.key} className="border-t border-sand-200/70 hover:bg-sand-50/60">
                     <td className="px-3 py-1.5 font-mono text-[12px] text-navy-700 whitespace-nowrap">
                       {r.bed}
                       {r.level ? <span className="text-navy-300 ml-1">L{r.level}</span> : null}
@@ -353,7 +384,7 @@ export default function BedCountGrid({ onSaved }: BedCountGridProps = {}) {
                         min={0}
                         inputMode="numeric"
                         value={value}
-                        onChange={(e) => setDraft((d) => ({ ...d, [r.bed]: e.target.value }))}
+                        onChange={(e) => setDraft((d) => ({ ...d, [r.key]: e.target.value }))}
                         // Typing down a column of thirty beds should not need
                         // the mouse between each one.
                         onKeyDown={(e) => {

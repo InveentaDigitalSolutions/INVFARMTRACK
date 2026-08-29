@@ -51,6 +51,7 @@ export interface BedCompositionsRow {
 export interface BedCountsRow {
   id: string;
   bed?: string;
+  plant?: string;
   season?: string;
   week?: number;
   counted?: number;
@@ -257,6 +258,7 @@ export interface HarvestRow {
   quality?: string;
   worker?: string;
   bed?: string;
+  plant?: string;
   primaryName?: string;
   [key: string]: unknown;
 }
@@ -384,6 +386,7 @@ export interface PlantingsRow {
   plant?: string;
   bed?: string;
   season?: string;
+  current?: boolean;
   primaryName?: string;
   [key: string]: unknown;
 }
@@ -439,6 +442,7 @@ export interface PruningRow {
   id: string;
   date?: string;
   bed?: string;
+  plant?: string;
   week?: number;
   bedsPruned?: number;
   cuttingsEstimated?: number;

@@ -244,6 +244,7 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     primaryKey: "bv_bedcountid",
     fields: {
       bed: "_bv_bedid_value",
+      plant: "_bv_plantid_value",
       season: "_bv_seasonid_value",
       week: "bv_shipmentweek",
       counted: "bv_countedqty",
@@ -340,6 +341,10 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // Lookup display text arrives via the formatted annotation on the
       // _value column, which DataverseStore unwraps.
       plant: "_bv_plantid_value", bed: "_bv_bedid_value", season: "_bv_seasonid_value",
+      // Whether this seeding is still the one on the bed. The form had a
+      // Status toggle bound to nothing, so it was dropped on every save and
+      // "Active Seedings" read zero for every real record.
+      current: "bv_currentplanting",
     },
     primaryName: "bv_plantingdescription",
     nameFrom: ["plant", "bed", "date"],
@@ -371,6 +376,7 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     fields: {
       date: "bv_date", qty: "bv_quantityharvested",
       quality: "bv_quality", worker: "bv_worker", bed: "_bv_bedid_value",
+      plant: "_bv_plantid_value",
     },
     primaryName: "bv_harvestname",
     nameFrom: ["bed", "date", "quality"],
@@ -394,6 +400,7 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     fields: {
       date: "bv_date",
       bed: "_bv_bedid_value",
+      plant: "_bv_plantid_value",
       week: "bv_weeknumber",
       bedsPruned: "bv_bedspruned",
       cuttingsEstimated: "bv_cuttingsestimated",

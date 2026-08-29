@@ -67,6 +67,7 @@ export function useShadehouseBeds(): {
             ? b.shade : undefined) as ShadehouseBed["shade"],
           state: s?.state ?? "empty",
           variety: s?.variety ?? "",
+          varieties: s?.varieties ?? [],
           plantedDate: s?.plantedDate ?? "",
           expectedHarvest: s?.expectedHarvest ?? "",
           notes: s?.notes ?? "",

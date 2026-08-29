@@ -1,5 +1,5 @@
 /** Checks fulfilment per variety. Run: npm run test:variety */
-import { varietyByBed, varietyCoverage, coverageVerdict } from '../../src/services/varietySupply.ts'
+import { varietiesByBed, soleVarietyOf, varietyCoverage, coverageVerdict } from '../../src/services/varietySupply.ts'
 
 let failures = 0
 const eq = (label: string, got: unknown, want: unknown) => {
@@ -12,14 +12,25 @@ const plantings = [
   { bed: 'E3-01', plant: 'Hawaiian', date: '2026-01-10' },
   { bed: 'E3-02', plant: 'Hawaiian', date: '2026-01-10' },
   { bed: 'C1-01', plant: 'Jade',     date: '2026-02-01' },
-  // replanted later: the bed now carries a different variety
+  // A second variety alongside the first — 4,000 of one and 200 of another is
+  // an ordinary seeding, not a replant.
   { bed: 'E3-01', plant: 'Marble Queen', date: '2026-06-01' },
 ]
-eq('a bed carries its latest planting', varietyByBed(plantings).get('E3-01'), 'Marble Queen')
-eq('an untouched bed keeps its own', varietyByBed(plantings).get('E3-02'), 'Hawaiian')
-eq('an inactive planting does not count',
-  varietyByBed([...plantings, { bed:'C1-02', plant:'X', date:'2026-07-01', status:'Inactive' }]).get('C1-02'),
+eq('a bed carries every variety standing on it',
+  varietiesByBed(plantings).get('E3-01'), ['Hawaiian', 'Marble Queen'])
+eq('a bed with one carries one', varietiesByBed(plantings).get('E3-02'), ['Hawaiian'])
+eq('a cleared seeding is not standing',
+  varietiesByBed([...plantings, { bed:'C1-02', plant:'X', date:'2026-07-01', current:false }]).get('C1-02'),
   undefined)
+eq('the same variety seeded twice is still one variety',
+  varietiesByBed([{ bed:'A-01', plant:'Jade', date:'2026-01-01' },
+                  { bed:'A-01', plant:'Jade', date:'2026-03-01' }]).get('A-01'), ['Jade'])
+
+const byBed = varietiesByBed(plantings)
+eq('a bed with one variety speaks for its records', soleVarietyOf('E3-02', byBed), 'Hawaiian')
+eq('a mixed bed does not — undefined, never a guess', soleVarietyOf('E3-01', byBed), undefined)
+eq('an unknown bed is undefined', soleVarietyOf('Z-99', byBed), undefined)
+eq('no bed is undefined', soleVarietyOf(undefined, byBed), undefined)
 
 const rows = varietyCoverage({
   plantings,

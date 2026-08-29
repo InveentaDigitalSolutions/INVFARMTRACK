@@ -41,7 +41,7 @@ eq('and says so rather than guessing', jade.unscheduled, true)
 eq('the screen can name what is missing', missingCycles(list), ['Jade'])
 
 eq('inactive plantings are excluded',
-  cohorts([...plantings, {bed:'C1-09',plant:'Neon',date:'2026-01-05',status:'Inactive'}], cycles)
+  cohorts([...plantings, {bed:'C1-09',plant:'Neon',date:'2026-01-05',current:false}], cycles)
     .some(c => c.plant==='Neon'), false)
 
 console.log(failures ? `\n  ${failures} failed` : '\n  all passed')

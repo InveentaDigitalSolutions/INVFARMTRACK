@@ -22,10 +22,11 @@ import BedRotation from "./BedRotation";
 import {
   harvestInsight, varietyInsight, occupancyInsight,
 } from "../services/productionInsight";
+import { varietiesByBed, soleVarietyOf } from "../services/varietySupply";
 import { cohorts, missingCycles } from "../services/productionSchedule";
 
-interface HarvestRow { id: string; date?: string; qty?: number; bed?: string }
-interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; qty?: number; status?: string }
+interface HarvestRow { id: string; date?: string; qty?: number; bed?: string; plant?: string }
+interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; qty?: number; current?: boolean }
 interface PlantRow { id: string; name?: string; variety?: string; weeksToFirstHarvest?: number; productiveWeeks?: number }
 interface CountRow { id: string; week?: number; counted?: number }
 
@@ -54,25 +55,26 @@ export default function ProductionOverview() {
       };
     });
 
-    /** The crop standing on each bed now. */
-    const latestByBed = new Map<string, PlantingRow>();
-    for (const p of [...plantings].sort((a, b) => (String(a.date) < String(b.date) ? -1 : 1))) {
-      if (p.bed && p.status !== "Inactive") latestByBed.set(p.bed, p);
-    }
+    /** Every variety standing on each bed now. */
+    const varietiesOfBed = varietiesByBed(plantings);
+    const bedsWithACrop = new Set(varietiesOfBed.keys());
 
-    /** Harvest attributed to a variety through the bed it came off. */
-    const varietyOfBed = new Map([...latestByBed].map(([bed, p]) => [bed, String(p.plant ?? "")]));
+    /**
+     * Harvest by variety. The harvest record's own variety wins; the bed's
+     * stands in only when that bed carries exactly one. A cut recorded against
+     * a mixed bed with no variety is left out — crediting it to whichever
+     * seeding happened to be latest is how the figure used to lie.
+     */
     const byVariety = new Map<string, number>();
     for (const h of harvests) {
-      const v = h.bed ? varietyOfBed.get(h.bed) : undefined;
+      const v = h.plant || soleVarietyOf(h.bed, varietiesOfBed);
       if (v) byVariety.set(v, (byVariety.get(v) ?? 0) + (h.qty ?? 0));
     }
 
-    /** Beds carrying each variety, which is the other half of the picture. */
+    /** Beds carrying each variety. A mixed bed counts once for each. */
     const bedsByVariety = new Map<string, number>();
-    for (const [, p] of latestByBed) {
-      const v = String(p.plant ?? "");
-      if (v) bedsByVariety.set(v, (bedsByVariety.get(v) ?? 0) + 1);
+    for (const [, here] of varietiesOfBed) {
+      for (const v of here) bedsByVariety.set(v, (bedsByVariety.get(v) ?? 0) + 1);
     }
 
     const waves = cohorts(
@@ -91,7 +93,7 @@ export default function ProductionOverview() {
       months,
       thisMonth: months[months.length - 1]?.value ?? 0,
       lastMonth: months[months.length - 2]?.value ?? 0,
-      planted: latestByBed.size,
+      planted: bedsWithACrop.size,
       totalBeds: liveBeds.length,
       byVariety: varietyList,
       bedsByVariety: [...bedsByVariety.entries()].map(([name, value]) => ({ name, value })),
@@ -103,7 +105,7 @@ export default function ProductionOverview() {
         .reduce((s, c) => s + (c.counted ?? 0), 0),
       harvest: harvestInsight(months),
       variety: varietyInsight(varietyList),
-      occupancy: occupancyInsight(latestByBed.size, liveBeds.length),
+      occupancy: occupancyInsight(bedsWithACrop.size, liveBeds.length),
     };
   }, [harvests, plantings, plants, counts, beds]);
 
@@ -145,7 +147,7 @@ export default function ProductionOverview() {
           context={model.totalBeds ? { label: "beds in total", value: String(model.totalBeds) } : undefined}
         />
         <MetricTile
-          label="Planting waves"
+          label="Seeding waves"
           value={String(model.waves.length)}
           icon={CalendarClock}
           context={

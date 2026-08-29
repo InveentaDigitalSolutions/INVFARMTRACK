@@ -40,6 +40,8 @@ export interface ShadehouseBed {
   potType?: PotType;
   /** Layers of shade cloth strung over the bed; undefined when not recorded. */
   shade?: ShadeLevel;
+  /** Every variety standing on the bed; `variety` is these joined for display. */
+  varieties?: string[];
   state: "empty" | "planted" | "growing" | "harvest-ready" | "issue";
   variety: string;
   plantedDate: string;

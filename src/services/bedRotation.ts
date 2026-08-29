@@ -17,7 +17,8 @@ export interface PlantingLike {
   plant?: string;
   date?: string;
   qty?: number;
-  status?: string;
+  /** False once the seeding has been cleared off the bed. */
+  current?: boolean;
 }
 
 export interface Occupancy {
@@ -52,7 +53,7 @@ export function occupancies(
   const byBed = new Map<string, PlantingLike[]>();
   for (const p of plantings) {
     if (!p.bed || !p.date) continue;
-    if (p.status === "Inactive") continue;
+    if (p.current === false) continue;
     const list = byBed.get(p.bed) ?? [];
     list.push(p);
     byBed.set(p.bed, list);

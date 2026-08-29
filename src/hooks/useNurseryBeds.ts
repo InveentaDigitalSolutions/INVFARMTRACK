@@ -26,13 +26,15 @@ export interface BedOption {
   type?: "Air" | "Ground";
   /** Undefined when unknown; 0 is a real answer meaning ground level. */
   level?: number;
-  /** What is growing there now, blank if the bed is empty. */
+  /** What is growing there now, joined for display; blank if the bed is empty. */
   plant?: string;
+  /** Every variety standing on the bed. Use this to count, not `plant`. */
+  plants?: string[];
 }
 
 interface BedRow { id: string; name?: string; field?: string; type?: string; level?: string | number; active?: boolean }
 interface FieldRow { id: string; name?: string; shadehouse?: string; rows?: number }
-interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; status?: string }
+interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; current?: boolean }
 
 export function useNurseryBeds(fallback: BedOption[] = []): {
   beds: BedOption[];
@@ -50,11 +52,16 @@ export function useNurseryBeds(fallback: BedOption[] = []): {
 
     const fieldOf = new Map(fieldRows.map((f) => [String(f.name ?? ""), f]));
 
-    // The most recent active planting per bed is what the bed is growing.
-    const plantOf = new Map<string, string>();
-    for (const p of [...plantings].sort((a, b) => String(a.date ?? "") < String(b.date ?? "") ? -1 : 1)) {
-      if (p.bed && p.plant && p.status !== "Inactive") plantOf.set(String(p.bed), String(p.plant));
+    // Every variety still standing on a bed, not just the latest — a bed can
+    // carry 4,000 of one and 200 of another at the same time.
+    const plantsOf = new Map<string, string[]>();
+    for (const p of plantings) {
+      if (!p.bed || !p.plant || p.current === false) continue;
+      const here = plantsOf.get(String(p.bed)) ?? [];
+      if (!here.includes(String(p.plant))) here.push(String(p.plant));
+      plantsOf.set(String(p.bed), here);
     }
+    for (const list of plantsOf.values()) list.sort();
 
     return bedRows
       .filter((b) => b.active !== false)
@@ -74,7 +81,8 @@ export function useNurseryBeds(fallback: BedOption[] = []): {
           // and calling it Air would be the same guess that had to be undone.
           type: (b.type === "Ground" || b.type === "Air" ? b.type : undefined) as BedOption["type"],
           level: b.level === undefined || b.level === null ? undefined : Number(b.level),
-          plant: plantOf.get(name) ?? "",
+          plant: (plantsOf.get(name) ?? []).join(" + "),
+          plants: plantsOf.get(name) ?? [],
         };
       })
       // "E3-02" after "E3-01", not after "E3-10", which a plain sort would do.

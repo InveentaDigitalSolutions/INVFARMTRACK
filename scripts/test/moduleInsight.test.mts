@@ -157,7 +157,7 @@ const infra = infrastructureSummary({
     { name: 'E3-02', field: 'E3' },
     { name: 'E3-03', field: 'E3', active: false },
   ],
-  plantings: [{ bed: 'E3-01', plant: 'Hawaiian', status: 'Active' }],
+  plantings: [{ bed: 'E3-01', plant: 'Hawaiian' }],
 })
 eq('an air bed above a ground bed is one position', infra.positions, 3)
 eq('positions against capacity, not records', infra.utilisation, 30)
@@ -171,7 +171,7 @@ const status = bedStatuses({
     { bed: 'E3-01', plant: 'Pothos / Hawaiian', date: '2026-01-05' },
     { bed: 'E3-02', plant: 'Pothos / Jade', date: '2026-08-20' },
     { bed: 'E3-03', plant: 'Pothos / Neon', date: '2026-03-01' },
-    { bed: 'E3-04', plant: 'Pothos / Jade', date: '2026-01-01', status: 'Inactive' },
+    { bed: 'E3-04', plant: 'Pothos / Jade', date: '2026-01-01', current: false },
   ],
   plants: [
     { name: 'Pothos', variety: 'Hawaiian', weeksToFirstHarvest: 12 },
@@ -183,7 +183,7 @@ const status = bedStatuses({
 eq('a bed treated for pests is flagged', status.get('E3-01')?.state, 'issue')
 eq('freshly planted reads as planted', status.get('E3-02')?.state, 'planted')
 eq('no cycle on file means growing, never ready', status.get('E3-03')?.state, 'growing')
-eq('an inactive planting leaves the bed out', status.has('E3-04'), false)
+eq('a cleared seeding leaves the bed out', status.has('E3-04'), false)
 eq('the first cut is dated from the cycle', status.get('E3-02')?.expectedHarvest, '2026-11-12')
 
 const hist = bedHistory('E3-01', {
@@ -194,6 +194,27 @@ const hist = bedHistory('E3-01', {
 eq('only this bed', hist.length, 2)
 eq('newest first', hist[0].date, '2026-05-05')
 eq('a bed with nothing recorded has no history', bedHistory('E9-99', {}).length, 0)
+
+
+console.log('\n— mixed beds —')
+// 4,000 of one variety and 200 of another on the same bed is an ordinary
+// seeding here, and every figure attributed through that bed has to cope.
+const mixed = bedStatuses({
+  plantings: [
+    { bed: 'E3-01', plant: 'Pothos / Hawaiian', date: '2026-05-01', qty: 4000 },
+    { bed: 'E3-01', plant: 'Pothos / Jade', date: '2026-05-20', qty: 200 },
+    { bed: 'E3-02', plant: 'Pothos / Jade', date: '2026-05-01', qty: 3000 },
+  ],
+  plants: [{ name: 'Pothos', variety: 'Hawaiian', weeksToFirstHarvest: 12 },
+           { name: 'Pothos', variety: 'Jade', weeksToFirstHarvest: 12 }],
+  today: TODAY,
+})
+eq('a mixed bed lists both varieties',
+   mixed.get('E3-01')?.varieties, ['Pothos / Hawaiian', 'Pothos / Jade'])
+eq('and reads as both', mixed.get('E3-01')?.variety, 'Pothos / Hawaiian + Pothos / Jade')
+eq('a single-variety bed is unchanged', mixed.get('E3-02')?.varieties, ['Pothos / Jade'])
+eq('readiness follows the oldest seeding, the one nearest cutting',
+   mixed.get('E3-01')?.plantedDate, '2026-05-01')
 
 console.log(failures === 0 ? '\n  all passed\n' : `\n  ${failures} FAILED\n`)
 process.exit(failures === 0 ? 0 : 1)

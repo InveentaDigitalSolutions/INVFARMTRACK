@@ -27,7 +27,7 @@ import type { FertilizationRow, HarvestRow, IrrigationRow, PlantingsRow, PlantsR
  */
 const tabs = [
   { id: "overview", label: "Overview" },
-  { id: "plantings", label: "Plantings" },
+  { id: "plantings", label: "Seedings" },
   { id: "care", label: "Crop Care" },
   { id: "harvest", label: "Harvest" },
   { id: "tasks", label: "Tasks" },
@@ -76,17 +76,19 @@ const workerOptionsFallback: { value: string; label: string }[] = [];
 
 // Form definitions
 const plantingFields = [
-  { title: "Planting Details", columns: 2 as const, fields: [
+  { title: "Seeding Details", columns: 2 as const, fields: [
     { key: "plant", label: "Plant", type: "select" as const, options: plantOptionsFallback, optionsFrom: "plants", required: true },
     { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
     { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons", required: true },
-    { key: "date", label: "Planting Date", type: "date" as const, required: true },
+    { key: "date", label: "Seeding Date", type: "date" as const, required: true },
     { key: "qty", label: "Quantity", type: "number" as const, min: 1 },
     // Air beds carry hanging pots in two shapes; the 3D view renders each.
     { key: "potType", label: "Pot Type", type: "select" as const, options: [
       { value: "round", label: "Round" }, { value: "square", label: "Square" },
     ] },
-    { key: "status", label: "Status", type: "toggle" as const, options: [{ value: "Active", label: "Active" }, { value: "Inactive", label: "Inactive" }] },
+    // A bed can carry several seedings at once — 4,000 of one variety and 200
+    // of another. This says which are still standing, not which is latest.
+    { key: "current", label: "Still on this bed", type: "boolean" as const },
   ]},
 ];
 
@@ -121,6 +123,9 @@ const irrigationFields = [
 const harvestFields = [
   { title: "Harvest Event", columns: 2 as const, fields: [
     { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
+    // Which variety was cut. A bed carrying one fills this in on its own; a
+    // bed carrying two cannot, and guessing is how a "by variety" figure lies.
+    { key: "plant", label: "Plant", type: "select" as const, options: [], optionsFrom: "plants" },
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "qty", label: "Quantity", type: "number" as const, min: 0, required: true },
     { key: "quality", label: "Quality", type: "select" as const, options: [
@@ -160,6 +165,9 @@ const pruningFields = [
   { title: "Pruning Event", columns: 2 as const, fields: [
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
+    // Which variety was cut. A bed carrying one fills this in on its own; a
+    // bed carrying two cannot, and guessing is how a "by variety" figure lies.
+    { key: "plant", label: "Plant", type: "select" as const, options: [], optionsFrom: "plants" },
     { key: "week", label: "Week", type: "number" as const, min: 1, max: 52, required: true },
     // No "beds pruned" field: it is however many beds are selected. Typing it
     // separately meant someone could select five and write three.
@@ -346,17 +354,17 @@ export default function ProductionPage() {
                 { key: "season", label: "Season" },
                 { key: "date", label: "Planted" },
                 { key: "qty", label: "Qty" },
-                { key: "status", label: "Status", render: (r) => <Badge variant={r.status === "Active" ? "green" : "gray"}>{r.status as string}</Badge> },
+                { key: "current", label: "Status", render: (r) => <Badge variant={r.current === false ? "gray" : "green"}>{r.current === false ? "Cleared" : "Standing"}</Badge> },
               ]}
               data={plantings}
               onAdd={plantingForm.openCreate}
               onEdit={(row, i) => plantingForm.openEdit(row as any, i)}
               onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="New Planting"
-              searchPlaceholder="Search plantings..."
+              addLabel="New Seeding"
+              searchPlaceholder="Search seedings..."
             />
-            <FormModal open={plantingForm.open} onClose={plantingForm.close} title={plantingForm.isEdit ? "Edit Planting" : "New Planting"} groups={plantingFields} values={plantingForm.values} onChange={plantingForm.onChange} isEdit={plantingForm.isEdit} onSubmit={(v) => handleSave(plantings, setPlantings, plantingForm, v)} />
-            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Planting" message="Are you sure you want to delete this planting record? This cannot be undone." onConfirm={() => handleDelete(plantings, setPlantings)} />
+            <FormModal open={plantingForm.open} onClose={plantingForm.close} title={plantingForm.isEdit ? "Edit Seeding" : "New Seeding"} groups={plantingFields} values={plantingForm.values} onChange={plantingForm.onChange} isEdit={plantingForm.isEdit} onSubmit={(v) => handleSave(plantings, setPlantings, plantingForm, v)} />
+            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Seeding" message="Are you sure you want to delete this seeding record? This cannot be undone." onConfirm={() => handleDelete(plantings, setPlantings)} />
           </>
         );
       case "overview":
@@ -586,9 +594,9 @@ export default function ProductionPage() {
   };
 
   return (
-    <PageShell title="Production" subtitle="Plantings, treatments, irrigation and harvest" icon={Sprout}>
+    <PageShell title="Production" subtitle="Seedings, treatments, irrigation and harvest" icon={Sprout}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard variant="hero" label="Active Plantings" value={plantings.filter((p) => p.status === "Active").length} icon={Leaf} />
+        <StatCard variant="hero" label="Active Seedings" value={plantings.filter((p) => p.current !== false).length} icon={Leaf} />
         <StatCard label="Treatments (month)" value={treatments.length} icon={Bug} />
         <StatCard label="Water Used (L)" value={irrigation.reduce((s, i) => s + (i.liters ?? 0), 0).toLocaleString()} icon={Droplets} />
         <StatCard label="Harvested" value={harvest.reduce((s, h) => s + (h.qty ?? 0), 0).toLocaleString()} icon={Scissors} />

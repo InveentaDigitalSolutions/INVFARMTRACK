@@ -16,9 +16,9 @@ import { useMemo } from "react";
 import { useRecords } from "../hooks/useRecords";
 import { varietyCoverage } from "../services/varietySupply";
 
-interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; status?: string }
-interface CountRow { id: string; bed?: string; week?: number; counted?: number }
-interface PruningRow { id: string; bed?: string; week?: number; cuttingsEstimated?: number }
+interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; current?: boolean }
+interface CountRow { id: string; bed?: string; plant?: string; week?: number; counted?: number }
+interface PruningRow { id: string; bed?: string; plant?: string; week?: number; cuttingsEstimated?: number }
 interface DemandRow { id: string; plant?: string; week?: number; requested?: number }
 
 export default function VarietyFulfilment() {
@@ -31,8 +31,10 @@ export default function VarietyFulfilment() {
     () =>
       varietyCoverage({
         plantings,
-        counts: counts.map((c) => ({ bed: c.bed, week: c.week, value: c.counted })),
-        pruning: pruning.map((p) => ({ bed: p.bed, week: p.week, value: p.cuttingsEstimated })),
+        // The record's own variety wins; the bed's stands in only when that
+        // bed carries exactly one.
+        counts: counts.map((c) => ({ bed: c.bed, plant: c.plant, week: c.week, value: c.counted })),
+        pruning: pruning.map((p) => ({ bed: p.bed, plant: p.plant, week: p.week, value: p.cuttingsEstimated })),
         demand,
       }),
     [plantings, counts, pruning, demand]

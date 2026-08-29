@@ -12,7 +12,7 @@
 
 export type BedState = "empty" | "planted" | "growing" | "harvest-ready" | "issue";
 
-export interface PlantingLike { bed?: string; plant?: string; date?: string; qty?: number; status?: string }
+export interface PlantingLike { bed?: string; plant?: string; date?: string; qty?: number; current?: boolean }
 export interface PlantLike { name?: string; variety?: string; weeksToFirstHarvest?: number; productiveWeeks?: number }
 export interface DatedBedRecord { bed?: string; date?: string; type?: string }
 
@@ -28,8 +28,13 @@ const weeksBetween = (from: string, to: Date): number => {
 
 export interface BedStatus {
   state: BedState;
-  /** The variety standing on the bed, blank when nothing is. */
+  /**
+   * What the bed reads as: the variety, or "A + B" where it carries several.
+   * Use `varieties` for anything that counts rather than displays.
+   */
   variety: string;
+  /** Every variety standing on the bed, sorted. Empty when nothing is. */
+  varieties: string[];
   plantedDate: string;
   /** When the first cut is due, from the plant's own cycle. Blank if unknown. */
   expectedHarvest: string;
@@ -59,11 +64,20 @@ export function bedStatuses(input: {
     if (p.variety) cycleOf.set(p.variety, p.weeksToFirstHarvest);
   }
 
-  // The latest active planting wins: a bed replanted in March is not still
-  // carrying what went in last August.
-  const latest = new Map<string, PlantingLike>();
+  /**
+   * Every seeding still standing on each bed, oldest first.
+   *
+   * A bed can carry more than one variety at a time — 4,000 of one and 200 of
+   * another. This kept only the latest, so the second silently replaced the
+   * first and the map showed a bed growing something it had alongside, not
+   * instead of.
+   */
+  const standing = new Map<string, PlantingLike[]>();
   for (const p of [...input.plantings].sort((a, b) => (String(a.date ?? "") < String(b.date ?? "") ? -1 : 1))) {
-    if (p.bed && p.status !== "Inactive") latest.set(String(p.bed), p);
+    if (!p.bed || p.current === false) continue;
+    const here = standing.get(String(p.bed)) ?? [];
+    here.push(p);
+    standing.set(String(p.bed), here);
   }
 
   // A pest or disease treatment in the last three weeks still counts as open.
@@ -76,10 +90,14 @@ export function bedStatuses(input: {
   }
 
   const out = new Map<string, BedStatus>();
-  for (const [bed, planting] of latest) {
-    const variety = String(planting.plant ?? "");
+  for (const [bed, here] of standing) {
+    // The oldest standing seeding sets the bed's age and readiness — it is the
+    // one nearest to being cut. All the varieties are listed alongside.
+    const planting = here[0];
+    const varieties = [...new Set(here.map((p) => String(p.plant ?? "")).filter(Boolean))].sort();
+    const variety = varieties.length === 1 ? varieties[0] : varieties.join(" + ");
     const planted = String(planting.date ?? "").slice(0, 10);
-    const cycle = cycleOf.get(variety);
+    const cycle = cycleOf.get(varieties[0] ?? variety);
     const age = planted ? weeksBetween(planted, today) : 0;
 
     let expectedHarvest = "";
@@ -102,6 +120,7 @@ export function bedStatuses(input: {
     out.set(bed, {
       state,
       variety,
+      varieties,
       plantedDate: planted,
       expectedHarvest,
       notes: flagged.get(bed) ?? "",

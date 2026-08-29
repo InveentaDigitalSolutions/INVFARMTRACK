@@ -17,7 +17,7 @@ import { useRecords } from "./useRecords";
 import { paidAgainst, money } from "../services/invoiceMath";
 
 interface HarvestRow { id: string; date?: string; qty?: number; quality?: string; bed?: string }
-interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; qty?: number; status?: string }
+interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; qty?: number; current?: boolean }
 interface InvoiceRow { id: string; total?: number; balance?: number; status?: string; dueDate?: string; currency?: string }
 interface BedRow { id: string; name?: string; active?: boolean; field?: string }
 interface CountRow { id: string; bed?: string; week?: number; counted?: number }
@@ -49,7 +49,7 @@ export function useDashboardMetrics() {
   const [harvests] = useRecords<HarvestRow>("harvest", []);
   const [plantings] = useRecords<PlantingRow>("plantings", []);
   const [invoices] = useRecords<InvoiceRow>("invoices", []);
-  const [payments] = useRecords<{ id: string; invoice?: string; amount?: number; status?: string }>("payments", []);
+  const [payments] = useRecords<{ id: string; invoice?: string; amount?: number; current?: boolean }>("payments", []);
   const [beds] = useRecords<BedRow>("beds", []);
   const [counts] = useRecords<CountRow>("bedCounts", []);
   const [treatments] = useRecords<TreatmentRow>("treatments", []);
@@ -81,7 +81,7 @@ export function useDashboardMetrics() {
     /** A planting is active until something replaces it on that bed. */
     const latestByBed = new Map<string, PlantingRow>();
     for (const p of [...plantings].sort((a, b) => (String(a.date) < String(b.date) ? -1 : 1))) {
-      if (p.bed && p.status !== "Inactive") latestByBed.set(p.bed, p);
+      if (p.bed && p.current !== false) latestByBed.set(p.bed, p);
     }
     const activePlantings: Metric = { value: plantings.length ? latestByBed.size : undefined };
 

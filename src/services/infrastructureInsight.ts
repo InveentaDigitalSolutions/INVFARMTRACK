@@ -13,7 +13,7 @@ import { ranked } from "./period";
 export interface Shadehouse { name?: string; capacity?: number; active?: boolean }
 export interface Field { name?: string; rows?: number; shadehouse?: string }
 export interface Bed { name?: string; field?: string; type?: string; level?: string; active?: boolean }
-export interface Planting { bed?: string; plant?: string; status?: string; date?: string }
+export interface Planting { bed?: string; plant?: string; current?: boolean; date?: string }
 
 export interface InfrastructureSummary {
   shadehouses: number;
@@ -64,7 +64,7 @@ export function infrastructureSummary(input: {
   }
 
   const live = new Set(
-    plantings.filter((p) => p.bed && p.status !== "Inactive").map((p) => String(p.bed))
+    plantings.filter((p) => p.bed && p.current !== false).map((p) => String(p.bed))
   );
 
   const fieldMap = new Map<string, number>();

@@ -10,8 +10,8 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 47 |
-| Columns | 573 |
-| Relationships | 64 |
+| Columns | 576 |
+| Relationships | 67 |
 
 ## Conventions
 
@@ -40,7 +40,7 @@
 | [Input](#input) | `bv_input` | `INP-0001` | 14 | Catalog of fertilizers, pesticides, and other inputs |
 | [Treatment](#treatment) | `bv_treatment` | `TRT-0001` | 14 | Treatment/fumigation applications to plantings |
 | [Irrigation](#irrigation) | `bv_irrigation` | `IRR-0001` | 12 | Watering events for plantings |
-| [Harvest](#harvest) | `bv_harvest` | `HRV-0001` | 9 | Harvest events tracking yield and quality per bed |
+| [Harvest](#harvest) | `bv_harvest` | `HRV-0001` | 10 | Harvest events tracking yield and quality per bed |
 | [Calendar](#calendar) | `bv_calendar` | `CAL-0001` | 17 | Date dimension table for scheduling and reporting |
 | [Task](#task) | `bv_task` | `TSK-0001` | 11 | Scheduled and assigned nursery tasks |
 | [Customer](#customer) | `bv_customer` | `CUS-0001` | 13 | Nursery customers for orders and invoicing |
@@ -56,7 +56,7 @@
 | [Purchase Order](#purchase-order) | `bv_purchaseorder` | `PO-0001` | 10 | Orders placed to suppliers for inputs, materials, and services |
 | [Worker](#worker) | `bv_worker` | `WRK-0001` | 10 | Nursery workers and field staff for labor tracking and performance measurement |
 | [Timesheet](#timesheet) | `bv_timesheet` | `TMS-0001` | 11 | Daily labor records — hours, tasks, piece count, and cost allocation |
-| [Pruning](#pruning) | `bv_pruning` | `PRN-0001` | 10 | Pruning (poda) events — drives availability projections |
+| [Pruning](#pruning) | `bv_pruning` | `PRN-0001` | 11 | Pruning (poda) events — drives availability projections |
 | [Pruning Curve](#pruning-curve) | `bv_pruningcurve` | `PCV-0001` | 9 | Seasonal pruning plan — planned vs actual beds per week for the whole nursery |
 | [Fertilization](#fertilization) | `bv_fertilization` | `FRT-0001` | 10 | Fertilization events with nutrient quantities (N, P, K, Ca) applied per bed |
 | [Availability](#availability) | `bv_availability` | `AVL-0001` | 15 | Weekly availability projections — Friday generation, Monday confirmation |
@@ -74,7 +74,7 @@
 | [Substrate Material](#substrate-material) | `bv_substratematerial` | `SUB-0001` | 6 | Anything a bed's growing medium is made of — a mineral fraction like sand, or an organic one like coconut coir. |
 | [Bed Composition](#bed-composition) | `bv_bedcomposition` | `BCM-0001` | 6 | One material in a bed's growing medium and how much of it there is. A bed has as many of these as its mix has parts. |
 | [Exchange Rate](#exchange-rate) | `bv_exchangerate` | `FX-0001` | 5 | The Banco Central de Honduras reference rate (TCR) for one day. Kept as history rather than a single current value: an invoice has to be read back at the rate it was converted at, and restating last month at today's rate would silently change reported sales. |
-| [Bed Count](#bed-count) | `bv_bedcount` | `CNT-0001` | 9 | What one bed is expected to yield for one shipment week, counted in the field. The nursery has two availabilities: one calculated from pruning, and this one, which is someone walking the rows. Where a count exists it is the better number, so it is kept beside the estimate rather than overwriting it. |
+| [Bed Count](#bed-count) | `bv_bedcount` | `CNT-0001` | 10 | What one bed is expected to yield for one shipment week, counted in the field. The nursery has two availabilities: one calculated from pruning, and this one, which is someone walking the rows. Where a count exists it is the better number, so it is kept beside the estimate rather than overwriting it. |
 | [Material](#material) | `bv_material` | `MAT-0001` | 10 | Something the nursery buys and stores rather than applies to a plant — drip line, boxes, plastic baskets, plumbing, shade cloth. Kept apart from Inputs because an input has a composition and a safety interval and a box of fittings has neither. |
 | [Stock Movement](#stock-movement) | `bv_stockmovement` | `STK-0001` | 12 | One receipt, issue or correction. Stock on hand is the sum of these rather than a number somebody edits: a stored total drifts silently, and nothing afterwards can say why it changed. Points at a Material or an Input — a sack of fertilizer is stock in the same way a box of fittings is. |
 | [Shipment](#shipment) | `bv_shipment` | `SHP-0001` | 11 | One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed — so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went. |
@@ -92,6 +92,7 @@
 | Treatment | `bv_inputid` | Input | Remove link |
 | Irrigation | `bv_bedid` | Bed | Restrict |
 | Harvest | `bv_bedid` | Bed | Restrict |
+| Harvest | `bv_plantid` | Plant | Remove link |
 | Task | `bv_plantingid` | Planting | Remove link |
 | Task | `bv_bedid` | Bed | Remove link |
 | Order | `bv_customerid` | Customer | Restrict |
@@ -114,6 +115,7 @@
 | Timesheet | `bv_workerid` | Worker | Restrict |
 | Timesheet | `bv_bedid` | Bed | Remove link |
 | Pruning | `bv_bedid` | Bed | Restrict |
+| Pruning | `bv_plantid` | Plant | Remove link |
 | Pruning | `bv_seasonid` | Season | Remove link |
 | Pruning Curve | `bv_seasonid` | Season | Restrict |
 | Fertilization | `bv_bedid` | Bed | Restrict |
@@ -138,6 +140,7 @@
 | Bed Composition | `bv_bedid` | Bed | Restrict |
 | Bed Composition | `bv_substratematerialid` | Substrate Material | Restrict |
 | Bed Count | `bv_bedid` | Bed | Restrict |
+| Bed Count | `bv_plantid` | Plant | Remove link |
 | Bed Count | `bv_seasonid` | Season | Remove link |
 | Material | `bv_supplierid` | Supplier | Remove link |
 | Stock Movement | `bv_materialid` | Material | Remove link |
@@ -338,7 +341,7 @@ Plant species, varieties, and patent catalog
 
 </details>
 
-**Referenced by:** Planting (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`)
+**Referenced by:** Planting (`bv_plantid`), Harvest (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Pruning (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`), Bed Count (`bv_plantid`)
 
 ## Season
 
@@ -573,6 +576,7 @@ Harvest events tracking yield and quality per bed
 | `bv_harvestcode` 🔑 | Harvest ID | Autonumber | ✓ | Auto-generated identifier, format HRV-0001. |
 | `bv_harvestname` | Harvest Event Name | Text(200) | ✓ | Descriptive name, shown wherever the record is listed. |
 | `bv_bedid` | Bed | Lookup → [Bed](#bed) | ✓ | Which bed was harvested |
+| `bv_plantid` | Plant | Lookup → [Plant](#plant) |  | What was cut. A bed may carry more than one variety. |
 | `bv_date` | Date | Date only | ✓ | Date the event took place. |
 | `bv_yieldkg` | Yield (kg) | Decimal(2) |  | Decimal number. Yield (kg) for the Harvest. |
 | `bv_quantityharvested` | Quantity Harvested | Whole number |  | Amount recorded for this entry. |
@@ -1250,6 +1254,7 @@ Pruning (poda) events — drives availability projections
 | `bv_pruningcode` 🔑 | Pruning ID | Autonumber | ✓ | Auto-generated identifier, format PRN-0001. |
 | `bv_pruningname` | Pruning Event | Text(200) | ✓ | Descriptive name, shown wherever the record is listed. |
 | `bv_bedid` | Bed | Lookup → [Bed](#bed) | ✓ | Link to the related Bed record. |
+| `bv_plantid` | Plant | Lookup → [Plant](#plant) |  | What was pruned. A bed may carry more than one variety. |
 | `bv_seasonid` | Season | Lookup → [Season](#season) |  | Link to the related Season record. |
 | `bv_date` | Date | Date only | ✓ | Date the event took place. |
 | `bv_weeknumber` | Week Number | Whole number |  | ISO week number. |
@@ -1862,6 +1867,7 @@ What one bed is expected to yield for one shipment week, counted in the field. T
 | `bv_bedcountcode` 🔑 | Bed Count ID | Autonumber | ✓ | Auto-generated identifier, format CNT-0001. |
 | `bv_bedcountname` | Name | Text(100) |  | How the row reads on its own, e.g. "E3-01 · wk 34". |
 | `bv_bedid` | Bed | Lookup → [Bed](#bed) | ✓ | Link to the related Bed record. |
+| `bv_plantid` | Plant | Lookup → [Plant](#plant) |  | What was counted. A bed may carry more than one variety. |
 | `bv_shipmentweek` | Shipment Week | Whole number | ✓ | The week the cuttings are expected to ship, not the week they were counted — the counter is estimating forward. |
 | `bv_countedqty` | Counted | Whole number | ✓ | Cuttings counted as ready for that shipment week. |
 | `bv_countdate` | Counted On | Date only |  | When the count was made, which is how its age can be judged. |

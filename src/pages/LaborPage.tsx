@@ -57,7 +57,7 @@ const timesheetFormGroups = [
     { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers", required: true },
     { key: "date", label: "Date", type: "date" as const, required: true },
     { key: "activity", label: "Activity", type: "select" as const, required: true, options: [
-      { value: "Planting", label: "Planting" }, { value: "Harvesting", label: "Harvesting" },
+      { value: "Planting", label: "Seeding" }, { value: "Harvesting", label: "Harvesting" },
       { value: "Packing", label: "Packing" }, { value: "Treatment", label: "Treatment" },
       { value: "Irrigation", label: "Irrigation" }, { value: "Maintenance", label: "Maintenance" },
       { value: "General", label: "General" },

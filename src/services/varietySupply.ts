@@ -17,11 +17,14 @@ export interface BedPlanting {
   bed?: string;
   plant?: string;
   date?: string;
-  status?: string;
+  /** False once the seeding has been cleared off the bed. */
+  current?: boolean;
 }
 
 export interface BedNumber {
   bed?: string;
+  /** What was counted or cut, where the record says. Beats the bed's variety. */
+  plant?: string;
   week?: number;
   /** Counted cuttings, or the pruning estimate, depending on the source. */
   value?: number;
@@ -53,17 +56,39 @@ export interface VarietyCoverage {
   beds: number;
 }
 
-/** The variety standing on each bed now — the link between beds and demand. */
-export function varietyByBed(plantings: BedPlanting[]): Map<string, string> {
-  const out = new Map<string, string>();
-  const ordered = [...plantings].sort((a, b) =>
-    String(a.date ?? "") < String(b.date ?? "") ? -1 : 1
-  );
-  for (const p of ordered) {
-    if (!p.bed || p.status === "Inactive") continue;
-    if (p.plant) out.set(p.bed, p.plant);
+/**
+ * The varieties standing on each bed now — the link between beds and demand.
+ *
+ * A bed can carry more than one: 4,000 of one variety and 200 of another is an
+ * ordinary seeding. This used to keep only the latest, so a second variety on
+ * a bed silently replaced the first and every figure attributed through that
+ * bed was wrong without saying so.
+ */
+export function varietiesByBed(plantings: BedPlanting[]): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  for (const p of plantings) {
+    if (!p.bed || !p.plant || p.current === false) continue;
+    const here = out.get(p.bed) ?? [];
+    if (!here.includes(p.plant)) here.push(p.plant);
+    out.set(p.bed, here);
   }
+  for (const list of out.values()) list.sort();
   return out;
+}
+
+/**
+ * The one variety a bed carries, or undefined when it carries several.
+ *
+ * Undefined is the honest answer for a mixed bed: a harvest recorded against
+ * it names no variety, and picking one would be a guess.
+ */
+export function soleVarietyOf(
+  bed: string | undefined,
+  byBed: Map<string, string[]>
+): string | undefined {
+  if (!bed) return undefined;
+  const here = byBed.get(bed);
+  return here && here.length === 1 ? here[0] : undefined;
 }
 
 /**
@@ -81,14 +106,19 @@ export function varietyCoverage(input: {
   week?: number;
 }): VarietyCoverage[] {
   const { week } = input;
-  const byBed = varietyByBed(input.plantings);
+  const byBed = varietiesByBed(input.plantings);
   const inWeek = <T extends { week?: number }>(rows: T[]) =>
     week === undefined ? rows : rows.filter((r) => Number(r.week) === week);
 
+  /**
+   * A record's own variety wins. Where it has none, the bed's variety stands in
+   * — but only when the bed carries exactly one. A mixed bed with an
+   * unattributed count is left out rather than credited to a guess.
+   */
   const sumByVariety = (rows: BedNumber[]) => {
     const out = new Map<string, number>();
     for (const r of inWeek(rows)) {
-      const v = r.bed ? byBed.get(r.bed) : undefined;
+      const v = r.plant || soleVarietyOf(r.bed, byBed);
       if (!v) continue;
       out.set(v, (out.get(v) ?? 0) + (Number(r.value) || 0));
     }
@@ -104,8 +134,11 @@ export function varietyCoverage(input: {
     demand.set(d.plant, (demand.get(d.plant) ?? 0) + (Number(d.requested) || 0));
   }
 
+  // A bed carrying two varieties counts once for each — it is a bed of both.
   const bedsPer = new Map<string, number>();
-  for (const [, variety] of byBed) bedsPer.set(variety, (bedsPer.get(variety) ?? 0) + 1);
+  for (const [, here] of byBed) {
+    for (const variety of here) bedsPer.set(variety, (bedsPer.get(variety) ?? 0) + 1);
+  }
 
   const varieties = new Set([...forecast.keys(), ...counted.keys(), ...demand.keys()]);
 

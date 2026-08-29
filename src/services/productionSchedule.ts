@@ -20,7 +20,8 @@ export interface PlantingLike {
   plant?: string;
   date?: string;
   qty?: number;
-  status?: string;
+  /** False once the seeding has been cleared off the bed. */
+  current?: boolean;
 }
 
 export interface PlantCycle {
@@ -86,7 +87,7 @@ export function cohorts(
 
   for (const p of plantings) {
     if (!p.plant || !p.date) continue;
-    if (p.status === "Inactive") continue;
+    if (p.current === false) continue;
 
     const start = weekStart(String(p.date));
     const key = `${p.plant}|${start}`;
