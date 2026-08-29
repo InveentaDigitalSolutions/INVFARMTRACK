@@ -3,7 +3,6 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain } from "lucide-react";
 import {
-  generateBedStack,
   stateColors,
   potTypeLabels,
   LEVEL_HEIGHTS_M,
@@ -11,6 +10,7 @@ import {
   type ShadehouseBed,
 } from "./ShadehouseView";
 import ShadehouseScene, { placeBeds, type LensMode } from "./ShadehouseScene";
+import { useShadehouseBeds } from "../hooks/useShadehouseBeds";
 import { readZone, zoneStatusColors, type ZoneReading } from "../services/irrigation";
 import { buildZones, demoAnomalies, simulateFixes } from "../services/irrigationSim";
 import { useCurrentWeather } from "../hooks/useCurrentWeather";
@@ -60,7 +60,10 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 export default function ShadehouseView3D({ className = "" }: { className?: string }) {
-  const [beds] = useState<ShadehouseBed[]>(() => generateBedStack());
+  // The stack is the real bed set: ground beds and whatever cable levels have
+  // actually been created above them. It used to be generated, which is why
+  // the model showed cables the nursery has not strung.
+  const { beds }: { beds: ShadehouseBed[] } = useShadehouseBeds();
   const [visibleLevels, setVisibleLevels] = useState<Set<BedLevel>>(
     () => new Set(ALL_LEVELS)
   );

@@ -10,10 +10,12 @@ import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
+import { isoWeek, sum } from "../services/period";
 import { PLANT_SIZE_OPTIONS } from "../services/plantSizes";
 import BedCountGrid from "../components/BedCountGrid";
 import AvailabilityOverview from "../components/AvailabilityOverview";
 import { expandBeds } from "../services/expandBeds";
+import type { CurveRow, ProjectionsRow, PruningRow } from "../services/rowTypes.generated";
 
 const tabs = [
   // The question the projections exist to answer, before the table of them.
@@ -24,77 +26,22 @@ const tabs = [
 ];
 
 // --- Weekly Projections data ---
-const initProjections = [
-  { week: "2026-W14", plant: "Pothos / Hawaiian", size: "Medium", projectedQty: 1200, orderedQty: 1000, confirmedQty: 1000, surplus: 200, shortfall: 0, status: "Confirmed - Over" },
-  { week: "2026-W14", plant: "Pothos / Marble Queen", size: "Medium", projectedQty: 800, orderedQty: 800, confirmedQty: 800, surplus: 0, shortfall: 0, status: "Confirmed - Equal" },
-  { week: "2026-W15", plant: "Pothos / Hawaiian", size: "Medium", projectedQty: 1100, orderedQty: 1300, confirmedQty: 1100, surplus: 0, shortfall: 200, status: "Confirmed - Under" },
-  { week: "2026-W15", plant: "Pothos / Jade", size: "Small", projectedQty: 600, orderedQty: 500, confirmedQty: 500, surplus: 100, shortfall: 0, status: "Confirmed - Over" },
-  { week: "2026-W16", plant: "Pothos / Marble Queen", size: "Medium", projectedQty: 900, orderedQty: 900, confirmedQty: 850, surplus: 0, shortfall: 50, status: "Confirmed - Under" },
-  { week: "2026-W16", plant: "Pothos / Hawaiian", size: "Small", projectedQty: 500, orderedQty: 500, confirmedQty: 500, surplus: 0, shortfall: 0, status: "Confirmed - Equal" },
-  { week: "2026-W17", plant: "Pothos / Hawaiian", size: "Medium", projectedQty: 1400, orderedQty: 1200, confirmedQty: 1200, surplus: 200, shortfall: 0, status: "Confirmed - Over" },
-  { week: "2026-W18", plant: "Pothos / Jade", size: "Medium", projectedQty: 700, orderedQty: 900, confirmedQty: 700, surplus: 0, shortfall: 200, status: "Confirmed - Under" },
-];
+const initProjections: ProjectionsRow[] = [];
 
 // --- Pruning Curve data (weeks 42-52 of 2025 + weeks 1-16 of 2026) ---
-const initCurve = [
-  { season: "2025-S2", week: 42, plannedBeds: 8, actualBeds: 8, plannedCuttings: 4000, actualCuttings: 3900 },
-  { season: "2025-S2", week: 43, plannedBeds: 8, actualBeds: 9, plannedCuttings: 4000, actualCuttings: 4300 },
-  { season: "2025-S2", week: 44, plannedBeds: 9, actualBeds: 9, plannedCuttings: 4500, actualCuttings: 4400 },
-  { season: "2025-S2", week: 45, plannedBeds: 9, actualBeds: 8, plannedCuttings: 4500, actualCuttings: 3800 },
-  { season: "2025-S2", week: 46, plannedBeds: 10, actualBeds: 10, plannedCuttings: 5000, actualCuttings: 5100 },
-  { season: "2025-S2", week: 47, plannedBeds: 10, actualBeds: 11, plannedCuttings: 5000, actualCuttings: 5400 },
-  { season: "2025-S2", week: 48, plannedBeds: 10, actualBeds: 10, plannedCuttings: 5000, actualCuttings: 4900 },
-  { season: "2025-S2", week: 49, plannedBeds: 11, actualBeds: 10, plannedCuttings: 5500, actualCuttings: 5000 },
-  { season: "2025-S2", week: 50, plannedBeds: 11, actualBeds: 11, plannedCuttings: 5500, actualCuttings: 5500 },
-  { season: "2025-S2", week: 51, plannedBeds: 12, actualBeds: 12, plannedCuttings: 6000, actualCuttings: 6100 },
-  { season: "2025-S2", week: 52, plannedBeds: 12, actualBeds: 11, plannedCuttings: 6000, actualCuttings: 5400 },
-  { season: "2026-S1", week: 1, plannedBeds: 10, actualBeds: 10, plannedCuttings: 5000, actualCuttings: 5000 },
-  { season: "2026-S1", week: 2, plannedBeds: 10, actualBeds: 10, plannedCuttings: 5000, actualCuttings: 5100 },
-  { season: "2026-S1", week: 3, plannedBeds: 11, actualBeds: 11, plannedCuttings: 5500, actualCuttings: 5300 },
-  { season: "2026-S1", week: 4, plannedBeds: 11, actualBeds: 12, plannedCuttings: 5500, actualCuttings: 5900 },
-  { season: "2026-S1", week: 5, plannedBeds: 12, actualBeds: 12, plannedCuttings: 6000, actualCuttings: 6000 },
-  { season: "2026-S1", week: 6, plannedBeds: 12, actualBeds: 11, plannedCuttings: 6000, actualCuttings: 5500 },
-  { season: "2026-S1", week: 7, plannedBeds: 12, actualBeds: 13, plannedCuttings: 6000, actualCuttings: 6400 },
-  { season: "2026-S1", week: 8, plannedBeds: 13, actualBeds: 13, plannedCuttings: 6500, actualCuttings: 6500 },
-  { season: "2026-S1", week: 9, plannedBeds: 13, actualBeds: 12, plannedCuttings: 6500, actualCuttings: 5800 },
-  { season: "2026-S1", week: 10, plannedBeds: 13, actualBeds: 14, plannedCuttings: 6500, actualCuttings: 7000 },
-  { season: "2026-S1", week: 11, plannedBeds: 14, actualBeds: 14, plannedCuttings: 7000, actualCuttings: 7100 },
-  { season: "2026-S1", week: 12, plannedBeds: 14, actualBeds: 13, plannedCuttings: 7000, actualCuttings: 6400 },
-  { season: "2026-S1", week: 13, plannedBeds: 14, actualBeds: 15, plannedCuttings: 7000, actualCuttings: 7500 },
-  { season: "2026-S1", week: 14, plannedBeds: 15, actualBeds: 15, plannedCuttings: 7500, actualCuttings: 7500 },
-  { season: "2026-S1", week: 15, plannedBeds: 15, actualBeds: 14, plannedCuttings: 7500, actualCuttings: 6800 },
-  { season: "2026-S1", week: 16, plannedBeds: 15, actualBeds: 0, plannedCuttings: 7500, actualCuttings: 0 },
-];
+const initCurve: CurveRow[] = [];
 
 // --- Pruning Log data ---
-const initLog = [
-  { date: "2026-04-07", bed: "E3-31", week: 15, bedsPruned: 1, cuttingsEstimated: 1500, worker: "Carlos M." },
-  { date: "2026-04-06", bed: "E1-18", week: 15, bedsPruned: 1, cuttingsEstimated: 1000, worker: "Maria L." },
-  { date: "2026-04-05", bed: "E3-01", week: 14, bedsPruned: 1, cuttingsEstimated: 2000, worker: "Juan P." },
-  { date: "2026-04-03", bed: "C3-02", week: 14, bedsPruned: 1, cuttingsEstimated: 1400, worker: "Ana R." },
-  { date: "2026-04-01", bed: "E1-26", week: 14, bedsPruned: 1, cuttingsEstimated: 2600, worker: "Carlos M." },
-  { date: "2026-03-30", bed: "E1-33", week: 13, bedsPruned: 1, cuttingsEstimated: 1500, worker: "Maria L." },
-];
+const initLog: PruningRow[] = [];
 
 // --- Options ---
-const plantOptionsFallback = [
-  { value: "Pothos / Hawaiian", label: "Pothos / Hawaiian" },
-  { value: "Pothos / Marble Queen", label: "Pothos / Marble Queen" },
-  { value: "Pothos / Jade", label: "Pothos / Jade" },
-  { value: "Pothos / N'Joy", label: "Pothos / N'Joy" },
-  { value: "Pothos / Neon", label: "Pothos / Neon" },
-];
+/** No fallback list. These names come from the table the lookup points at;
+ *  a hand-written stand-in offered workers and varieties that do not exist,
+ *  and picking one saved the record with the lookup empty. */
+const plantOptionsFallback: { value: string; label: string }[] = [];
 const sizeOptions = PLANT_SIZE_OPTIONS;
-const seasonOptionsFallback = [
-  { value: "2026-S1", label: "2026-S1" },
-  { value: "2025-S2", label: "2025-S2" },
-];
-const workerOptionsFallback = [
-  { value: "Carlos M.", label: "Carlos M. (W001)" },
-  { value: "Maria L.", label: "Maria L. (W002)" },
-  { value: "Juan P.", label: "Juan P. (W003)" },
-  { value: "Ana R.", label: "Ana R. (W004)" },
-];
+const seasonOptionsFallback: { value: string; label: string }[] = [];
+const workerOptionsFallback: { value: string; label: string }[] = [];
 
 // --- Form groups ---
 const projectionFields = [
@@ -153,7 +100,7 @@ const availabilityStatusBadge = (s: string) => {
 
 // --- Pruning Curve Chart component ---
 function PruningCurveChart({ data }: { data: typeof initCurve }) {
-  const maxBeds = Math.max(...data.map((d) => Math.max(d.plannedBeds, d.actualBeds)), 1);
+  const maxBeds = Math.max(...data.map((d) => Math.max(d.plannedBeds ?? 0, d.actualBeds ?? 0)), 1);
 
   return (
     <div className="bg-white rounded-xl border border-sand-200 p-4 mb-4">
@@ -167,9 +114,11 @@ function PruningCurveChart({ data }: { data: typeof initCurve }) {
       <div className="overflow-x-auto">
         <div className="flex gap-[3px] items-end min-w-max" style={{ height: 120 }}>
           {data.map((entry, i) => {
-            const plannedH = (entry.plannedBeds / maxBeds) * 100;
-            const actualH = (entry.actualBeds / maxBeds) * 100;
-            const onTrack = entry.actualBeds >= entry.plannedBeds;
+            const planned = entry.plannedBeds ?? 0;
+            const actual = entry.actualBeds ?? 0;
+            const plannedH = (planned / maxBeds) * 100;
+            const actualH = (actual / maxBeds) * 100;
+            const onTrack = actual >= planned;
             const weekLabel = entry.week;
 
             return (
@@ -234,12 +183,14 @@ export default function AvailabilityPage() {
     if (confirm.pending) setData(data.filter((_: any, i: number) => i !== confirm.pending!.index));
   };
 
-  // Stats
-  const thisWeekProjections = projections.filter((p) => p.week === "2026-W15");
-  const totalProjected = thisWeekProjections.reduce((s, p) => s + p.projectedQty, 0);
-  const totalConfirmed = thisWeekProjections.reduce((s, p) => s + p.confirmedQty, 0);
-  const totalSurplus = projections.reduce((s, p) => s + p.surplus, 0);
-  const totalShortfall = projections.reduce((s, p) => s + p.shortfall, 0);
+  // "This week" was pinned to 2026-W15, a demo week that would have read zero
+  // against real data forever. It is the current ISO week.
+  const currentWeek = isoWeek(new Date());
+  const thisWeekProjections = projections.filter((p) => Number(p.week) === currentWeek);
+  const totalProjected = sum(thisWeekProjections, (p) => p.projectedQty);
+  const totalConfirmed = sum(thisWeekProjections, (p) => p.confirmedQty);
+  const totalSurplus = sum(projections, (p) => p.surplus);
+  const totalShortfall = sum(projections, (p) => p.shortfall);
 
   const renderTab = () => {
     switch (tab) {

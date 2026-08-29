@@ -14,6 +14,7 @@ import { nextSeasonName } from "../services/infrastructureRules";
 import ProductionOverview from "../components/ProductionOverview";
 import { useInputNutrients } from "../hooks/useInputNutrients";
 import { expandBeds } from "../services/expandBeds";
+import type { FertilizationRow, HarvestRow, IrrigationRow, PlantingsRow, PlantsRow, PruningRow, SeasonsRow, TasksRow, TreatmentsRow } from "../services/rowTypes.generated";
 
 /**
  * Ordered the way the work happens: see where you stand, plant, tend, harvest,
@@ -47,85 +48,31 @@ const catalogViews = [
 ] as const;
 
 // Initial data
-const initPlantings = [
-  { plant: "Pothos / Hawaiian", bed: "E3-01", season: "2026-S1", date: "2026-03-15", qty: 5000, status: "Active" },
-  { plant: "Pothos / Marble Queen", bed: "E1-05", season: "2026-S1", date: "2026-03-10", qty: 3000, status: "Active" },
-  { plant: "Pothos / Jade", bed: "C3-12", season: "2026-S1", date: "2026-02-28", qty: 2000, status: "Active" },
-];
-const initTreatments = [
-  { date: "2026-04-08", bed: "E3-01", input: "Neem Oil", type: "Insecticide", worker: "Carlos M.", temp: "28", humidity: "75", ph: "6.5" },
-  { date: "2026-04-05", bed: "E1-05", input: "Copper Fungicide", type: "Fungicide", worker: "Maria L.", temp: "26", humidity: "80", ph: "6.2" },
-];
-const initIrrigation = [
-  { date: "2026-04-09", bed: "E3-01", liters: 450, method: "Drip" },
-  { date: "2026-04-09", bed: "E1-05", liters: 320, method: "Sprinkler" },
-  { date: "2026-04-08", bed: "C3-12", liters: 200, method: "Manual" },
-];
-const initHarvest = [
-  { date: "2026-04-07", bed: "E3-01", qty: 4200, quality: "Excellent", worker: "Juan P." },
-  { date: "2026-04-05", bed: "E1-05", qty: 2800, quality: "Good", worker: "Carlos M." },
-];
-const initTasks = [
-  { title: "Water Shadehouse 1", type: "Watering", due: "2026-04-10", assigned: "Carlos M.", priority: "High", status: "Pending", notes: "" },
-  { title: "Apply Neem Oil E3-01", type: "Pest Control", due: "2026-04-11", assigned: "Maria L.", priority: "Normal", status: "Pending", notes: "" },
-  { title: "Harvest Epipremnum Hawaiian", type: "Harvesting", due: "2026-04-10", assigned: "Juan P.", priority: "Urgent", status: "In Progress", notes: "" },
-];
+const initPlantings: PlantingsRow[] = [];
+const initTreatments: TreatmentsRow[] = [];
+const initIrrigation: IrrigationRow[] = [];
+const initHarvest: HarvestRow[] = [];
+const initTasks: TasksRow[] = [];
 
-const initPruning = [
-  { date: "2026-04-08", bed: "E1-03", week: 15, bedsPruned: 3, cuttingsEstimated: 1500, worker: "Carlos M." },
-  { date: "2026-04-06", bed: "E3-25", week: 15, bedsPruned: 2, cuttingsEstimated: 1000, worker: "Maria L." },
-  { date: "2026-04-03", bed: "E1-24", week: 14, bedsPruned: 4, cuttingsEstimated: 2100, worker: "Juan P." },
-  { date: "2026-04-01", bed: "E3-27", week: 14, bedsPruned: 3, cuttingsEstimated: 1400, worker: "Ana R." },
-];
+const initPruning: PruningRow[] = [];
 // No invoiceName: it was a stored copy of "{name} / {variety}", which the
 // app already composes wherever a plant is shown. A duplicate that can only
 // go stale.
-const initPlants = [
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Hawaiian", patent: true, patentNum: "PP32456", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "High Color", patent: false, patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "N'Joy", patent: true, patentNum: "PP33012", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Neon", patent: false, patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Jade", patent: false, patentNum: "", active: true },
-  { code: "PTH", name: "Pothos", latin: "Epipremnum aureum", variety: "Marble Queen", patent: false, patentNum: "", active: true },
-  { code: "SNS", name: "Sansevieria", latin: "Dracaena trifasciata", variety: "Sansevieria", patent: false, patentNum: "", active: true },
-];
+const initPlants: PlantsRow[] = [];
 
-const initSeasons = [
-  { name: "2026-S1", start: "2026-01-01", end: "2026-06-30", description: "First season 2026", active: true },
-  { name: "2025-S2", start: "2025-07-01", end: "2025-12-31", description: "Second season 2025", active: false },
-];
+const initSeasons: SeasonsRow[] = [];
 
 
 
-const initFertilization = [
-  { date: "2026-04-09", bed: "E3-31", input: "NPK 20-20-20", qtyKg: 5, method: "Soil Drench", nKg: 1.0, pKg: 1.0, kKg: 1.0, caKg: 0, worker: "Carlos M." },
-  { date: "2026-04-07", bed: "E3-01", input: "Calcium Nitrate", qtyKg: 3, method: "Foliar Spray", nKg: 0.5, pKg: 0, kKg: 0, caKg: 0.6, worker: "Maria L." },
-  { date: "2026-04-04", bed: "C3-20", input: "NPK 20-20-20", qtyKg: 4, method: "Soil Drench", nKg: 0.8, pKg: 0.8, kKg: 0.8, caKg: 0, worker: "Juan P." },
-  { date: "2026-04-01", bed: "C3-16", input: "MKP (0-52-34)", qtyKg: 2, method: "Foliar Spray", nKg: 0, pKg: 1.04, kKg: 0.68, caKg: 0, worker: "Ana R." },
-];
+const initFertilization: FertilizationRow[] = [];
 
-const plantOptionsFallback = [
-  { value: "Pothos / Hawaiian", label: "Pothos / Hawaiian" },
-  { value: "Pothos / Marble Queen", label: "Pothos / Marble Queen" },
-  { value: "Pothos / Jade", label: "Pothos / Jade" },
-  { value: "Pothos / N'Joy", label: "Pothos / N'Joy" },
-  { value: "Pothos / Neon", label: "Pothos / Neon" },
-];
-const seasonOptionsFallback = [
-  { value: "2026-S1", label: "2026-S1" },
-  { value: "2025-S2", label: "2025-S2" },
-];
-const inputOptionsFallback = [
-  { value: "Neem Oil", label: "Neem Oil" },
-  { value: "Copper Fungicide", label: "Copper Fungicide" },
-  { value: "NPK 20-20-20", label: "NPK 20-20-20" },
-];
-const workerOptionsFallback = [
-  { value: "Carlos M.", label: "Carlos M. (W001)" },
-  { value: "Maria L.", label: "Maria L. (W002)" },
-  { value: "Juan P.", label: "Juan P. (W003)" },
-  { value: "Ana R.", label: "Ana R. (W004)" },
-];
+/** No fallback list. These names come from the table the lookup points at;
+ *  a hand-written stand-in offered workers and varieties that do not exist,
+ *  and picking one saved the record with the lookup empty. */
+const plantOptionsFallback: { value: string; label: string }[] = [];
+const seasonOptionsFallback: { value: string; label: string }[] = [];
+const inputOptionsFallback: { value: string; label: string }[] = [];
+const workerOptionsFallback: { value: string; label: string }[] = [];
 
 // Form definitions
 const plantingFields = [
@@ -207,13 +154,7 @@ const taskFormGroups = [
   ]},
 ];
 
-const fertilizerInputOptionsFallback = [
-  { value: "NPK 20-20-20", label: "NPK 20-20-20" },
-  { value: "Calcium Nitrate", label: "Calcium Nitrate" },
-  { value: "MKP (0-52-34)", label: "MKP (0-52-34)" },
-  { value: "Potassium Sulfate", label: "Potassium Sulfate" },
-  { value: "Magnesium Sulfate", label: "Magnesium Sulfate" },
-];
+const fertilizerInputOptionsFallback: { value: string; label: string }[] = [];
 
 const pruningFields = [
   { title: "Pruning Event", columns: 2 as const, fields: [
@@ -649,8 +590,8 @@ export default function ProductionPage() {
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard variant="hero" label="Active Plantings" value={plantings.filter((p) => p.status === "Active").length} icon={Leaf} />
         <StatCard label="Treatments (month)" value={treatments.length} icon={Bug} />
-        <StatCard label="Water Used (L)" value={irrigation.reduce((s, i) => s + i.liters, 0).toLocaleString()} icon={Droplets} />
-        <StatCard label="Harvested" value={harvest.reduce((s, h) => s + h.qty, 0).toLocaleString()} icon={Scissors} />
+        <StatCard label="Water Used (L)" value={irrigation.reduce((s, i) => s + (i.liters ?? 0), 0).toLocaleString()} icon={Droplets} />
+        <StatCard label="Harvested" value={harvest.reduce((s, h) => s + (h.qty ?? 0), 0).toLocaleString()} icon={Scissors} />
       </motion.div>
 
       <div className="mb-4">

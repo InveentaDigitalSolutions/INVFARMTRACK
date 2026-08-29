@@ -12,6 +12,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { stockLevels, lowStock, direction, type Movement } from "../services/stock";
+import type { InputsRow } from "../services/rowTypes.generated";
 
 /** Lempira, the way Accounting writes it, so one number reads like the next. */
 const lempira = (v: number) =>
@@ -77,11 +78,7 @@ const movementFields = [
   ]},
 ];
 
-const initInputs = [
-  { name: "Neem Oil", category: "Pesticide", method: "Foliar Spray", safety: "7", brand: "BioGrow", composition: "Azadirachtin 0.3%" },
-  { name: "Copper Fungicide", category: "Fungicide", method: "Soil Drench", safety: "14", brand: "CupraSol", composition: "Copper hydroxide 77%" },
-  { name: "NPK 20-20-20", category: "Fertilizer", method: "Drip", safety: "", brand: "NutriMax", composition: "N-P-K balanced" },
-];
+const initInputs: InputsRow[] = [];
 
 const inputFields = [
   { title: "Input Details", columns: 2 as const, fields: [

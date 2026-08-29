@@ -14,6 +14,7 @@ import NutritionPage from "./pages/NutritionPage";
 import SuppliersPage from "./pages/SuppliersPage";
 import LaborPage from "./pages/LaborPage";
 import SettingsPage from "./pages/SettingsPage";
+import WriteErrorBanner from "./components/WriteErrorBanner";
 
 export type PageId =
   | "dashboard"
@@ -176,6 +177,8 @@ export default function App() {
               <AnimatePresence mode="wait">{renderPage()}</AnimatePresence>
             </div>
           </main>
+          {/* Says so when a record did not reach Dataverse. */}
+          <WriteErrorBanner />
         </div>
       )}
     </>

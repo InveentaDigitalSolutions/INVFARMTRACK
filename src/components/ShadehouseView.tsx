@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useShadehouseBeds } from "../hooks/useShadehouseBeds";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Droplets, Bug, Scissors, Sprout, Leaf, FlaskConical,
@@ -66,43 +67,6 @@ export const plotConfigs: PlotConfig[] = [
   { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "Field C1" },
 ];
 
-// Generate 120 beds with sample data
-export function generateBeds(): ShadehouseBed[] {
-  const varieties = [
-    "Pothos / Hawaiian", "Pothos / Marble Queen", "Pothos / Jade",
-    "Pothos / N'Joy", "Pothos / Neon", "Pothos / High Color",
-    "Pothos / Golden Glen", "Sansevieria / Sansevieria",
-  ];
-  const states: ShadehouseBed["state"][] = ["empty", "planted", "growing", "harvest-ready", "issue"];
-
-  const beds: ShadehouseBed[] = [];
-  plotConfigs.forEach((field) => {
-    for (let i = 1; i <= field.bedCount; i++) {
-      // Deterministic but varied distribution
-      const seed = (field.id.charCodeAt(0) * 100 + i) % 100;
-      const stateIdx = seed < 10 ? 0 : seed < 25 ? 1 : seed < 65 ? 2 : seed < 85 ? 3 : 4;
-      const state = states[stateIdx];
-      const variety = state === "empty" ? "" : varieties[(seed * 3 + i) % varieties.length];
-
-      beds.push({
-        bedId: `${field.id}-${String(i).padStart(2, "0")}`,
-        fieldId: field.id,
-        bedNumber: i,
-        level: 0,
-        type: "ground",
-        widthM: field.bedWidth,
-        lengthM: field.bedLength,
-        state,
-        variety,
-        plantedDate: state !== "empty" ? `2026-0${1 + (i % 4)}-${String(5 + (i % 20)).padStart(2, "0")}` : "",
-        expectedHarvest: state === "growing" || state === "harvest-ready" ? `2026-0${4 + (i % 3)}-${String(1 + (i % 28)).padStart(2, "0")}` : "",
-        notes: state === "issue" ? "Pest detected — check" : "",
-      });
-    }
-  });
-  return beds;
-}
-
 /** Posts stand roughly every 3.6 m, whatever the bed pitch. */
 export const POST_SPACING_M = 3.6;
 
@@ -125,64 +89,14 @@ export function isPostLine(bed: ShadehouseBed): boolean {
  * length of the house. How many levels a given post line carries varies — some
  * carry none, others up to three.
  */
-export function airLevelsFor(bed: ShadehouseBed): BedLevel[] {
+export function airLevelsFor(bed: ShadehouseBed, all: ShadehouseBed[]): BedLevel[] {
   if (!isPostLine(bed)) return [];
-  const seed = (bed.fieldId.charCodeAt(0) * 31 + bed.bedNumber * 7) % 100;
-  const count = seed < 12 ? 0 : seed < 45 ? 1 : seed < 80 ? 2 : 3;
-  return ([1, 2, 3] as BedLevel[]).slice(0, count);
-}
-
-export function generateAirBeds(groundBeds: ShadehouseBed[]): ShadehouseBed[] {
-  const varieties = [
-    "Pothos / Marble Queen", "Pothos / N'Joy", "Pothos / Golden Glen",
-    "Pothos / Hawaiian", "Pothos / Neon",
-  ];
-  const states: ShadehouseBed["state"][] = ["empty", "planted", "growing", "harvest-ready", "issue"];
-
-  return groundBeds.flatMap((ground) =>
-    airLevelsFor(ground).map((level) => {
-      const seed = (ground.fieldId.charCodeAt(0) * 100 + ground.bedNumber * 13 + level * 29) % 100;
-      const stateIdx = seed < 8 ? 0 : seed < 30 ? 1 : seed < 70 ? 2 : seed < 90 ? 3 : 4;
-      const state = states[stateIdx];
-      // One pot roughly every 45 cm of cable.
-      const potCount = state === "empty" ? 0 : Math.round(ground.lengthM / 0.45) - (seed % 7);
-      const potType: PotType = seed % 3 === 0 ? "square" : "round";
-
-      return {
-        bedId: `${ground.bedId}-A${level}`,
-        fieldId: ground.fieldId,
-        bedNumber: ground.bedNumber,
-        level,
-        type: "air" as const,
-        widthM: ground.widthM,
-        lengthM: ground.lengthM,
-        potCount,
-        potType,
-        state,
-        variety: state === "empty" ? "" : varieties[(seed + level) % varieties.length],
-        plantedDate: state !== "empty" ? `2026-0${1 + (seed % 4)}-${String(3 + (seed % 22)).padStart(2, "0")}` : "",
-        expectedHarvest: state === "growing" || state === "harvest-ready"
-          ? `2026-0${4 + (seed % 3)}-${String(1 + (seed % 27)).padStart(2, "0")}` : "",
-        notes: state === "issue" ? "Pest detected — check hanging pots" : "",
-      };
-    })
-  );
-}
-
-/** Ground beds plus every cable line above them — the full 3D stack. */
-export function generateBedStack(): ShadehouseBed[] {
-  const ground = generateBeds();
-  return [...ground, ...generateAirBeds(ground)];
-}
-
-// Activity history types
-interface BedActivity {
-  id: string;
-  type: "planting" | "treatment" | "irrigation" | "harvest" | "fertilization" | "pruning";
-  date: string;
-  description: string;
-  worker: string;
-  details: string;
+  // Which levels exist above this row is recorded, not guessed: a hash used to
+  // decide it, so the 3D view showed cables the nursery has not strung.
+  return all
+    .filter((b) => b.fieldId === bed.fieldId && b.bedNumber === bed.bedNumber && b.level > 0)
+    .map((b) => b.level)
+    .sort((a, z) => a - z);
 }
 
 const activityIcons: Record<string, { icon: typeof Sprout; color: string; bg: string }> = {
@@ -193,58 +107,6 @@ const activityIcons: Record<string, { icon: typeof Sprout; color: string; bg: st
   fertilization: { icon: FlaskConical, color: "text-lime-600", bg: "bg-lime-50" },
   pruning: { icon: Leaf, color: "text-green-500", bg: "bg-green-50" },
 };
-
-// Generate sample activity history for a bed
-function generateBedHistory(bedId: string): BedActivity[] {
-  const seed = bedId.charCodeAt(0) * 100 + bedId.charCodeAt(bedId.length - 1);
-  const activities: BedActivity[] = [];
-  const types: BedActivity["type"][] = ["planting", "treatment", "irrigation", "harvest", "fertilization", "pruning"];
-  const workers = ["Carlos M.", "Maria L.", "Juan P.", "Ana R.", "Pedro H."];
-
-  // Generate 15-25 activities over the past 90 days
-  const count = 15 + (seed % 11);
-  for (let i = 0; i < count; i++) {
-    const daysAgo = Math.floor(i * (90 / count)) + (seed + i) % 3;
-    const d = new Date();
-    d.setDate(d.getDate() - daysAgo);
-    const date = d.toISOString().slice(0, 10);
-    const type = types[(seed + i * 3) % types.length];
-    const worker = workers[(seed + i) % workers.length];
-
-    let description = "";
-    let details = "";
-    switch (type) {
-      case "planting":
-        description = "New planting established";
-        details = `Planted ${500 + (i * 37) % 500} cuttings`;
-        break;
-      case "treatment":
-        description = i % 2 === 0 ? "Neem Oil applied" : "Copper Fungicide applied";
-        details = `${(1 + (i % 3)).toFixed(1)}L · Temp ${25 + (i % 8)}°C · pH ${(6 + (i % 10) / 10).toFixed(1)}`;
-        break;
-      case "irrigation":
-        description = i % 3 === 0 ? "Drip irrigation" : i % 3 === 1 ? "Sprinkler cycle" : "Manual watering";
-        details = `${200 + (i * 23) % 400}L`;
-        break;
-      case "harvest":
-        description = "Cuttings harvested";
-        details = `${1000 + (i * 137) % 4000} stems · Quality: ${["Excellent", "Good", "Average"][(seed + i) % 3]}`;
-        break;
-      case "fertilization":
-        description = i % 2 === 0 ? "NPK 20-20-20 applied" : "Calcium Nitrate applied";
-        details = `${(2 + (i % 4)).toFixed(1)} kg · N:${(0.4 + i * 0.1).toFixed(1)} P:${(0.3 + i * 0.08).toFixed(1)} K:${(0.4 + i * 0.1).toFixed(1)}`;
-        break;
-      case "pruning":
-        description = "Beds pruned";
-        details = `Est. ${800 + (i * 97) % 2000} cuttings in 6-8 weeks`;
-        break;
-    }
-
-    activities.push({ id: `act-${bedId}-${i}`, type, date, description, worker, details });
-  }
-
-  return activities.sort((a, b) => b.date.localeCompare(a.date));
-}
 
 const timeRanges = [
   { value: "7", label: "Last 7 days" },
@@ -261,7 +123,7 @@ interface ShadehouseViewProps {
 }
 
 export default function ShadehouseView({ className = "", onBedClick }: ShadehouseViewProps) {
-  const [beds] = useState(() => generateBeds());
+  const { beds, historyFor, isEmpty } = useShadehouseBeds();
   const [selectedBed, setSelectedBed] = useState<ShadehouseBed | null>(null);
   const [hoveredBed, setHoveredBed] = useState<string | null>(null);
   const [filterState, setFilterState] = useState<string | null>(null);
@@ -270,10 +132,11 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
   const [timeRange, setTimeRange] = useState("30");
   const [activityFilter, setActivityFilter] = useState<string | null>(null);
 
-  // Activity history for selected bed
+  // Everything recorded against the selected bed. Where a generator used to
+  // stand there is now the record, so an empty bed reads as empty.
   const bedHistory = useMemo(() => {
     if (!selectedBed) return [];
-    const all = generateBedHistory(selectedBed.bedId);
+    const all = historyFor(selectedBed.bedId);
     const cutoff = new Date();
     if (timeRange !== "all") {
       cutoff.setDate(cutoff.getDate() - parseInt(timeRange));
@@ -284,7 +147,7 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
     }
     if (activityFilter) return all.filter((a) => a.type === activityFilter);
     return all;
-  }, [selectedBed, timeRange, activityFilter]);
+  }, [selectedBed, timeRange, activityFilter, historyFor]);
 
   const varieties = useMemo(() => {
     const set = new Set<string>();
@@ -349,7 +212,11 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
       <div className="px-4 py-3 border-b border-sand-100 flex items-center justify-between">
         <div>
           <h3 className="text-[14px] font-bold text-navy-900">Shadehouse Layout</h3>
-          <p className="text-[11px] text-navy-400">120 beds across 4 fields — click a bed for details, shift+click to multi-select</p>
+          <p className="text-[11px] text-navy-400">
+            {isEmpty
+              ? "No beds recorded yet — add them under Infrastructure"
+              : `${beds.length} beds across ${new Set(beds.map((b) => b.fieldId)).size} fields — click a bed for details, shift+click to multi-select`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {/* State filter */}

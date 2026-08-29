@@ -8,6 +8,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { PLANT_SIZES } from "../services/plantSizes";
+import { useNurseryBeds } from "../hooks/useNurseryBeds";
+import { useLookupOptions } from "../hooks/useLookupOptions";
+import { useRecords } from "../hooks/useRecords";
 
 interface PackingEntry {
   id: string;
@@ -35,30 +38,8 @@ interface QuickPackFormProps {
   existingBoxCount?: number;
 }
 
-// Dummy data for dropdowns
-const plants = [
-  "Pothos / Hawaiian",
-  "Pothos / Marble Queen",
-  "Pothos / Jade",
-  "Pothos / N'Joy",
-  "Pothos / Golden Glen",
-];
-
-const beds = [
-  { id: "bed-3a", label: "E3-01", batch: "Field E3", shadehouse: "Shadehouse 1" },
-  { id: "bed-1b", label: "E1-05", batch: "Field E1", shadehouse: "Shadehouse 1" },
-  { id: "bed-5c", label: "C3-12", batch: "Field C3", shadehouse: "Shadehouse 1" },
-  { id: "bed-2a", label: "E3-15", batch: "Field C3", shadehouse: "Shadehouse 1" },
-  { id: "bed-4b", label: "C1-10", batch: "Field C1", shadehouse: "Shadehouse 1" },
-];
-
 const sizes = PLANT_SIZES;
-const workers = [
-  { name: "Carlos M.", id: "W001" },
-  { name: "Maria L.", id: "W002" },
-  { name: "Juan P.", id: "W003" },
-  { name: "Ana R.", id: "W004" },
-];
+
 
 function SelectField({
   label,
@@ -147,6 +128,15 @@ export default function QuickPackForm({
   onCancel,
   existingBoxCount = 0,
 }: QuickPackFormProps) {
+  // Beds, varieties and crew come from the tables, not from a list typed here.
+  // The lists that stood in their place offered five beds and four workers who
+  // are not in the nursery, and picking one saved a box against nothing.
+  const { beds } = useNurseryBeds();
+  const plants = useLookupOptions("plants").map((o) => o.value);
+  const [workerRows] = useRecords<{ id: string; name?: string; code?: string; active?: boolean }>("workers", []);
+  const workers = workerRows
+    .filter((w) => w.name && w.active !== false)
+    .map((w) => ({ name: String(w.name), id: String(w.code ?? "") }));
   const [plant, setPlant] = useState("");
   const [bed, setBed] = useState("");
   const [size, setSize] = useState("");
@@ -186,8 +176,8 @@ export default function QuickPackForm({
         barcode: `HN${today}${String(num).padStart(3, "0")}`,
         boxNumber: num,
         plant,
-        bed: selectedBed?.label || bed,
-        shadehouse: selectedBed?.shadehouse || "",
+        bed: selectedBed?.name || bed,
+        shadehouse: selectedBed?.shadehouseName || "",
         size,
         packingType,
         bundleSize: packingType === "BNDL" ? bundleSize : 0,
@@ -248,7 +238,7 @@ export default function QuickPackForm({
               onChange={setBed}
               options={beds.map((b) => ({
                 value: b.id,
-                label: `${b.label} (${b.shadehouse})`,
+                label: `${b.name} (${b.fieldName})`,
               }))}
               required
             />
@@ -262,7 +252,7 @@ export default function QuickPackForm({
           </div>
           {selectedBed && (
             <p className="text-xs text-navy-400 mt-2">
-              {selectedBed.shadehouse} / {selectedBed.batch} / {selectedBed.label}
+              {[selectedBed.shadehouseName, selectedBed.fieldName, selectedBed.name].filter(Boolean).join(" / ")}
             </p>
           )}
         </div>

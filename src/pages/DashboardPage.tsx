@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Leaf,
@@ -18,12 +18,15 @@ import {
 } from "lucide-react";
 import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
-import ShadehouseView, { generateBeds } from "../components/ShadehouseView";
+import ShadehouseView from "../components/ShadehouseView";
 import InsightPanel, { deriveShadehouseInsight } from "../components/InsightPanel";
 import BedWaffle from "../components/BedWaffle";
 import WeatherWidget from "../components/WeatherWidget";
 import { useExchangeRate } from "../hooks/useExchangeRate";
 import { useDashboardMetrics } from "../hooks/useDashboardMetrics";
+import { useShadehouseBeds } from "../hooks/useShadehouseBeds";
+import { useRecords } from "../hooks/useRecords";
+import type { ShipmentsRow } from "../services/rowTypes.generated";
 import RankedBars from "../components/RankedBars";
 import VarietyFulfilment from "../components/VarietyFulfilment";
 
@@ -43,17 +46,6 @@ const item = {
 const VARIETY_COLORS = ["#1f2f42", "#33465e", "#4a6280", "#667f57", "#8aa832", "#a3b835"];
 
 
-
-const recentShipments = [
-  { id: "SHP-015", customer: "The Plant Company", boxes: 38, status: "In Progress", carrier: "DHL" },
-  { id: "SHP-014", customer: "Green Gardens Inc.", boxes: 15, status: "Shipped", carrier: "FedEx" },
-];
-
-const upcomingTasks = [
-  { title: "Water Shadehouse 1 — Field E3", due: "Today", priority: "High" },
-  { title: "Apply Neem Oil — E3-01", due: "Today", priority: "Normal" },
-  { title: "Harvest Hawaiian — Field C1", due: "Tomorrow", priority: "Urgent" },
-];
 
 function MiniBarChart({ data, max }: { data: { month: string; value: number }[]; max: number }) {
   return (
@@ -114,8 +106,18 @@ function DonutChart({ segments, total, label }: { segments: { value: number; col
 }
 
 export default function DashboardPage() {
-  const [beds] = useState(() => generateBeds());
+  const { beds } = useShadehouseBeds();
+  const [shipments] = useRecords<ShipmentsRow>("shipments", []);
   const m = useDashboardMetrics();
+
+  /** Shipments still moving, soonest first. Was two invented consignments. */
+  const activeShipments = useMemo(
+    () => shipments
+      .filter((s) => s.status !== "Delivered" && s.status !== "Cancelled")
+      .sort((a, b) => String(a.etd ?? a.date ?? "").localeCompare(String(b.etd ?? b.date ?? "")))
+      .slice(0, 4),
+    [shipments]
+  );
   const insight = useMemo(() => deriveShadehouseInsight(beds), [beds]);
   const { rate: exchangeRate, loading: fxLoading, isLive: fxLive, staleDays: fxStaleDays } = useExchangeRate();
   return (
@@ -353,16 +355,22 @@ export default function DashboardPage() {
               <Plane className="w-4 h-4 text-navy-300" />
             </div>
             <div className="space-y-2">
-              {recentShipments.map((s) => (
-                <div key={s.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-sand-50/80 hover:bg-sand-100 transition-colors cursor-pointer">
+              {activeShipments.length === 0 ? (
+                <p className="text-[12px] text-navy-400 py-4 text-center">
+                  Nothing in transit. Shipments appear here once one is created under Sales.
+                </p>
+              ) : activeShipments.map((s) => (
+                <div key={s.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-sand-50/80 hover:bg-sand-100 transition-colors">
                   <div className="shipment-icon flex items-center justify-center w-8 h-8 rounded-lg bg-navy-50">
                     <Package className="shipment-icon-svg w-4 h-4 text-navy-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-medium text-navy-800 truncate">{s.customer}</p>
-                    <p className="text-[10px] text-navy-400">{s.id} · {s.boxes} boxes · {s.carrier}</p>
+                    <p className="text-[12px] font-medium text-navy-800 truncate">{s.customer || "No customer"}</p>
+                    <p className="text-[10px] text-navy-400">
+                      {[s.code, s.carrier, s.etd ? `ETD ${String(s.etd).slice(0, 10)}` : ""].filter(Boolean).join(" · ")}
+                    </p>
                   </div>
-                  <Badge variant={s.status === "Shipped" ? "green" : "amber"}>{s.status}</Badge>
+                  <Badge variant={s.status === "Shipped" ? "green" : "amber"}>{s.status || "Draft"}</Badge>
                 </div>
               ))}
             </div>
@@ -371,17 +379,23 @@ export default function DashboardPage() {
           {/* Tasks */}
           <motion.div variants={item} className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[13px] font-semibold text-navy-900">Today's Tasks</p>
+              <p className="text-[13px] font-semibold text-navy-900">Next due</p>
               <CalendarDays className="w-4 h-4 text-navy-300" />
             </div>
             <div className="space-y-1.5">
-              {upcomingTasks.map((t, i) => (
+              {m.openTasks.next.length === 0 ? (
+                <p className="text-[12px] text-navy-400 py-4 text-center">
+                  {m.openTasks.count === 0
+                    ? "No open tasks. Add one under Production."
+                    : "Open tasks have no due date set."}
+                </p>
+              ) : m.openTasks.next.map((t, i) => (
                 <div key={i} className="flex items-center gap-2.5 py-2 border-b border-sand-100/80 last:border-0">
-                  <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                    t.priority === "Urgent" ? "bg-red-500" : t.priority === "High" ? "bg-amber-500" : "bg-blue-400"
-                  }`} />
-                  <p className="flex-1 text-[12px] text-navy-800">{t.title}</p>
-                  <span className="text-[10px] text-navy-400">{t.due}</span>
+                  {/* Late is the only state worth a colour here; a task that is
+                      merely upcoming does not need one. */}
+                  <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${t.late ? "bg-red-500" : "bg-navy-300"}`} />
+                  <p className="flex-1 text-[12px] text-navy-800 truncate">{t.title || "Untitled task"}</p>
+                  <span className={`text-[10px] ${t.late ? "text-red-600 font-medium" : "text-navy-400"}`}>{t.due}</span>
                 </div>
               ))}
             </div>

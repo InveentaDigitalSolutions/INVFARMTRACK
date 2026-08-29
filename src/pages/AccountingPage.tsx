@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Receipt, DollarSign, FileText, Shield, Wallet, Landmark, ArrowDownToLine,
@@ -8,12 +8,15 @@ import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
 import Badge from "../components/Badge";
-import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { invoiceAmounts, invoiceStatus } from "../services/invoiceMath";
+import { useExchangeRate } from "../hooks/useExchangeRate";
+import { accountingSummary } from "../services/accountingInsight";
+import MetricTile from "../components/MetricTile";
+import RankedBars from "../components/RankedBars";
 
 /* -----------------------------------------------------------------
  * Types
@@ -48,80 +51,45 @@ interface BankStatementLine {
   amount: number; balance: number; matchedTo: string; reconciled: boolean;
 }
 
-const FX_HNL_USD = 25; // 1 USD = 25 HNL (display-only conversion)
+/**
+ * Last-resort rate. Every conversion below prefers the live central-bank rate;
+ * this only stands in before the first load returns, and the page says so.
+ */
+const FX_HNL_USD_FALLBACK = 26.8667;
 
 const fmt = (a: number, c: Currency = "USD") =>
   `${c === "USD" ? "$" : "L "}${a.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-const toUSD = (amount: number, currency: Currency) =>
-  currency === "USD" ? amount : amount / FX_HNL_USD;
 const daysBetween = (a: string, b: string) =>
   Math.floor((new Date(b).getTime() - new Date(a).getTime()) / 86_400_000);
-const today = "2026-04-30";
+/** The month key the P&L covers, e.g. "2026-08". Was pinned to April 2026. */
+const monthOf = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 
 /* -----------------------------------------------------------------
  * Sample data
  * ----------------------------------------------------------------- */
-const initInvoices: Invoice[] = [
-  { number: "000-001-01-00001461", customer: "The Plant Company, LLC", date: "2026-04-08", dueDate: "2026-05-08", week: 14, subtotal: 1520, isv: 0, total: 1520, balance: 1520, currency: "USD", status: "Sent" },
-  { number: "000-001-01-00001460", customer: "Green Gardens Inc.", date: "2026-04-01", dueDate: "2026-05-01", week: 13, subtotal: 600, isv: 0, total: 600, balance: 0, currency: "USD", status: "Paid" },
-  { number: "000-001-01-00001459", customer: "Tropical Imports Co.", date: "2026-02-25", dueDate: "2026-03-25", week: 8, subtotal: 2200, isv: 0, total: 2200, balance: 1100, currency: "USD", status: "Overdue" },
-];
+const initInvoices : Invoice[] = [];
 
-const initBills: Bill[] = [
-  { number: "B-2026-0042", supplier: "AgroSupply HN", poRef: "PO-2026-013", date: "2026-04-09", dueDate: "2026-05-09", subtotal: 380, isv: 57, total: 437, balance: 437, currency: "USD", status: "Open", rtn: "08019988007632", notes: "Neem oil 5L x10" },
-  { number: "B-2026-0041", supplier: "TecniAgua", poRef: "PO-2026-012", date: "2026-04-02", dueDate: "2026-05-02", subtotal: 2174, isv: 326, total: 2500, balance: 0, currency: "HNL", status: "Paid", rtn: "08011995004421", notes: "Pump repair" },
-  { number: "B-2026-0040", supplier: "ENEE", poRef: "—", date: "2026-04-01", dueDate: "2026-04-15", subtotal: 7391, isv: 1109, total: 8500, balance: 4250, currency: "HNL", status: "Partially Paid", rtn: "06019994201001", notes: "Electricity April" },
-];
+const initBills : Bill[] = [];
 
-const initExpenses: Expense[] = [
-  { name: "Office supplies", date: "2026-04-10", category: "Office", amount: 60, currency: "USD", vendor: "Librería Maya", bankAccount: "BAC USD Operating", status: "Paid", notes: "" },
-  { name: "Fuel — pickup", date: "2026-04-09", category: "Transportation", amount: 1200, currency: "HNL", vendor: "UNO", bankAccount: "BAC HNL Cash", status: "Paid", notes: "" },
-  { name: "Coffee for crew", date: "2026-04-07", category: "Other", amount: 200, currency: "HNL", vendor: "Sula Pulpería", bankAccount: "BAC HNL Cash", status: "Paid", notes: "" },
-];
+const initExpenses : Expense[] = [];
 
-const initBankAccounts: BankAccount[] = [
-  { id: "BA-001", name: "BAC USD Operating", bank: "Banco BAC", accountNumber: "725012345", currency: "USD", openingBalance: 18500, active: true },
-  { id: "BA-002", name: "Atlántida HNL Operations", bank: "Banco Atlántida", accountNumber: "11045678", currency: "HNL", openingBalance: 250000, active: true },
-  { id: "BA-003", name: "BAC HNL Cash", bank: "Banco BAC", accountNumber: "725098765", currency: "HNL", openingBalance: 35000, active: true },
-];
+const initBankAccounts : BankAccount[] = [];
 
-const initPayments: Payment[] = [
-  { id: "PMT-0001", type: "Receipt",  date: "2026-04-02", counterparty: "Green Gardens Inc.",      bankAccount: "BAC USD Operating",        amount: 600,   currency: "USD", reference: "000-001-01-00001460", method: "Wire",  status: "Cleared" },
-  { id: "PMT-0002", type: "Receipt",  date: "2026-03-15", counterparty: "Tropical Imports Co.",    bankAccount: "BAC USD Operating",        amount: 1100,  currency: "USD", reference: "000-001-01-00001459", method: "Wire",  status: "Cleared" },
-  { id: "PMT-0003", type: "Payment",  date: "2026-04-04", counterparty: "TecniAgua",               bankAccount: "Atlántida HNL Operations", amount: 2500,  currency: "HNL", reference: "B-2026-0041",         method: "Wire",  status: "Cleared" },
-  { id: "PMT-0004", type: "Payment",  date: "2026-04-16", counterparty: "ENEE",                    bankAccount: "Atlántida HNL Operations", amount: 4250,  currency: "HNL", reference: "B-2026-0040",         method: "Wire",  status: "Cleared" },
-  { id: "PMT-0005", type: "Expense",  date: "2026-04-10", counterparty: "Librería Maya",           bankAccount: "BAC USD Operating",        amount: 60,    currency: "USD", reference: "Office supplies",     method: "Card",  status: "Cleared" },
-  { id: "PMT-0006", type: "Expense",  date: "2026-04-09", counterparty: "UNO",                     bankAccount: "BAC HNL Cash",             amount: 1200,  currency: "HNL", reference: "Fuel — pickup",       method: "Cash",  status: "Cleared" },
-  { id: "PMT-0007", type: "Expense",  date: "2026-04-07", counterparty: "Sula Pulpería",           bankAccount: "BAC HNL Cash",             amount: 200,   currency: "HNL", reference: "Coffee for crew",     method: "Cash",  status: "Cleared" },
-];
+const initPayments : Payment[] = [];
 
-const initStatementLines: BankStatementLine[] = [
-  { id: "ST-001", bankAccount: "BAC USD Operating",        date: "2026-04-02", description: "WIRE IN GREEN GARDENS",     amount:  600,   balance: 19100,  matchedTo: "PMT-0001", reconciled: true },
-  { id: "ST-002", bankAccount: "BAC USD Operating",        date: "2026-04-10", description: "POS LIBRERIA MAYA",         amount:  -60,   balance: 19040,  matchedTo: "PMT-0005", reconciled: true },
-  { id: "ST-003", bankAccount: "Atlántida HNL Operations", date: "2026-04-04", description: "TRX TECNIAGUA",             amount: -2500,  balance: 247500, matchedTo: "PMT-0003", reconciled: true },
-  { id: "ST-004", bankAccount: "Atlántida HNL Operations", date: "2026-04-16", description: "ENEE PAGO PARCIAL",         amount: -4250,  balance: 243250, matchedTo: "PMT-0004", reconciled: true },
-  { id: "ST-005", bankAccount: "BAC USD Operating",        date: "2026-04-22", description: "BANK FEE",                  amount:  -12,   balance: 19028,  matchedTo: "",         reconciled: false },
-];
+const initStatementLines : BankStatementLine[] = [];
 
-const initFiscal = [
-  { name: "CAI 2026", cai: "4ED113-4AB1C5-B6B9E0-63BE03-090919-95", rtn: "05019011379855", rangeStart: "000-001-01-00001461", rangeEnd: "000-001-01-00001530", expiry: "2027-04-06", total: 70, next: 1462, requestDate: "2026-04-06", active: true },
-];
+const initFiscal: Record<string, any>[] = [];
 
 /* -----------------------------------------------------------------
  * Form definitions
  * ----------------------------------------------------------------- */
-const customerOptionsFallback = [
-  { value: "The Plant Company, LLC", label: "The Plant Company, LLC" },
-  { value: "Green Gardens Inc.", label: "Green Gardens Inc." },
-  { value: "Tropical Imports Co.", label: "Tropical Imports Co." },
-];
+/** No fallback list. These names come from the table the lookup points at;
+ *  a hand-written stand-in offered workers and varieties that do not exist,
+ *  and picking one saved the record with the lookup empty. */
+const customerOptionsFallback: { value: string; label: string }[] = [];
 
-const supplierOptionsFallback = [
-  { value: "AgroSupply HN", label: "AgroSupply HN" },
-  { value: "TecniAgua", label: "TecniAgua" },
-  { value: "ENEE", label: "ENEE" },
-  { value: "DHL Express", label: "DHL Express" },
-];
+const supplierOptionsFallback: { value: string; label: string }[] = [];
 
 const bankAccountOptions = (accounts: BankAccount[]) =>
   accounts.map((a) => ({ value: a.name, label: `${a.name} (${a.currency})` }));
@@ -273,7 +241,11 @@ const paymentTypeBadge = (t: string) => {
 };
 
 /* Bucket open balances by aging window. */
-function buildAging<T extends { dueDate: string; balance: number; currency: Currency }>(rows: T[]) {
+function buildAging<T extends { dueDate: string; balance: number; currency: Currency }>(
+  rows: T[],
+  today: string,
+  toUSD: (amount: number, currency: Currency) => number,
+) {
   const buckets = { current: 0, d30: 0, d60: 0, d90: 0 };
   rows.forEach((r) => {
     if (r.balance <= 0) return;
@@ -361,6 +333,7 @@ function withDerivedAmounts(values: Record<string, unknown>): Record<string, unk
 
 export default function AccountingPage() {
   const [tab, setTab] = useState(tabs[0].id);
+  const { rate: exchangeRate } = useExchangeRate();
 
   const [invoices, setInvoices] = useRecords("invoices", initInvoices);
   const [bills, setBills] = useRecords("bills", initBills);
@@ -379,15 +352,23 @@ export default function AccountingPage() {
   const fiscalForm = useFormModal(initFiscal[0]);
   const confirm = useConfirmDialog();
 
+  /**
+   * Today, and the rate to convert with.
+   *
+   * Both were constants: `today` was 2026-04-30 and the rate a flat 25 HNL to
+   * the dollar. Ageing measured against a fixed day stops ageing, and a flat
+   * rate quietly misstates every lempira invoice on the page.
+   */
+  const today = new Date().toISOString().slice(0, 10);
+  const thisMonth = monthOf(new Date());
+  const monthLabel = new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+  const fx = exchangeRate?.value ?? FX_HNL_USD_FALLBACK;
+  const toUSD = useCallback(
+    (amount: number, currency: Currency) => (currency === "USD" ? amount : amount / fx),
+    [fx]
+  );
+
   /* Derived totals (USD-equivalent for cross-currency rollups) */
-  const arOutstandingUSD = useMemo(
-    () => invoices.reduce((s, i) => s + (i.balance > 0 ? toUSD(i.balance, i.currency) : 0), 0),
-    [invoices],
-  );
-  const apOutstandingUSD = useMemo(
-    () => bills.reduce((s, b) => s + (b.balance > 0 ? toUSD(b.balance, b.currency) : 0), 0),
-    [bills],
-  );
   const cashOnHandUSD = useMemo(() => {
     return bankAccounts.reduce((s, a) => {
       const delta = payments
@@ -396,20 +377,47 @@ export default function AccountingPage() {
       const balance = a.openingBalance + delta;
       return s + toUSD(balance, a.currency);
     }, 0);
-  }, [bankAccounts, payments]);
+  }, [bankAccounts, payments, toUSD]);
   const monthIncomeUSD = useMemo(
-    () => payments.filter((p) => p.type === "Receipt" && p.date.startsWith("2026-04"))
+    () => payments.filter((p) => p.type === "Receipt" && p.date.startsWith(thisMonth))
       .reduce((s, p) => s + toUSD(p.amount, p.currency), 0),
-    [payments],
+    [payments, thisMonth, toUSD],
   );
   const monthExpensesUSD = useMemo(
-    () => payments.filter((p) => (p.type === "Payment" || p.type === "Expense") && p.date.startsWith("2026-04"))
+    () => payments.filter((p) => (p.type === "Payment" || p.type === "Expense") && p.date.startsWith(thisMonth))
       .reduce((s, p) => s + toUSD(p.amount, p.currency), 0),
-    [payments],
+    [payments, thisMonth, toUSD],
   );
-  const arAging = useMemo(() => buildAging(invoices), [invoices]);
-  const apAging = useMemo(() => buildAging(bills), [bills]);
-  const caiRemaining = fiscal.length > 0 ? fiscal[0].total - (fiscal[0].next - 1461) : 0;
+  /**
+   * The module read in five figures. The four cards it replaces each stated a
+   * total with nothing to read it against: an AR figure says little without
+   * how much of it is late, and a cash figure says little without what is owed
+   * out of it.
+   */
+  const acc = useMemo(
+    () => accountingSummary({
+      invoices: invoices as never, bills: bills as never, expenses: expenses as never,
+      payments: payments as never, accounts: bankAccounts as never, rate: fx,
+    }),
+    [invoices, bills, expenses, payments, bankAccounts, fx]
+  );
+
+  const arAging = useMemo(() => buildAging(invoices, today, toUSD), [invoices, today, toUSD]);
+  const apAging = useMemo(() => buildAging(bills, today, toUSD), [bills, today, toUSD]);
+  /**
+   * Invoices left in the authorised range.
+   *
+   * This subtracted a literal 1461 — the start of the seeded CAI range — so it
+   * only ever gave the right answer for that one authorisation. The range's
+   * own start is the number to count from.
+   */
+  const caiRemaining = useMemo(() => {
+    const auth = fiscal[0];
+    if (!auth) return 0;
+    const start = Number(String(auth.rangeStart ?? "").split("-").pop()) || 0;
+    const next = Number(auth.next) || start;
+    return Math.max(0, Number(auth.total ?? 0) - (next - start));
+  }, [fiscal]);
 
   const accountBalance = (a: BankAccount) => {
     const delta = payments
@@ -459,7 +467,7 @@ export default function AccountingPage() {
 
           <div className="bg-white rounded-2xl border border-sand-200/80 shadow-sm p-5">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-[14px] font-bold text-navy-900">April 2026 P&amp;L</h3>
+              <h3 className="text-[14px] font-bold text-navy-900">{monthLabel} P&amp;L</h3>
               <TrendingUp className="w-4 h-4 text-navy-400" />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -858,7 +866,7 @@ export default function AccountingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white rounded-2xl border border-sand-200/80 shadow-sm p-5">
                 <h3 className="text-[14px] font-bold text-navy-900 mb-3 flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-green-600" /> P&amp;L — April 2026
+                  <BarChart3 className="w-4 h-4 text-green-600" /> P&amp;L — {monthLabel}
                 </h3>
                 <div className="space-y-2 text-[12px]">
                   <div className="flex justify-between font-semibold text-green-700">
@@ -890,7 +898,7 @@ export default function AccountingPage() {
 
               <div className="bg-white rounded-2xl border border-sand-200/80 shadow-sm p-5">
                 <h3 className="text-[14px] font-bold text-navy-900 mb-3 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-blue-600" /> Cash Flow — April 2026
+                  <TrendingUp className="w-4 h-4 text-blue-600" /> Cash Flow — {monthLabel}
                 </h3>
                 <div className="space-y-2 text-[12px]">
                   <div className="flex justify-between font-semibold text-green-700">
@@ -935,12 +943,80 @@ export default function AccountingPage() {
 
   return (
     <PageShell title="Accounting" subtitle="AR · AP · Cash · Fiscal · Reports" icon={Receipt}>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard variant="hero" label="Cash Position" value={fmt(cashOnHandUSD)} icon={Banknote} />
-        <StatCard tone="warning" label="AR Outstanding" value={fmt(arOutstandingUSD)} icon={DollarSign} />
-        <StatCard tone="critical" label="AP Outstanding" value={fmt(apOutstandingUSD)} icon={Wallet} />
-        <StatCard label="CAI Remaining" value={caiRemaining} icon={Shield} />
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                  className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 mb-5">
+        <MetricTile
+          label="Cash position"
+          value={fmt(cashOnHandUSD)}
+          icon={Banknote}
+          tone={cashOnHandUSD < 0 ? "bad" : "default"}
+          context={{ label: "across accounts", value: String(bankAccounts.length) }}
+        />
+        <MetricTile
+          label="Owed to us"
+          value={`L ${acc.receivable.toLocaleString()}`}
+          icon={DollarSign}
+          tone={acc.overdueShare > 40 ? "bad" : acc.overdueShare > 0 ? "warn" : "good"}
+          comparison={
+            acc.receivable > 0
+              ? { label: "overdue", value: `${acc.overdueShare}%`, direction: acc.overdueShare > 0 ? "down" : "flat" }
+              : undefined
+          }
+          context={{ label: "invoices late", value: String(acc.overdueCount) }}
+        />
+        <MetricTile
+          label="Owed by us"
+          value={`L ${acc.payable.toLocaleString()}`}
+          icon={Wallet}
+          context={{
+            // Net is the figure a grower actually plans against.
+            label: acc.net >= 0 ? "net in our favour" : "net against us",
+            value: `L ${Math.abs(acc.net).toLocaleString()}`,
+          }}
+        />
+        <MetricTile
+          label={`Spend in ${monthLabel.split(" ")[0]}`}
+          value={`L ${acc.expensesThisMonth.toLocaleString()}`}
+          icon={TrendingUp}
+          series={acc.expenseSeries}
+          comparison={
+            acc.expensesLastMonth > 0
+              ? {
+                  label: "vs last month",
+                  value: `${acc.expensesThisMonth >= acc.expensesLastMonth ? "+" : ""}${Math.round(((acc.expensesThisMonth - acc.expensesLastMonth) / acc.expensesLastMonth) * 100)}%`,
+                  direction: acc.expensesThisMonth > acc.expensesLastMonth ? "up" : "down",
+                }
+              : undefined
+          }
+        />
+        <MetricTile
+          label="CAI numbers left"
+          value={String(caiRemaining)}
+          icon={Shield}
+          // Running out mid-week stops invoicing until SAR issues a new range.
+          tone={caiRemaining === 0 ? "bad" : caiRemaining < 20 ? "warn" : "good"}
+          context={{ label: "oldest unpaid", value: acc.oldestDays ? `${acc.oldestDays} d` : "—" }}
+        />
       </motion.div>
+
+      {(acc.ageing.length > 0 || acc.byCategory.length > 0) && (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-5">
+          {acc.ageing.length > 0 && (
+            <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
+              <h4 className="text-[13px] font-semibold text-navy-900">How old the receivable is</h4>
+              <p className="text-[11px] text-navy-400 mb-4">Open balance by days past due, in lempira</p>
+              <RankedBars rows={acc.ageing} format={(v) => `L ${v.toLocaleString()}`} showAverage={false} />
+            </div>
+          )}
+          {acc.byCategory.length > 0 && (
+            <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
+              <h4 className="text-[13px] font-semibold text-navy-900">Where the money went</h4>
+              <p className="text-[11px] text-navy-400 mb-4">Expense by category this year</p>
+              <RankedBars rows={acc.byCategory} format={(v) => `L ${v.toLocaleString()}`} />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mb-4 overflow-x-auto"><TabBar tabs={tabs} active={tab} onChange={setTab} /></div>
 

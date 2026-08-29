@@ -183,6 +183,15 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       unitPrice: "bv_unitprice",
       lineTotal: "bv_linetotal",
       packedBy: "bv_packedby",
+      workerId: "bv_workerid",
+      // How the box is made up. These columns existed in Dataverse and were
+      // simply not mapped, so every packing type and bundle size typed on the
+      // screen was dropped on the way to the table.
+      packingType: "bv_packingtype",
+      bundleSize: "bv_bundlesize",
+      productType: "bv_producttype",
+      cuttingType: "bv_cuttingtype",
+      totalWeight: "bv_totalweight",
       packingDate: "bv_packingdate",
       completed: "bv_packingcompleted",
       plant: "_bv_plantid_value",

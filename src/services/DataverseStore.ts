@@ -17,6 +17,8 @@ import type { IOperationResult } from "@microsoft/power-apps/data";
 import { dataSourcesInfo } from "../../.power/schemas/appschemas/dataSourcesInfo";
 import type { DataStore, Identified, QueryOptions } from "./DataService";
 import { CHOICE_MAP, CHOICE_LABELS, LOOKUP_MAP } from "./choiceMap.generated";
+import { COLUMN_KIND } from "./columnKinds.generated";
+import { buildPayload } from "./payload";
 import { LookupResolver } from "./lookupResolver";
 
 type Row = Record<string, unknown>;
@@ -130,22 +132,19 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
 
   /** App record -> Dataverse record: rename fields, never send the key. */
   private toDataverse(record: Row): Row {
-    const out: Row = {};
-    for (const [field, value] of Object.entries(record)) {
-      if (field === "id" || field === this.primaryKey) continue;
-      // Autonumber and other server-computed columns must not be written.
-      if (value === undefined) continue;
-      const column = this.toColumn[field] ?? field;
-      // Only send columns Dataverse knows about; an unmapped app-only field
-      // would be rejected for the whole request.
-      if (!column.startsWith("bv_")) continue;
-      // Lookups are bound separately, by navigation property — see bindLookups.
-      if (column.startsWith("_") && column.endsWith("_value")) continue;
-      const translated = this.toChoiceValue(column, value);
-      if (translated === undefined) continue;
-      out[column] = translated;
-    }
-    return out;
+    return buildPayload(record, {
+      toColumn: this.toColumn,
+      kinds: COLUMN_KIND[this.dataSourceName] ?? {},
+      primaryKey: this.primaryKey,
+      choices: this.choiceColumns(),
+      onUnknownChoice: (column, value, allowed) =>
+        // An unrecognised label would fail the whole request with an opaque
+        // Dataverse error, so it is dropped and said out loud instead.
+        console.error(
+          `[data] ${this.dataSourceName}.${column}: "${value}" is not one of ` +
+            `${allowed.join(", ")} — the column was left unset.`
+        ),
+    });
   }
 
 
@@ -158,20 +157,6 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
     return CHOICE_MAP[this.dataSourceName] ?? {};
   }
 
-  /** Text -> option value on the way out. */
-  private toChoiceValue(column: string, value: unknown): unknown {
-    const options = this.choiceColumns()[column];
-    if (!options || typeof value !== "string") return value;
-    const mapped = options[value];
-    if (mapped !== undefined) return mapped;
-    // An unrecognised label would fail the whole request with an opaque
-    // Dataverse error, so drop it and say exactly what was wrong.
-    console.error(
-      `[data] ${this.dataSourceName}.${column}: "${value}" is not one of ` +
-        `${Object.keys(options).join(", ")} — the column was left unset.`
-    );
-    return undefined;
-  }
 
   /** Option value -> text on the way in. */
   private toChoiceLabel(column: string, value: unknown): unknown {

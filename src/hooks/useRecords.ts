@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { LocalStore, type DataStore, type Identified } from "../services/DataService";
 import { DataverseStore } from "../services/DataverseStore";
 import { DATAVERSE_TABLES, ENABLED_TABLES, hostingMode } from "../services/tableMap";
+import { planWrites } from "../services/syncPlan";
+import { reportWriteError } from "../services/writeErrors";
 
 /**
  * Store-backed replacement for `useState(initialArray)`.
@@ -45,15 +47,6 @@ function storeFor(table: string, seed: Record<string, unknown>[]): DataStore<Ide
 
   registry.set(table, store);
   return store;
-}
-
-function sameContent(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
-  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
-  for (const k of keys) {
-    if (k === "id") continue;
-    if (JSON.stringify(a[k]) !== JSON.stringify(b[k])) return false;
-  }
-  return true;
 }
 
 /**
@@ -100,31 +93,38 @@ export function useRecords<T>(
       });
 
       void (async () => {
-        const current = (await store.getAll()) as unknown as T[];
-        const idOf = (r: T) => String((r as { id?: unknown }).id ?? "");
-        const currentById = new Map(current.map((r) => [idOf(r), r]));
-        const nextIds = new Set(next.map(idOf).filter(Boolean));
+        try {
+          const current = (await store.getAll()) as unknown as T[];
+          const plan = planWrites(
+            current as unknown as { id?: string }[],
+            next as unknown as { id?: string }[]
+          );
 
-        for (const [id] of currentById) {
-          if (!nextIds.has(id)) await store.delete(id);
-        }
-        for (const row of next) {
-          const id = idOf(row);
-          if (!id) {
-            await store.create(row as unknown as Omit<Identified, "id">);
-          } else {
-            const existing = currentById.get(id);
-            if (existing && !sameContent(
-              existing as Record<string, unknown>, row as Record<string, unknown>
-            )) {
-              await store.update(id, row as unknown as Partial<Identified>);
-            }
+          // Each write is reported on its own. One rejected row must not stop
+          // the others, and the message has to name what failed — the whole
+          // block used to run uncaught, so a rejection vanished into an
+          // unhandled promise and the row simply disappeared on next load.
+          for (const id of plan.remove) {
+            try { await store.delete(id); }
+            catch (err) { reportWriteError(table, "delete", err); }
           }
+          for (const row of plan.create) {
+            try { await store.create(row as unknown as Omit<Identified, "id">); }
+            catch (err) { reportWriteError(table, "create", err); }
+          }
+          for (const { id, row } of plan.update) {
+            try { await store.update(id, row as unknown as Partial<Identified>); }
+            catch (err) { reportWriteError(table, "update", err); }
+          }
+        } catch (err) {
+          reportWriteError(table, "update", err);
         }
+        // Reload either way: the screen must end up showing what is stored,
+        // not what was typed.
         await load();
       })();
     },
-    [store, load]
+    [store, load, table]
   );
 
   return [rows, setRows];

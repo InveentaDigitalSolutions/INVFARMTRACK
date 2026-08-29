@@ -24,14 +24,17 @@ export interface Insight {
 export function deriveShadehouseInsight(beds: ShadehouseBed[]): Insight | null {
   if (!beds.length) return null;
 
-  const byField = plotConfigs.map((field) => {
-    const own = beds.filter((b) => b.fieldId === field.id);
+  // Fields come from the beds, not from a fixed list: a field added under
+  // Infrastructure has to appear here, and one with no beds must not.
+  const byField = [...new Set(beds.map((b) => b.fieldId).filter(Boolean))].sort().map((id) => {
+    const field = plotConfigs.find((p) => p.id === id);
+    const own = beds.filter((b) => b.fieldId === id);
     const empty = own.filter((b) => b.state === "empty").length;
     const issues = own.filter((b) => b.state === "issue").length;
     const ready = own.filter((b) => b.state === "harvest-ready").length;
     return {
-      id: field.id,
-      label: field.label,
+      id,
+      label: field?.label ?? `Field ${id}`,
       total: own.length,
       empty,
       issues,

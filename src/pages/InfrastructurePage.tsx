@@ -1,18 +1,21 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Warehouse, Layers, LayoutGrid, BarChart3 } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
 import Badge from "../components/Badge";
-import StatCard from "../components/StatCard";
+import MetricTile from "../components/MetricTile";
+import RankedBars from "../components/RankedBars";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import ShadehouseView from "../components/ShadehouseView";
 import ShadehouseView3D from "../components/ShadehouseView3D";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
+import { infrastructureSummary } from "../services/infrastructureInsight";
 import { availableRows, bedName, parseBedName, typeForLevel, planBulkBeds, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
+import type { BedsRow, FieldsRow, PlantingsRow, ShadehousesRow } from "../services/rowTypes.generated";
 
 const tabs = [
   { id: "shadehouses", label: "Shadehouses" },
@@ -20,31 +23,15 @@ const tabs = [
   { id: "beds", label: "Beds" },
 ];
 
-const initShadehouses = [
-  { name: "Shadehouse 1", code: "SH-1", location: "El Olvido, Santa Cruz de Yojoa", coordinates: "14.9700, -87.8500", length: 80, width: 80, capacity: 120, active: true },
-];
-const initFieldes = [
-  // No season: a field is infrastructure and does not belong to one. Compass
-  // points are gone too — Santiago's word was that north and south say
-  // nothing about this nursery; the bed width does.
-  { name: "E3", shadehouse: "Shadehouse 1", rows: 33, notes: "" },
-  { name: "E1", shadehouse: "Shadehouse 1", rows: 33, notes: "" },
-  { name: "C3", shadehouse: "Shadehouse 1", rows: 27, notes: "" },
-  { name: "C1", shadehouse: "Shadehouse 1", rows: 27, notes: "" },
-];
-const initBeds = [
-  { name: "E3-01", field: "E3", type: "Air", level: "1", capacity: 500, material: "Metal", soilType: "Loamy", drainage: "Excellent", irrigation: "Drip", active: true },
-  { name: "E3-02", field: "E3", type: "Air", level: "2", capacity: 500, material: "Metal", soilType: "Loamy", drainage: "Excellent", irrigation: "Drip", active: true },
-  { name: "E1-01", field: "E1", type: "Air", level: "1", capacity: 500, material: "Metal", soilType: "Loamy", drainage: "Good", irrigation: "Drip", active: true },
-  { name: "C3-01", field: "C3", type: "Ground", level: "0", capacity: 400, material: "Concrete", soilType: "Loamy", drainage: "Good", irrigation: "Sprinkler", active: true },
-  { name: "C1-01", field: "C1", type: "Ground", level: "0", capacity: 400, material: "Concrete", soilType: "Sandy", drainage: "Moderate", irrigation: "Manual", active: true },
-];
+const initShadehouses: ShadehousesRow[] = [];
+const initFieldes: FieldsRow[] = [];
+const initBeds: BedsRow[] = [];
 
-const shOptions = initShadehouses.map((s) => ({ value: s.name, label: s.name }));
-// The value must be the field NAME: that is what a bed's lookup resolves
-// against, and what the bed name is built from. It was the code, which
-// resolves to nothing.
-const fieldOptions = initFieldes.map((f) => ({ value: f.name, label: `${f.name} (${f.shadehouse})` }));
+// No fallback lists. Both come from the live tables through `optionsFrom`;
+// the value must be the NAME, since that is what a bed's lookup resolves
+// against and what the bed name is built from.
+const shOptions: { value: string; label: string }[] = [];
+const fieldOptions: { value: string; label: string }[] = [];
 
 const shadehouseFormGroups = [
   { title: "Shadehouse Details", columns: 2 as const, fields: [
@@ -175,6 +162,9 @@ export default function InfrastructurePage() {
   const [shadehouses, setShadehouses] = useRecords("shadehouses", initShadehouses);
   const [fields, setFieldes] = useRecords("fields", initFieldes);
   const [beds, setBeds] = useRecords("beds", initBeds);
+  // Read-only here: which beds carry a crop is the other half of "how much of
+  // the nursery is in use", and it lives on the planting, not the bed.
+  const [plantings] = useRecords<PlantingsRow>("plantings", []);
   const [shView, setShView] = useState<"plan" | "3d">("plan");
 
   const bulkBedForm = useFormModal({
@@ -329,9 +319,19 @@ export default function InfrastructurePage() {
     if (confirm.pending) setData(data.filter((_, i) => i !== confirm.pending!.index));
   };
 
-  const totalCapacity = shadehouses.filter((s) => s.active).reduce((sum, s) => sum + s.capacity, 0);
-  const activeBeds = beds.filter((b) => b.active).length;
-  const utilization = totalCapacity > 0 ? Math.round((activeBeds / totalCapacity) * 100) : 0;
+  /**
+   * Utilisation counted bed records against capacity, but a shadehouse's
+   * capacity is measured in positions — field plus row — and three air beds
+   * hanging above one ground bed are one position, not four. Counting records
+   * put the house over 100% the moment air beds went in.
+   */
+  const infra = useMemo(
+    () => infrastructureSummary({
+      shadehouses: shadehouses as never, fields: fields as never,
+      beds: beds as never, plantings: plantings as never,
+    }),
+    [shadehouses, fields, beds, plantings]
+  );
 
   const renderTab = () => {
     switch (tab) {
@@ -422,12 +422,53 @@ export default function InfrastructurePage() {
 
   return (
     <PageShell title="Infrastructure" subtitle="Shadehouses, fields and beds" icon={Warehouse}>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Shadehouses" value={shadehouses.filter((s) => s.active).length} icon={Warehouse} />
-        <StatCard label="Active Fields" value={fields.length} icon={Layers} />
-        <StatCard label="Active Beds" value={activeBeds} icon={LayoutGrid} />
-        <StatCard variant="hero" label="Utilization %" value={`${utilization}%`} icon={BarChart3} />
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <MetricTile
+          label="Beds in the nursery"
+          value={String(infra.beds)}
+          icon={LayoutGrid}
+          context={{ label: "ground / air", value: `${infra.ground} / ${infra.air}` }}
+        />
+        <MetricTile
+          label="Positions used"
+          value={infra.capacity ? `${infra.utilisation}%` : "—"}
+          icon={BarChart3}
+          tone={infra.utilisation > 100 ? "bad" : infra.utilisation > 90 ? "warn" : "good"}
+          context={{ label: "of capacity", value: infra.capacity ? `${infra.positions} / ${infra.capacity}` : "not set" }}
+        />
+        <MetricTile
+          label="Beds carrying a crop"
+          value={String(infra.planted)}
+          icon={Layers}
+          comparison={infra.beds ? { label: "of the nursery", value: `${infra.plantedShare}%` } : undefined}
+          context={{ label: "sitting idle", value: String(infra.idle) }}
+        />
+        <MetricTile
+          label="Fields"
+          value={String(infra.fields)}
+          icon={Warehouse}
+          context={{ label: "shadehouses", value: String(infra.shadehouses) }}
+        />
       </motion.div>
+
+      {(infra.byField.length > 0 || infra.byLevel.length > 1) && (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-5">
+          {infra.byField.length > 0 && (
+            <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadew-sm shadow-sm">
+              <h4 className="text-[13px] font-semibold text-navy-900">Beds per field</h4>
+              <p className="text-[11px] text-navy-400 mb-4">Ground and air together, against the average field</p>
+              <RankedBars rows={infra.byField} format={(v) => `${v}`} />
+            </div>
+          )}
+          {infra.byLevel.length > 1 && (
+            <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
+              <h4 className="text-[13px] font-semibold text-navy-900">Beds by level</h4>
+              <p className="text-[11px] text-navy-400 mb-4">Ground, then each cable line above it</p>
+              <RankedBars rows={infra.byLevel} format={(v) => `${v}`} showAverage={false} />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mb-4"><TabBar tabs={tabs} active={tab} onChange={setTab} /></div>
 

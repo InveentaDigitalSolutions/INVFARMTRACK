@@ -25,13 +25,19 @@ export default function BedWaffle({
 }) {
   const fields = useMemo(
     () =>
-      plotConfigs.map((field) => {
-        const own = beds.filter((b) => b.fieldId === field.id);
+      // The fields are whichever ones the beds are actually in. Reading them
+      // off plotConfigs drew four fixed panels, so a field added under
+      // Infrastructure never appeared and a field with no beds drew an empty
+      // panel that looked like a fault.
+      [...new Set(beds.map((b) => b.fieldId).filter(Boolean))].sort().map((id) => {
+        const field = plotConfigs.find((p) => p.id === id);
+        const own = beds.filter((b) => b.fieldId === id);
         // Group by state so the dot grid reads as bands, not confetti.
         const ordered = ORDER.flatMap((state) => own.filter((b) => b.state === state));
         const filled = own.filter((b) => b.state !== "empty").length;
         return {
-          ...field,
+          id,
+          label: field?.label ?? `Field ${id}`,
           beds: ordered,
           filled,
           total: own.length,

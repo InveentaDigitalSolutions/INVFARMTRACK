@@ -1,37 +1,32 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Truck, ShoppingBag, FileText, Users } from "lucide-react";
 import PageShell from "../components/PageShell";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
 import Badge from "../components/Badge";
-import StatCard from "../components/StatCard";
+import MetricTile from "../components/MetricTile";
+import RankedBars from "../components/RankedBars";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
+import { supplierSummary } from "../services/supplierInsight";
+import type { PurchaseOrdersRow, SuppliersRow } from "../services/rowTypes.generated";
 
 const tabs = [
   { id: "suppliers", label: "Suppliers" },
   { id: "purchase-orders", label: "Purchase Orders" },
 ];
 
-const initSuppliers = [
-  { name: "AgroSupply HN", code: "SUP-001", category: "Chemicals / Inputs", contact: "Roberto Mendez", phone: "+504 9812 3456", email: "roberto@agrosupply.hn", taxId: "08019012345678", terms: "Net 30", active: true, notes: "" },
-  { name: "DHL Express", code: "SUP-002", category: "Logistics / Freight", contact: "Ana Torres", phone: "+504 2231 4567", email: "ana.torres@dhl.com", taxId: "", terms: "Cash", active: true, notes: "Primary carrier for USA shipments" },
-  { name: "TecniAgua", code: "SUP-003", category: "Maintenance", contact: "Mario Reyes", phone: "+504 9745 6789", email: "info@tecniagua.hn", taxId: "05019087654321", terms: "Net 15", active: true, notes: "Irrigation system maintenance" },
-  { name: "NutriMax Honduras", code: "SUP-004", category: "Chemicals / Inputs", contact: "Laura Gomez", phone: "+504 9923 4567", email: "ventas@nutrimax.hn", taxId: "08019098765432", terms: "Net 30", active: true, notes: "NPK fertilizers" },
-  { name: "PackBox Central", code: "SUP-005", category: "Packaging", contact: "Carlos Mejia", phone: "+504 9634 5678", email: "carlos@packbox.hn", taxId: "", terms: "Cash", active: true, notes: "Cardboard boxes and packaging materials" },
-];
+const initSuppliers: SuppliersRow[] = [];
 
-const initPOs = [
-  { number: "PO-2026-001", supplier: "AgroSupply HN", date: "2026-04-01", delivery: "2026-04-08", description: "Neem Oil 20L + Copper Fungicide 10L", amount: 320.00, currency: "USD", status: "Received", notes: "" },
-  { number: "PO-2026-002", supplier: "PackBox Central", date: "2026-04-05", delivery: "2026-04-12", description: "Export boxes (200 units) + foam inserts", amount: 15000.00, currency: "HNL", status: "Confirmed", notes: "" },
-  { number: "PO-2026-003", supplier: "NutriMax Honduras", date: "2026-04-08", delivery: "2026-04-15", description: "NPK 20-20-20 (50kg bags x 10)", amount: 8500.00, currency: "HNL", status: "Sent", notes: "Monthly fertilizer order" },
-  { number: "PO-2026-004", supplier: "TecniAgua", date: "2026-04-10", delivery: "2026-04-20", description: "Drip line replacement — Shadehouse 1 C2", amount: 4200.00, currency: "HNL", status: "Draft", notes: "" },
-];
+const initPOs: PurchaseOrdersRow[] = [];
 
-const supplierOptionsFallback = initSuppliers.map((s) => ({ value: s.name, label: s.name }));
+/** No fallback list. These names come from the table the lookup points at;
+ *  a hand-written stand-in offered workers and varieties that do not exist,
+ *  and picking one saved the record with the lookup empty. */
+const supplierOptionsFallback: { value: string; label: string }[] = [];
 
 const supplierFormGroups = [
   { title: "Supplier Information", columns: 2 as const, fields: [
@@ -86,6 +81,11 @@ export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useRecords("suppliers", initSuppliers);
   const [pos, setPOs] = useRecords("purchaseOrders", initPOs);
 
+  const sup = useMemo(
+    () => supplierSummary({ suppliers: suppliers as never, orders: pos as never }),
+    [suppliers, pos]
+  );
+
   const supplierForm = useFormModal(initSuppliers[0]);
   const poForm = useFormModal(initPOs[0]);
   const confirm = useConfirmDialog();
@@ -139,12 +139,57 @@ export default function SuppliersPage() {
 
   return (
     <PageShell title="Suppliers" subtitle="Vendor management and purchase orders" icon={Truck}>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard variant="hero" label="Active Suppliers" value={suppliers.filter((s) => s.active).length} icon={Users} />
-        <StatCard tone="warning" label="Open POs" value={pos.filter((p) => p.status !== "Received" && p.status !== "Cancelled").length} icon={FileText} />
-        <StatCard label="Monthly Spend" value="L 27,700" icon={ShoppingBag} />
-        <StatCard label="Pending Delivery" value={pos.filter((p) => p.status === "Confirmed" || p.status === "Sent").length} icon={Truck} />
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <MetricTile
+          label="Spend this year"
+          value={sup.spendThisYear ? `L ${sup.spendThisYear.toLocaleString()}` : "—"}
+          icon={ShoppingBag}
+          // "Monthly Spend" was the literal string "L 27,700" — a number that
+          // came from nowhere and would never have moved.
+          context={{ label: "purchase orders", value: String(pos.length) }}
+        />
+        <MetricTile
+          label="Open purchase orders"
+          value={String(sup.openOrders)}
+          icon={FileText}
+          tone={sup.lateOrders > 0 ? "warn" : "default"}
+          context={{ label: "value outstanding", value: sup.openValue ? `L ${sup.openValue.toLocaleString()}` : "—" }}
+        />
+        <MetricTile
+          label="Past their delivery date"
+          value={String(sup.lateOrders)}
+          icon={Truck}
+          tone={sup.lateOrders > 0 ? "bad" : "good"}
+          context={{ label: "oldest open PO", value: sup.oldestDays ? `${sup.oldestDays} d` : "—" }}
+        />
+        <MetricTile
+          label="Largest supplier"
+          value={sup.topSupplier ?? "—"}
+          icon={Users}
+          // Single-sourcing is the risk a vendor list never shows.
+          tone={sup.topShare >= 60 ? "warn" : "default"}
+          context={{ label: "of this year's spend", value: sup.topShare ? `${sup.topShare}%` : "—" }}
+        />
       </motion.div>
+
+      {(sup.bySupplier.length > 0 || sup.byCategory.length > 0) && (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-5">
+          {sup.bySupplier.length > 0 && (
+            <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
+              <h4 className="text-[13px] font-semibold text-navy-900">Spend by supplier</h4>
+              <p className="text-[11px] text-navy-400 mb-4">Purchase orders raised this year</p>
+              <RankedBars rows={sup.bySupplier} format={(v) => `L ${v.toLocaleString()}`} />
+            </div>
+          )}
+          {sup.byCategory.length > 0 && (
+            <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm">
+              <h4 className="text-[13px] font-semibold text-navy-900">Suppliers per category</h4>
+              <p className="text-[11px] text-navy-400 mb-4">A category with one name in it has no second source</p>
+              <RankedBars rows={sup.byCategory} format={(v) => `${v}`} showAverage={false} />
+            </div>
+          )}
+        </div>
+      )}
       <div className="mb-4"><TabBar tabs={tabs} active={tab} onChange={setTab} /></div>
       <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
         {renderTab()}

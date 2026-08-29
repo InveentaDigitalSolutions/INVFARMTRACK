@@ -6,46 +6,13 @@ import { useNurseryBeds, type BedOption } from "../hooks/useNurseryBeds";
 export type { BedOption };
 
 
-// Real structure: 1 shadehouse, 4 fields (E3, E1, C3, C1), 120 beds
-const plotConfigs = [
-  { id: "E3", name: "Field E3", bedCount: 33, shadehouseId: "SH-1", shadehouseName: "Shadehouse 1" },
-  { id: "C3", name: "Field C3", bedCount: 27, shadehouseId: "SH-1", shadehouseName: "Shadehouse 1" },
-  { id: "E1", name: "Field E1", bedCount: 33, shadehouseId: "SH-1", shadehouseName: "Shadehouse 1" },
-  { id: "C1", name: "Field C1", bedCount: 27, shadehouseId: "SH-1", shadehouseName: "Shadehouse 1" },
-];
-
-const varieties = [
-  "Pothos / Hawaiian", "Pothos / Marble Queen", "Pothos / Jade",
-  "Pothos / N'Joy", "Pothos / Neon", "Pothos / High Color",
-  "Pothos / Golden Glen", "Sansevieria / Sansevieria",
-];
-
 /**
- * Stand-in for demo mode, where there is no Dataverse to read. Everything
- * about it except the bed names is invented, which is why it is only ever a
- * fallback — see useNurseryBeds.
+ * No stand-in list. It invented eight varieties and gave every E-field bed an
+ * air level, so a bed picked in demo mode described a nursery that does not
+ * exist. An empty list is the honest answer when no bed has been created.
  */
-const demoBeds: BedOption[] = plotConfigs.flatMap((field) =>
-  Array.from({ length: field.bedCount }, (_, i) => {
-    const num = i + 1;
-    const seed = field.id.charCodeAt(0) * 100 + num;
-    const isE = field.id.startsWith("E");
-    return {
-      id: `${field.id}-${String(num).padStart(2, "0")}`,
-      name: `${field.id}-${String(num).padStart(2, "0")}`,
-      fieldId: field.id,
-      fieldName: field.name,
-      shadehouseId: field.shadehouseId,
-      shadehouseName: field.shadehouseName,
-      type: (isE ? "Air" : "Ground") as "Air" | "Ground",
-      level: isE ? (num % 2 === 0 ? 2 : 1) : 0,
-      plant: seed % 100 < 75 ? varieties[(seed * 3 + num) % varieties.length] : "",
-    };
-  })
-);
-
 export function getAllBeds(): BedOption[] {
-  return demoBeds;
+  return [];
 }
 
 interface BedSelectorProps {
@@ -56,7 +23,7 @@ interface BedSelectorProps {
 }
 
 export default function BedSelector({ selected, onChange, multiSelect = true, label = "Select Beds" }: BedSelectorProps) {
-  const { beds: nurseryData, countByField } = useNurseryBeds(demoBeds);
+  const { beds: nurseryData, countByField } = useNurseryBeds();
   const [shadehouse, setShadehouse] = useState<string>("");
   const [field, setField] = useState<string>("");
 

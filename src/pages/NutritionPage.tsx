@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { FlaskConical, Scale, Beaker, Microscope, Leaf } from "lucide-react";
 import PageShell from "../components/PageShell";
@@ -9,6 +9,9 @@ import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
+import MetricTile from "../components/MetricTile";
+import { nutritionSummary } from "../services/nutritionInsight";
+import type { BalanceRow, FoliarRow, SoilRow, WeightRow } from "../services/rowTypes.generated";
 
 const tabs = [
   { id: "weight", label: "Weight Tracking" },
@@ -18,45 +21,16 @@ const tabs = [
 ];
 
 // --- Weight Tracking ---
-const initWeight = [
-  { date: "2026-04-09", packingBox: "BOX-1520", awb: "176-84329871", avgLeafWeight: 1.05, netWeight: 7.2, grossWeight: 8.1, dryMatterPct: 25, notes: "Hawaiian, export grade" },
-  { date: "2026-04-09", packingBox: "BOX-1521", awb: "176-84329871", avgLeafWeight: 0.95, netWeight: 6.8, grossWeight: 7.7, dryMatterPct: 24, notes: "Marble Queen" },
-  { date: "2026-04-07", packingBox: "BOX-1518", awb: "176-84329865", avgLeafWeight: 1.12, netWeight: 7.5, grossWeight: 8.4, dryMatterPct: 26, notes: "Hawaiian, large leaves" },
-  { date: "2026-04-07", packingBox: "BOX-1519", awb: "176-84329865", avgLeafWeight: 0.88, netWeight: 6.5, grossWeight: 7.4, dryMatterPct: 23, notes: "Jade" },
-  { date: "2026-04-05", packingBox: "BOX-1515", awb: "176-84329860", avgLeafWeight: 1.01, netWeight: 7.0, grossWeight: 7.9, dryMatterPct: 25, notes: "N'Joy mix" },
-  { date: "2026-04-05", packingBox: "BOX-1516", awb: "176-84329860", avgLeafWeight: 0.92, netWeight: 6.9, grossWeight: 7.8, dryMatterPct: 24, notes: "Neon" },
-];
+const initWeight: WeightRow[] = [];
 
 // --- Nutrient Balance ---
-const initBalance = [
-  { week: 14, bed: "E1-03", nApplied: 1.2, pApplied: 0.8, kApplied: 1.0, caApplied: 0.5, nExtracted: 0.9, pExtracted: 0.6, kExtracted: 0.7, caExtracted: 0.3, dryMatterPct: 25 },
-  { week: 14, bed: "E1-24", nApplied: 1.5, pApplied: 1.0, kApplied: 1.2, caApplied: 0.6, nExtracted: 1.1, pExtracted: 0.7, kExtracted: 0.9, caExtracted: 0.4, dryMatterPct: 26 },
-  { week: 13, bed: "E3-25", nApplied: 1.0, pApplied: 0.6, kApplied: 0.8, caApplied: 0.4, nExtracted: 1.2, pExtracted: 0.5, kExtracted: 1.0, caExtracted: 0.3, dryMatterPct: 24 },
-  { week: 13, bed: "E1-03", nApplied: 1.3, pApplied: 0.9, kApplied: 1.1, caApplied: 0.7, nExtracted: 0.8, pExtracted: 0.4, kExtracted: 0.6, caExtracted: 0.2, dryMatterPct: 25 },
-  { week: 12, bed: "E3-27", nApplied: 0.8, pApplied: 0.5, kApplied: 0.7, caApplied: 0.3, nExtracted: 1.0, pExtracted: 0.6, kExtracted: 0.9, caExtracted: 0.4, dryMatterPct: 23 },
-  { week: 12, bed: "E3-25", nApplied: 1.1, pApplied: 0.7, kApplied: 0.9, caApplied: 0.5, nExtracted: 0.7, pExtracted: 0.3, kExtracted: 0.5, caExtracted: 0.2, dryMatterPct: 25 },
-  { week: 11, bed: "C3-20", nApplied: 1.4, pApplied: 1.1, kApplied: 1.3, caApplied: 0.8, nExtracted: 1.0, pExtracted: 0.8, kExtracted: 1.1, caExtracted: 0.5, dryMatterPct: 26 },
-  { week: 11, bed: "E3-27", nApplied: 0.9, pApplied: 0.6, kApplied: 0.8, caApplied: 0.4, nExtracted: 1.1, pExtracted: 0.7, kExtracted: 1.0, caExtracted: 0.6, dryMatterPct: 24 },
-];
+const initBalance: BalanceRow[] = [];
 
 // --- Soil Analysis ---
-const initSoil = [
-  {
-    sampleDate: "2023-10-23", reportDate: "2023-11-05", lab: "Zamorano (LSZ)", labCode: "23-S-3674", reportNumber: "2023-329.b", crop: "Epipremnum sp.", bed: "E1-03",
-    texture: "Franco Arcillo Arenoso", sand: 62, silt: 16, clay: 22,
-    ph: 5.03, organicCarbon: 3.35, organicMatter: 5.78, nTotal: 0.29, al: 1, alSaturation: 17, ce: 0.11, cl: 11, cic: 14,
-    ca: 797, mg: 105, k: 197, na: 0, cice: 6.43,
-    caSat: 61.97, mgSat: 13.50, kSat: 7.85,
-    caMg: 5, mgK: 2, caK: 8, caMgK: 10,
-    cu: 2.1, fe: 112, mn: 41, zn: 2.4, b: 4.6, s: 14, p: 36,
-  },
-];
+const initSoil: SoilRow[] = [];
 
 // --- Foliar Analysis ---
-const initFoliar = [
-  { sampleDate: "2026-03-15", reportDate: "2026-03-28", lab: "Zamorano (LSZ)", labCode: "26-F-0412", crop: "Epipremnum sp.", bed: "E1-03", n: 2.85, p: 0.32, k: 3.10, ca: 1.45, mg: 0.38, fe: 125, zn: 32, mn: 85, cu: 6.2, b: 28, s: 0.21 },
-  { sampleDate: "2026-01-20", reportDate: "2026-02-05", lab: "Zamorano (LSZ)", labCode: "26-F-0198", crop: "Epipremnum sp.", bed: "E3-25", n: 2.62, p: 0.28, k: 2.90, ca: 1.30, mg: 0.35, fe: 110, zn: 28, mn: 78, cu: 5.8, b: 25, s: 0.19 },
-];
+const initFoliar: FoliarRow[] = [];
 
 // --- Form Definitions ---
 const weightFields = [
@@ -198,11 +172,16 @@ export default function NutritionPage() {
     if (confirm.pending) setData(data.filter((_, i) => i !== confirm.pending!.index));
   };
 
-  // Nutrient balance totals
-  const totalN = balance.reduce((s, r) => s + r.nApplied - r.nExtracted, 0);
-  const totalP = balance.reduce((s, r) => s + r.pApplied - r.pExtracted, 0);
-  const totalK = balance.reduce((s, r) => s + r.kApplied - r.kExtracted, 0);
-  const totalCa = balance.reduce((s, r) => s + r.caApplied - r.caExtracted, 0);
+  /**
+   * One reading of the whole module. The page had four totals that divided by
+   * `weight.length` with no guard — NaN on an empty table — and a "Latest pH"
+   * that took row zero from an unsorted list, so it was the latest only by
+   * accident.
+   */
+  const n = useMemo(
+    () => nutritionSummary({ balances: balance, soil, foliar, weights: weight }),
+    [balance, soil, foliar, weight]
+  );
 
   const renderTab = () => {
     switch (tab) {
@@ -210,10 +189,10 @@ export default function NutritionPage() {
         return (
           <>
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <StatCard label="Total Boxes Weighed" value={weight.length} icon={Scale} />
-              <StatCard label="Avg Leaf Weight" value={`${(weight.reduce((s, r) => s + r.avgLeafWeight, 0) / weight.length).toFixed(2)} g`} icon={Leaf} />
-              <StatCard label="Total Fresh Matter" value={`${weight.reduce((s, r) => s + r.netWeight, 0).toFixed(1)} kg`} icon={Scale} />
-              <StatCard label="Avg Dry Matter %" value={`${(weight.reduce((s, r) => s + r.dryMatterPct, 0) / weight.length).toFixed(1)}%`} icon={FlaskConical} />
+              <StatCard label="Boxes weighed" value={weight.length} icon={Scale} />
+              <StatCard label="Avg leaf weight" value={n.meanLeafWeight ? `${n.meanLeafWeight} g` : "—"} icon={Leaf} />
+              <StatCard label="Total fresh matter" value={`${weight.reduce((s, r) => s + (r.netWeight ?? 0), 0).toFixed(1)} kg`} icon={Scale} />
+              <StatCard label="Avg dry matter" value={n.meanDryMatter ? `${n.meanDryMatter}%` : "—"} icon={FlaskConical} />
             </motion.div>
             <DataTable
               columns={[
@@ -223,7 +202,7 @@ export default function NutritionPage() {
                 { key: "avgLeafWeight", label: "Avg Leaf (g)" },
                 { key: "netWeight", label: "Net (kg)" },
                 { key: "grossWeight", label: "Gross (kg)" },
-                { key: "dryMatterPct", label: "DM %", render: (r) => `${r.dryMatterPct}%` },
+                { key: "dryMatterPct", label: "DM %", render: (r) => (r.dryMatterPct === undefined || r.dryMatterPct === null ? "—" : `${r.dryMatterPct}%`) },
                 { key: "notes", label: "Notes" },
               ]}
               data={weight}
@@ -240,26 +219,17 @@ export default function NutritionPage() {
       case "balance":
         return (
           <>
-            {/* Nutrient Balance Summary Cards */}
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              {[
-                { label: "N Balance", applied: balance.reduce((s, r) => s + r.nApplied, 0), extracted: balance.reduce((s, r) => s + r.nExtracted, 0), bal: totalN },
-                { label: "P Balance", applied: balance.reduce((s, r) => s + r.pApplied, 0), extracted: balance.reduce((s, r) => s + r.pExtracted, 0), bal: totalP },
-                { label: "K Balance", applied: balance.reduce((s, r) => s + r.kApplied, 0), extracted: balance.reduce((s, r) => s + r.kExtracted, 0), bal: totalK },
-                { label: "Ca Balance", applied: balance.reduce((s, r) => s + r.caApplied, 0), extracted: balance.reduce((s, r) => s + r.caExtracted, 0), bal: totalCa },
-              ].map((n) => (
-                <div key={n.label} className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <div className="text-xs text-white/50 mb-1">{n.label}</div>
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className={`text-2xl font-bold ${n.bal >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                      {n.bal >= 0 ? "+" : ""}{n.bal.toFixed(1)} kg
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs text-white/40">
-                    <span>Applied: {n.applied.toFixed(1)} kg</span>
-                    <span>Extracted: {n.extracted.toFixed(1)} kg</span>
-                  </div>
-                </div>
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+              {n.elements.map((el) => (
+                <MetricTile
+                  key={el.element}
+                  label={`${el.element} balance`}
+                  value={`${el.balance >= 0 ? "+" : ""}${el.balance.toFixed(1)} kg`}
+                  icon={FlaskConical}
+                  // Negative means the crop is taking out more than goes in.
+                  tone={el.balance < 0 ? "bad" : el.balance > 0 ? "good" : "default"}
+                  context={{ label: "applied / extracted", value: `${el.applied.toFixed(1)} / ${el.extracted.toFixed(1)}` }}
+                />
               ))}
             </motion.div>
             <DataTable
@@ -274,7 +244,7 @@ export default function NutritionPage() {
                 { key: "pExtracted", label: "P Ext" },
                 { key: "kExtracted", label: "K Ext" },
                 { key: "caExtracted", label: "Ca Ext" },
-                { key: "dryMatterPct", label: "DM %", render: (r) => `${r.dryMatterPct}%` },
+                { key: "dryMatterPct", label: "DM %", render: (r) => (r.dryMatterPct === undefined || r.dryMatterPct === null ? "—" : `${r.dryMatterPct}%`) },
               ]}
               data={balance}
               onAdd={balanceForm.openCreate}
@@ -291,10 +261,14 @@ export default function NutritionPage() {
         return (
           <>
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <StatCard label="Analyses Count" value={soil.length} icon={Microscope} />
-              <StatCard label="Latest pH" value={soil.length > 0 ? soil[0].ph : "—"} icon={Beaker} />
-              <StatCard label="Latest Organic Matter %" value={soil.length > 0 ? `${soil[0].organicMatter}%` : "—"} icon={Leaf} />
-              <StatCard label="Latest CIC" value={soil.length > 0 ? soil[0].cic : "—"} icon={FlaskConical} />
+              <StatCard label="Analyses on record" value={soil.length} icon={Microscope} />
+              <StatCard label="Mean pH" value={n.meanPh ?? "—"} icon={Beaker}
+                tone={n.acidBeds > 0 ? "warning" : "neutral"}
+                context={n.acidBeds > 0 ? `${n.acidBeds} beds below 5.5` : undefined} />
+              <StatCard label="Mean organic matter" value={n.meanOrganicMatter ? `${n.meanOrganicMatter}%` : "—"} icon={Leaf} />
+              <StatCard label="Aluminium risk" value={n.aluminiumBeds} icon={FlaskConical}
+                tone={n.aluminiumBeds > 0 ? "critical" : "neutral"}
+                context="beds above 30% saturation" />
             </motion.div>
             <DataTable
               columns={[
@@ -303,8 +277,8 @@ export default function NutritionPage() {
                 { key: "labCode", label: "Sample Code" },
                 { key: "texture", label: "Texture" },
                 { key: "ph", label: "pH" },
-                { key: "organicMatter", label: "M.O. %", render: (r) => `${r.organicMatter}%` },
-                { key: "nTotal", label: "N %", render: (r) => `${r.nTotal}%` },
+                { key: "organicMatter", label: "M.O. %", render: (r) => (r.organicMatter === undefined || r.organicMatter === null ? "—" : `${r.organicMatter}%`) },
+                { key: "nTotal", label: "N %", render: (r) => (r.nTotal === undefined || r.nTotal === null ? "—" : `${r.nTotal}%`) },
                 { key: "ca", label: "Ca" },
                 { key: "mg", label: "Mg" },
                 { key: "k", label: "K" },
@@ -326,21 +300,22 @@ export default function NutritionPage() {
         return (
           <>
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <StatCard label="Analyses Count" value={foliar.length} icon={Microscope} />
-              <StatCard label="Latest N %" value={foliar.length > 0 ? `${foliar[0].n}%` : "—"} icon={Leaf} />
-              <StatCard label="Latest K %" value={foliar.length > 0 ? `${foliar[0].k}%` : "—"} icon={FlaskConical} />
-              <StatCard label="Latest Lab" value={foliar.length > 0 ? foliar[0].lab : "—"} icon={Beaker} />
+              <StatCard label="Analyses on record" value={foliar.length} icon={Microscope} />
+              <StatCard label="Beds sampled" value={n.bedsAnalysed} icon={Leaf} />
+              <StatCard label="Beds with a balance" value={n.bedsWithBalance} icon={FlaskConical} />
+              <StatCard label="Since last soil sample" value={n.daysSinceSoil === undefined ? "—" : `${n.daysSinceSoil} d`} icon={Beaker}
+                tone={(n.daysSinceSoil ?? 0) > 180 ? "warning" : "neutral"} />
             </motion.div>
             <DataTable
               columns={[
                 { key: "sampleDate", label: "Date" },
                 { key: "lab", label: "Lab" },
                 { key: "crop", label: "Crop" },
-                { key: "n", label: "N %", render: (r) => `${r.n}%` },
-                { key: "p", label: "P %", render: (r) => `${r.p}%` },
-                { key: "k", label: "K %", render: (r) => `${r.k}%` },
-                { key: "ca", label: "Ca %", render: (r) => `${r.ca}%` },
-                { key: "mg", label: "Mg %", render: (r) => `${r.mg}%` },
+                { key: "n", label: "N %", render: (r) => (r.n === undefined || r.n === null ? "—" : `${r.n}%`) },
+                { key: "p", label: "P %", render: (r) => (r.p === undefined || r.p === null ? "—" : `${r.p}%`) },
+                { key: "k", label: "K %", render: (r) => (r.k === undefined || r.k === null ? "—" : `${r.k}%`) },
+                { key: "ca", label: "Ca %", render: (r) => (r.ca === undefined || r.ca === null ? "—" : `${r.ca}%`) },
+                { key: "mg", label: "Mg %", render: (r) => (r.mg === undefined || r.mg === null ? "—" : `${r.mg}%`) },
                 { key: "fe", label: "Fe ppm" },
                 { key: "zn", label: "Zn ppm" },
               ]}
@@ -360,11 +335,100 @@ export default function NutritionPage() {
 
   return (
     <PageShell title="Nutrition" subtitle="Weight tracking, nutrient balance, soil and foliar analysis" icon={FlaskConical}>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                  className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <MetricTile
+          label="Elements running a deficit"
+          value={n.depleted.length ? n.depleted.join(", ") : n.elements.some((e) => e.applied || e.extracted) ? "None" : "—"}
+          icon={FlaskConical}
+          tone={n.depleted.length ? "bad" : n.elements.some((e) => e.applied) ? "good" : "default"}
+          context={{ label: "of four tracked", value: `${n.depleted.length}` }}
+        />
+        <MetricTile
+          label="Mean soil pH"
+          value={n.meanPh === undefined ? "—" : String(n.meanPh)}
+          icon={Beaker}
+          // Below 5.5 the crop stops taking up what is applied, so fertiliser
+          // spent on those beds largely does not arrive.
+          tone={n.meanPh === undefined ? "default" : n.meanPh < 5.5 ? "bad" : n.meanPh > 7.5 ? "warn" : "good"}
+          context={{ label: "beds below 5.5", value: String(n.acidBeds) }}
+        />
+        <MetricTile
+          label="Beds sampled"
+          value={String(n.bedsAnalysed)}
+          icon={Microscope}
+          context={{ label: "with a nutrient balance", value: String(n.bedsWithBalance) }}
+        />
+        <MetricTile
+          label="Since last soil sample"
+          value={n.daysSinceSoil === undefined ? "—" : `${n.daysSinceSoil} d`}
+          icon={Leaf}
+          tone={n.daysSinceSoil === undefined ? "default" : n.daysSinceSoil > 180 ? "warn" : "good"}
+          context={{ label: "mean organic matter", value: n.meanOrganicMatter ? `${n.meanOrganicMatter}%` : "—" }}
+        />
+      </motion.div>
+
+      {n.elements.some((e) => e.applied || e.extracted) && (
+        <div className="bg-white rounded-xl border border-sand-200/80 p-5 shadow-sm mb-5">
+          <h4 className="text-[13px] font-semibold text-navy-900">Applied against extracted</h4>
+          <p className="text-[11px] text-navy-400 mb-4">
+            Kilograms per element across every bed with a balance recorded
+          </p>
+          <ElementBalanceChart elements={n.elements} />
+        </div>
+      )}
+
       <div className="mb-4"><TabBar tabs={tabs} active={tab} onChange={setTab} /></div>
 
       <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
         {renderTab()}
       </motion.div>
     </PageShell>
+  );
+}
+
+/**
+ * Two bars per element on a shared scale: what went in, what came out.
+ *
+ * Drawn rather than charted because the comparison is the whole point — a
+ * single "balance" bar hides whether a small surplus came from feeding little
+ * and cropping less, or from feeding heavily against a heavy crop.
+ */
+function ElementBalanceChart({
+  elements,
+}: {
+  elements: { element: string; applied: number; extracted: number; balance: number }[];
+}) {
+  const max = Math.max(...elements.flatMap((e) => [e.applied, e.extracted]), 1);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-4 text-[11px] text-navy-500">
+        <span className="flex items-center gap-1.5"><span className="w-3 h-2.5 rounded-sm bar-fill" /> applied</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-2.5 rounded-sm bar-accent" /> extracted</span>
+      </div>
+      {elements.map((e) => (
+        <div key={e.element} className="flex items-center gap-3">
+          <span className="w-8 shrink-0 text-[11px] font-medium text-navy-700">{e.element}</span>
+          <div className="flex-1 space-y-1">
+            <div className="relative h-3 rounded bg-sand-100 overflow-hidden">
+              <div className="absolute inset-y-0 left-0 rounded bar-fill"
+                   style={{ width: `${Math.max((e.applied / max) * 100, e.applied > 0 ? 1 : 0)}%` }}
+                   title={`Applied ${e.applied} kg`} />
+            </div>
+            <div className="relative h-3 rounded bg-sand-100 overflow-hidden">
+              <div className="absolute inset-y-0 left-0 rounded bar-accent"
+                   style={{ width: `${Math.max((e.extracted / max) * 100, e.extracted > 0 ? 1 : 0)}%` }}
+                   title={`Extracted ${e.extracted} kg`} />
+            </div>
+          </div>
+          <span className={`w-24 shrink-0 text-[11px] text-right tabular-nums font-medium ${
+            e.balance < 0 ? "text-red-600" : e.balance > 0 ? "text-lime-700" : "text-navy-400"
+          }`}>
+            {e.balance >= 0 ? "+" : ""}{e.balance.toFixed(1)} kg
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }

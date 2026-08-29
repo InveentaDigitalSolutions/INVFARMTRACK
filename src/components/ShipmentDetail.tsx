@@ -5,69 +5,25 @@ import {
   Plus,
   UserCheck,
   FileText,
-  Check,
   AlertCircle,
 } from "lucide-react";
 import Badge from "./Badge";
 import InvoiceGenerator from "./InvoiceGenerator";
 import { PLANT_SIZES } from "../services/plantSizes";
+import { useNurseryBeds } from "../hooks/useNurseryBeds";
+import { useLookupOptions } from "../hooks/useLookupOptions";
+import { useRecords } from "../hooks/useRecords";
 
-// Types
-interface OrderLine {
-  plant: string;
-  qtyOrdered: number;
-  qtyPacked: number;
-  pricePerUnit: number;
-}
+import type { Shipment, PackedBox } from "../services/shipmentModel";
 
-interface PackedBox {
-  id: string;
-  barcode: string;
-  boxNumber: number;
-  plant: string;
-  bed: string;
-  size: string;
-  packingType: string;
-  bundleSize: number;
-  quantity: number;
-  grossWeight: number;
-  netWeight: number;
-  worker: string;
-  workerId: string;
-}
+/**
+ * Order lines are not a table yet — bv_orderitem exists but nothing writes it —
+ * so fulfilment against an ordered quantity cannot be shown. The panel that
+ * claimed to is gone rather than showing a percentage of nothing.
+ */
 
-interface Shipment {
-  id: string;
-  customer: string;
-  orderNumber: string;
-  date: string;
-  carrier: string;
-  awb: string;
-  status: string;
-  orderLines: OrderLine[];
-  boxes: PackedBox[];
-}
-
-// Dummy data
-const plants = [
-  "Pothos / Hawaiian",
-  "Pothos / Marble Queen",
-  "Pothos / Jade",
-  "Pothos / N'Joy",
-  "Pothos / Golden Glen",
-];
-const beds = [
-  { id: "bed-3a", label: "E3-01", shadehouse: "Shadehouse 1" },
-  { id: "bed-1b", label: "E1-05", shadehouse: "Shadehouse 1" },
-  { id: "bed-5c", label: "C3-12", shadehouse: "Shadehouse 1" },
-];
 const sizes = PLANT_SIZES;
-const workers = [
-  { name: "Carlos M.", id: "W001" },
-  { name: "Maria L.", id: "W002" },
-  { name: "Juan P.", id: "W003" },
-  { name: "Ana R.", id: "W004" },
-];
+
 
 interface ShipmentDetailProps {
   shipment: Shipment;
@@ -80,6 +36,15 @@ export default function ShipmentDetail({
   onBack,
   onUpdate,
 }: ShipmentDetailProps) {
+  // Beds, varieties and crew come from the tables, not from a list typed here.
+  // The lists that stood in their place offered five beds and four workers who
+  // are not in the nursery, and picking one saved a box against nothing.
+  const { beds } = useNurseryBeds();
+  const plants = useLookupOptions("plants").map((o) => o.value);
+  const [workerRows] = useRecords<{ id: string; name?: string; code?: string; active?: boolean }>("workers", []);
+  const workers = workerRows
+    .filter((w) => w.name && w.active !== false)
+    .map((w) => ({ name: String(w.name), id: String(w.code ?? "") }));
   const [showAddGroup, setShowAddGroup] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [selectedBoxes, setSelectedBoxes] = useState<Set<string>>(new Set());
@@ -97,20 +62,24 @@ export default function ShipmentDetail({
   const [groupCount, setGroupCount] = useState(1);
 
   // Fulfillment calc
-  const totalOrdered = shipment.orderLines.reduce((s, l) => s + l.qtyOrdered, 0);
-  const totalPacked = shipment.boxes.reduce((s, b) => s + b.quantity, 0);
-  const fulfillmentPct = totalOrdered > 0 ? Math.min(100, Math.round((totalPacked / totalOrdered) * 100)) : 0;
-  const totalBoxes = shipment.boxes.length;
-  const totalGW = shipment.boxes.reduce((s, b) => s + b.grossWeight, 0);
-  const totalNW = shipment.boxes.reduce((s, b) => s + b.netWeight, 0);
 
-  // Per-plant fulfillment
-  const plantFulfillment = shipment.orderLines.map((line) => {
-    const packed = shipment.boxes
-      .filter((b) => b.plant === line.plant)
-      .reduce((s, b) => s + b.quantity, 0);
-    return { ...line, qtyPacked: packed, pct: Math.min(100, Math.round((packed / line.qtyOrdered) * 100)) };
-  });
+  const totalPacked = shipment.boxes.reduce((s, b) => s + (b.quantity ?? 0), 0);
+
+  const totalBoxes = shipment.boxes.length;
+  const totalGW = shipment.boxes.reduce((s, b) => s + (b.grossWeight ?? 0), 0);
+  const totalNW = shipment.boxes.reduce((s, b) => s + (b.netWeight ?? 0), 0);
+
+  /** What has been packed, per variety. Not against an order: order lines
+   *  are not recorded anywhere yet, so a fulfilment percentage would be a
+   *  fraction of a number nobody has entered. */
+  const byPlant = Array.from(
+    shipment.boxes.reduce((map, b) => {
+      const key = String(b.plant ?? "Unspecified");
+      map.set(key, (map.get(key) ?? 0) + (Number(b.quantity) || 0));
+      return map;
+    }, new Map<string, number>()),
+    ([plant, quantity]) => ({ plant, quantity })
+  ).sort((a, z) => z.quantity - a.quantity);
 
   const handleAddBoxes = () => {
     if (!groupPlant || !groupBed || !groupSize || groupCount < 1) return;
@@ -126,14 +95,14 @@ export default function ShipmentDetail({
         barcode: `HN${today}${String(num).padStart(3, "0")}`,
         boxNumber: num,
         plant: groupPlant,
-        bed: bedObj?.label || groupBed,
+        bed: bedObj?.name || groupBed,
         size: groupSize,
         packingType: groupType,
         bundleSize: groupType === "BNDL" ? groupBundle : 0,
         quantity: groupQty,
         grossWeight: groupGW,
         netWeight: groupNW,
-        worker: "",
+        packedBy: "",
         workerId: "",
       };
     });
@@ -155,7 +124,7 @@ export default function ShipmentDetail({
     const w = workers.find((w) => w.name === assignWorker);
     const updated = shipment.boxes.map((b) =>
       selectedBoxes.has(b.id)
-        ? { ...b, worker: assignWorker, workerId: w?.id || "" }
+        ? { ...b, packedBy: assignWorker, workerId: w?.id || "" }
         : b
     );
     onUpdate({ ...shipment, boxes: updated });
@@ -171,7 +140,7 @@ export default function ShipmentDetail({
   };
 
   const selectAllUnassigned = () => {
-    const unassigned = shipment.boxes.filter((b) => !b.worker).map((b) => b.id);
+    const unassigned = shipment.boxes.filter((b) => !b.packedBy).map((b) => b.id);
     setSelectedBoxes(new Set(unassigned));
   };
 
@@ -195,7 +164,7 @@ export default function ShipmentDetail({
             </Badge>
           </div>
           <p className="text-sm text-navy-500">
-            {shipment.orderNumber} — {shipment.date} — {shipment.carrier}{shipment.awb ? ` (${shipment.awb})` : ""}
+            {[shipment.code, shipment.date, shipment.carrier, shipment.awb].filter(Boolean).join(" — ")}
           </p>
         </div>
         {shipment.boxes.length > 0 && (
@@ -224,41 +193,33 @@ export default function ShipmentDetail({
         )}
       </AnimatePresence>
 
-      {/* Fulfillment progress */}
+      {/* What is in the boxes */}
       <div className="bg-white rounded-xl border border-sand-200 p-5">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-navy-900">Order Fulfillment</p>
-          <span className="text-sm font-bold text-navy-700">{fulfillmentPct}%</span>
-        </div>
-        <div className="w-full h-3 rounded-full bg-sand-100 overflow-hidden mb-4">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${fulfillmentPct}%` }}
-            transition={{ duration: 0.5 }}
-            className={`h-full rounded-full ${
-              fulfillmentPct >= 100 ? "bg-green-500" : fulfillmentPct >= 50 ? "bg-lime-500" : "bg-amber-400"
-            }`}
-          />
+          <p className="text-sm font-semibold text-navy-900">Packed by variety</p>
+          <span className="text-xs text-navy-400">{totalBoxes} boxes</span>
         </div>
 
-        {/* Per-plant breakdown */}
-        <div className="space-y-2">
-          {plantFulfillment.map((line) => (
-            <div key={line.plant} className="flex items-center gap-3 text-sm">
-              <p className="flex-1 text-navy-800 truncate">{line.plant}</p>
-              <div className="w-32 h-2 rounded-full bg-sand-100 overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${line.pct >= 100 ? "bg-green-500" : "bg-lime-400"}`}
-                  style={{ width: `${line.pct}%` }}
-                />
+        {byPlant.length === 0 ? (
+          <p className="text-[12px] text-navy-400 py-4">
+            Nothing packed yet. Add a group of boxes below — each one records the bed it was cut from.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {byPlant.map((line) => (
+              <div key={line.plant} className="flex items-center gap-3 text-sm">
+                <p className="flex-1 text-navy-800 truncate">{line.plant}</p>
+                <div className="w-32 h-2 rounded-full bg-sand-100 overflow-hidden">
+                  <div className="h-full rounded-full bar-fill"
+                       style={{ width: `${Math.max((line.quantity / (byPlant[0]?.quantity || 1)) * 100, 2)}%` }} />
+                </div>
+                <p className="text-xs text-navy-500 w-24 text-right tabular-nums">
+                  {line.quantity.toLocaleString()}
+                </p>
               </div>
-              <p className="text-xs text-navy-500 w-28 text-right">
-                {line.qtyPacked.toLocaleString()} / {line.qtyOrdered.toLocaleString()}
-              </p>
-              {line.pct >= 100 && <Check className="w-4 h-4 text-green-500" />}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Totals */}
         <div className="flex gap-6 mt-4 pt-4 border-t border-sand-100">
@@ -306,7 +267,7 @@ export default function ShipmentDetail({
                 <select value={groupBed} onChange={(e) => setGroupBed(e.target.value)}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-sand-200 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-300">
                   <option value="">Select...</option>
-                  {beds.map((b) => <option key={b.id} value={b.id}>{b.label} ({b.shadehouse})</option>)}
+                  {beds.map((b) => <option key={b.id} value={b.id}>{b.name} ({b.fieldName})</option>)}
                 </select>
               </div>
               <div>
@@ -493,13 +454,13 @@ export default function ShipmentDetail({
                         {box.packingType}{box.packingType === "BNDL" ? ` x${box.bundleSize}` : ""}
                       </Badge>
                     </td>
-                    <td className="px-4 py-2.5 text-navy-900">{box.quantity.toLocaleString()}</td>
+                    <td className="px-4 py-2.5 text-navy-900">{(box.quantity ?? 0).toLocaleString()}</td>
                     <td className="px-4 py-2.5 text-navy-700">{box.grossWeight}kg</td>
                     <td className="px-4 py-2.5">
-                      {box.worker ? (
+                      {box.packedBy ? (
                         <span className="flex items-center gap-1 text-navy-700">
                           <UserCheck className="w-3.5 h-3.5 text-green-500" />
-                          {box.worker}
+                          {box.packedBy}
                         </span>
                       ) : (
                         <span className="text-amber-500 text-xs flex items-center gap-1">

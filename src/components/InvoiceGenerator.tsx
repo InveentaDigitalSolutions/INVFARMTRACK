@@ -2,6 +2,9 @@ import { useState, useMemo, useEffect } from "react";
 import { motion} from "framer-motion";
 import { downloadInvoicePDFs, type InvoiceData } from "../services/InvoicePDF";
 import { useExchangeRate } from "../hooks/useExchangeRate";
+import { useInvoiceNumber } from "../hooks/useInvoiceNumber";
+import { useRecords } from "../hooks/useRecords";
+import type { CustomersRow, FiscalRow, PricesRow } from "../services/rowTypes.generated";
 import {
   FileText,
   Check,
@@ -15,35 +18,14 @@ import {
 import Badge from "./Badge";
 
 // Types matching our schema
-interface PackedBox {
-  id: string;
-  plant: string;
-  bed: string;
-  size: string;
-  packingType: string;
-  bundleSize: number;
-  quantity: number;
-  grossWeight: number;
-  netWeight: number;
-  worker: string;
-}
-
-interface Shipment {
-  id: string;
-  customer: string;
-  orderNumber: string;
-  date: string;
-  carrier: string;
-  awb: string;
-  boxes: PackedBox[];
-}
-
-interface CAINumber {
-  number: string;
-  sequence: number;
-  used: boolean;
-  usedFor?: string;
-}
+/**
+ * The shipment as the model holds it. The invoice used to declare its own
+ * shape with every field required, which stopped compiling the moment boxes
+ * became packing rows — where every column is optional because Dataverse
+ * returns nothing for an empty cell.
+ */
+import type { Shipment, PackedBox } from "../services/shipmentModel";
+import { ISV_RATE } from "../services/invoiceMath";
 
 interface InvoiceGeneratorProps {
   shipment: Shipment;
@@ -84,24 +66,6 @@ interface InvoiceLine {
   amount: number;
 }
 
-// Dummy CAI numbers
-const caiNumbers: CAINumber[] = Array.from({ length: 70 }, (_, i) => ({
-  number: `000-001-01-${String(1461 + i).padStart(8, "0")}`,
-  sequence: 1461 + i,
-  used: i === 0, // first one already used
-  usedFor: i === 0 ? "Export Invoice (BANCO)" : undefined,
-}));
-
-// Dummy price lookup
-const priceMap: Record<string, { ext: number; int: number }> = {
-  "Pothos / Hawaiian": { ext: 0.020, int: 5.00 },
-  "Pothos / Marble Queen": { ext: 0.020, int: 5.00 },
-  "Pothos / Jade": { ext: 0.018, int: 4.50 },
-  "Pothos / N'Joy": { ext: 0.022, int: 6.00 },
-  "Pothos / Golden Glen": { ext: 0.020, int: 5.00 },
-  "Sansevieria / Sansevieria": { ext: 0.035, int: 8.00 },
-};
-
 function getWeekNumber(date: string): number {
   const d = new Date(date);
   const start = new Date(d.getFullYear(), 0, 1);
@@ -121,23 +85,53 @@ export default function InvoiceGenerator({
   onGenerate,
 }: InvoiceGeneratorProps) {
   const { rate: bchRate, isLive: bchLive } = useExchangeRate();
-  const [exchangeRate, setExchangeRate] = useState(24.6746);
+  // Falls back only until the central-bank rate loads; never a made-up figure
+  // on a printed invoice.
+  const [exchangeRate, setExchangeRate] = useState(0);
 
-  // Auto-fill from BCH API when available
   useEffect(() => {
     if (bchRate) setExchangeRate(bchRate.value);
   }, [bchRate]);
+
+  /**
+   * The real authorisation and the real price list.
+   *
+   * Both were literals: 70 invented CAI numbers starting at 1461, and a price
+   * map of six varieties at prices nobody set. An invoice built on either is a
+   * fiscal document with invented content on it.
+   */
+  const { next: nextNumber } = useInvoiceNumber();
+  const [priceRows] = useRecords<PricesRow>("prices", []);
+  const [customerRows] = useRecords<CustomersRow>("customers", []);
+  const [fiscalRows] = useRecords<FiscalRow>("fiscal", []);
+
+  const priceMap = useMemo(() => {
+    const out: Record<string, { ext: number; int: number }> = {};
+    // Latest valid-from wins where a variety has more than one price on file.
+    for (const r of [...priceRows].sort((a, b) => String(a.from ?? "").localeCompare(String(b.from ?? "")))) {
+      if (!r.plant) continue;
+      out[String(r.plant)] = { ext: Number(r.priceExt) || 0, int: Number(r.priceInt) || 0 };
+    }
+    return out;
+  }, [priceRows]);
+
+  const customer = useMemo(
+    () => customerRows.find((c) => c.name === shipment.customer),
+    [customerRows, shipment.customer]
+  );
+  const auth = useMemo(() => fiscalRows.find((f) => f.active !== false) ?? fiscalRows[0], [fiscalRows]);
+
   const [step, setStep] = useState<"review" | "generating" | "done">("review");
-  const [selectedCAI, setSelectedCAI] = useState(() => {
-    const next = caiNumbers.find((c) => !c.used);
-    return next?.number || "";
-  });
+  const [selectedCAI, setSelectedCAI] = useState("");
+  useEffect(() => {
+    if (nextNumber?.invoiceNumber) setSelectedCAI(nextNumber.invoiceNumber);
+  }, [nextNumber?.invoiceNumber]);
 
   // Aggregate boxes into invoice lines (group by plant variety)
   const invoiceLines = useMemo((): InvoiceLine[] => {
     const groups = new Map<string, PackedBox[]>();
     shipment.boxes.forEach((box) => {
-      const key = `${box.plant}|${box.size}|${box.packingType}|${box.bundleSize}`;
+      const key = `${box.plant ?? ""}|${box.size ?? ""}|${box.packingType ?? ""}|${box.bundleSize ?? 0}`;
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(box);
     });
@@ -150,23 +144,23 @@ export default function InvoiceGenerator({
       const endBox = boxCounter + boxes.length;
       boxCounter = endBox;
 
-      const price = priceMap[first.plant]?.ext || 0.020;
-      const totalQty = boxes.reduce((s, b) => s + b.quantity, 0);
+      const price = priceMap[String(first.plant ?? "")]?.ext || 0.020;
+      const totalQty = boxes.reduce((s, b) => s + (b.quantity ?? 0), 0);
 
-      const bundleStr = first.packingType === "BNDL" ? ` ${first.bundleSize} BNDL` : "";
-      const description = `${first.plant} URC L/E ${first.size.toUpperCase()}${bundleStr}`;
+      const bundleStr = first.packingType === "BNDL" ? ` ${first.bundleSize ?? 0} BNDL` : "";
+      const description = `${first.plant ?? ""} URC L/E ${String(first.size ?? "").toUpperCase()}${bundleStr}`.trim();
 
       lines.push({
         boxRange: startBox === endBox
           ? String(startBox).padStart(2, "0")
           : `${String(startBox).padStart(2, "0")}-${String(endBox).padStart(2, "0")}`,
-        grossWeight: first.grossWeight,
-        netWeight: first.netWeight,
+        grossWeight: first.grossWeight ?? 0,
+        netWeight: first.netWeight ?? 0,
         boxes: boxes.length,
-        pack: first.quantity,
+        pack: first.quantity ?? 0,
         quantity: totalQty,
         description,
-        customer: shipment.customer.substring(0, 20),
+        customer: String(shipment.customer ?? "").substring(0, 20),
         pricePerUnit: price,
         amount: totalQty * price,
       });
@@ -176,7 +170,9 @@ export default function InvoiceGenerator({
   }, [shipment]);
 
   const subtotal = invoiceLines.reduce((s, l) => s + l.amount, 0);
-  const isvRate = 0.18;
+  // Honduran ISV is 15%. This said 18, which put the wrong tax on a document
+  // that carries a CAI and is filed with SAR.
+  const isvRate = ISV_RATE;
   const isvAmount = subtotal * isvRate;
   const total = subtotal + isvAmount;
   const totalHNL = total * exchangeRate;
@@ -190,13 +186,13 @@ export default function InvoiceGenerator({
     setTimeout(() => {
       const invoice: GeneratedInvoice = {
         invoiceNumber: selectedCAI,
-        customer: shipment.customer,
-        date: shipment.date,
-        dueDate: addDays(shipment.date, 30),
-        weekNumber: getWeekNumber(shipment.date),
-        etd: shipment.date,
-        carrier: shipment.carrier,
-        awb: shipment.awb,
+        customer: String(shipment.customer ?? ""),
+        date: String(shipment.date ?? ""),
+        dueDate: addDays(String(shipment.date ?? ""), 30),
+        weekNumber: getWeekNumber(String(shipment.date ?? "")),
+        etd: String(shipment.etd ?? shipment.date ?? ""),
+        carrier: String(shipment.carrier ?? ""),
+        awb: String(shipment.awb ?? ""),
         lines: invoiceLines,
         subtotal,
         isvRate,
@@ -206,37 +202,40 @@ export default function InvoiceGenerator({
         totalHNL,
       };
 
-      // Generate actual PDFs
-      const activeCai = caiNumbers.find((c) => !c.used);
+      // Every fiscal field comes from the authorisation on file and every
+      // customer field from the customer record. They were another company's
+      // address, tax id and contact, printed on Broton Verde's invoice.
       const pdfData: InvoiceData = {
         invoiceNumber: selectedCAI,
-        cai: activeCai ? "4ED113-4AB1C5-B6B9E0-63BE03-090919-95" : "",
-        caiExpiry: "06-04-2027",
-        caiRange: "000-001-01-00001461 hasta 000-001-01-00001530",
-        rtn: "05019011379855",
-        customerName: shipment.customer,
-        customerAddress: "3038 Stuarts Draft Highway\nStuarts Draft, VA 24477, USA",
-        customerTaxId: "85-1008901",
-        customerContact: "Frank Paul",
-        customerPhone: "+1(440) 458 0177",
-        customerEmail: "invoices@theplantcompany.com",
-        invoiceDate: shipment.date,
-        weekNumber: getWeekNumber(shipment.date),
-        etd: shipment.date,
-        eta: addDays(shipment.date, 2),
+        cai: String(auth?.cai ?? ""),
+        caiExpiry: String(auth?.expiry ?? ""),
+        caiRange: auth?.rangeStart && auth?.rangeEnd ? `${auth.rangeStart} hasta ${auth.rangeEnd}` : "",
+        rtn: String(auth?.rtn ?? ""),
+        customerName: String(shipment.customer ?? ""),
+        // The customer table has no address, tax id or phone yet. Blank is the
+        // honest answer; inventing one puts a false party on a tax document.
+        customerAddress: "",
+        customerTaxId: "",
+        customerContact: String(customer?.contact ?? ""),
+        customerPhone: "",
+        customerEmail: String(customer?.email ?? ""),
+        invoiceDate: String(shipment.date ?? ""),
+        weekNumber: getWeekNumber(String(shipment.date ?? "")),
+        etd: String(shipment.etd ?? shipment.date ?? ""),
+        eta: String(shipment.eta ?? ""),
         shippedVia: "Air",
-        carrier: shipment.carrier,
-        awbNumber: shipment.awb || "TBD",
-        terms: "CIF",
-        portOfEntry: "Miami (MIA), FL, USA",
-        tempRecord: "15 C° /59°F",
-        notifyPartyName: "MH Logistics, LTD",
-        notifyPartyAddress: "2020 S. Stiles St Unit B\nLinden, NJ 07036 USA",
-        notifyPartyContact: "+1-908-965-3191",
+        carrier: String(shipment.carrier ?? ""),
+        awbNumber: String(shipment.awb ?? ""),
+        terms: String(customer?.terms ?? ""),
+        portOfEntry: "",
+        tempRecord: "",
+        notifyPartyName: "",
+        notifyPartyAddress: "",
+        notifyPartyContact: "",
         lines: invoiceLines,
         subtotal,
-        isv15: 0,
-        isv18: isvAmount,
+        isv15: isvAmount,
+        isv18: 0,
         subtotalExonerated: 0,
         discounts: 0,
         airFreight: 0,
@@ -258,7 +257,9 @@ export default function InvoiceGenerator({
     }, 2000);
   };
 
-  const nextAvailable = caiNumbers.filter((c) => !c.used);
+  // Only the next free number. The picker offered ten because the list was
+  // invented; the real authorisation issues them strictly in order.
+  const nextAvailable = nextNumber && !nextNumber.problem ? [nextNumber.invoiceNumber] : [];
 
   return (
     <motion.div
@@ -305,8 +306,8 @@ export default function InvoiceGenerator({
                       className="w-full px-3 py-2.5 text-[13px] font-mono rounded-lg border border-sand-200 bg-white
                                  text-navy-900 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-lime-400/30"
                     >
-                      {nextAvailable.slice(0, 10).map((c) => (
-                        <option key={c.number} value={c.number}>{c.number}</option>
+                      {nextAvailable.map((n) => (
+                        <option key={n} value={n}>{n}</option>
                       ))}
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-navy-300 pointer-events-none" />
@@ -402,11 +403,11 @@ export default function InvoiceGenerator({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-navy-400">Due Date</span>
-                    <span className="font-semibold text-navy-900">{addDays(shipment.date, 30)}</span>
+                    <span className="font-semibold text-navy-900">{addDays(String(shipment.date ?? ""), 30)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-navy-400">Week</span>
-                    <span className="font-semibold text-navy-900">{getWeekNumber(shipment.date)}</span>
+                    <span className="font-semibold text-navy-900">{getWeekNumber(String(shipment.date ?? ""))}</span>
                   </div>
                 </div>
 
