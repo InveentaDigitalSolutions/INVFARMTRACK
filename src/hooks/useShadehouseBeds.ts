@@ -13,7 +13,7 @@
 
 import { useMemo } from "react";
 import { useRecords } from "./useRecords";
-import { plotConfigs, type ShadehouseBed, type BedLevel } from "../components/ShadehouseView";
+import { plotConfigs, type ShadehouseBed, type BedLevel } from "../services/shadehouseLayout";
 import { bedStatuses, bedHistory, type BedActivity } from "../services/bedState";
 import { parseBedName } from "../services/infrastructureRules";
 import type {

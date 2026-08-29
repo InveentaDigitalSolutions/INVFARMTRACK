@@ -8,7 +8,7 @@ import {
   plotConfigs,
   type BedLevel,
   type ShadehouseBed,
-} from "./ShadehouseView";
+} from "../services/shadehouseLayout";
 import { zoneStatusColors, type ZoneReading } from "../services/irrigation";
 import WeatherLayer from "./WeatherLayer";
 import type { CurrentConditions } from "../services/weather";

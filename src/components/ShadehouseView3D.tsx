@@ -8,7 +8,7 @@ import {
   LEVEL_HEIGHTS_M,
   type BedLevel,
   type ShadehouseBed,
-} from "./ShadehouseView";
+} from "../services/shadehouseLayout";
 import ShadehouseScene, { placeBeds, type LensMode } from "./ShadehouseScene";
 import { useShadehouseBeds } from "../hooks/useShadehouseBeds";
 import { readZone, zoneStatusColors, type ZoneReading } from "../services/irrigation";

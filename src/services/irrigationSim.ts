@@ -9,7 +9,7 @@
  * Replace `buildZones` with a Dataverse read of inv_Irrigation once the
  * controller writes events, and flip `feed` to "live".
  */
-import type { ShadehouseBed } from "../components/ShadehouseView";
+import type { ShadehouseBed } from "./shadehouseLayout";
 import { POLL_INTERVAL_MS, type IrrigationZone, type ZoneFix } from "./irrigation";
 
 /** One valve per bed-level line, as the risers in the shadehouse photos show. */

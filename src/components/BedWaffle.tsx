@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import type { ShadehouseBed } from "./ShadehouseView";
-import { plotConfigs, stateColors } from "./ShadehouseView";
+import type { ShadehouseBed } from "../services/shadehouseLayout";
+import { plotConfigs, stateColors } from "../services/shadehouseLayout";
 
 /**
  * One dot per bed — not per percentage point. A grower can count the empties,

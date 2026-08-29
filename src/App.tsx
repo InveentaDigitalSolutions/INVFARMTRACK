@@ -15,6 +15,7 @@ import SuppliersPage from "./pages/SuppliersPage";
 import LaborPage from "./pages/LaborPage";
 import SettingsPage from "./pages/SettingsPage";
 import WriteErrorBanner from "./components/WriteErrorBanner";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 export type PageId =
   | "dashboard"
@@ -174,7 +175,9 @@ export default function App() {
             <div className={`h-full overflow-auto rounded-2xl main-content ${
               darkMode ? "bg-navy-900" : "bg-surface"
             } ${isMobile ? "rounded-none" : ""}`}>
-              <AnimatePresence mode="wait">{renderPage()}</AnimatePresence>
+              <ErrorBoundary key={currentPage}>
+                <AnimatePresence mode="wait">{renderPage()}</AnimatePresence>
+              </ErrorBoundary>
             </div>
           </main>
           {/* Says so when a record did not reach Dataverse. */}

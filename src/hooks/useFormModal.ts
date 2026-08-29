@@ -12,9 +12,17 @@ type FormValues = Record<string, unknown>;
  *
  * Booleans are carried over: they are flags like "active", where the sample's
  * value is a reasonable default rather than someone else's data.
+ *
+ * There may be no sample at all. Pages used to pass `initRows[0]` from a demo
+ * array; those arrays are empty now, so that argument is `undefined` and this
+ * threw inside a useState initialiser — which unmounted the whole app and left
+ * a blank screen on every module with a form. The field set comes from the
+ * form's own `groups` and FormModal already treats a missing key as empty, so
+ * no sample is a perfectly good answer.
  */
-function blankFrom(sample: FormValues): FormValues {
+function blankFrom(sample: FormValues | undefined): FormValues {
   const blank: FormValues = {};
+  if (!sample || typeof sample !== "object") return blank;
   for (const [key, value] of Object.entries(sample)) {
     if (typeof value === "boolean") blank[key] = value;
     else if (Array.isArray(value)) blank[key] = [];
@@ -24,7 +32,7 @@ function blankFrom(sample: FormValues): FormValues {
   return blank;
 }
 
-export function useFormModal(defaults: FormValues) {
+export function useFormModal(defaults?: FormValues) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<FormValues>(() => blankFrom(defaults));
   const [editIndex, setEditIndex] = useState<number | null>(null);

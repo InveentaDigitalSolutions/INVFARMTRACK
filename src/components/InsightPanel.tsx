@@ -1,6 +1,6 @@
 import { Lightbulb, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import type { ShadehouseBed } from "./ShadehouseView";
-import { plotConfigs } from "./ShadehouseView";
+import type { ShadehouseBed } from "../services/shadehouseLayout";
+import { plotConfigs } from "../services/shadehouseLayout";
 
 /**
  * The insight is *derived*, never authored. Every figure below traces back to
