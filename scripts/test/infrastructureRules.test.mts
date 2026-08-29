@@ -4,7 +4,8 @@
 import {
   nextSeasonName, fieldNameProblem, fieldCapacityProblem,
   bedName, rowOf, levelOf, parseBedName, availableRows, levelsFor, defaultLevel,
-  levelProblem, bedCapacityProblem, typeForLevel, planBulkBeds, positionCount,
+  levelProblem, bedCapacityProblem, typeForLevel, planBulkBeds,
+  planBedUpdate, positionCount,
 } from '../../src/services/infrastructureRules.ts'
 
 let failures = 0
@@ -119,6 +120,48 @@ const groundE3 = Array.from({length:33},(_,i)=>({name:`E3-${String(i+1).padStart
 eq('a full run of air beds over existing rows is allowed',
   planBulkBeds({field:E3, level:1, fromRow:1, toRow:33, existing:groundE3,
     shadehouse:{name:'Shadehouse 1', capacity:33}}).create.length, 33)
+
+
+// ── planBedUpdate ───────────────────────────────────────────────────────────
+// Shade is recorded per bed but strung over whole runs, so a run-update is the
+// only practical way to set it across a nursery of 120.
+const field = { name: "E3", rows: 6, shadehouse: "SH1" }
+const nursery = [
+  { name: "E3-01" }, { name: "E3-01-1" },
+  { name: "E3-02" },
+  { name: "E3-03" }, { name: "E3-03-1" }, { name: "E3-03-2" },
+  { name: "C1-01" },
+]
+
+const everyLevel = planBedUpdate({ field, fromRow: 1, toRow: 3, existing: nursery })
+eq('a run with no level takes every bed over those rows',
+   everyLevel.match, ["E3-01", "E3-01-1", "E3-02", "E3-03", "E3-03-1", "E3-03-2"])
+eq('and never a bed in another field', everyLevel.match.some(n => n.startsWith("C1")), false)
+
+const groundOnly = planBedUpdate({ field, level: 0, fromRow: 1, toRow: 3, existing: nursery })
+eq('a level narrows it to that tier', groundOnly.match, ["E3-01", "E3-02", "E3-03"])
+
+const airOnly = planBedUpdate({ field, level: 1, fromRow: 1, toRow: 3, existing: nursery })
+eq('air level 1 only', airOnly.match, ["E3-01-1", "E3-03-1"])
+eq('and rows with no bed at that level are reported, not silently skipped',
+   airOnly.missing, [2])
+
+const past = planBedUpdate({ field, fromRow: 5, toRow: 8, existing: nursery })
+eq('rows past the end of the field are named', past.outOfRange, [7, 8])
+eq('and rows inside it with no bed are missing', past.missing, [5, 6])
+
+eq('no field is a problem, not an empty result',
+   planBedUpdate({ field: undefined, fromRow: 1, toRow: 2, existing: nursery }).problem, "Choose a field.")
+eq('a backwards range is refused',
+   planBedUpdate({ field, fromRow: 4, toRow: 2, existing: nursery }).problem,
+   "The last row comes before the first.")
+eq('a level outside 0-3 is refused',
+   planBedUpdate({ field, level: 9, fromRow: 1, toRow: 2, existing: nursery }).problem,
+   "Levels run from 0 to 3.")
+eq('the run reads in row order, not string order',
+   planBedUpdate({ field: { name: "E3", rows: 12 }, fromRow: 1, toRow: 11,
+     existing: [{ name: "E3-11" }, { name: "E3-02" }, { name: "E3-01" }] }).match,
+   ["E3-01", "E3-02", "E3-11"])
 
 console.log(failures ? `\n  ${failures} failed` : '\n  all passed')
 process.exit(failures ? 1 : 0)

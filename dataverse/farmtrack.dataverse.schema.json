@@ -160,6 +160,27 @@
           "description": "Vertical level: 0 is the ground bed, 1-3 are the cable lines strung above it. One of: 0, 1, 2, 3."
         },
         {
+          "schemaName": "bv_ShadeLevel",
+          "displayName": "Shade",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 121320000,
+              "label": "Single"
+            },
+            {
+              "value": 121320001,
+              "label": "Double"
+            },
+            {
+              "value": 121320002,
+              "label": "Triple"
+            }
+          ],
+          "description": "How many layers of shade cloth are strung over the bed. One of: Single, Double, Triple."
+        },
+        {
           "schemaName": "bv_Capacity",
           "displayName": "Capacity",
           "type": "integer",

@@ -98,6 +98,9 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       location: "bv_location",
       type: "bv_type",
       level: "bv_level",
+      // How many layers of cloth are over the bed. Level is how high the bed
+      // sits; shade is what is above it, and the two vary independently.
+      shade: "bv_shadelevel",
       soilType: "bv_soiltype",
       drainage: "bv_drainage",
       irrigationType: "bv_irrigationtype",

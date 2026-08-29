@@ -63,6 +63,7 @@ export const COLUMN_KIND: Record<string, Record<string, ColumnKind>> = {
     "bv_fieldid": "lookup",
     "bv_type": "choice",
     "bv_level": "choice",
+    "bv_shadelevel": "choice",
     "bv_capacity": "number",
     "bv_soiltype": "choice",
     "bv_drainage": "choice",

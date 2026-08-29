@@ -495,6 +495,11 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "2": 121320002,
       "3": 121320003
     },
+    "bv_shadelevel": {
+      "Single": 121320000,
+      "Double": 121320001,
+      "Triple": 121320002
+    },
     "bv_soiltype": {
       "Sandy": 121320000,
       "Loamy": 121320001,

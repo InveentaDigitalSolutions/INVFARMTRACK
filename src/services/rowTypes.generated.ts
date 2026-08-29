@@ -68,6 +68,7 @@ export interface BedsRow {
   location?: string;
   type?: string;
   level?: string;
+  shade?: string;
   soilType?: string;
   drainage?: string;
   irrigationType?: string;

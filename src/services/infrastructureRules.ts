@@ -326,3 +326,70 @@ export function bedCapacityProblem(
       `This would need ${newPositions} more.`
     : null;
 }
+
+/** What a run-update would touch, before it touches it. */
+export interface BedUpdatePlan {
+  /** Bed names that match the range and will be patched. */
+  match: string[];
+  /** Rows in the range with no bed at that level. */
+  missing: number[];
+  /** Rows past the end of the field. */
+  outOfRange: number[];
+  problem?: string;
+}
+
+export interface BedUpdateRequest {
+  field: FieldLike | undefined;
+  /** A single level, or undefined for every level over those rows. */
+  level?: number;
+  fromRow: number;
+  toRow: number;
+  existing: BedLike[];
+}
+
+/**
+ * Which beds a change to a run would touch.
+ *
+ * Shade is recorded per bed but strung over whole runs, so setting it one bed
+ * at a time across a nursery of 120 is not a real option. The same is true of
+ * soil, drainage and irrigation — they were only ever settable at creation,
+ * which left no way to correct them afterwards.
+ *
+ * This only finds the beds. What changes about them is the caller's business,
+ * so one plan serves every attribute.
+ */
+export function planBedUpdate(request: BedUpdateRequest): BedUpdatePlan {
+  const { field, level, fromRow, toRow, existing } = request;
+  const empty: BedUpdatePlan = { match: [], missing: [], outOfRange: [] };
+
+  if (!field?.name) return { ...empty, problem: "Choose a field." };
+  if (!Number.isFinite(fromRow) || !Number.isFinite(toRow) || fromRow < 1 || toRow < 1) {
+    return { ...empty, problem: "Give a first and last row." };
+  }
+  if (toRow < fromRow) return { ...empty, problem: "The last row comes before the first." };
+  if (level !== undefined && (level < 0 || level > 3)) {
+    return { ...empty, problem: "Levels run from 0 to 3." };
+  }
+
+  const parsed = existing
+    .map((b) => ({ name: String(b.name ?? ""), at: parseBedName(String(b.name ?? "")) }))
+    .filter((b): b is { name: string; at: ParsedBed } => b.at !== null && b.at.field === field.name);
+
+  const match: string[] = [];
+  const missing: number[] = [];
+  const outOfRange: number[] = [];
+
+  for (let row = fromRow; row <= toRow; row++) {
+    if (field.rows && row > field.rows) { outOfRange.push(row); continue; }
+    const here = parsed.filter((b) => b.at.row === row && (level === undefined || b.at.level === level));
+    if (here.length === 0) { missing.push(row); continue; }
+    match.push(...here.map((b) => b.name));
+  }
+
+  if (match.length === 0 && !missing.length && !outOfRange.length) {
+    return { ...empty, problem: "That range covers no rows." };
+  }
+  // Sorted so "E3-02" follows "E3-01" rather than "E3-10".
+  match.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  return { match, missing, outOfRange };
+}

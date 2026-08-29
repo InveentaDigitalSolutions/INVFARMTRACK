@@ -14,7 +14,7 @@ import ShadehouseView3D from "../components/ShadehouseView3D";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { infrastructureSummary } from "../services/infrastructureInsight";
-import { availableRows, bedName, parseBedName, typeForLevel, planBulkBeds, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
+import { availableRows, bedName, parseBedName, typeForLevel, planBulkBeds, planBedUpdate, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
 import type { BedsRow, FieldsRow, PlantingsRow, ShadehousesRow } from "../services/rowTypes.generated";
 
 const tabs = [
@@ -89,6 +89,56 @@ const bulkBedFormGroups = [
     ] },
     { key: "fromRow", label: "First Row", type: "number" as const, min: 1, required: true },
     { key: "toRow", label: "Last Row", type: "number" as const, min: 1, required: true },
+    { key: "shade", label: "Shade", type: "select" as const, options: [
+      { value: "Single", label: "Single" }, { value: "Double", label: "Double" },
+      { value: "Triple", label: "Triple" },
+    ] },
+    { key: "soilType", label: "Soil Type", type: "select" as const, options: [
+      { value: "Sandy", label: "Sandy" }, { value: "Loamy", label: "Loamy" },
+      { value: "Clay", label: "Clay" }, { value: "Peaty", label: "Peaty" },
+      { value: "Chalky", label: "Chalky" }, { value: "Silty", label: "Silty" },
+    ] },
+    { key: "irrigationType", label: "Irrigation", type: "select" as const, options: [
+      { value: "Drip", label: "Drip" }, { value: "Sprinkler", label: "Sprinkler" },
+      { value: "Manual", label: "Manual" }, { value: "None", label: "None" },
+    ] },
+    { key: "drainage", label: "Drainage", type: "select" as const, options: [
+      { value: "Excellent", label: "Excellent" }, { value: "Good", label: "Good" },
+      { value: "Moderate", label: "Moderate" }, { value: "Poor", label: "Poor" },
+    ] },
+  ]},
+];
+
+/**
+ * Changing a run of beds that already exist.
+ *
+ * Shade is recorded per bed but strung over whole runs, so setting it one bed
+ * at a time across 120 is not a real option. Soil, drainage and irrigation had
+ * the same problem from the other direction: settable only at creation, with
+ * no way to correct them afterwards.
+ *
+ * Every attribute is optional. Only the ones filled in are applied, so this can
+ * set shade over a run without disturbing anything else about those beds.
+ */
+const bedRunFormGroups = [
+  { title: "Which beds", columns: 2 as const, fields: [
+    { key: "field", label: "Field", type: "select" as const,
+      options: fieldOptions, optionsFrom: "fields", required: true },
+    { key: "level", label: "Level", type: "select" as const, options: [
+      { value: "", label: "Every level" },
+      { value: "0", label: "0 — ground beds" },
+      { value: "1", label: "1 — air beds" },
+      { value: "2", label: "2 — air beds" },
+      { value: "3", label: "3 — air beds" },
+    ] },
+    { key: "fromRow", label: "First Row", type: "number" as const, min: 1, required: true },
+    { key: "toRow", label: "Last Row", type: "number" as const, min: 1, required: true },
+  ]},
+  { title: "What to change — leave blank to keep as it is", columns: 2 as const, fields: [
+    { key: "shade", label: "Shade", type: "select" as const, options: [
+      { value: "Single", label: "Single" }, { value: "Double", label: "Double" },
+      { value: "Triple", label: "Triple" },
+    ] },
     { key: "soilType", label: "Soil Type", type: "select" as const, options: [
       { value: "Sandy", label: "Sandy" }, { value: "Loamy", label: "Loamy" },
       { value: "Clay", label: "Clay" }, { value: "Peaty", label: "Peaty" },
@@ -137,6 +187,10 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
       } },
     { key: "name", label: "Bed Name", type: "text" as const, readOnly: true,
       placeholder: "E3-01, or E3-01-2 for an air bed" },
+    { key: "shade", label: "Shade", type: "select" as const, options: [
+      { value: "Single", label: "Single" }, { value: "Double", label: "Double" },
+      { value: "Triple", label: "Triple" },
+    ] },
     { key: "soilType", label: "Soil Type", type: "select" as const, options: [
       { value: "Sandy", label: "Sandy" }, { value: "Loamy", label: "Loamy" },
       { value: "Clay", label: "Clay" }, { value: "Peaty", label: "Peaty" },
@@ -167,6 +221,11 @@ export default function InfrastructurePage() {
   const [plantings] = useRecords<PlantingsRow>("plantings", []);
   const [shView, setShView] = useState<"plan" | "3d">("plan");
 
+  const bedRunForm = useFormModal({
+    field: "", level: "", fromRow: 1, toRow: 1,
+    shade: "", soilType: "", irrigationType: "", drainage: "",
+  });
+
   const bulkBedForm = useFormModal({
     field: "", level: "1", fromRow: 1, toRow: 1,
     soilType: "", irrigationType: "", drainage: "",
@@ -178,6 +237,55 @@ export default function InfrastructurePage() {
    * refused — asking for rows 1 to 20 when 2 and 7 exist should fill the
    * gaps, not fail.
    */
+  /**
+   * Apply a change across every bed in a row range.
+   *
+   * Only the attributes actually filled in are written, so setting shade over a
+   * run leaves the soil and irrigation of those beds alone.
+   */
+  const saveBedRun = (values: Record<string, unknown>) => {
+    const field = (fields as FieldRow[]).find((f) => f.name === values.field);
+    const level = String(values.level ?? "") === "" ? undefined : Number(values.level);
+
+    const plan = planBedUpdate({
+      field,
+      level,
+      fromRow: Number(values.fromRow),
+      toRow: Number(values.toRow),
+      existing: beds as BedRow[],
+    });
+    if (plan.problem) { alert(plan.problem); return; }
+
+    const patch: Record<string, unknown> = {};
+    for (const key of ["shade", "soilType", "irrigationType", "drainage"]) {
+      if (values[key]) patch[key] = values[key];
+    }
+    if (Object.keys(patch).length === 0) {
+      alert("Nothing to change — fill in at least one attribute.");
+      return;
+    }
+    if (plan.match.length === 0) {
+      alert("No bed in that range. Nothing was changed.");
+      return;
+    }
+
+    const notes: string[] = [];
+    if (plan.missing.length) notes.push(`${plan.missing.length} rows have no bed at that level`);
+    if (plan.outOfRange.length) notes.push(`${plan.outOfRange.length} rows are past the end of ${field?.name}`);
+    const what = Object.entries(patch).map(([k, v]) => `${k} = ${v}`).join(", ");
+    const summary =
+      `Set ${what} on ${plan.match.length} bed${plan.match.length === 1 ? "" : "s"}, ` +
+      `${plan.match[0]} to ${plan.match[plan.match.length - 1]}?` +
+      (notes.length ? `\n\n${notes.join(". ")}.` : "");
+    if (!window.confirm(summary)) return;
+
+    const touched = new Set(plan.match);
+    setBeds((beds as BedRow[]).map((b) =>
+      touched.has(String(b.name ?? "")) ? { ...b, ...patch } : b
+    ) as never);
+    bedRunForm.close();
+  };
+
   const saveBulkBeds = (values: Record<string, unknown>) => {
     const field = (fields as FieldRow[]).find((f) => f.name === values.field);
     const level = Number(values.level ?? 0);
@@ -215,6 +323,7 @@ export default function InfrastructurePage() {
       field: values.field,
       level: String(level),
       type: typeForLevel(level),
+      shade: values.shade || undefined,
       soilType: values.soilType || undefined,
       irrigationType: values.irrigationType || undefined,
       drainage: values.drainage || undefined,
@@ -395,10 +504,22 @@ export default function InfrastructurePage() {
               { key: "name", label: "Name" }, { key: "field", label: "Field" },
               { key: "type", label: "Type", render: (r) => <Badge variant={r.type === "Air" ? "blue" : "green"}>{r.type as string}</Badge> },
               { key: "level", label: "Level" },
+              { key: "shade", label: "Shade", render: (r) => r.shade
+                ? <Badge variant={r.shade === "Triple" ? "green" : r.shade === "Double" ? "blue" : "gray"}>{r.shade as string}</Badge>
+                : <span className="text-navy-300">—</span> },
               { key: "soilType", label: "Soil" }, { key: "irrigationType", label: "Irrigation" },
               { key: "active", label: "Status", render: (r) => <Badge variant={r.active ? "green" : "gray"}>{r.active ? "Active" : "Inactive"}</Badge> },
             ]} data={beds} onAdd={bedForm.openCreate} onEdit={(r, i) => openBedEdit(r as Record<string, unknown>, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Bed" searchPlaceholder="Search beds..." />
-            <div className="flex justify-end -mt-2">
+            <div className="flex justify-end gap-2 -mt-2">
+              <button
+                type="button"
+                onClick={bedRunForm.openCreate}
+                className="px-3 py-2 text-[12px] font-medium rounded-lg border border-sand-200
+                           text-navy-700 hover:bg-sand-50 focus:outline-none
+                           focus:ring-2 focus:ring-lime-400/30 transition-colors cursor-pointer"
+              >
+                Change a run of beds
+              </button>
               <button
                 type="button"
                 onClick={bulkBedForm.openCreate}
@@ -409,6 +530,10 @@ export default function InfrastructurePage() {
                 Add a run of beds
               </button>
             </div>
+            <FormModal open={bedRunForm.open} onClose={bedRunForm.close} title="Change a run of beds"
+              subtitle="Sets shade, soil, irrigation or drainage across every bed in the range"
+              groups={bedRunFormGroups} values={bedRunForm.values} onChange={bedRunForm.onChange}
+              submitLabel="Preview" onSubmit={(v) => saveBedRun(v)} />
             <FormModal open={bulkBedForm.open} onClose={bulkBedForm.close} title="Add a run of beds"
               subtitle="Creates every bed in the row range at once"
               groups={bulkBedFormGroups} values={bulkBedForm.values} onChange={bulkBedForm.onChange}

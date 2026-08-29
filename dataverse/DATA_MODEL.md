@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 47 |
-| Columns | 572 |
+| Columns | 573 |
 | Relationships | 64 |
 
 ## Conventions
@@ -32,7 +32,7 @@
 | Table | Logical name | ID format | Columns | Purpose |
 |---|---|---|---|---|
 | [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 9 | Physical growing structures in the nursery |
-| [Bed](#bed) | `bv_bed` | `BED-0001` | 11 | Growing beds within batches (Shadehouse > Batch > Bed) |
+| [Bed](#bed) | `bv_bed` | `BED-0001` | 12 | Growing beds within batches (Shadehouse > Batch > Bed) |
 | [Plant](#plant) | `bv_plant` | `PLT-0001` | 23 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
 | [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
@@ -187,6 +187,7 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 | `bv_fieldid` | Field | Lookup → [Field](#field) | ✓ | Link to the related Field record. |
 | `bv_type` | Type | Choice |  | Whether this is a ground bed planted in soil, or an air bed of hanging pots on a cable. One of: Air, Ground. |
 | `bv_level` | Level | Choice |  | Vertical level: 0 is the ground bed, 1-3 are the cable lines strung above it. One of: 0, 1, 2, 3. |
+| `bv_shadelevel` | Shade | Choice |  | How many layers of shade cloth are strung over the bed. One of: Single, Double, Triple. |
 | `bv_capacity` | Capacity | Whole number |  | Maximum the unit can hold. |
 | `bv_soiltype` | Soil Type | Choice |  | Overall classification of the growing medium. The exact mix is recorded as Bed Composition rows, one per material with its percentage; this stays as the one-word summary people use when talking about a bed. One of: Sandy, Loamy, Clay, Peaty, Chalky, Silty. |
 | `bv_drainage` | Drainage | Choice |  | One of: Excellent, Good, Moderate, Poor. |
@@ -211,6 +212,14 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 | 121320001 | 1 |
 | 121320002 | 2 |
 | 121320003 | 3 |
+
+**Shade** (`bv_shadelevel`)
+
+| Value | Label |
+|---|---|
+| 121320000 | Single |
+| 121320001 | Double |
+| 121320002 | Triple |
 
 **Soil Type** (`bv_soiltype`)
 
