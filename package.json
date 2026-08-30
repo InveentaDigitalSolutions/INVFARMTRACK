@@ -23,7 +23,7 @@
     "dataverse:seed-fix": "node scripts/dataverse/fix-autonumber-seeds.mjs",
     "test:math": "tsx scripts/test/invoiceMath.test.mts",
     "test:rules": "tsx scripts/test/infrastructureRules.test.mts",
-    "test": "npm run test:math && npm run test:rules && npm run test:rotation && npm run test:schedule && npm run test:forecast && npm run test:insight && npm run test:availability && npm run test:beds && npm run test:stock && npm run test:variety && npm run test:modules && npm run test:sync && npm run test:payload",
+    "test": "npm run test:math && npm run test:rules && npm run test:rotation && npm run test:schedule && npm run test:forecast && npm run test:insight && npm run test:availability && npm run test:beds && npm run test:stock && npm run test:variety && npm run test:modules && npm run test:sync && npm run test:payload && npm run test:geometry",
     "dataverse:photos": "node scripts/dataverse/sync-user-photos.mjs",
     "test:rotation": "tsx scripts/test/bedRotation.test.mts",
     "test:schedule": "tsx scripts/test/productionSchedule.test.mts",
@@ -45,7 +45,8 @@
     "dataverse:check-blank-saves": "tsx scripts/dataverse/check-blank-saves.mts",
     "test:smoke": "npm run build && node scripts/test/smoke.mjs",
     "test:sandbox": "node scripts/test/check-sandbox-safe.mjs",
-    "dataverse:bed-shade": "node scripts/dataverse/set-bed-shade.mjs"
+    "dataverse:bed-shade": "node scripts/dataverse/set-bed-shade.mjs",
+    "test:geometry": "tsx scripts/test/shadehouseGeometry.test.mts"
   },
   "dependencies": {
     "@fontsource-variable/playfair-display": "^5.3.0",

@@ -92,14 +92,41 @@ export const stateColors: Record<string, { fill: string; label: string }> = {
 
 // Real shadehouse config — 1 shadehouse with 4 fields
 export const plotConfigs: PlotConfig[] = [
-  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "E3" },
-  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "C3" },
-  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "E1" },
-  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "C1" },
+  // Bed widths are Santiago's and the survey confirms them: 120 beds at these
+  // widths measure 88.20 m, which with the 16.08 m road is the 104.28 m the
+  // survey gives across. Bed length was 37.20 m, measured off a photograph;
+  // the survey makes it 79.06 m — the model was less than half the real run.
+  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 79.06, label: "E3" },
+  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 79.06, label: "C3" },
+  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 79.06, label: "E1" },
+  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 79.06, label: "C1" },
 ];
 
-/** Posts stand roughly every 3.6 m, whatever the bed pitch. */
-export const POST_SPACING_M = 3.6;
+/**
+ * The structural bay, measured from the survey.
+ *
+ * The topographic survey (Topografía CAPAZ, July 2025, 1:830) shows an 11 x 19
+ * post grid over the existing nurseries at a spacing that varies by less than
+ * 0.2% across the whole block. This replaces a guessed 3.6 m.
+ */
+export const POST_SPACING_M = 9.72;
+
+/**
+ * The shadehouse envelope, measured rather than inferred.
+ *
+ * These come out of the survey's vector geometry, not off a photograph, and
+ * they close on the bed arithmetic exactly: 33 x 1.20 + 16.08 + 27 x 1.80 =
+ * 104.28 across, and 79.06 + 16.08 + 79.06 = 174.20 along.
+ */
+export const BLOCK_ACROSS_M = 104.28;
+export const BLOCK_ALONG_M = 174.20;
+
+/** Degrees the structure sits off grid north. The model draws it square. */
+export const BLOCK_BEARING_DEG = 72;
+
+/** The floor is not level: it falls this far from one end to the other. */
+export const FLOOR_FALL_M = 3.5;
+export const FLOOR_RANGE_M = { low: 566.0, high: 569.5 };
 
 export function postEveryFor(fieldId: string): number {
   const field = plotConfigs.find((p) => p.id === fieldId);

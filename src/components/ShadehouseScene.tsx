@@ -9,6 +9,7 @@ import {
   LEVEL_HEIGHTS_M,
   stateColors,
   plotConfigs,
+  POST_SPACING_M,
   SHADE_COLOR,
   SHADE_HEIGHT_M,
   SHADE_OPACITY,
@@ -47,8 +48,17 @@ export const PLAN_COLORS = {
 };
 
 /** Gap between the two field columns — the logistics road in the layout. */
-const ROAD_M = 3.5;
-const PLOT_GAP_M = 3.5;
+/**
+ * The logistics road, as a cross through the middle of the block.
+ *
+ * Not measured directly — the survey's post grid runs straight over the road,
+ * because the shade structure spans it. It is what the survey leaves once the
+ * beds are taken out: 104.28 across minus 33 x 1.20 minus 27 x 1.80 = 16.08 m.
+ * The cross arm is taken to be the same width, which is what makes the along
+ * axis close at 79.06 + 16.08 + 79.06 = 174.20.
+ */
+const ROAD_M = 16.08;
+const PLOT_GAP_M = 16.08;
 
 export interface RoadLayout {
   vertical: { x: number; width: number; length: number };
@@ -626,7 +636,8 @@ function Structure({
   /** Posts every 6 m along each line, tall enough to carry its top cable. */
   const posts = useMemo(() => {
     const out: { x: number; z: number; height: number }[] = [];
-    const step = 6;
+    // Posts follow the surveyed bay rather than a round number.
+    const step = POST_SPACING_M;
     for (const line of postLines) {
       const top = Math.max(...line.levels.map((l) => LEVEL_HEIGHTS_M[l]), 0);
       // A post stands proud of the cable it carries, as a real one does.

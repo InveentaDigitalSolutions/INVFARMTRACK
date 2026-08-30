@@ -300,7 +300,9 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           shadows="percentage"
           dpr={[1, 2]}
           gl={{ antialias: true, toneMappingExposure: 1.05 }}
-          camera={{ position: [62, 52, 74], fov: 36 }}
+          // Framed for the surveyed block, 104 x 174 m. The old position was
+          // set for a model less than half that long and cropped it badly.
+          camera={{ position: [122, 102, 146], fov: 36, far: 2000 }}
           onPointerMissed={() => setSelectedBedId(null)}
         >
           <ShadehouseScene
@@ -323,7 +325,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             makeDefault
             enablePan
             minDistance={12}
-            maxDistance={140}
+            // Far enough out to see the whole block, which is 174 m end to end.
+            maxDistance={420}
             maxPolarAngle={Math.PI / 2.15}
             target={[0, 0.8, 0]}
           />
