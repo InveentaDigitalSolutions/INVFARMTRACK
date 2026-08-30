@@ -2,13 +2,18 @@
  * The moon, as a planner reads it: four figures and a month at a glance.
  *
  * Seeding, pruning and cutting are timed against the phase here, so this is
- * production information rather than an ornament — which is why it sits in
- * Production rather than beside the weather.
+ * production information rather than an ornament. It lives in the Production
+ * overview beside the other figures, not behind a tab of its own — a tab makes
+ * it somewhere to go, and this is context you want in front of you while
+ * reading everything else.
+ *
+ * The tiles are the same MetricTile the rest of the overview uses, so the moon
+ * figures sit level with harvest and occupancy instead of looking bolted on.
  */
 
 import { useMemo } from "react";
 import { Moon, MoonStar, Sunrise, Clock } from "lucide-react";
-import StatCard from "./StatCard";
+import MetricTile from "./MetricTile";
 import { MoonDisc } from "./MoonPanel";
 import { moonKpis, moonCalendar } from "../services/moonInsight";
 
@@ -19,6 +24,12 @@ const clock = (hours: number | null) => {
 };
 
 const dayNum = (iso: string) => Number(iso.slice(8, 10));
+const shortDate = (iso: string | null) =>
+  iso
+    ? new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", {
+        day: "numeric", month: "short", timeZone: "UTC",
+      })
+    : "—";
 const monthOf = (iso: string) =>
   new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
 
@@ -29,30 +40,35 @@ export default function MoonSection({ dateISO }: { dateISO?: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label="Phase today"
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <MetricTile
+          label="Moon phase"
           value={k.phase.name}
           icon={Moon}
-          context={`${(k.phase.illumination * 100).toFixed(0)}% lit · ${k.phase.waxing ? "waxing" : "waning"}`}
+          comparison={{
+            label: k.phase.waxing ? "waxing" : "waning",
+            value: `${(k.phase.illumination * 100).toFixed(0)}% lit`,
+            direction: k.phase.waxing ? "up" : "down",
+          }}
+          context={{ label: "up today", value: `${k.hoursUp.toFixed(1)} h` }}
         />
-        <StatCard
+        <MetricTile
           label="Day of cycle"
           value={k.phase.age.toFixed(1)}
           icon={MoonStar}
-          context="of 29.5 days since the new moon"
+          context={{ label: "of the cycle", value: "29.5 days" }}
         />
-        <StatCard
+        <MetricTile
           label="Next full moon"
           value={k.daysToFull === 0 ? "Today" : `${k.daysToFull} days`}
           icon={Moon}
-          context={k.nextFullISO ?? "—"}
+          context={{ label: "on", value: shortDate(k.nextFullISO) }}
         />
-        <StatCard
+        <MetricTile
           label="Next new moon"
           value={k.daysToNew === 0 ? "Today" : `${k.daysToNew} days`}
           icon={Moon}
-          context={k.nextNewISO ?? "—"}
+          context={{ label: "on", value: shortDate(k.nextNewISO) }}
         />
       </div>
 

@@ -16,6 +16,7 @@ import { Scissors, Sprout, Layers, Boxes, CalendarClock } from "lucide-react";
 import { useRecords } from "../hooks/useRecords";
 import { useNurseryBeds } from "../hooks/useNurseryBeds";
 import MetricTile, { trendOf } from "./MetricTile";
+import MoonSection from "./MoonSection";
 import RankedBars from "./RankedBars";
 import ProductionSchedule from "./ProductionSchedule";
 import BedRotation from "./BedRotation";
@@ -197,6 +198,12 @@ export default function ProductionOverview() {
           <RankedBars rows={model.bedsByVariety} format={(v) => `${v}`} />
         </div>
       </div>
+
+      {/* The moon sits with the figures rather than behind a tab of its own.
+          Seeding, pruning and cutting are timed against it, so it is context to
+          have in front of you while reading everything else — not somewhere to
+          go and look. */}
+      <MoonSection />
 
       {/* Detail below the figures, collapsed. They are worth having and not
           worth the top of the screen — Santiago's point was that big visuals

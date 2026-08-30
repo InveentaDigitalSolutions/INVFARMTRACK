@@ -12,7 +12,6 @@ import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { nextSeasonName } from "../services/infrastructureRules";
 import ProductionOverview from "../components/ProductionOverview";
-import MoonSection from "../components/MoonSection";
 import { useInputNutrients } from "../hooks/useInputNutrients";
 import { expandBeds, expandPlantLines } from "../services/expandBeds";
 import { emptyLine } from "../components/PlantLines";
@@ -34,9 +33,6 @@ const tabs = [
   { id: "harvest", label: "Harvest" },
   { id: "tasks", label: "Tasks" },
   { id: "catalog", label: "Catalog" },
-  // Seeding, pruning and cutting are timed against the phase here, so the moon
-  // is production information rather than an ornament beside the weather.
-  { id: "moon", label: "Moon" },
 ];
 
 /** The activities inside Crop Care, in the order they recur. */
@@ -521,8 +517,6 @@ export default function ProductionPage() {
         );
       case "overview":
         return <ProductionOverview />;
-      case "moon":
-        return <MoonSection />;
       case "care":
         return (
           <div className="space-y-4">
