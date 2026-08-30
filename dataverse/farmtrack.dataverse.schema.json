@@ -6133,6 +6133,65 @@
           "description": "Link to the related Invoice record."
         }
       ]
+    },
+    {
+      "schemaName": "bv_SolarRadiation",
+      "displayName": "Solar Radiation",
+      "displayCollectionName": "Solar Radiation",
+      "ownershipType": "UserOwned",
+      "description": "Measured shortwave radiation for one day at the nursery. Kept as history for the same reason the exchange rate is: the light a planting actually received is a fact about the past, and the weather service only offers a 92-day window. Without this, a crop older than that accumulates on clear-sky assumptions.",
+      "columns": [
+        {
+          "schemaName": "bv_SolarRadiationCode",
+          "displayName": "Solar Radiation ID",
+          "type": "autonumber",
+          "autoNumberFormat": "SR-{SEQNUM:5}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format SR-00001."
+        },
+        {
+          "schemaName": "bv_RadiationDate",
+          "displayName": "Date",
+          "type": "date",
+          "required": true,
+          "description": "The day the radiation was measured over."
+        },
+        {
+          "schemaName": "bv_ShortwaveSum",
+          "displayName": "Shortwave Sum",
+          "type": "decimal",
+          "required": true,
+          "precision": 2,
+          "minValue": 0,
+          "maxValue": 100,
+          "description": "Total shortwave radiation for the day in MJ/m2, as Open-Meteo reports it. Around 11 on a dull day here and 26 on a bright one."
+        },
+        {
+          "schemaName": "bv_RadiationSource",
+          "displayName": "Source",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187470000,
+              "label": "Open-Meteo"
+            },
+            {
+              "value": 187470001,
+              "label": "Manual"
+            }
+          ],
+          "description": "Where the figure came from. A manual entry stands in for a day the feed missed, and is worth being able to tell apart. One of: Open-Meteo, Manual."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
     }
   ]
 }

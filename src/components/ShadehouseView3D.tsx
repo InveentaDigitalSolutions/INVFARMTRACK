@@ -5,6 +5,7 @@ import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, Clou
 import { terrainFall } from "../services/terrain";
 import { atLocal, sunPosition, dayArc } from "../services/solar";
 import SceneCompass from "./SceneCompass";
+import { useRadiation } from "../hooks/useRadiation";
 import { measuredDayLight, clothTransmission, SHADE_LAYERS } from "../services/bedLight";
 
 /** Decimal local hours as a clock reading: 6.75 -> "06:45". */
@@ -129,7 +130,10 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   // Re-read at 1s; the reader itself renders one poll interval behind and
   // interpolates, so this only controls how often we re-sample that curve.
   const now = useNow(1000);
-  const { conditions: weather, radiation, loading: weatherLoading } = useCurrentWeather();
+  const { conditions: weather, loading: weatherLoading } = useCurrentWeather();
+  // Stored history plus the live window: the store reaches back past the feed's
+  // 92 days, which is what a planting older than that needs.
+  const { radiation } = useRadiation();
 
   const readings = useMemo(() => {
     const zones = simulateFixes(baseZones, now, anomalies);

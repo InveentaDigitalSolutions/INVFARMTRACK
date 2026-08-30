@@ -9,8 +9,8 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 47 |
-| Columns | 578 |
+| Tables | 48 |
+| Columns | 583 |
 | Relationships | 67 |
 
 ## Conventions
@@ -78,6 +78,7 @@
 | [Material](#material) | `bv_material` | `MAT-0001` | 10 | Something the nursery buys and stores rather than applies to a plant — drip line, boxes, plastic baskets, plumbing, shade cloth. Kept apart from Inputs because an input has a composition and a safety interval and a box of fittings has neither. |
 | [Stock Movement](#stock-movement) | `bv_stockmovement` | `STK-0001` | 12 | One receipt, issue or correction. Stock on hand is the sum of these rather than a number somebody edits: a stored total drifts silently, and nothing afterwards can say why it changed. Points at a Material or an Input — a sack of fertilizer is stock in the same way a box of fittings is. |
 | [Shipment](#shipment) | `bv_shipment` | `SHP-0001` | 11 | One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed — so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went. |
+| [Solar Radiation](#solar-radiation) | `bv_solarradiation` | `SR-{SEQNUM:5}` | 5 | Measured shortwave radiation for one day at the nursery. Kept as history for the same reason the exchange rate is: the light a planting actually received is a fact about the past, and the weather service only offers a 92-day window. Without this, a crop older than that accumulates on clear-sky assumptions. |
 
 ## Relationships
 
@@ -2025,3 +2026,30 @@ One consignment to a customer. Boxes are bv_Packing rows pointing here, each alr
 </details>
 
 **Referenced by:** Packing (`bv_shipmentid`)
+
+## Solar Radiation
+
+`bv_solarradiation` · User-owned
+
+Measured shortwave radiation for one day at the nursery. Kept as history for the same reason the exchange rate is: the light a planting actually received is a fact about the past, and the weather service only offers a 92-day window. Without this, a crop older than that accumulates on clear-sky assumptions.
+
+**Record ID:** `bv_solarradiationcode` — format `SR-{SEQNUM:5}`, e.g. `SR-{SEQNUM:5}`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_solarradiationcode` 🔑 | Solar Radiation ID | Autonumber | ✓ | Auto-generated identifier, format SR-00001. |
+| `bv_radiationdate` | Date | Date only | ✓ | The day the radiation was measured over. |
+| `bv_shortwavesum` | Shortwave Sum | Decimal(2) | ✓ | Total shortwave radiation for the day in MJ/m2, as Open-Meteo reports it. Around 11 on a dull day here and 26 on a bright one. |
+| `bv_radiationsource` | Source | Choice |  | Where the figure came from. A manual entry stands in for a day the feed missed, and is worth being able to tell apart. One of: Open-Meteo, Manual. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Source** (`bv_radiationsource`)
+
+| Value | Label |
+|---|---|
+| 187470000 | Open-Meteo |
+| 187470001 | Manual |
+
+</details>

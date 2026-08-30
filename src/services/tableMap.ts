@@ -694,6 +694,22 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       notes: "bv_notes",
     },
   },
+  /**
+   * Measured daily radiation, kept for the same reason the exchange rate is:
+   * the light a planting actually received is a fact about the past, and the
+   * weather service only offers a 92-day window.
+   */
+  solarRadiation: {
+    dataSource: "bv_solarradiations",
+    primaryKey: "bv_solarradiationid",
+    fields: {
+      code: "bv_solarradiationcode",
+      date: "bv_radiationdate",
+      megajoules: "bv_shortwavesum",
+      source: "bv_radiationsource",
+      notes: "bv_notes",
+    },
+  },
   caiNumbers: {
     dataSource: "bv_cainumbers",
     primaryKey: "bv_cainumberid",
@@ -809,6 +825,7 @@ export const ENABLED_TABLES = new Set<string>([
   "bedCompositions",
   "caiNumbers",
   "exchangeRates",
+  "solarRadiation",
   "bedCounts",
   "shipments",
   "packing",

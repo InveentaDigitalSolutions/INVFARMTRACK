@@ -54,6 +54,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_shadehouses",
   "bv_shipments",
   "bv_soilanalysises",
+  "bv_solarradiations",
   "bv_stockmovements",
   "bv_substratematerials",
   "bv_suppliers",
@@ -123,7 +124,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_workers": "bv_workername",
   "bv_materials": "bv_materialname",
   "bv_stockmovements": "bv_stockmovementname",
-  "bv_shipments": "bv_shipmentcode"
+  "bv_shipments": "bv_shipmentcode",
+  "bv_solarradiations": "bv_solarradiationcode"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -944,6 +946,12 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Shipped": 187460003,
       "Delivered": 187460004,
       "Cancelled": 187460005
+    }
+  },
+  "bv_solarradiations": {
+    "bv_radiationsource": {
+      "Open-Meteo": 187470000,
+      "Manual": 187470001
     }
   }
 };
