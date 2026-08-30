@@ -292,7 +292,7 @@ Plant species, varieties, and patent catalog
 | `bv_isactive` | Is Active | Yes/No |  | Whether the record is currently in use. |
 | `bv_plantsperbed` | Plants per Bed Row | Whole number |  | How many of this variety fit in one ground bed row. Every bed row is the same size, so this is a property of the variety. |
 | `bv_grownin` | Grown In | Choice |  | Where this variety can be grown — the ground, a basket, or both. Some varieties are only ever hung and must never be offered for a ground bed. One of: Ground, Basket, Ground & Basket. |
-| `bv_shadeneeded` | Shade Needed | Choice |  | Layers of 65% cloth this variety needs. Distinct from the shade a bed actually has: this is the requirement, that is the fact. One of: Single, Double, Triple. |
+| `bv_shadeneeded` | Shade Needed | Choice |  | Layers of 65% cloth this variety needs, and the combinations where more than one will do. Distinct from the shade a bed actually has: this is the requirement, that is the fact. |
 | `bv_growthweeksminmaraug` | Growth Weeks Min (Mar-Aug) | Whole number |  | Weeks from planting to 8 leaves in the bright half of the year, low end of the range. |
 | `bv_growthweeksmaxmaraug` | Growth Weeks Max (Mar-Aug) | Whole number |  | Weeks from planting to 8 leaves in the bright half of the year, high end of the range. |
 | `bv_harvestweeksmaraug` | Harvest Weeks (Mar-Aug) | Whole number |  | Weeks between harvests once the plant is at 8 leaves, bright half of the year. |
@@ -301,7 +301,7 @@ Plant species, varieties, and patent catalog
 | `bv_growthweeksmaxsepfeb` | Growth Weeks Max (Sep-Feb) | Whole number |  | Weeks from planting to 8 leaves in the dark half of the year, high end of the range. |
 | `bv_harvestweekssepfeb` | Harvest Weeks (Sep-Feb) | Whole number |  | Weeks between harvests once the plant is at 8 leaves, dark half of the year. |
 | `bv_pruningweekssepfeb` | Pruning Weeks (Sep-Feb) | Whole number |  | Weeks to recover after pruning back to 2 leaves, dark half of the year. |
-| `bv_plantsperbasketrow` | Plants per Basket Row | Whole number |  | How many of this variety fit in one basket row. A basket holds a different number from a ground bed row, so a variety grown both ways carries both figures. |
+| `bv_plantsperbasketrow` | Plants per Cable | Whole number |  | How many of this variety hang on one cable. A basket bed is a cable strung between the posts with pots hooked along it, so the cable is the unit, and it holds a different number from a ground bed row. |
 
 <details><summary>Choice values</summary>
 
@@ -366,6 +366,9 @@ Plant species, varieties, and patent catalog
 | 187490000 | Single |
 | 187490001 | Double |
 | 187490002 | Triple |
+| 187490003 | Single & Double |
+| 187490004 | Double & Triple |
+| 187490005 | Single & Double & Triple |
 
 </details>
 
@@ -876,13 +879,17 @@ Per-box packing records — each record is one box with full traceability
 
 | Value | Label |
 |---|---|
-| 187460000 | URC |
+| 121340000 | URC |
+| 121340001 | RC |
 
 **Cutting Type** (`bv_cuttingtype`)
 
 | Value | Label |
 |---|---|
-| 187460000 | L/E |
+| 121350000 | L&E |
+| 121350001 | E |
+| 121350002 | Bulbs |
+| 121350003 | Tips |
 
 **Size** (`bv_size`)
 
@@ -2097,8 +2104,8 @@ What a box of one variety at one size holds. The catalogue counterpart to Packin
 | `bv_size` | Size | Choice | ✓ | Cutting size. LRG, REG, CAL, SML and PET on the product table. One of: Large, Regular, California, Small, Petit. |
 | `bv_cuttingsperbox` | Cuttings per Box | Whole number | ✓ | How many cuttings a box of this size holds. 1,000 for Large, 2,000 for Regular and California, 2,500 for Small and Petit. |
 | `bv_bundlesize` | Bundle Size | Whole number |  | Cuttings per bundle inside the box. Three throughout the current catalogue. |
-| `bv_producttype` | Product Type | Choice |  | Unrooted cutting. One of: URC. |
-| `bv_cuttingtype` | Cutting Type | Choice |  | Leaf and eye. One of: L/E. |
+| `bv_producttype` | Type | Choice |  | Unrooted or rooted cutting. One of: URC, RC. |
+| `bv_cuttingtype` | Product | Choice |  | What is actually cut and boxed. One of: L&E, E, Bulbs, Tips. |
 | `bv_isactive` | Active | Yes/No |  | Whether this size is currently offered. |
 | `bv_notes` | Notes | Text area(2000) |  |  |
 
@@ -2114,16 +2121,20 @@ What a box of one variety at one size holds. The catalogue counterpart to Packin
 | 187500003 | Small |
 | 187500004 | Petit |
 
-**Product Type** (`bv_producttype`)
+**Type** (`bv_producttype`)
 
 | Value | Label |
 |---|---|
 | 187510000 | URC |
+| 187510001 | RC |
 
-**Cutting Type** (`bv_cuttingtype`)
+**Product** (`bv_cuttingtype`)
 
 | Value | Label |
 |---|---|
-| 187520000 | L/E |
+| 187520000 | L&E |
+| 187520001 | E |
+| 187520002 | Bulbs |
+| 187520003 | Tips |
 
 </details>

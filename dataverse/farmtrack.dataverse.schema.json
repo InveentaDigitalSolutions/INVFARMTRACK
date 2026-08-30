@@ -591,9 +591,21 @@
             {
               "value": 187490002,
               "label": "Triple"
+            },
+            {
+              "value": 187490003,
+              "label": "Single & Double"
+            },
+            {
+              "value": 187490004,
+              "label": "Double & Triple"
+            },
+            {
+              "value": 187490005,
+              "label": "Single & Double & Triple"
             }
           ],
-          "description": "Layers of 65% cloth this variety needs. Distinct from the shade a bed actually has: this is the requirement, that is the fact. One of: Single, Double, Triple."
+          "description": "Layers of 65% cloth this variety needs, and the combinations where more than one will do. Distinct from the shade a bed actually has: this is the requirement, that is the fact."
         },
         {
           "schemaName": "bv_GrowthWeeksMinMarAug",
@@ -669,12 +681,12 @@
         },
         {
           "schemaName": "bv_PlantsPerBasketRow",
-          "displayName": "Plants per Basket Row",
+          "displayName": "Plants per Cable",
           "type": "integer",
           "required": false,
           "minValue": 0,
           "maxValue": 100000,
-          "description": "How many of this variety fit in one basket row. A basket holds a different number from a ground bed row, so a variety grown both ways carries both figures."
+          "description": "How many of this variety hang on one cable. A basket bed is a cable strung between the posts with pots hooked along it, so the cable is the unit, and it holds a different number from a ground bed row."
         }
       ]
     },
@@ -2274,8 +2286,12 @@
           "required": false,
           "options": [
             {
-              "value": 187460000,
+              "value": 121340000,
               "label": "URC"
+            },
+            {
+              "value": 121340001,
+              "label": "RC"
             }
           ],
           "description": "URC = Unrooted Cutting"
@@ -2287,8 +2303,20 @@
           "required": false,
           "options": [
             {
-              "value": 187460000,
-              "label": "L/E"
+              "value": 121350000,
+              "label": "L&E"
+            },
+            {
+              "value": 121350001,
+              "label": "E"
+            },
+            {
+              "value": 121350002,
+              "label": "Bulbs"
+            },
+            {
+              "value": 121350003,
+              "label": "Tips"
             }
           ],
           "description": "L/E = Leaf & Eye (point of growth)"
@@ -6375,29 +6403,45 @@
         },
         {
           "schemaName": "bv_ProductType",
-          "displayName": "Product Type",
+          "displayName": "Type",
           "type": "choice",
           "required": false,
           "options": [
             {
               "value": 187510000,
               "label": "URC"
+            },
+            {
+              "value": 187510001,
+              "label": "RC"
             }
           ],
-          "description": "Unrooted cutting. One of: URC."
+          "description": "Unrooted or rooted cutting. One of: URC, RC."
         },
         {
           "schemaName": "bv_CuttingType",
-          "displayName": "Cutting Type",
+          "displayName": "Product",
           "type": "choice",
           "required": false,
           "options": [
             {
               "value": 187520000,
-              "label": "L/E"
+              "label": "L&E"
+            },
+            {
+              "value": 187520001,
+              "label": "E"
+            },
+            {
+              "value": 187520002,
+              "label": "Bulbs"
+            },
+            {
+              "value": 187520003,
+              "label": "Tips"
             }
           ],
-          "description": "Leaf and eye. One of: L/E."
+          "description": "What is actually cut and boxed. One of: L&E, E, Bulbs, Tips."
         },
         {
           "schemaName": "bv_IsActive",

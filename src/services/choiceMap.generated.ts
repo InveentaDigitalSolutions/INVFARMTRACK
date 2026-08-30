@@ -719,14 +719,19 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
   },
   "bv_packings": {
     "bv_cuttingtype": {
-      "L/E": 187460000
+      "L/E": 187460000,
+      "L&E": 121350000,
+      "E": 121350001,
+      "Bulbs": 121350002,
+      "Tips": 121350003
     },
     "bv_packingtype": {
       "BNDL": 125690000,
       "IND": 125690001
     },
     "bv_producttype": {
-      "URC": 187460000
+      "URC": 187460000,
+      "RC": 121340001
     },
     "bv_size": {
       "Petit": 187460000,
@@ -784,7 +789,10 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
     "bv_shadeneeded": {
       "Single": 187490000,
       "Double": 187490001,
-      "Triple": 187490002
+      "Triple": 187490002,
+      "Single & Double": 187490003,
+      "Double & Triple": 187490004,
+      "Single & Double & Triple": 187490005
     },
     "bv_soiltype": {
       "Sandy": 121320000,
@@ -975,10 +983,14 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
   },
   "bv_plantsizes": {
     "bv_cuttingtype": {
-      "L/E": 187520000
+      "L&E": 187520000,
+      "E": 187520001,
+      "Bulbs": 187520002,
+      "Tips": 187520003
     },
     "bv_producttype": {
-      "URC": 187510000
+      "URC": 187510000,
+      "RC": 187510001
     },
     "bv_size": {
       "Large": 187500000,

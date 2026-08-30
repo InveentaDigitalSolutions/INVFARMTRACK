@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { LocalStore, type DataStore, type Identified } from "../services/DataService";
-import { DataverseStore } from "../services/DataverseStore";
+import { DataverseStore, dataverseResolver } from "../services/DataverseStore";
 import { DATAVERSE_TABLES, ENABLED_TABLES, hostingMode } from "../services/tableMap";
 import { planWrites } from "../services/syncPlan";
 import { reportWriteError } from "../services/writeErrors";
@@ -119,6 +119,14 @@ export function useRecords<T>(
         } catch (err) {
           reportWriteError(table, "update", err);
         }
+        /**
+         * Anything that writes to a table can change what other forms may
+         * pick from it — a new season, a new plant, a renamed customer. The
+         * lookup index is cached, so it has to be told.
+         */
+        const binding = DATAVERSE_TABLES[table];
+        if (binding) dataverseResolver.invalidate(binding.dataSource);
+
         // Reload either way: the screen must end up showing what is stored,
         // not what was typed.
         await load();

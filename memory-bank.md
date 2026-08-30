@@ -107,6 +107,12 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   layer, drawn by default. Turn Shade off before judging any lighting change —
   `NOSHADE=1 node scripts/test/shot3d.mjs` does it. Shadows work for anything
   bed-sized; 15 cm posts are below what one 4096 map resolves over 115 m.
+- **A lookup list is cached for the life of the page load.** `LookupResolver`
+  indexes each table once and nothing called `invalidate()`, so a season created
+  in the app could not be picked in the planting form until a full reload —
+  and the same for every plant, customer and worker. Writes now invalidate the
+  table they touched and `useLookupOptionsFor` listens, so an open form catches
+  up. Watch for this whenever a form offers names from another table.
 - **Read the whole `dataverse:apply` output, not a grep of it.** A column add
   was missed because the run was piped through `grep -iE "error|added|renam"`
   and the line did not match, so it looked applied and was not. `dry-run` says

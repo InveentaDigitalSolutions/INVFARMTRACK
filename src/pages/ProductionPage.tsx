@@ -218,11 +218,15 @@ const plantSizeFields = [
     // Bounded and small, so it drags. Cuttings per box stays a typed box: it
     // runs to 2,500 and an exact figure matters more than a quick one.
     { key: "bundleSize", label: "Bundle Size", type: "range" as const, min: 1, max: 25, suffix: "per bundle" },
-    { key: "productType", label: "Product Type", type: "toggle" as const, options: [
-      { value: "URC", label: "URC — unrooted cutting" },
+    { key: "productType", label: "Type", type: "toggle" as const, options: [
+      { value: "URC", label: "URC — unrooted" },
+      { value: "RC", label: "RC — rooted" },
     ] },
-    { key: "cuttingType", label: "Cutting Type", type: "toggle" as const, options: [
-      { value: "L/E", label: "L/E — leaf and eye" },
+    { key: "cuttingType", label: "Product", type: "toggle" as const, options: [
+      { value: "L&E", label: "L&E" },
+      { value: "E", label: "E" },
+      { value: "Bulbs", label: "Bulbs" },
+      { value: "Tips", label: "Tips" },
     ] },
     { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
   ]},
@@ -253,7 +257,10 @@ const plantFields = [
      * The light model still works in transmission underneath: 35%, 12.25%,
      * 4.29%.
      */
-    { key: "shadeNeeded", label: "Shade Needed", type: "toggle" as const, options: [
+    // Multi-select, because a variety may take more than one. The combinations
+    // exist as their own choice values, so "Single & Double" is stored as one
+    // label rather than needing to be taken apart and put back together.
+    { key: "shadeNeeded", label: "Shade Needed", type: "toggle" as const, multi: true, options: [
       { value: "Single", label: "Single · 65%" },
       { value: "Double", label: "Double · 87.75%" },
       { value: "Triple", label: "Triple · 95.71%" },
@@ -263,7 +270,7 @@ const plantFields = [
     // both figures, and each only appears when it applies.
     { key: "plantsPerBed", label: "Plants per Bed Row", type: "number" as const, min: 0,
       showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Ground") },
-    { key: "plantsPerBasketRow", label: "Plants per Basket Row", type: "number" as const, min: 0,
+    { key: "plantsPerBasketRow", label: "Plants per Cable", type: "number" as const, min: 0,
       showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Basket") },
   ]},
   /**
@@ -716,7 +723,7 @@ export default function ProductionPage() {
                 { key: "variety", label: "Variety" },
                 { key: "grownIn", label: "Grown In" },
                 { key: "plantsPerBed", label: "Per Bed Row" },
-                { key: "plantsPerBasketRow", label: "Per Basket Row" },
+                { key: "plantsPerBasketRow", label: "Per Cable" },
                 // The seasonal pair replaced a single "weeks to first cut":
                 // the same cutting takes 8-10 weeks in the bright half of the
                 // year and 10-12 in the dark, so one number was always wrong
@@ -757,7 +764,7 @@ export default function ProductionPage() {
                 ) },
                 { key: "bundleSize", label: "Bundle" },
                 { key: "productType", label: "Type" },
-                { key: "cuttingType", label: "Condition" },
+                { key: "cuttingType", label: "Product" },
                 { key: "active", label: "Offered", render: (r) => (
                   <Badge variant={r.active === false ? "gray" : "green"}>
                     {r.active === false ? "No" : "Yes"}

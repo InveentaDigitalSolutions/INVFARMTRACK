@@ -61,6 +61,10 @@ export function useLookupOptions(table: string, fallback: Option[] = []): Option
 export function useLookupOptionsFor(tables: string[]): Record<string, Option[]> {
   const [options, setOptions] = useState<Record<string, Option[]>>({});
   const key = tables.join(",");
+  /** Bumped when a lookup table is written to, to fetch the names again. */
+  const [version, setVersion] = useState(0);
+
+  useEffect(() => dataverseResolver.onInvalidate(() => setVersion((v) => v + 1)), []);
 
   useEffect(() => {
     if (tables.length === 0 || hostingMode() === "demo") return;
@@ -86,9 +90,11 @@ export function useLookupOptionsFor(tables: string[]): Record<string, Option[]> 
     return () => {
       cancelled = true;
     };
-    // `key` is the stable identity of the table list.
+    // `key` is the stable identity of the table list; `version` re-runs it
+    // after a write, so a season created a moment ago is selectable now
+    // instead of after a reload.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [key, version]);
 
   return options;
 }

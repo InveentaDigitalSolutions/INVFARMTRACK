@@ -119,5 +119,18 @@ export class LookupResolver {
   invalidate(entitySet?: string): void {
     if (entitySet) this.indexes.delete(entitySet);
     else this.indexes.clear();
+    // Dropping the cache is not enough on its own: the lists were built once
+    // when the app loaded and nothing asked again, so a season created after
+    // that could not be picked until a full reload. Anyone showing those names
+    // needs telling.
+    for (const listener of this.listeners) listener();
+  }
+
+  private readonly listeners = new Set<() => void>();
+
+  /** Called whenever any cached index is dropped. Returns an unsubscribe. */
+  onInvalidate(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => { this.listeners.delete(listener); };
   }
 }
