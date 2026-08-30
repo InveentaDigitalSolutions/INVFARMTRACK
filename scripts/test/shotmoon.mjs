@@ -18,6 +18,10 @@ await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' })
 await page.getByRole('button', { name: 'Production' }).first().click()
 await page.waitForTimeout(800)
 await page.waitForTimeout(1200)
+if (process.env.RANGE) {
+  await page.getByRole('button', { name: process.env.RANGE, exact: true }).first().click()
+  await page.waitForTimeout(600)
+}
 await page.screenshot({ path: process.argv[2], fullPage: true })
 console.log('errors:', errs.length ? errs.slice(0,3) : 'none')
 await browser.close(); stop()
