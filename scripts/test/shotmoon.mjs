@@ -18,6 +18,11 @@ await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' })
 await page.getByRole('button', { name: 'Production' }).first().click()
 await page.waitForTimeout(800)
 await page.waitForTimeout(1200)
+// The moon card is collapsed by default now; open it before reaching inside.
+if (process.env.OPEN || process.env.RANGE) {
+  await page.getByText('Show the days ahead').first().click()
+  await page.waitForTimeout(500)
+}
 if (process.env.RANGE) {
   await page.getByRole('button', { name: process.env.RANGE, exact: true }).first().click()
   await page.waitForTimeout(600)

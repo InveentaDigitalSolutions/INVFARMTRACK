@@ -33,19 +33,26 @@ const shortDate = (iso: string | null) =>
     : "—";
 /** How far ahead the strip runs, and how big the discs are at that range. */
 const RANGES = [
-  { key: "2w", label: "2 weeks", forward: 14, disc: 34, width: 50 },
-  { key: "1m", label: "1 month", forward: 30, disc: 28, width: 40 },
-  { key: "3m", label: "3 months", forward: 90, disc: 20, width: 28 },
+  { key: "1m", label: "1 month", forward: 30, disc: 32, width: 46 },
+  { key: "3m", label: "3 months", forward: 90, disc: 22, width: 30 },
+  { key: "6m", label: "6 months", forward: 180, disc: 15, width: 21 },
 ] as const;
 
 type RangeKey = (typeof RANGES)[number]["key"];
+
+/**
+ * How many turning points to spell out above the strip. Eight covers two
+ * months of them, which is as far as anyone reads a line of dates before it
+ * stops being a summary; the rest are counted.
+ */
+const NAMED_AHEAD = 8;
 
 const monthOf = (iso: string) =>
   new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
 
 export default function MoonSection({ dateISO }: { dateISO?: string }) {
   const today = dateISO ?? new Date().toISOString().slice(0, 10);
-  const [rangeKey, setRangeKey] = useState<RangeKey>("2w");
+  const [rangeKey, setRangeKey] = useState<RangeKey>("1m");
   const range = RANGES.find((r) => r.key === rangeKey)!;
 
   const k = useMemo(() => moonKpis(today), [today]);
@@ -54,7 +61,17 @@ export default function MoonSection({ dateISO }: { dateISO?: string }) {
   const turning = useMemo(() => days.filter((d) => d.isTurning && d.dateISO >= today), [days, today]);
 
   return (
-    <div className="bg-white rounded-xl border border-sand-200/80 shadow-sm px-5 py-4">
+    /**
+     * Collapsed by default, like the schedule and rotation below it.
+     *
+     * The summary line is the part worth having in front of you — what the moon
+     * is doing today and when it turns next. The strip is what you open when
+     * you are actually planning, and it does not need to hold vertical space
+     * the rest of the time.
+     */
+    <details className="group bg-white rounded-xl border border-sand-200/80 shadow-sm">
+      <summary className="px-5 py-4 cursor-pointer select-none list-none rounded-xl
+                          hover:bg-sand-50/60 [&::-webkit-details-marker]:hidden">
       {/* One row rather than four tiles and a banner. The moon is context for
           reading the rest of the page, and four full-size cards made it the
           subject — which is exactly what it is not. */}
@@ -85,9 +102,15 @@ export default function MoonSection({ dateISO }: { dateISO?: string }) {
             </div>
           ))}
         </dl>
-      </div>
 
-      <div className="mt-3.5 pt-3.5 border-t border-sand-200/70">
+        <span className="ml-auto shrink-0 text-[11px] font-medium text-navy-400">
+          <span className="group-open:hidden">Show the days ahead</span>
+          <span className="hidden group-open:inline">Hide</span>
+        </span>
+      </div>
+      </summary>
+
+      <div className="px-5 pb-4 -mt-1 border-t border-sand-200/70 pt-3.5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
           <p className="text-[11px] text-navy-400">
             {/* The turning points, spelled out. On a three-month strip they are
@@ -96,7 +119,7 @@ export default function MoonSection({ dateISO }: { dateISO?: string }) {
             {turning.length > 0 ? (
               <>
                 Ahead:{" "}
-                {turning.slice(0, 6).map((d, i) => (
+                {turning.slice(0, NAMED_AHEAD).map((d, i) => (
                   <span key={d.dateISO}>
                     {i > 0 && " · "}
                     <span className="text-navy-600 font-medium">
@@ -105,7 +128,7 @@ export default function MoonSection({ dateISO }: { dateISO?: string }) {
                     {shortDate(d.dateISO)}
                   </span>
                 ))}
-                {turning.length > 6 && ` · +${turning.length - 6} more`}
+                {turning.length > NAMED_AHEAD && ` · +${turning.length - NAMED_AHEAD} more`}
               </>
             ) : (
               "No turning point in this range."
@@ -169,6 +192,6 @@ export default function MoonSection({ dateISO }: { dateISO?: string }) {
           </div>
         </div>
       </div>
-    </div>
+    </details>
   );
 }
