@@ -45,8 +45,8 @@ eq('air bed on level 2, row 12', bedName('E3', 12, 2), 'E3-12-2')
 eq('air bed parses to its row, not its level', rowOf('E3-01-1'), 1)
 eq('the trap: E3-12-2 is row 12, not row 2', rowOf('E3-12-2'), 12)
 eq('and its level is 2', levelOf('E3-12-2'), 2)
-// Level 3 carries the irrigation line, so it is not a bed name at all.
-eq('a level 3 name is not a bed', parseBedName('E3-12-3'), null)
+// Level 3 exists in the house but carries irrigation, so it is not a bed name.
+eq('level 3 is the irrigation line, not a bed', parseBedName('E3-12-3'), null)
 eq('full parse', parseBedName('C1-27-2'), {field:'C1', row:27, level:2})
 eq('a name that is not a bed', parseBedName('nonsense'), null)
 eq('type follows the level', typeForLevel(0), 'Ground')
@@ -55,28 +55,15 @@ eq('type follows the level, air', typeForLevel(2), 'Air')
 const beds = [{name:'E3-01',field:'E3'},{name:'E3-03',field:'E3'}]
 eq('free ground rows skip the taken ones', availableRows({name:'E3',rows:5}, beds), [2,4,5])
 eq('no row count -> offer nothing', availableRows({name:'E3'}, beds), [])
-// A ground bed in row 1 does not stop an air bed hanging above it — but an air
-// bed can only hang where a cable is, and a cable is strung between posts. In
-// E3 the post lines fall on rows 1, 8, 16, 24 and 32.
-eq('ground rows are every free row', availableRows({name:'E3',rows:33}, beds), 
-   Array.from({length:33},(_,i)=>i+1).filter(r=>r!==1&&r!==3))
-// Beds stack across their quadrant's depth, so it is the post lines running
-// along a bed that decide which rows carry a cable. E3 catches four of the
-// twelve, C3 five.
-eq('air rows are only the ones carrying a cable',
-   availableRows({name:'E3',rows:33}, beds, 1), [2,10,18,26])
-const mixed = [{name:'E3-01'},{name:'E3-02-1'},{name:'E3-10-1'}]
-eq('and a taken cable row drops out',
-   availableRows({name:'E3',rows:33}, mixed, 1), [18,26])
-eq('a ground bed below does not block the cable above',
-   availableRows({name:'E3',rows:33}, [{name:'E3-18'}], 1), [2,10,18,26])
-eq('level 2 is untouched by what hangs at level 1',
-   availableRows({name:'E3',rows:33}, mixed, 2), [2,10,18,26])
-eq('C fields have their own post rows',
-   availableRows({name:'C3',rows:27}, [], 1), [1,6,12,17,22])
+// a ground bed in row 1 does not stop an air bed hanging above it
+eq('levels are counted separately', availableRows({name:'E3',rows:3}, beds, 1), [1,2,3])
+const mixed = [{name:'E3-01'},{name:'E3-01-1'},{name:'E3-02-1'}]
+eq('level 1 free rows', availableRows({name:'E3',rows:3}, mixed, 1), [3])
+eq('level 2 is untouched by level 1', availableRows({name:'E3',rows:3}, mixed, 2), [1,2,3])
 eq('ground free rows ignore air beds', availableRows({name:'E3',rows:3}, mixed, 0), [2,3])
 eq('ground beds are level 0 only', levelsFor('Ground'), ['0'])
-eq('air beds cannot be level 0, and stop at 2', levelsFor('Air'), ['1','2'])
+eq('air beds cannot be level 0', levelsFor('Air'), ['1','2'])
+eq('and never level 3 — that is irrigation', !!levelProblem('Air','3'), true)
 eq('ground defaults to 0', defaultLevel('Ground'), '0')
 eq('air at level 0 refused', !!levelProblem('Air','0'), true)
 eq('ground at level 2 refused', !!levelProblem('Ground','2'), true)
@@ -173,7 +160,7 @@ eq('a backwards range is refused',
    "The last row comes before the first.")
 eq('a level outside 0-3 is refused',
    planBedUpdate({ field, level: 9, fromRow: 1, toRow: 2, existing: nursery }).problem,
-   "Levels run from 0 to 2 — level 3 is the irrigation line.")
+   "Levels run from 0 to 3.")
 eq('the run reads in row order, not string order',
    planBedUpdate({ field: { name: "E3", rows: 12 }, fromRow: 1, toRow: 11,
      existing: [{ name: "E3-11" }, { name: "E3-02" }, { name: "E3-01" }] }).match,

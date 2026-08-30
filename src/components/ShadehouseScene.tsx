@@ -9,10 +9,8 @@ import {
   LEVEL_HEIGHTS_M,
   stateColors,
   plotConfigs,
-  fieldOffsets,
-  BLOCK_WIDTH_M,
-  postLinesAcross,
-  postLinesAlong,
+  POSTS_ALONG_BED,
+  POSTS_ACROSS_BEDS,
   SHADE_COLOR,
   SHADE_HEIGHT_M,
   SHADE_OPACITY,
@@ -21,24 +19,8 @@ import {
   type ShadehouseBed,
 } from "../services/shadehouseLayout";
 import { zoneStatusColors, type ZoneReading } from "../services/irrigation";
-import { groundAt, elevationFraction, contourLines, TERRAIN_MEAN_M } from "../services/terrain";
-import { TERRAIN_ACROSS, TERRAIN_ALONG } from "../services/terrain.generated";
 import WeatherLayer from "./WeatherLayer";
 import type { CurrentConditions } from "../services/weather";
-
-/**
- * How far the vertical is stretched, and by whom.
- *
- * The floor falls 4 m over 174 m — 2.3%, which is very nearly invisible at true
- * scale. Exaggerating it is the only way to see the shape of the ground, but
- * everything standing on it has to move by the same amount or the beds sink
- * into a hill they are supposed to sit on. So the factor lives in one place and
- * every height reads it, rather than each site applying its own.
- */
-let verticalScale = 1;
-export function setVerticalScale(v: number) { verticalScale = v; }
-/** Ground height at a point, with the current exaggeration applied. */
-function lift(x: number, z: number): number { return groundAt(x, z) * verticalScale; }
 
 /** Rounded-rectangle shape, mirroring the plan's rx on every rect. */
 function roundedRectShape(w: number, h: number, r: number) {
@@ -67,17 +49,10 @@ export const PLAN_COLORS = {
 };
 
 /** Gap between the two field columns — the logistics road in the layout. */
-/**
- * The logistics road, as a cross through the middle of the block.
- *
- * Not measured directly — the survey's post grid runs straight over the road,
- * because the shade structure spans it. It is what the survey leaves once the
- * beds are taken out: 104.28 across minus 33 x 1.20 minus 27 x 1.80 = 16.08 m.
- * The cross arm is taken to be the same width, which is what makes the along
- * axis close at 79.06 + 16.08 + 79.06 = 174.20.
- */
-const ROAD_M = 16.08;
-const PLOT_GAP_M = 16.08;
+const ROAD_M = 3.5;
+const PLOT_GAP_M = 3.5;
+/** Height of the shade cloth, and so of the posts that hold it up. */
+const ROOF_HEIGHT_M = 3.1;
 
 export interface RoadLayout {
   vertical: { x: number; width: number; length: number };
@@ -233,30 +208,66 @@ function fieldLayout(fieldId: string, beds: ShadehouseBed[]) {
   };
 }
 
+/** Fields with no plan geometry, in a stable order. */
+function unknownFields(beds: ShadehouseBed[]): string[] {
+  return [...new Set(beds.map((b) => b.fieldId))]
+    .filter((id) => id && !plotConfigs.some((p) => p.id === id))
+    .sort();
+}
 
 export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
-  const seats = fieldOffsets();
+  const widthOf = (fieldId: string) => {
+    const field = fieldLayout(fieldId, beds);
+    return field.bedCount * field.bedWidth;
+  };
+
+  const westWidth = Math.max(widthOf("E3"), widthOf("E1"));
+  const eastWidth = Math.max(widthOf("C3"), widthOf("C1"));
+  const totalWidth = westWidth + ROAD_M + eastWidth;
+
+  // Where the south band for unfamiliar fields starts, and how they stack.
+  const NEW_FIELD_BAND = plotConfigs[0]?.bedLength ?? 37.2;
+  const extra = unknownFields(beds);
 
   return beds.map((bed) => {
     const field = fieldLayout(bed.fieldId, beds);
-    const seat = seats[bed.fieldId];
+    const isSouth = field.position === "SOUTH";
+    const isEast = field.position === "NE" || field.position === "SE";
+    const isNorth = field.position === "NW" || field.position === "NE";
 
-    // A bed runs east-west across its quadrant; consecutive beds stack
-    // north-south across the quadrant's depth.
-    const x = seat ? seat.centre : BLOCK_WIDTH_M / 2 + 2;
-    const z = seat
-      ? seat.start + (bed.bedNumber - 0.5) * field.bedWidth
-      : 0;
-    const length = seat ? seat.length : field.bedLength;
+    if (isSouth) {
+      // One band per unfamiliar field, laid out below the measured block so it
+      // can never sit on top of a field that is already there.
+      const seat = extra.indexOf(bed.fieldId);
+      const rowStart = NEW_FIELD_BAND + PLOT_GAP_M * 1.5;
+      return {
+        bed,
+        x: -totalWidth / 2 + (bed.bedNumber - 0.5) * field.bedWidth,
+        z: rowStart + seat * (field.bedLength + PLOT_GAP_M) + field.bedLength / 2,
+        y: LEVEL_HEIGHTS_M[bed.level],
+        width: field.bedWidth * 0.86,
+        length: field.bedLength,
+      };
+    }
+
+    const columnStart = isEast
+      ? -totalWidth / 2 + westWidth + ROAD_M
+      : -totalWidth / 2;
+
+    // Beds run along Z; consecutive beds step along X.
+    const x = columnStart + (bed.bedNumber - 0.5) * field.bedWidth;
+    const z = isNorth
+      ? -(field.bedLength / 2 + PLOT_GAP_M / 2)
+      : field.bedLength / 2 + PLOT_GAP_M / 2;
 
     return {
       bed,
       x,
       z,
-      y: LEVEL_HEIGHTS_M[bed.level] + lift(x, z),
+      y: LEVEL_HEIGHTS_M[bed.level],
       // Leave a sliver between beds so rows stay individually readable.
       width: field.bedWidth * 0.86,
-      length,
+      length: field.bedLength,
     };
   });
 }
@@ -407,7 +418,7 @@ function Bed({
       }}
     >
       <RoundedBox
-        args={[placement.length, height, placement.width]}
+        args={[placement.width, height, placement.length]}
         radius={Math.min(0.085, placement.width / 2.6, height / 2.2)}
         smoothness={4}
         creaseAngle={0.5}
@@ -482,7 +493,7 @@ function AirLine({
     const usable = Math.min(count, Math.floor(span / POT_PITCH_M));
     const start = -span / 2;
     for (let i = 0; i < usable; i++) {
-      dummy.position.set(placement.x + start + i * POT_PITCH_M, placement.y - POT_DROP_M, placement.z);
+      dummy.position.set(placement.x, placement.y - POT_DROP_M, placement.z + start + i * POT_PITCH_M);
       dummy.updateMatrix();
       out.push(dummy.matrix.clone());
     }
@@ -549,14 +560,14 @@ function AirLine({
           skips invisible objects entirely. */}
       {!dimmed && (
         <mesh position={[placement.x, placement.y - POT_DROP_M / 2, placement.z]}>
-          <boxGeometry args={[placement.length, 0.72, 0.62]} />
+          <boxGeometry args={[0.62, 0.72, placement.length]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
       )}
 
       {/* The cable itself, running post to post along the row. */}
       <mesh position={[placement.x, placement.y, placement.z]}>
-        <boxGeometry args={selected ? [placement.length, 0.09, 0.09] : [placement.length, 0.05, 0.05]} />
+        <boxGeometry args={selected ? [0.09, 0.09, placement.length] : [0.05, 0.05, placement.length]} />
         <meshStandardMaterial
           ref={cableMat}
           color={cableColor}
@@ -604,87 +615,6 @@ function AirLine({
 }
 
 /** Structural context: posts and the shade-cloth roof from the photos. */
-/**
- * The floor, with its 4 m of fall.
- *
- * A flat plane was a convenient lie: the nursery drops from 569 m at one corner
- * to 565 m at the other, and on a growing site that is where the water goes.
- * The mesh is displaced from the survey's contours and shaded by height, so the
- * slope reads without having to hunt for a number.
- */
-function Ground({ span, depth }: { span: number; depth: number }) {
-  const geometry = useMemo(() => {
-    const w = span + 8;
-    const d = depth + 8;
-    const g = new THREE.PlaneGeometry(w, d, TERRAIN_ACROSS - 1, TERRAIN_ALONG - 1);
-    const pos = g.attributes.position;
-    const colours = new Float32Array(pos.count * 3);
-
-    // Low ground reads cooler and darker, high ground warmer and paler — the
-    // same convention a paper contour plan uses, so it needs no legend.
-    const low = new THREE.Color("#b9bfae");
-    const high = new THREE.Color("#e9e4d4");
-
-    for (let i = 0; i < pos.count; i++) {
-      // The plane is built in XY and laid flat, so its y is the model's z.
-      const x = pos.getX(i);
-      const z = pos.getY(i);
-      const h = groundAt(x, -z);
-      pos.setZ(i, h);
-      const c = low.clone().lerp(high, elevationFraction(h + TERRAIN_MEAN_M));
-      colours[i * 3] = c.r;
-      colours[i * 3 + 1] = c.g;
-      colours[i * 3 + 2] = c.b;
-    }
-    g.setAttribute("color", new THREE.BufferAttribute(colours, 3));
-    g.computeVertexNormals();
-    return g;
-  }, [span, depth]);
-
-  return (
-    <mesh geometry={geometry} position={[0, -0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <meshStandardMaterial vertexColors roughness={1} />
-    </mesh>
-  );
-}
-
-/**
- * The survey's contours, drawn on the floor.
- *
- * These stay true whatever the vertical is exaggerated to — the lines are the
- * measurement, the relief is only a way of seeing it. Whole metres are drawn
- * heavier than the half-metre intermediates, as they are on the survey.
- */
-function Contours({ scale }: { scale: number }) {
-  const { index, half } = useMemo(() => {
-    const segs = contourLines(0.5);
-    const build = (only: boolean) => {
-      const pts: number[] = [];
-      for (const c of segs) {
-        if (c.index !== only) continue;
-        // Just clear of the surface, so they read rather than z-fight with it.
-        pts.push(c.x1, groundAt(c.x1, c.z1) * scale + 0.05, c.z1);
-        pts.push(c.x2, groundAt(c.x2, c.z2) * scale + 0.05, c.z2);
-      }
-      const g = new THREE.BufferGeometry();
-      g.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-      return g;
-    };
-    return { index: build(true), half: build(false) };
-  }, [scale]);
-
-  return (
-    <group>
-      <lineSegments geometry={index}>
-        <lineBasicMaterial color="#5a6b52" transparent opacity={0.85} />
-      </lineSegments>
-      <lineSegments geometry={half}>
-        <lineBasicMaterial color="#8a9683" transparent opacity={0.5} />
-      </lineSegments>
-    </group>
-  );
-}
-
 function Structure({
   span,
   depth,
@@ -698,25 +628,33 @@ function Structure({
   postLines: { x: number; z: number; length: number; levels: BedLevel[] }[];
 }) {
   /**
-   * Every post in the house: 12 lines north-south by 19 east-west.
+   * The posts of the house: nineteen lines across the beds by twelve along
+   * them, as Santiago counts them on the ground.
    *
-   * They used to be derived from the air beds, so a house with no cables strung
-   * yet had no posts at all — and the shade cloth floated. The posts are the
-   * structure; they stand whether or not anything hangs from them.
+   * They used to be derived from the air beds — a post appeared only where a
+   * cable hung — so a house with no air beds recorded yet had no structure at
+   * all. The posts carry the shade cloth; they stand whether or not anything is
+   * strung between them.
    */
   const posts = useMemo(() => {
-    const xs = postLinesAcross();
-    const zs = postLinesAlong();
-    return xs.flatMap((x) =>
-      zs.map((z) => ({
-        x, z,
-        // A post carries the cloth, so it reaches it and stands a little proud.
-        height: SHADE_HEIGHT_M + 0.25,
-        // On the ground where it is, not on an average of the site.
-        base: lift(x, z),
-      }))
-    );
-  }, []);
+    const at = (n: number, extent: number) =>
+      Array.from({ length: n }, (_, i) => -extent / 2 + (i * extent) / (n - 1));
+    const roads = computeRoads();
+    // Nothing is planted on a road and nothing stands on one either — a truck
+    // has to get down it. A post landing in a carriageway is moved to its edge.
+    const clearOf = (v: number, centre: number, width: number) => {
+      const half = width / 2;
+      if (Math.abs(v - centre) > half) return v;
+      return v < centre ? centre - half : centre + half;
+    };
+    return at(POSTS_ACROSS_BEDS, span)
+      .map((x) => clearOf(x, roads.vertical.x, roads.vertical.width))
+      .flatMap((x) =>
+        at(POSTS_ALONG_BED, depth)
+          .map((z) => clearOf(z, roads.horizontal.z, roads.horizontal.width))
+          .map((z) => ({ x, z, height: ROOF_HEIGHT_M }))
+      );
+  }, [span, depth]);
 
   /** One cable per level per line, running the length of the row. */
   const cables = useMemo(
@@ -736,7 +674,7 @@ function Structure({
   return (
     <group>
       {posts.map((post, i) => (
-        <mesh key={i} position={[post.x, post.base + post.height / 2, post.z]} castShadow>
+        <mesh key={i} position={[post.x, post.height / 2, post.z]} castShadow>
           <cylinderGeometry args={[0.075, 0.095, post.height, 14]} />
           <meshStandardMaterial color="#7a6048" roughness={0.85} />
         </mesh>
@@ -746,7 +684,7 @@ function Structure({
       {cables.map((cable) => (
         <mesh
           key={cable.key}
-          position={[cable.x, cable.y + lift(cable.x, cable.z), cable.z]}
+          position={[cable.x, cable.y, cable.z]}
           rotation={[Math.PI / 2, 0, 0]}
         >
           <cylinderGeometry args={[0.016, 0.016, cable.length, 6]} />
@@ -754,7 +692,7 @@ function Structure({
         </mesh>
       ))}
       {showRoof && (
-        <mesh position={[0, 3.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={[0, ROOF_HEIGHT_M, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[span + 3, depth + 3]} />
           <meshStandardMaterial
             color="#1f2a24"
@@ -764,7 +702,10 @@ function Structure({
           />
         </mesh>
       )}
-      <Ground span={span} depth={depth} />
+      <mesh position={[0, -0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[span + 8, depth + 8]} />
+        <meshStandardMaterial color={PLAN_COLORS.ground} roughness={1} />
+      </mesh>
     </group>
   );
 }
@@ -784,11 +725,10 @@ function BedLabel({
   const isGround = placement.bed.type === "ground";
   const y = placement.y + (isGround ? 0.75 : 0.3);
   // Sit just off the near end of the row.
-  const z = placement.z;
-  const labelX = placement.x - placement.length / 2 - (isGround ? 1.2 : 1.0);
+  const z = placement.z + placement.length / 2 + (isGround ? 0.65 : 0.5);
 
   return (
-    <Billboard position={[labelX, y, z]}>
+    <Billboard position={[placement.x, y, z]}>
       <SceneText
         fontSize={compact ? 0.3 : 0.42}
         color={isGround ? "#1f2f42" : "#3f6b4a"}
@@ -949,7 +889,7 @@ function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
       {panels.map((panel) => (
         <mesh
           key={panel.key}
-          position={[panel.x, SHADE_HEIGHT_M + lift(panel.x, panel.z), panel.z]}
+          position={[panel.x, SHADE_HEIGHT_M, panel.z]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
           <planeGeometry args={[panel.width, panel.length]} />
@@ -974,8 +914,6 @@ export default function ShadehouseScene({
   showIrrigation,
   showRoof,
   showShade,
-  showContours,
-  verticalExaggeration,
   lens,
   nowMs,
   showPlotLabels,
@@ -991,9 +929,6 @@ export default function ShadehouseScene({
   showIrrigation: boolean;
   showRoof: boolean;
   showShade: boolean;
-  showContours: boolean;
-  /** 1 is true scale; higher stretches the ground so its shape can be read. */
-  verticalExaggeration: number;
   lens: LensMode;
   nowMs: number;
   showPlotLabels: boolean;
@@ -1094,7 +1029,6 @@ export default function ShadehouseScene({
       <directionalLight position={[-24, 18, -16]} intensity={0.3} color="#cfe3ff" />
 
       <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} />
-      {showContours && <Contours scale={verticalExaggeration} />}
       {showShade && <ShadeCloth placements={placements} />}
       <Roads />
       <WeatherLayer conditions={weather} span={span} depth={depth} />

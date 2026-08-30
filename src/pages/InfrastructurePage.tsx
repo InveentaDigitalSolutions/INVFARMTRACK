@@ -85,7 +85,6 @@ const bulkBedFormGroups = [
       { value: "0", label: "0 — ground beds" },
       { value: "1", label: "1 — air beds" },
       { value: "2", label: "2 — air beds" },
-      // No level 3: that height carries the irrigation line, not a bed.
     ] },
     { key: "fromRow", label: "First Row", type: "number" as const, min: 1, required: true },
     { key: "toRow", label: "Last Row", type: "number" as const, min: 1, required: true },
@@ -129,7 +128,6 @@ const bedRunFormGroups = [
       { value: "0", label: "0 — ground beds" },
       { value: "1", label: "1 — air beds" },
       { value: "2", label: "2 — air beds" },
-      // No level 3: that height carries the irrigation line, not a bed.
     ] },
     { key: "fromRow", label: "First Row", type: "number" as const, min: 1, required: true },
     { key: "toRow", label: "Last Row", type: "number" as const, min: 1, required: true },
@@ -165,7 +163,6 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
       { value: "0", label: "0 — ground bed" },
       { value: "1", label: "1 — air bed" },
       { value: "2", label: "2 — air bed" },
-      // No level 3: that height carries the irrigation line, not a bed.
     ] },
     // Free rows at this level. A ground bed in row 7 does not stop an air bed
     // hanging above it, so each level is counted separately.

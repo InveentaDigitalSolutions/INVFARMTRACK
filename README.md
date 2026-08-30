@@ -73,6 +73,11 @@ metadata into `src/services/choiceMap.generated.ts`.
 `src/services/writeErrors.ts` into a banner naming the table and the reason. A
 render-time exception is caught by `ErrorBoundary` rather than blanking the app.
 
+**The shadehouse layout has one source.** `src/services/shadehouseLayout.ts` —
+four fields in a 2 x 2 around a crossing logistics road, from the nursery's own
+plan. The topographic survey in `dataverse/reference/SURVEY.md` is reference for
+detail (the 3.5 m fall, contours, post counts) and never for the layout.
+
 **Insight lives in services, not components.** Each module's figures come from a
 small pure module with its own tests — `laborInsight`, `accountingInsight`,
 `salesInsight`, `supplierInsight`, `nutritionInsight`, `infrastructureInsight`,
@@ -114,6 +119,12 @@ npm run test:smoke                  # builds, opens all 11 modules in chromium,
                                     #   fails on any console error or blank screen
 npm run build                       # tsc -b && vite build
 npm run lint
+npm run test:sandbox                # fails if a CDN reference returns to the bundle
+
+# Renders the 3D shadehouse headless and writes a PNG, so the layout can be
+# looked at rather than assumed. Build with an empty VITE_DATAVERSE_URL first.
+VITE_DATAVERSE_URL= npx vite build --mode development
+node scripts/test/shot3d.mjs out.png
 
 npm run dataverse:check             # every choice label the app can send is one Dataverse accepts
 npm run dataverse:check-columns     # every displayed column exists in its binding

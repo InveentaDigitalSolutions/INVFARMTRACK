@@ -7,7 +7,7 @@ is parked for want of analysis.
 A shareable version of this document lives at
 <https://claude.ai/code/artifact/7e8688fe-22df-41e0-9658-f3838177f593>.
 
-**Counts:** 6 blocked on Santiago · 7 decisions · 6 builds · 3 watching.
+**Counts:** 6 blocked on Santiago · 7 decisions · 7 builds · 3 watching.
 
 ---
 
@@ -199,6 +199,19 @@ and cutting type (`L/E`) — and the packing form does not offer them, so the
 invoice prints them as fixed text.
 
 **Decide:** do these vary per box? If so they belong on the packing form.
+
+### PRK-5 · Terrain and contours in the 3D view — **build**
+
+The survey gives the shadehouse floor a 3.5 m fall and contours every 0.50 m,
+already extracted to `src/services/terrain.generated.ts`. Nothing reads it yet.
+The floor is drawn flat.
+
+Worth building as an **additive** layer — a relief exaggeration slider over the
+existing ground plane — and explicitly not as a source of layout. See
+`dataverse/reference/SURVEY.md` for why that distinction is load-bearing.
+
+Alongside it: a measurements layer (bed and road dimensions on the plan), and
+the exchange-rate history chart on hover — both asked for, neither built.
 
 ### PRK-4 · The irrigation layer is simulated — **watching**
 

@@ -8,8 +8,6 @@
  * ground level.
  */
 
-import { postRowsIn } from "./shadehouseLayout";
-
 export interface SeasonLike {
   id?: string;
   name?: string;
@@ -104,7 +102,7 @@ export function fieldCapacityProblem(
  *
  * A field's rows are its ground beds: E3 row 1 is "E3-01", always level 0.
  * Air beds hang on cables above a ground row, up to three levels, and are
- * named for the row they sit over: "E3-01-1", "E3-01-2". Not every
+ * named for the row they sit over: "E3-01-1", "E3-01-2", "E3-01-3". Not every
  * row has air above it — the cables cover part of a field, not all of it — so
  * which rows do is recorded, never derived.
  */
@@ -165,16 +163,8 @@ export function availableRows(
       .filter((p): p is ParsedBed => p !== null && p.field === field.name && p.level === level)
       .map((p) => p.row)
   );
-  // An air bed hangs on a cable, and a cable is strung between posts. Offering
-  // a row with no post above it invites a bed that cannot physically exist.
-  const carriesCable = level > 0 ? new Set(postRowsIn(String(field.name ?? ""))) : null;
-
   const free: number[] = [];
-  for (let row = 1; row <= field.rows; row++) {
-    if (taken.has(row)) continue;
-    if (carriesCable && !carriesCable.has(row)) continue;
-    free.push(row);
-  }
+  for (let row = 1; row <= field.rows; row++) if (!taken.has(row)) free.push(row);
   return free;
 }
 
@@ -207,6 +197,9 @@ export function levelProblem(type: string | undefined, level: string | number | 
   if (!type || !value) return null;
   if (type === "Ground" && value !== "0") return "A ground bed is planted in the earth, so it is always level 0.";
   if (type === "Air" && value === "0") return "An air bed hangs above the ground, so it cannot be level 0.";
+  // Three cable lines are strung above each row, but the top one carries the
+  // irrigation, so only the first two ever hold a bed.
+  if (type === "Air" && value === "3") return "Level 3 carries the irrigation line, not a bed. Air beds go up to level 2.";
   return null;
 }
 
@@ -378,8 +371,8 @@ export function planBedUpdate(request: BedUpdateRequest): BedUpdatePlan {
     return { ...empty, problem: "Give a first and last row." };
   }
   if (toRow < fromRow) return { ...empty, problem: "The last row comes before the first." };
-  if (level !== undefined && (level < 0 || level > 2)) {
-    return { ...empty, problem: "Levels run from 0 to 2 — level 3 is the irrigation line." };
+  if (level !== undefined && (level < 0 || level > 3)) {
+    return { ...empty, problem: "Levels run from 0 to 3." };
   }
 
   const parsed = existing

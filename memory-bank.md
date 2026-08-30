@@ -88,6 +88,21 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   console error. Both were added after emptying the demo seeds left
   `initRows[0]` undefined — `useFormModal` called `Object.entries` on it inside a
   useState initialiser and every screen with a form went blank.
+- **The shadehouse layout is `src/services/shadehouseLayout.ts`, and nothing else.**
+  Four fields in a 2 x 2 around a crossing logistics road — E3 NW · C3 NE · E1 SW ·
+  C1 SE, beds 37.20 m long. It came from the nursery's own plan and is correct.
+  The topographic survey (`dataverse/reference/SURVEY.md`) is reference for
+  *detail* — the 3.5 m fall, the contours, the post counts — never for the
+  layout. Rebuilding the geometry from it produced five wrong versions in a row
+  while every unit test stayed green, because the survey's measurements span the
+  whole footprint and its rotation is relative to the sheet, not to north.
+- **Look at the 3D view before believing it.** `node scripts/test/shot3d.mjs
+  out.png` renders it headless and writes a PNG. Build with an empty
+  `VITE_DATAVERSE_URL` first or the preview has no session and draws an empty
+  house. Tests pass on a layout that is visibly wrong.
+- **Air beds go to level 2. Level 3 is the irrigation line**, above everything
+  that grows, so it never holds a bed — `infrastructureRules.ts` refuses it and
+  `parseBedName` does not accept `E3-12-3`.
 - **Watch for import cycles.** `ShadehouseView` imported the hook that built its
   beds while the hook imported the view for `plotConfigs`. The shared model now
   lives in `services/shadehouseLayout.ts`, which depends on nothing.
