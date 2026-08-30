@@ -21,10 +21,24 @@ import {
   type ShadehouseBed,
 } from "../services/shadehouseLayout";
 import { zoneStatusColors, type ZoneReading } from "../services/irrigation";
-import { groundAt, elevationFraction, TERRAIN_MEAN_M } from "../services/terrain";
+import { groundAt, elevationFraction, contourLines, TERRAIN_MEAN_M } from "../services/terrain";
 import { TERRAIN_ACROSS, TERRAIN_ALONG } from "../services/terrain.generated";
 import WeatherLayer from "./WeatherLayer";
 import type { CurrentConditions } from "../services/weather";
+
+/**
+ * How far the vertical is stretched, and by whom.
+ *
+ * The floor falls 4 m over 174 m — 2.3%, which is very nearly invisible at true
+ * scale. Exaggerating it is the only way to see the shape of the ground, but
+ * everything standing on it has to move by the same amount or the beds sink
+ * into a hill they are supposed to sit on. So the factor lives in one place and
+ * every height reads it, rather than each site applying its own.
+ */
+let verticalScale = 1;
+export function setVerticalScale(v: number) { verticalScale = v; }
+/** Ground height at a point, with the current exaggeration applied. */
+function lift(x: number, z: number): number { return groundAt(x, z) * verticalScale; }
 
 /** Rounded-rectangle shape, mirroring the plan's rx on every rect. */
 function roundedRectShape(w: number, h: number, r: number) {
@@ -221,31 +235,28 @@ function fieldLayout(fieldId: string, beds: ShadehouseBed[]) {
 
 
 export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
-  const offsets = fieldOffsets();
+  const seats = fieldOffsets();
 
   return beds.map((bed) => {
     const field = fieldLayout(bed.fieldId, beds);
-    const seat = offsets[bed.fieldId];
+    const seat = seats[bed.fieldId];
 
-    // Fields sit side by side across the house and every bed runs its full
-    // length. This used to place them in quadrants either side of a cross
-    // road, which needed the posts counted the other way round.
-    const start = seat
-      ? seat.start
-      // A field with no place of its own goes beyond the last one.
-      : BLOCK_WIDTH_M / 2 + 2;
-    const x = start + (bed.bedNumber - 0.5) * field.bedWidth;
-    const z = 0;
+    // A bed runs east-west across its quadrant; consecutive beds stack
+    // north-south across the quadrant's depth.
+    const x = seat ? seat.centre : BLOCK_WIDTH_M / 2 + 2;
+    const z = seat
+      ? seat.start + (bed.bedNumber - 0.5) * field.bedWidth
+      : 0;
+    const length = seat ? seat.length : field.bedLength;
 
     return {
       bed,
       x,
       z,
-      // The bed sits on the ground, which is not level.
-      y: LEVEL_HEIGHTS_M[bed.level] + groundAt(x, z),
+      y: LEVEL_HEIGHTS_M[bed.level] + lift(x, z),
       // Leave a sliver between beds so rows stay individually readable.
       width: field.bedWidth * 0.86,
-      length: field.bedLength,
+      length,
     };
   });
 }
@@ -396,7 +407,7 @@ function Bed({
       }}
     >
       <RoundedBox
-        args={[placement.width, height, placement.length]}
+        args={[placement.length, height, placement.width]}
         radius={Math.min(0.085, placement.width / 2.6, height / 2.2)}
         smoothness={4}
         creaseAngle={0.5}
@@ -471,7 +482,7 @@ function AirLine({
     const usable = Math.min(count, Math.floor(span / POT_PITCH_M));
     const start = -span / 2;
     for (let i = 0; i < usable; i++) {
-      dummy.position.set(placement.x, placement.y - POT_DROP_M, placement.z + start + i * POT_PITCH_M);
+      dummy.position.set(placement.x + start + i * POT_PITCH_M, placement.y - POT_DROP_M, placement.z);
       dummy.updateMatrix();
       out.push(dummy.matrix.clone());
     }
@@ -538,14 +549,14 @@ function AirLine({
           skips invisible objects entirely. */}
       {!dimmed && (
         <mesh position={[placement.x, placement.y - POT_DROP_M / 2, placement.z]}>
-          <boxGeometry args={[0.62, 0.72, placement.length]} />
+          <boxGeometry args={[placement.length, 0.72, 0.62]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
       )}
 
       {/* The cable itself, running post to post along the row. */}
       <mesh position={[placement.x, placement.y, placement.z]}>
-        <boxGeometry args={selected ? [0.09, 0.09, placement.length] : [0.05, 0.05, placement.length]} />
+        <boxGeometry args={selected ? [placement.length, 0.09, 0.09] : [placement.length, 0.05, 0.05]} />
         <meshStandardMaterial
           ref={cableMat}
           color={cableColor}
@@ -637,6 +648,43 @@ function Ground({ span, depth }: { span: number; depth: number }) {
   );
 }
 
+/**
+ * The survey's contours, drawn on the floor.
+ *
+ * These stay true whatever the vertical is exaggerated to — the lines are the
+ * measurement, the relief is only a way of seeing it. Whole metres are drawn
+ * heavier than the half-metre intermediates, as they are on the survey.
+ */
+function Contours({ scale }: { scale: number }) {
+  const { index, half } = useMemo(() => {
+    const segs = contourLines(0.5);
+    const build = (only: boolean) => {
+      const pts: number[] = [];
+      for (const c of segs) {
+        if (c.index !== only) continue;
+        // Just clear of the surface, so they read rather than z-fight with it.
+        pts.push(c.x1, groundAt(c.x1, c.z1) * scale + 0.05, c.z1);
+        pts.push(c.x2, groundAt(c.x2, c.z2) * scale + 0.05, c.z2);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+      return g;
+    };
+    return { index: build(true), half: build(false) };
+  }, [scale]);
+
+  return (
+    <group>
+      <lineSegments geometry={index}>
+        <lineBasicMaterial color="#5a6b52" transparent opacity={0.85} />
+      </lineSegments>
+      <lineSegments geometry={half}>
+        <lineBasicMaterial color="#8a9683" transparent opacity={0.5} />
+      </lineSegments>
+    </group>
+  );
+}
+
 function Structure({
   span,
   depth,
@@ -665,7 +713,7 @@ function Structure({
         // A post carries the cloth, so it reaches it and stands a little proud.
         height: SHADE_HEIGHT_M + 0.25,
         // On the ground where it is, not on an average of the site.
-        base: groundAt(x, z),
+        base: lift(x, z),
       }))
     );
   }, []);
@@ -698,7 +746,7 @@ function Structure({
       {cables.map((cable) => (
         <mesh
           key={cable.key}
-          position={[cable.x, cable.y + groundAt(cable.x, cable.z), cable.z]}
+          position={[cable.x, cable.y + lift(cable.x, cable.z), cable.z]}
           rotation={[Math.PI / 2, 0, 0]}
         >
           <cylinderGeometry args={[0.016, 0.016, cable.length, 6]} />
@@ -736,10 +784,11 @@ function BedLabel({
   const isGround = placement.bed.type === "ground";
   const y = placement.y + (isGround ? 0.75 : 0.3);
   // Sit just off the near end of the row.
-  const z = placement.z + placement.length / 2 + (isGround ? 0.65 : 0.5);
+  const z = placement.z;
+  const labelX = placement.x - placement.length / 2 - (isGround ? 1.2 : 1.0);
 
   return (
-    <Billboard position={[placement.x, y, z]}>
+    <Billboard position={[labelX, y, z]}>
       <SceneText
         fontSize={compact ? 0.3 : 0.42}
         color={isGround ? "#1f2f42" : "#3f6b4a"}
@@ -900,7 +949,7 @@ function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
       {panels.map((panel) => (
         <mesh
           key={panel.key}
-          position={[panel.x, SHADE_HEIGHT_M + groundAt(panel.x, panel.z), panel.z]}
+          position={[panel.x, SHADE_HEIGHT_M + lift(panel.x, panel.z), panel.z]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
           <planeGeometry args={[panel.width, panel.length]} />
@@ -925,6 +974,8 @@ export default function ShadehouseScene({
   showIrrigation,
   showRoof,
   showShade,
+  showContours,
+  verticalExaggeration,
   lens,
   nowMs,
   showPlotLabels,
@@ -940,6 +991,9 @@ export default function ShadehouseScene({
   showIrrigation: boolean;
   showRoof: boolean;
   showShade: boolean;
+  showContours: boolean;
+  /** 1 is true scale; higher stretches the ground so its shape can be read. */
+  verticalExaggeration: number;
   lens: LensMode;
   nowMs: number;
   showPlotLabels: boolean;
@@ -1040,6 +1094,7 @@ export default function ShadehouseScene({
       <directionalLight position={[-24, 18, -16]} intensity={0.3} color="#cfe3ff" />
 
       <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} />
+      {showContours && <Contours scale={verticalExaggeration} />}
       {showShade && <ShadeCloth placements={placements} />}
       <Roads />
       <WeatherLayer conditions={weather} span={span} depth={depth} />

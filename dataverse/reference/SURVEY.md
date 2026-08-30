@@ -48,9 +48,27 @@ of quadrants with a 16.08 m cross road and 79 m beds. That layout needs 12
 posts perpendicular to the beds, which is the opposite of how they are counted.
 `npm run test:geometry` now pins the axes to the counts.
 
-**Still to place: the logistics road.** 120 beds fill the block, so there is no
-room for a 16 m cross inside it. It runs outside the shaded block, or between
-fields as something much narrower.
+**The roads, placed by the posts either side of them.** Santiago: the east-west
+road is the bay between north-south posts 6 and 7; the north-south road is the
+bay between east-west posts 9 and 10. So each is exactly one structural bay —
+9.48 m and 9.68 m — and no post ever stands in one.
+
+That cross cuts the house into four quadrants, one field each:
+
+| | width | depth |
+|---|---|---|
+| E3 north-west, E1 south-west | 77.42 m | 47.40 m |
+| C3 north-east, C1 south-east | 87.10 m | 47.40 m |
+
+**Which way the beds run follows from the arithmetic.** Stacking 27 C beds
+across the 47.40 m depth implies 1.76 m each against the 1.80 m recorded — a 2%
+match. Stacking them along the 87 m width instead would need beds over 3 m
+wide. So a bed runs the quadrant's width and the beds stack across its depth.
+
+**One number still does not close.** The E fields' 33 beds at 1.20 m span
+39.60 m of a 47.40 m depth, leaving 7.80 m — where the C fields fill theirs
+almost exactly. Either an E field has nearer 39 beds, or its beds are closer to
+1.44 m than 1.20 m.
 
 ## The earlier derivation, kept for the record
 

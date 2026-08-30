@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain } from "lucide-react";
+import { Droplets, Layers, Mountain, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain } from "lucide-react";
 import {
   stateColors,
+  FLOOR_FALL_M,
   potTypeLabels,
   LEVEL_HEIGHTS_M,
   type BedLevel,
   type ShadehouseBed,
 } from "../services/shadehouseLayout";
-import ShadehouseScene, { placeBeds, type LensMode } from "./ShadehouseScene";
+import ShadehouseScene, { placeBeds, setVerticalScale, type LensMode } from "./ShadehouseScene";
 import { useShadehouseBeds } from "../hooks/useShadehouseBeds";
 import { readZone, zoneStatusColors, type ZoneReading } from "../services/irrigation";
 import { buildZones, demoAnomalies, simulateFixes } from "../services/irrigationSim";
@@ -79,6 +80,10 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const [showCompass, setShowCompass] = useState(true);
   // The cloth is the point of a shadehouse, so it is on by default.
   const [showShade, setShowShade] = useState(true);
+  // The floor falls 4 m over 174 m. The contours say so at any zoom; the
+  // exaggeration is what makes the shape of it visible.
+  const [showContours, setShowContours] = useState(true);
+  const [exaggeration, setExaggeration] = useState(4);
   const [showWeather, setShowWeather] = useState(true);
   const webgl = useWebgl();
   useEffect(() => {
@@ -89,7 +94,13 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
 
-  const placements = useMemo(() => placeBeds(beds), [beds]);
+  // placeBeds bakes the ground height into each bed, so it has to be redone
+  // when the exaggeration changes — otherwise the floor moves and the beds
+  // stay where they were.
+  const placements = useMemo(() => {
+    setVerticalScale(exaggeration);
+    return placeBeds(beds);
+  }, [beds, exaggeration]);
   const baseZones = useMemo(() => buildZones(beds), [beds]);
   const anomalies = useMemo(() => demoAnomalies(baseZones), [baseZones]);
 
@@ -240,6 +251,37 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           Shade
         </button>
         <button
+          onClick={() => setShowContours((v) => !v)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+            showContours ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+          }`}
+        >
+          <Mountain className="w-3 h-3" />
+          Contours
+        </button>
+
+        {/* The lines are the measurement; this only changes how visible the
+            shape is. Saying the true fall next to it keeps that honest. */}
+        <label className="inline-flex items-center gap-2 ml-1 text-[11px] text-navy-500">
+          <span className="whitespace-nowrap">Relief</span>
+          <input
+            type="range"
+            min={1}
+            max={10}
+            step={1}
+            value={exaggeration}
+            onChange={(e) => setExaggeration(Number(e.target.value))}
+            aria-label="Vertical exaggeration"
+            className="w-24 accent-lime-600 cursor-pointer"
+          />
+          <span className="tabular-nums font-semibold text-navy-700 w-14">
+            {exaggeration === 1 ? "true" : `${exaggeration}x`}
+          </span>
+          <span className="text-navy-400 whitespace-nowrap">
+            falls {FLOOR_FALL_M.toFixed(1)} m
+          </span>
+        </label>
+        <button
           onClick={() => setShowBedNumbers((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
             showBedNumbers ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
@@ -315,6 +357,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             showIrrigation={showIrrigation}
             showRoof={false}
             showShade={showShade}
+            showContours={showContours}
+            verticalExaggeration={exaggeration}
             lens={lens}
             nowMs={now}
             showPlotLabels={showPlotLabels}

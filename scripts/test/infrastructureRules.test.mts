@@ -60,19 +60,20 @@ eq('no row count -> offer nothing', availableRows({name:'E3'}, beds), [])
 // E3 the post lines fall on rows 1, 8, 16, 24 and 32.
 eq('ground rows are every free row', availableRows({name:'E3',rows:33}, beds), 
    Array.from({length:33},(_,i)=>i+1).filter(r=>r!==1&&r!==3))
-// The post lines fall where they fall: with the fields side by side across the
-// house, E3 catches four of the nineteen and C3 catches five.
+// Beds stack across their quadrant's depth, so it is the post lines running
+// along a bed that decide which rows carry a cable. E3 catches four of the
+// twelve, C3 five.
 eq('air rows are only the ones carrying a cable',
-   availableRows({name:'E3',rows:33}, beds, 1), [1,9,18,26])
-const mixed = [{name:'E3-01'},{name:'E3-01-1'},{name:'E3-09-1'}]
+   availableRows({name:'E3',rows:33}, beds, 1), [2,10,18,26])
+const mixed = [{name:'E3-01'},{name:'E3-02-1'},{name:'E3-10-1'}]
 eq('and a taken cable row drops out',
    availableRows({name:'E3',rows:33}, mixed, 1), [18,26])
 eq('a ground bed below does not block the cable above',
-   availableRows({name:'E3',rows:33}, [{name:'E3-18'}], 1), [1,9,18,26])
+   availableRows({name:'E3',rows:33}, [{name:'E3-18'}], 1), [2,10,18,26])
 eq('level 2 is untouched by what hangs at level 1',
-   availableRows({name:'E3',rows:33}, mixed, 2), [1,9,18,26])
+   availableRows({name:'E3',rows:33}, mixed, 2), [2,10,18,26])
 eq('C fields have their own post rows',
-   availableRows({name:'C3',rows:27}, [], 1), [6,11,16,22,27])
+   availableRows({name:'C3',rows:27}, [], 1), [1,6,12,17,22])
 eq('ground free rows ignore air beds', availableRows({name:'E3',rows:3}, mixed, 0), [2,3])
 eq('ground beds are level 0 only', levelsFor('Ground'), ['0'])
 eq('air beds cannot be level 0, and stop at 2', levelsFor('Air'), ['1','2'])

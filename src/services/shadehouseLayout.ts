@@ -114,10 +114,15 @@ export const plotConfigs: PlotConfig[] = [
   // the survey makes it 79.06 m — the model was less than half the real run.
   // Side by side across the house, all beds running its full length. The
   // quadrant positions are kept only because the plan view still reads them.
-  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 104.28, label: "E3" },
-  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 104.28, label: "E1" },
-  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 104.28, label: "C3" },
-  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 104.28, label: "C1" },
+  // One field to a quadrant, which is what the cross of roads is for. Bed
+  // length is the quadrant's depth: half the house, less half a road.
+  // One field to a quadrant. A bed runs the quadrant's width; the beds stack
+  // across its 47.40 m depth. bedLength here is nominal — the real length is
+  // the quadrant's width, which differs between the E and C sides.
+  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 77.42, label: "E3" },
+  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 87.10, label: "C3" },
+  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 77.42, label: "E1" },
+  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 87.10, label: "C1" },
 ];
 
 /**
@@ -195,9 +200,11 @@ export function postRowsIn(fieldId: string): number[] {
   const seat = fieldOffsets()[fieldId];
   if (!field || !seat) return [];
 
+  // Beds stack across the quadrant's depth, so it is the post lines running
+  // along a bed that decide which rows carry a cable.
   const rows = new Set<number>();
-  for (const x of postLinesAcross()) {
-    const row = Math.round((x - seat.start) / field.bedWidth + 0.5);
+  for (const z of postLinesAlong()) {
+    const row = Math.round((z - seat.start) / field.bedWidth + 0.5);
     if (row >= 1 && row <= field.bedCount) rows.add(row);
   }
   return [...rows].sort((a, b) => a - b);
@@ -238,14 +245,91 @@ export function postLinesAlong(): number[] {
   return Array.from({ length: POSTS_ALONG_BED }, (_, i) => -BED_LENGTH_M / 2 + i * step);
 }
 
-/** Where each field starts, measured across the house from the west edge. */
-export function fieldOffsets(): Record<string, { start: number; width: number }> {
-  const out: Record<string, { start: number; width: number }> = {};
-  let x = -BLOCK_WIDTH_M / 2;
+/**
+ * The logistics roads, placed by the posts either side of them.
+ *
+ * Santiago: the east-west road is the bay between north-south posts 6 and 7,
+ * and the north-south road is the bay between east-west posts 9 and 10. So each
+ * road is exactly one structural bay wide, and no post ever stands in one.
+ */
+export const ROAD_EW_BETWEEN_POSTS = [6, 7] as const;
+export const ROAD_NS_BETWEEN_POSTS = [9, 10] as const;
+
+/** The east-west road: where it runs along a bed, and how wide. */
+export function roadEastWest(): { centre: number; width: number } {
+  const lines = postLinesAlong();
+  const a = lines[ROAD_EW_BETWEEN_POSTS[0] - 1];
+  const b = lines[ROAD_EW_BETWEEN_POSTS[1] - 1];
+  return { centre: (a + b) / 2, width: b - a };
+}
+
+/** The north-south road: where it crosses the house, and how wide. */
+export function roadNorthSouth(): { centre: number; width: number } {
+  const lines = postLinesAcross();
+  const a = lines[ROAD_NS_BETWEEN_POSTS[0] - 1];
+  const b = lines[ROAD_NS_BETWEEN_POSTS[1] - 1];
+  return { centre: (a + b) / 2, width: b - a };
+}
+
+/**
+ * The four quadrants the roads cut the house into, one per field.
+ *
+ * The fields are not in a row — they sit one to a quadrant, which is what the
+ * cross is for. E3 north-west, C3 north-east, E1 south-west, C1 south-east.
+ */
+export function quadrantOf(fieldId: string): {
+  x0: number; x1: number; z0: number; z1: number;
+} | null {
+  const field = plotConfigs.find((p) => p.id === fieldId);
+  if (!field) return null;
+
+  const ns = roadNorthSouth();
+  const ew = roadEastWest();
+  const west = field.position === "NW" || field.position === "SW";
+  const north = field.position === "NW" || field.position === "NE";
+
+  return {
+    x0: west ? -POSTS_WIDTH_M / 2 : ns.centre + ns.width / 2,
+    x1: west ? ns.centre - ns.width / 2 : POSTS_WIDTH_M / 2,
+    z0: north ? -BED_LENGTH_M / 2 : ew.centre + ew.width / 2,
+    z1: north ? ew.centre - ew.width / 2 : BED_LENGTH_M / 2,
+  };
+}
+
+/**
+ * Where a field's beds sit within its quadrant.
+ *
+ * Beds run the width of the quadrant — east to west — and stack across its
+ * depth. The other way round does not fit: 27 C beds across a 47.40 m depth
+ * implies 1.76 m each against the 1.80 m recorded, a 2% match, while stacking
+ * them along the 87 m width would need beds over 3 m wide.
+ *
+ * They are counted outward from the road, which is what "the road comes after
+ * the 33rd bed" means.
+ */
+export function fieldOffsets(): Record<string, {
+  /** First bed's edge, across the quadrant's depth. */
+  start: number;
+  /** How far the beds reach across that depth. */
+  span: number;
+  /** A bed's length: the quadrant's width. */
+  length: number;
+  /** Where the bed's centre line sits, along the quadrant's width. */
+  centre: number;
+}> {
+  const out: Record<string, { start: number; span: number; length: number; centre: number }> = {};
   for (const f of plotConfigs) {
-    const width = f.bedCount * f.bedWidth;
-    out[f.id] = { start: x, width };
-    x += width;
+    const q = quadrantOf(f.id);
+    if (!q) continue;
+    const span = f.bedCount * f.bedWidth;
+    const north = f.position === "NW" || f.position === "NE";
+    out[f.id] = {
+      // Counted from the road inward, so the first bed is against it.
+      start: north ? q.z1 - span : q.z0,
+      span,
+      length: q.x1 - q.x0,
+      centre: (q.x0 + q.x1) / 2,
+    };
   }
   return out;
 }
