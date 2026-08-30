@@ -47,6 +47,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_plantings",
   "bv_plantprices",
   "bv_plants",
+  "bv_plantsizes",
   "bv_pruningcurves",
   "bv_prunings",
   "bv_purchaseorders",
@@ -125,7 +126,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_materials": "bv_materialname",
   "bv_stockmovements": "bv_stockmovementname",
   "bv_shipments": "bv_shipmentcode",
-  "bv_solarradiations": "bv_solarradiationcode"
+  "bv_solarradiations": "bv_solarradiationcode",
+  "bv_plantsizes": "bv_plantsizecode"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -462,6 +464,12 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "nav": "bv_OrderId",
       "targetSet": "bv_orders"
     }
+  },
+  "bv_plantsizes": {
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
   }
 };
 
@@ -727,7 +735,8 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Medium": 187460003,
       "California": 187460004,
       "Large": 187460005,
-      "Extra Large": 187460006
+      "Extra Large": 187460006,
+      "Regular": 121330007
     }
   },
   "bv_payments": {
@@ -754,6 +763,11 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
     }
   },
   "bv_plants": {
+    "bv_grownin": {
+      "Ground": 187480000,
+      "Basket": 187480001,
+      "Ground or Basket": 187480002
+    },
     "bv_growthhabit": {
       "Upright": 121320000,
       "Spreading": 121320001,
@@ -766,6 +780,11 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Division": 121320002,
       "Grafting": 121320003,
       "Tissue Culture": 121320004
+    },
+    "bv_shadeneeded": {
+      "Single": 187490000,
+      "Double": 187490001,
+      "Triple": 187490002
     },
     "bv_soiltype": {
       "Sandy": 121320000,
@@ -952,6 +971,21 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
     "bv_radiationsource": {
       "Open-Meteo": 187470000,
       "Manual": 187470001
+    }
+  },
+  "bv_plantsizes": {
+    "bv_cuttingtype": {
+      "L/E": 187520000
+    },
+    "bv_producttype": {
+      "URC": 187510000
+    },
+    "bv_size": {
+      "Large": 187500000,
+      "Regular": 187500001,
+      "California": 187500002,
+      "Small": 187500003,
+      "Petit": 187500004
     }
   }
 };

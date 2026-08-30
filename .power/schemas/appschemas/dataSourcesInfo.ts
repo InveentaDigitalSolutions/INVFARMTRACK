@@ -243,6 +243,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_plantsizes": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_plantsizeid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_pruningcurves": {
     "tableId": "",
     "version": "",
@@ -289,6 +296,13 @@ export const dataSourcesInfo = {
     "tableId": "",
     "version": "",
     "primaryKey": "bv_soilanalysisid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
+  "bv_solarradiations": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_solarradiationid",
     "dataSourceType": "Dataverse",
     "apis": {}
   },

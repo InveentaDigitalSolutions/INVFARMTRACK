@@ -570,6 +570,120 @@
           "minValue": 0,
           "maxValue": 1000000,
           "description": "How many of this variety a bed holds. Every bed is the same size, so this is a property of the variety rather than of any particular bed \u2014 which is why it lives here and not on a bed-and-variety pairing."
+        },
+        {
+          "schemaName": "bv_GrownIn",
+          "displayName": "Grown In",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187480000,
+              "label": "Ground"
+            },
+            {
+              "value": 187480001,
+              "label": "Basket"
+            },
+            {
+              "value": 187480002,
+              "label": "Ground or Basket"
+            }
+          ],
+          "description": "Where this variety can be grown. Some varieties are only ever hung in baskets and must never be offered for a ground bed. One of: Ground, Basket, Ground or Basket."
+        },
+        {
+          "schemaName": "bv_ShadeNeeded",
+          "displayName": "Shade Needed",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187490000,
+              "label": "Single"
+            },
+            {
+              "value": 187490001,
+              "label": "Double"
+            },
+            {
+              "value": 187490002,
+              "label": "Triple"
+            }
+          ],
+          "description": "Layers of 65% cloth this variety needs. Distinct from the shade a bed actually has: this is the requirement, that is the fact. One of: Single, Double, Triple."
+        },
+        {
+          "schemaName": "bv_GrowthWeeksMinMarAug",
+          "displayName": "Growth Weeks Min (Mar-Aug)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks from seeding to 8 leaves in the bright half of the year, low end of the range."
+        },
+        {
+          "schemaName": "bv_GrowthWeeksMaxMarAug",
+          "displayName": "Growth Weeks Max (Mar-Aug)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks from seeding to 8 leaves in the bright half of the year, high end of the range."
+        },
+        {
+          "schemaName": "bv_HarvestWeeksMarAug",
+          "displayName": "Harvest Weeks (Mar-Aug)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks between harvests once the plant is at 8 leaves, bright half of the year."
+        },
+        {
+          "schemaName": "bv_PruningWeeksMarAug",
+          "displayName": "Pruning Weeks (Mar-Aug)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks to recover after pruning back to 2 leaves, bright half of the year."
+        },
+        {
+          "schemaName": "bv_GrowthWeeksMinSepFeb",
+          "displayName": "Growth Weeks Min (Sep-Feb)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks from seeding to 8 leaves in the dark half of the year, low end of the range."
+        },
+        {
+          "schemaName": "bv_GrowthWeeksMaxSepFeb",
+          "displayName": "Growth Weeks Max (Sep-Feb)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks from seeding to 8 leaves in the dark half of the year, high end of the range."
+        },
+        {
+          "schemaName": "bv_HarvestWeeksSepFeb",
+          "displayName": "Harvest Weeks (Sep-Feb)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks between harvests once the plant is at 8 leaves, dark half of the year."
+        },
+        {
+          "schemaName": "bv_PruningWeeksSepFeb",
+          "displayName": "Pruning Weeks (Sep-Feb)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks to recover after pruning back to 2 leaves, dark half of the year."
         }
       ]
     },
@@ -2222,6 +2336,10 @@
             {
               "value": 187460006,
               "label": "Extra Large"
+            },
+            {
+              "value": 121330007,
+              "label": "Regular"
             }
           ],
           "description": "One of: Petit, Mini Petit, Small, Medium, California, Large, Extra Large."
@@ -6184,6 +6302,119 @@
             }
           ],
           "description": "Where the figure came from. A manual entry stands in for a day the feed missed, and is worth being able to tell apart. One of: Open-Meteo, Manual."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "bv_PlantSize",
+      "displayName": "Plant Size",
+      "displayCollectionName": "Plant Sizes",
+      "ownershipType": "UserOwned",
+      "description": "What a box of one variety at one size holds. The catalogue counterpart to Packing: packing records what WAS in a box, this records what a box SHOULD hold, which is what makes an order line checkable.",
+      "columns": [
+        {
+          "schemaName": "bv_PlantSizeCode",
+          "displayName": "Plant Size ID",
+          "type": "autonumber",
+          "autoNumberFormat": "PS-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format PS-0001."
+        },
+        {
+          "schemaName": "bv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "bv_Plant",
+          "required": true,
+          "description": "The variety this size belongs to. A variety name alone is not unique \u2014 Neon is both a Pothos and a Philodendron \u2014 so everything keys on the plant record, never on the name."
+        },
+        {
+          "schemaName": "bv_Size",
+          "displayName": "Size",
+          "type": "choice",
+          "required": true,
+          "options": [
+            {
+              "value": 187500000,
+              "label": "Large"
+            },
+            {
+              "value": 187500001,
+              "label": "Regular"
+            },
+            {
+              "value": 187500002,
+              "label": "California"
+            },
+            {
+              "value": 187500003,
+              "label": "Small"
+            },
+            {
+              "value": 187500004,
+              "label": "Petit"
+            }
+          ],
+          "description": "Cutting size. LRG, REG, CAL, SML and PET on the product table. One of: Large, Regular, California, Small, Petit."
+        },
+        {
+          "schemaName": "bv_CuttingsPerBox",
+          "displayName": "Cuttings per Box",
+          "type": "integer",
+          "required": true,
+          "minValue": 1,
+          "maxValue": 100000,
+          "description": "How many cuttings a box of this size holds. 1,000 for Large, 2,000 for Regular and California, 2,500 for Small and Petit."
+        },
+        {
+          "schemaName": "bv_BundleSize",
+          "displayName": "Bundle Size",
+          "type": "integer",
+          "required": false,
+          "minValue": 1,
+          "maxValue": 1000,
+          "description": "Cuttings per bundle inside the box. Three throughout the current catalogue."
+        },
+        {
+          "schemaName": "bv_ProductType",
+          "displayName": "Product Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187510000,
+              "label": "URC"
+            }
+          ],
+          "description": "Unrooted cutting. One of: URC."
+        },
+        {
+          "schemaName": "bv_CuttingType",
+          "displayName": "Cutting Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187520000,
+              "label": "L/E"
+            }
+          ],
+          "description": "Leaf and eye. One of: L/E."
+        },
+        {
+          "schemaName": "bv_IsActive",
+          "displayName": "Active",
+          "type": "boolean",
+          "required": false,
+          "description": "Whether this size is currently offered."
         },
         {
           "schemaName": "bv_Notes",

@@ -229,6 +229,16 @@
         "shipments": {
           "entitySetName": "bv_shipments",
           "logicalName": "bv_shipment"
+        },
+        "plantsizes": {
+          "entitySetName": "bv_plantsizes",
+          "logicalName": "bv_plantsize",
+          "isHidden": false
+        },
+        "solarradiation": {
+          "entitySetName": "bv_solarradiations",
+          "logicalName": "bv_solarradiation",
+          "isHidden": false
         }
       }
     }

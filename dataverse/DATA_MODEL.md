@@ -9,9 +9,9 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 48 |
-| Columns | 583 |
-| Relationships | 67 |
+| Tables | 49 |
+| Columns | 602 |
+| Relationships | 68 |
 
 ## Conventions
 
@@ -33,7 +33,7 @@
 |---|---|---|---|---|
 | [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 9 | Physical growing structures in the nursery |
 | [Bed](#bed) | `bv_bed` | `BED-0001` | 12 | Growing beds within batches (Shadehouse > Batch > Bed) |
-| [Plant](#plant) | `bv_plant` | `PLT-0001` | 23 | Plant species, varieties, and patent catalog |
+| [Plant](#plant) | `bv_plant` | `PLT-0001` | 33 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
 | [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
 | [Planting](#planting) | `bv_planting` | `PLG-0001` | 11 | Records of plants placed in beds — central activity hub |
@@ -79,6 +79,7 @@
 | [Stock Movement](#stock-movement) | `bv_stockmovement` | `STK-0001` | 12 | One receipt, issue or correction. Stock on hand is the sum of these rather than a number somebody edits: a stored total drifts silently, and nothing afterwards can say why it changed. Points at a Material or an Input — a sack of fertilizer is stock in the same way a box of fittings is. |
 | [Shipment](#shipment) | `bv_shipment` | `SHP-0001` | 11 | One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed — so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went. |
 | [Solar Radiation](#solar-radiation) | `bv_solarradiation` | `SR-{SEQNUM:5}` | 5 | Measured shortwave radiation for one day at the nursery. Kept as history for the same reason the exchange rate is: the light a planting actually received is a fact about the past, and the weather service only offers a 92-day window. Without this, a crop older than that accumulates on clear-sky assumptions. |
+| [Plant Size](#plant-size) | `bv_plantsize` | `PS-0001` | 9 | What a box of one variety at one size holds. The catalogue counterpart to Packing: packing records what WAS in a box, this records what a box SHOULD hold, which is what makes an order line checkable. |
 
 ## Relationships
 
@@ -151,6 +152,7 @@
 | Shipment | `bv_customerid` | Customer | Restrict |
 | Shipment | `bv_orderid` | Order | Remove link |
 | Shipment | `bv_invoiceid` | Invoice | Remove link |
+| Plant Size | `bv_plantid` | Plant | Restrict |
 
 ---
 
@@ -291,6 +293,16 @@ Plant species, varieties, and patent catalog
 | `bv_weekstofirstharvest` | Weeks to First Cut | Whole number |  | Weeks from planting a bed to its first cut. Without this a planting date says when work started but nothing about when stock arrives, so the schedule can only report the past. |
 | `bv_productiveweeks` | Productive Weeks | Whole number |  | How long a bed keeps yielding after the first cut. A cutting nursery harvests the same bed repeatedly, so the useful answer is a window rather than a date. Leave blank if the bed is cut once. |
 | `bv_plantsperbed` | Plants per Bed | Whole number |  | How many of this variety a bed holds. Every bed is the same size, so this is a property of the variety rather than of any particular bed — which is why it lives here and not on a bed-and-variety pairing. |
+| `bv_grownin` | Grown In | Choice |  | Where this variety can be grown. Some varieties are only ever hung in baskets and must never be offered for a ground bed. One of: Ground, Basket, Ground or Basket. |
+| `bv_shadeneeded` | Shade Needed | Choice |  | Layers of 65% cloth this variety needs. Distinct from the shade a bed actually has: this is the requirement, that is the fact. One of: Single, Double, Triple. |
+| `bv_growthweeksminmaraug` | Growth Weeks Min (Mar-Aug) | Whole number |  | Weeks from seeding to 8 leaves in the bright half of the year, low end of the range. |
+| `bv_growthweeksmaxmaraug` | Growth Weeks Max (Mar-Aug) | Whole number |  | Weeks from seeding to 8 leaves in the bright half of the year, high end of the range. |
+| `bv_harvestweeksmaraug` | Harvest Weeks (Mar-Aug) | Whole number |  | Weeks between harvests once the plant is at 8 leaves, bright half of the year. |
+| `bv_pruningweeksmaraug` | Pruning Weeks (Mar-Aug) | Whole number |  | Weeks to recover after pruning back to 2 leaves, bright half of the year. |
+| `bv_growthweeksminsepfeb` | Growth Weeks Min (Sep-Feb) | Whole number |  | Weeks from seeding to 8 leaves in the dark half of the year, low end of the range. |
+| `bv_growthweeksmaxsepfeb` | Growth Weeks Max (Sep-Feb) | Whole number |  | Weeks from seeding to 8 leaves in the dark half of the year, high end of the range. |
+| `bv_harvestweekssepfeb` | Harvest Weeks (Sep-Feb) | Whole number |  | Weeks between harvests once the plant is at 8 leaves, dark half of the year. |
+| `bv_pruningweekssepfeb` | Pruning Weeks (Sep-Feb) | Whole number |  | Weeks to recover after pruning back to 2 leaves, dark half of the year. |
 
 <details><summary>Choice values</summary>
 
@@ -340,9 +352,25 @@ Plant species, varieties, and patent catalog
 | 121320004 | Chalky |
 | 121320005 | Silty |
 
+**Grown In** (`bv_grownin`)
+
+| Value | Label |
+|---|---|
+| 187480000 | Ground |
+| 187480001 | Basket |
+| 187480002 | Ground or Basket |
+
+**Shade Needed** (`bv_shadeneeded`)
+
+| Value | Label |
+|---|---|
+| 187490000 | Single |
+| 187490001 | Double |
+| 187490002 | Triple |
+
 </details>
 
-**Referenced by:** Planting (`bv_plantid`), Harvest (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Pruning (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`), Bed Count (`bv_plantid`)
+**Referenced by:** Planting (`bv_plantid`), Harvest (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Pruning (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`), Bed Count (`bv_plantid`), Plant Size (`bv_plantid`)
 
 ## Season
 
@@ -868,6 +896,7 @@ Per-box packing records — each record is one box with full traceability
 | 187460004 | California |
 | 187460005 | Large |
 | 187460006 | Extra Large |
+| 121330007 | Regular |
 
 </details>
 
@@ -2051,5 +2080,51 @@ Measured shortwave radiation for one day at the nursery. Kept as history for the
 |---|---|
 | 187470000 | Open-Meteo |
 | 187470001 | Manual |
+
+</details>
+
+## Plant Size
+
+`bv_plantsize` · User-owned
+
+What a box of one variety at one size holds. The catalogue counterpart to Packing: packing records what WAS in a box, this records what a box SHOULD hold, which is what makes an order line checkable.
+
+**Record ID:** `bv_plantsizecode` — format `PS-{SEQNUM:4}`, e.g. `PS-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_plantsizecode` 🔑 | Plant Size ID | Autonumber | ✓ | Auto-generated identifier, format PS-0001. |
+| `bv_plantid` | Plant | Lookup → [Plant](#plant) | ✓ | The variety this size belongs to. A variety name alone is not unique — Neon is both a Pothos and a Philodendron — so everything keys on the plant record, never on the name. |
+| `bv_size` | Size | Choice | ✓ | Cutting size. LRG, REG, CAL, SML and PET on the product table. One of: Large, Regular, California, Small, Petit. |
+| `bv_cuttingsperbox` | Cuttings per Box | Whole number | ✓ | How many cuttings a box of this size holds. 1,000 for Large, 2,000 for Regular and California, 2,500 for Small and Petit. |
+| `bv_bundlesize` | Bundle Size | Whole number |  | Cuttings per bundle inside the box. Three throughout the current catalogue. |
+| `bv_producttype` | Product Type | Choice |  | Unrooted cutting. One of: URC. |
+| `bv_cuttingtype` | Cutting Type | Choice |  | Leaf and eye. One of: L/E. |
+| `bv_isactive` | Active | Yes/No |  | Whether this size is currently offered. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Size** (`bv_size`)
+
+| Value | Label |
+|---|---|
+| 187500000 | Large |
+| 187500001 | Regular |
+| 187500002 | California |
+| 187500003 | Small |
+| 187500004 | Petit |
+
+**Product Type** (`bv_producttype`)
+
+| Value | Label |
+|---|---|
+| 187510000 | URC |
+
+**Cutting Type** (`bv_cuttingtype`)
+
+| Value | Label |
+|---|---|
+| 187520000 | L/E |
 
 </details>

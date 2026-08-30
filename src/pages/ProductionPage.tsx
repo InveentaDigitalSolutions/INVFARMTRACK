@@ -45,10 +45,15 @@ const careViews = [
 
 const catalogViews = [
   { id: "plants", label: "Plants" },
+  // What a box of each variety and size should hold. Beside Plants because it
+  // is reference data typed once and read constantly, the same reason Seasons
+  // is here rather than under Accounting.
+  { id: "sizes", label: "Sizes & Packing" },
   { id: "seasons", label: "Seasons" },
 ] as const;
 
 // Initial data
+const initPlantSizes: Record<string, unknown>[] = [];
 const initPlantings: PlantingsRow[] = [];
 const initTreatments: TreatmentsRow[] = [];
 const initIrrigation: IrrigationRow[] = [];
@@ -179,6 +184,40 @@ const pruningFields = [
   ]},
 ];
 
+/**
+ * One row per variety and size. Deliberately keyed on the plant record rather
+ * than the variety name: "Neon" is both a Pothos and a Philodendron, and a form
+ * that matched on the name would quietly merge the two.
+ */
+const plantSizeFields = [
+  { title: "Which product", columns: 2 as const, fields: [
+    { key: "code", label: "Size ID", type: "text" as const, readOnly: true, placeholder: "PS-0001 (auto)" },
+    { key: "plant", label: "Plant", type: "select" as const, required: true,
+      options: [], optionsFrom: "plants" },
+    { key: "size", label: "Size", type: "select" as const, required: true, options: [
+      { value: "Large", label: "Large (LRG)" },
+      { value: "Regular", label: "Regular (REG)" },
+      { value: "California", label: "California (CAL)" },
+      { value: "Small", label: "Small (SML)" },
+      { value: "Petit", label: "Petit (PET)" },
+    ] },
+    { key: "active", label: "Offered", type: "boolean" as const },
+  ]},
+  { title: "What a box holds", columns: 2 as const, fields: [
+    // The number an order line is checked against: 40 boxes of Regular
+    // Hawaiian is 80,000 cuttings, and nothing could say so before this.
+    { key: "cuttingsPerBox", label: "Cuttings per Box", type: "number" as const, min: 1, required: true },
+    { key: "bundleSize", label: "Bundle Size", type: "number" as const, min: 1 },
+    { key: "productType", label: "Product Type", type: "select" as const, options: [
+      { value: "URC", label: "URC — unrooted cutting" },
+    ] },
+    { key: "cuttingType", label: "Cutting Type", type: "select" as const, options: [
+      { value: "L/E", label: "L/E — leaf and eye" },
+    ] },
+    { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
+  ]},
+];
+
 const plantFields = [
   { title: "Plant Information", columns: 2 as const, fields: [
     { key: "code", label: "Plant ID", type: "text" as const, readOnly: true, placeholder: "PLT-0001 (auto)" },
@@ -186,14 +225,50 @@ const plantFields = [
     { key: "latin", label: "Latin Name", type: "text" as const },
     { key: "variety", label: "Variety", type: "text" as const },
   ]},
-  { title: "Growing Cycle", columns: 2 as const, fields: [
+  { title: "How it is grown", columns: 2 as const, fields: [
+    // What the variety asks for. The bed records what it actually has, and the
+    // two are different facts — a basket-only variety offered for a ground bed
+    // is a mistake nothing could catch before this existed.
+    { key: "grownIn", label: "Grown In", type: "select" as const, options: [
+      { value: "Ground", label: "Ground" },
+      { value: "Basket", label: "Basket" },
+      { value: "Ground or Basket", label: "Ground or basket" },
+    ] },
+    { key: "shadeNeeded", label: "Shade Needed", type: "select" as const, options: [
+      { value: "Single", label: "Single — 35% of daylight" },
+      { value: "Double", label: "Double — 12.25%" },
+      { value: "Triple", label: "Triple — 4.3%" },
+    ] },
     // Every bed is the same size, so how many fit is a property of the
     // variety rather than of any particular bed.
     { key: "plantsPerBed", label: "Plants per Bed", type: "number" as const, min: 0 },
-    // Without these the schedule can only report the past: a planting date
-    // says when work started, not when stock arrives.
-    { key: "weeksToFirstHarvest", label: "Weeks to First Cut", type: "number" as const, min: 0 },
     { key: "productiveWeeks", label: "Productive Weeks", type: "number" as const, min: 0 },
+  ]},
+  /**
+   * Production knowledge, and it is genuinely per variety — the figures happen
+   * to fall into two groups today, but Santiago is clear that is not a rule
+   * about shade, so each variety carries its own.
+   *
+   * Two seasons because the same cutting takes longer in the dark half of the
+   * year: measured daylight here averages 45.3 mol/m2 a day from March to
+   * August and 34.7 from September to February.
+   */
+  { title: "Production — March to August", columns: 3 as const, fields: [
+    { key: "growthWeeksMinMarAug", label: "Growth wks to 8 leaves — from", type: "number" as const, min: 0 },
+    { key: "growthWeeksMaxMarAug", label: "to", type: "number" as const, min: 0 },
+    { key: "harvestWeeksMarAug", label: "Harvest every (wks)", type: "number" as const, min: 0 },
+    { key: "pruningWeeksMarAug", label: "Pruning back to 2 leaves (wks)", type: "number" as const, min: 0, span: 3 as const },
+  ]},
+  { title: "Production — September to February", columns: 3 as const, fields: [
+    { key: "growthWeeksMinSepFeb", label: "Growth wks to 8 leaves — from", type: "number" as const, min: 0 },
+    { key: "growthWeeksMaxSepFeb", label: "to", type: "number" as const, min: 0 },
+    { key: "harvestWeeksSepFeb", label: "Harvest every (wks)", type: "number" as const, min: 0 },
+    { key: "pruningWeeksSepFeb", label: "Pruning back to 2 leaves (wks)", type: "number" as const, min: 0, span: 3 as const },
+  ]},
+  { title: "Legacy", columns: 2 as const, fields: [
+    // Superseded by the seasonal figures above, kept because the schedule and
+    // availability services still read it. Remove once they take the pair.
+    { key: "weeksToFirstHarvest", label: "Weeks to First Cut", type: "number" as const, min: 0 },
   ]},
   { title: "Patent & Status", columns: 2 as const, fields: [
     // bv_IsPatented is a boolean; the form used to offer "Yes"/"No" strings,
@@ -303,6 +378,7 @@ export default function ProductionPage() {
   const [seasons, setSeasons] = useRecords("seasons", initSeasons);
   const { elementsFor, hasCompositions } = useInputNutrients();
   const [plants, setPlants] = useRecords("plants", initPlants);
+  const [plantSizes, setPlantSizes] = useRecords("plantSizes", initPlantSizes);
 
   /** Names a new season from its start date; an existing one keeps its name. */
   const saveSeason = (values: Record<string, unknown>) => {
@@ -324,6 +400,7 @@ export default function ProductionPage() {
   const pruningForm = useFormModal(initPruning[0]);
   const fertilizationForm = useFormModal(initFertilization[0]);
   const plantForm = useFormModal(initPlants[0]);
+  const plantSizeForm = useFormModal(initPlantSizes[0]);
   const seasonForm = useFormModal(initSeasons[0]);
   const confirm = useConfirmDialog();
 
@@ -628,6 +705,53 @@ export default function ProductionPage() {
             />
             <FormModal open={plantForm.open} onClose={plantForm.close} title={plantForm.isEdit ? "Edit Plant" : "Add Plant"} groups={plantFields} values={plantForm.values} onChange={plantForm.onChange} isEdit={plantForm.isEdit} onSubmit={(v) => handleSave(plants, setPlants, plantForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Plant" message="Are you sure you want to delete this plant from the catalog?" onConfirm={() => handleDelete(plants, setPlants)} />
+          </>
+        );
+      case "sizes":
+        return (
+          <>
+            <div className="mb-3 text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3.5 py-2.5">
+              What a box <em>should</em> hold, per variety and size. Packing records
+              what a box actually held; this is what an order is checked against —
+              40 boxes of Regular Hawaiian is 80,000 cuttings.
+            </div>
+            <DataTable
+              columns={[
+                { key: "plant", label: "Plant" },
+                { key: "size", label: "Size", render: (r) => <Badge variant="blue">{r.size as string}</Badge> },
+                { key: "cuttingsPerBox", label: "Per Box", render: (r) => (
+                  <span className="font-mono tabular-nums text-navy-700">
+                    {Number(r.cuttingsPerBox ?? 0).toLocaleString()}
+                  </span>
+                ) },
+                { key: "bundleSize", label: "Bundle" },
+                { key: "productType", label: "Type" },
+                { key: "cuttingType", label: "Condition" },
+                { key: "active", label: "Offered", render: (r) => (
+                  <Badge variant={r.active === false ? "gray" : "green"}>
+                    {r.active === false ? "No" : "Yes"}
+                  </Badge>
+                ) },
+              ]}
+              data={plantSizes}
+              onAdd={plantSizeForm.openCreate}
+              onEdit={(row, i) => plantSizeForm.openEdit(row as any, i)}
+              onDelete={(row, i) => confirm.requestDelete(row, i)}
+              addLabel="Add Size"
+              searchPlaceholder="Search sizes..."
+            />
+            <FormModal
+              open={plantSizeForm.open} onClose={plantSizeForm.close}
+              title={plantSizeForm.isEdit ? "Edit Size" : "Add Size"}
+              groups={plantSizeFields} values={plantSizeForm.values}
+              onChange={plantSizeForm.onChange} isEdit={plantSizeForm.isEdit}
+              onSubmit={(v) => handleSave(plantSizes, setPlantSizes, plantSizeForm, v)}
+            />
+            <ConfirmDialog
+              open={confirm.open} onClose={confirm.close} title="Delete Size"
+              message="Remove this size from the catalogue?"
+              onConfirm={() => handleDelete(plantSizes, setPlantSizes)}
+            />
           </>
         );
       case "seasons":

@@ -7,6 +7,7 @@ import {
   Cloud, CloudDrizzle, CloudLightning, Snowflake, CloudFog,
 } from "lucide-react";
 import { SITE_LAT, SITE_LON } from "../services/site";
+import MoonPanel from "./MoonPanel";
 
 // The nursery, from the survey's control monument. These were -87.85 before,
 // about 11 km east of here — a guess that predated having the survey.
@@ -374,6 +375,10 @@ export default function WeatherWidget({ compact = false, className = "" }: Weath
                 </div>
               </div>
             )}
+
+            {/* The moon, on both views: work is planned around it and it is
+                not a forecast — it is arithmetic, so it is always available. */}
+            <MoonPanel />
 
             {/* Daily forecast */}
             {view === "daily" && (

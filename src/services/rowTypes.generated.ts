@@ -552,6 +552,16 @@ export interface SoilRow {
   [key: string]: unknown;
 }
 
+export interface SolarRadiationRow {
+  id: string;
+  code?: string;
+  date?: string;
+  megajoules?: number;
+  source?: string;
+  notes?: string;
+  [key: string]: unknown;
+}
+
 export interface StatementsRow {
   id: string;
   code?: string;

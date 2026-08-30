@@ -107,6 +107,20 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   layer, drawn by default. Turn Shade off before judging any lighting change —
   `NOSHADE=1 node scripts/test/shot3d.mjs` does it. Shadows work for anything
   bed-sized; 15 cm posts are below what one 4096 map resolves over 115 m.
+- **A new Dataverse table needs registering with the CODE APP too.** Applying
+  the schema is only half of it: the SDK reads `.power/schemas/appschemas/
+  dataSourcesInfo.ts`, and a table missing from it fails at runtime with
+  "Data source not found" — caught by `npm run test:smoke`, not by tsc. Register
+  it with `npx power-apps add-data-source --non-interactive -a dataverse -t
+  bv_<logicalname> -u <org url>`, which also generates the service. Pass the
+  **logical** name (`bv_plantsize`), not the entity set (`bv_plantsizes`) — the
+  entity set 404s.
+- **The moon needs no API either.** `services/moon.ts` computes phase,
+  illumination, rise and set from elongation. Checked against Open-Meteo (which
+  does return moon_phase): agrees to 0.0009 of a cycle — 0.7 hours — over 76
+  days, and rise/set within 5 minutes. Computed rather than fetched because the
+  feed only covers the forecast window and planting by the moon looks a season
+  either way.
 - **They are baskets, not air beds.** Renamed 2026-08-30, in the app and in the
   `bv_Bed.bv_Type` choice — label only, value 121320000 unchanged, and no bed
   held it yet so nothing migrated. `apply-schema.mjs` now renames an option by

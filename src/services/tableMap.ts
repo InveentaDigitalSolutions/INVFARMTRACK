@@ -58,6 +58,20 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       patentHolder: "bv_patentholder",
       patentExpiry: "bv_patentexpiry",
       plantsPerBed: "bv_plantsperbed",
+      // Where it may be grown, and what it needs over it. The bed records what
+      // it actually has; these two record what the variety asks for.
+      grownIn: "bv_grownin",
+      shadeNeeded: "bv_shadeneeded",
+      // Production knowledge, per season. Santiago's figures come as a range
+      // for growth ("8-10 weeks") and a single number for the other two.
+      growthWeeksMinMarAug: "bv_growthweeksminmaraug",
+      growthWeeksMaxMarAug: "bv_growthweeksmaxmaraug",
+      harvestWeeksMarAug: "bv_harvestweeksmaraug",
+      pruningWeeksMarAug: "bv_pruningweeksmaraug",
+      growthWeeksMinSepFeb: "bv_growthweeksminsepfeb",
+      growthWeeksMaxSepFeb: "bv_growthweeksmaxsepfeb",
+      harvestWeeksSepFeb: "bv_harvestweekssepfeb",
+      pruningWeeksSepFeb: "bv_pruningweekssepfeb",
       weeksToFirstHarvest: "bv_weekstofirstharvest",
       productiveWeeks: "bv_productiveweeks",
       active: "bv_isactive",
@@ -710,6 +724,26 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       notes: "bv_notes",
     },
   },
+  /**
+   * What a box of one variety at one size should hold. Packing records what
+   * WAS in a box; this records what a box SHOULD hold, which is what makes an
+   * order line checkable.
+   */
+  plantSizes: {
+    dataSource: "bv_plantsizes",
+    primaryKey: "bv_plantsizeid",
+    fields: {
+      code: "bv_plantsizecode",
+      plant: "_bv_plantid_value",
+      size: "bv_size",
+      cuttingsPerBox: "bv_cuttingsperbox",
+      bundleSize: "bv_bundlesize",
+      productType: "bv_producttype",
+      cuttingType: "bv_cuttingtype",
+      active: "bv_isactive",
+      notes: "bv_notes",
+    },
+  },
   caiNumbers: {
     dataSource: "bv_cainumbers",
     primaryKey: "bv_cainumberid",
@@ -825,6 +859,7 @@ export const ENABLED_TABLES = new Set<string>([
   "bedCompositions",
   "caiNumbers",
   "exchangeRates",
+  "plantSizes",
   "solarRadiation",
   "bedCounts",
   "shipments",
