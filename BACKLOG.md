@@ -216,14 +216,21 @@ path and its cloth: about 18 mol/m²/day under single shade at the equinox, 6.4
 under double, 2.2 under triple. That is the light available when nothing is in
 the way but air and cloth.
 
-Two things would make it what actually landed:
+**Cloud is done.** The weather flow returns Open-Meteo's daily radiation for the
+last 92 days and the next 7, and light per bed uses the measurement wherever
+there is one — the panel says "light that day" and gives the cloud fraction, or
+"light (clear sky)" where it is falling back. Recent days here ran 88-93% of
+clear sky.
 
-- **Cloud.** Open-Meteo returns measured and forecast shortwave radiation, and
-  the weather flow already talks to it. Multiply the clear-sky figure by the
-  day's real radiation and the rainy season stops being invisible.
-- **Structure.** Air beds shade the ground beds beneath them, and posts shade
-  their neighbours at a low sun. Neither is modelled, and no air beds are
-  recorded yet, so today the cloth is the only term that varies between beds.
+What is left:
+
+- **A store.** The window is 92 days. A planting older than that accumulates on
+  clear-sky assumptions for its early life. Persisting the daily figure the way
+  `bv_exchangerates` is persisted would fix it permanently.
+- **Structure.** Air beds shade the ground beds beneath them. The renderer
+  handles it — a slab at air-bed height casts correctly — but the *arithmetic*
+  does not, and no air beds are recorded yet, so today the cloth is still the
+  only term that varies between beds.
 
 Then `accumulatedLight()` over a planting's life is what a growth model should
 count in, instead of calendar days.

@@ -112,6 +112,17 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   house, far larger than the seasonal swing (about 30%) or the terrain (1-4%).
   `services/bedLight.ts` holds it. Clear-day DLI at this site: about 52 mol/m²
   open sky at the equinox, so 18 under single shade and 2.2 under triple.
+- **The weather flow also returns radiation.** `FarmTrack - Get Weather`
+  (`3a7f1e64…`) gained a second HTTP action fetching Open-Meteo's daily
+  `shortwave_radiation_sum`, 92 days back and 7 forward, merged into the weather
+  object under `radiation` with `setProperty` — so the response *schema* is
+  unchanged and nothing had to be regenerated. Definition kept at
+  `dataverse/flows/FarmTrack-Get-Weather.json`. A PowerApps-triggered flow
+  cannot be run from the API (`DirectApiAuthorizationRequired`), so verify it by
+  calling Open-Meteo directly and by using the app.
+- **Open-Meteo leaves nulls in the radiation series.** `Number(null)` is 0 and
+  `Number.isFinite(0)` is true, so a missing day silently became a day of total
+  darkness. Test the raw value for null before converting.
 - **Solar position needs no network.** `services/solar.ts` is the NOAA
   algorithm, checked against Greenwich at solar noon (179.98° — due south).
   Note the site is inside the tropics: the noon sun passes **north** of overhead

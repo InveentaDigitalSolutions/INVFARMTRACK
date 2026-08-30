@@ -5,7 +5,7 @@ import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, Clou
 import { terrainFall } from "../services/terrain";
 import { atLocal, sunPosition, dayArc } from "../services/solar";
 import SceneCompass from "./SceneCompass";
-import { dayLight, clothTransmission, SHADE_LAYERS } from "../services/bedLight";
+import { measuredDayLight, clothTransmission, SHADE_LAYERS } from "../services/bedLight";
 
 /** Decimal local hours as a clock reading: 6.75 -> "06:45". */
 function fmtHour(hours: number): string {
@@ -129,7 +129,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   // Re-read at 1s; the reader itself renders one poll interval behind and
   // interpolates, so this only controls how often we re-sample that curve.
   const now = useNow(1000);
-  const { conditions: weather, loading: weatherLoading } = useCurrentWeather();
+  const { conditions: weather, radiation, loading: weatherLoading } = useCurrentWeather();
 
   const readings = useMemo(() => {
     const zones = simulateFixes(baseZones, now, anomalies);
@@ -543,10 +543,27 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
                   {/* The number that matters for growth. Days in a triple-shade
                       bed are not the same as days in a single-shade one, and
                       this is by how much. */}
-                  <Row
-                    label="Light today"
-                    value={`${dayLight(sunDate, selected.shade).atBed.toFixed(1)} mol/m²`}
-                  />
+                  {(() => {
+                    // Measured where Open-Meteo has a reading for that day,
+                    // clear-sky where it does not — and the label says which,
+                    // because a modelled figure and a measured one are not the
+                    // same claim.
+                    const light = measuredDayLight(sunDate, selected.shade, radiation);
+                    return (
+                      <>
+                        <Row
+                          label={light.measured ? "Light that day" : "Light (clear sky)"}
+                          value={`${light.atBed.toFixed(1)} mol/m²`}
+                        />
+                        {light.measured && (
+                          <Row
+                            label="Cloud"
+                            value={`${(light.clearSkyFraction * 100).toFixed(0)}% of a clear day`}
+                          />
+                        )}
+                      </>
+                    );
+                  })()}
                   <Row
                     label="Through cloth"
                     value={`${(clothTransmission(selected.shade) * 100).toFixed(2)}% · ${

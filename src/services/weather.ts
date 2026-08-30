@@ -7,6 +7,7 @@
  */
 
 import { FarmTrack_GetWeatherService } from "../generated/services/FarmTrack_GetWeatherService";
+import { radiationSeries, type RadiationByDay } from "./bedLight";
 
 export const STATION = { lat: 14.97, lng: -87.85, label: "El Olvido, Santa Cruz de Yojoa" };
 
@@ -68,7 +69,33 @@ function toConditions(data: {
  * locally outside the player, the direct call still works, so both paths are
  * kept and the flow is preferred wherever it is available.
  */
+export interface WeatherPayload {
+  conditions: CurrentConditions;
+  /** Measured daily shortwave radiation, MJ/m², keyed by ISO date. */
+  radiation: RadiationByDay;
+}
+
+/**
+ * Fetch conditions and the radiation history in one call.
+ *
+ * The flow returns both: the weather object with Open-Meteo's daily radiation
+ * block merged in under `radiation`, covering 92 days back and 7 forward. That
+ * window is what turns clear-sky light into the light that actually landed.
+ */
+export async function fetchWeather(signal?: AbortSignal): Promise<WeatherPayload> {
+  const parsed = await fetchPayload(signal);
+  return {
+    conditions: toConditions(parsed as Parameters<typeof toConditions>[0]),
+    radiation: radiationSeries(parsed),
+  };
+}
+
+/** Conditions alone, for callers that do not care about light. */
 export async function fetchCurrentConditions(signal?: AbortSignal): Promise<CurrentConditions> {
+  return (await fetchWeather(signal)).conditions;
+}
+
+async function fetchPayload(signal?: AbortSignal): Promise<unknown> {
   try {
     const result = await FarmTrack_GetWeatherService.Run({
       latitude: STATION.lat,
@@ -79,7 +106,7 @@ export async function fetchCurrentConditions(signal?: AbortSignal): Promise<Curr
       // The flow's failure branch returns a structured error rather than
       // failing the run, so a successful call can still carry a failure.
       if (parsed?.error) throw new Error(parsed.message ?? "Weather service unavailable");
-      return toConditions(parsed);
+      return parsed;
     }
     throw new Error(result.error?.message ?? "Weather flow returned no data");
   } catch (flowError) {
@@ -88,11 +115,13 @@ export async function fetchCurrentConditions(signal?: AbortSignal): Promise<Curr
     const url =
       `https://api.open-meteo.com/v1/forecast?latitude=${STATION.lat}&longitude=${STATION.lng}` +
       `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,` +
-      `precipitation,weather_code,cloud_cover,is_day&timezone=America%2FTegucigalpa`;
+      `precipitation,weather_code,cloud_cover,is_day` +
+      `&daily=shortwave_radiation_sum&past_days=92&forecast_days=7` +
+      `&timezone=America%2FTegucigalpa`;
     try {
       const res = await fetch(url, { signal });
       if (!res.ok) throw new Error(`Weather fetch failed: ${res.status}`);
-      return toConditions(await res.json());
+      return await res.json();
     } catch {
       // Report the flow's failure, not the fallback's — the flow is the path
       // that matters in the deployed app.

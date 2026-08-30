@@ -1,0 +1,94 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "$authentication": { "defaultValue": {}, "type": "SecureObject" },
+    "$connections": { "defaultValue": {}, "type": "Object" }
+  },
+  "triggers": {
+    "manual": {
+      "metadata": { "operationMetadataId": "1a2b3c4d-5e6f-4071-8293-a4b5c6d7e8f9" },
+      "type": "Request",
+      "kind": "PowerAppV2",
+      "inputs": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "latitude": { "title": "latitude", "type": "number", "x-ms-dynamically-added": true, "description": "Latitude in decimal degrees (e.g. 14.0818)", "x-ms-content-hint": "NUMBER" },
+            "longitude": { "title": "longitude", "type": "number", "x-ms-dynamically-added": true, "description": "Longitude in decimal degrees (e.g. -87.2068)", "x-ms-content-hint": "NUMBER" }
+          },
+          "required": ["latitude", "longitude"]
+        }
+      }
+    }
+  },
+  "actions": {
+    "HTTP_Get_Weather": {
+      "runAfter": {},
+      "metadata": { "operationMetadataId": "2b3c4d5e-6f70-4182-93a4-b5c6d7e8f9a0" },
+      "type": "Http",
+      "inputs": {
+        "method": "GET",
+        "uri": "https://api.open-meteo.com/v1/forecast",
+        "queries": {
+          "latitude": "@{string(triggerBody()?['latitude'])}",
+          "longitude": "@{string(triggerBody()?['longitude'])}",
+          "current": "temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,precipitation,weather_code,cloud_cover,is_day,uv_index",
+          "hourly": "temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,wind_speed_10m",
+          "daily": "weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,wind_speed_10m_max,uv_index_max",
+          "timezone": "America/Tegucigalpa",
+          "forecast_days": "7"
+        }
+      }
+    },
+    "HTTP_Get_Radiation": {
+      "runAfter": { "HTTP_Get_Weather": ["Succeeded"] },
+      "metadata": { "operationMetadataId": "5e6f7081-92a3-44b5-c6d7-e8f9a0b1c2d3" },
+      "type": "Http",
+      "inputs": {
+        "method": "GET",
+        "uri": "https://api.open-meteo.com/v1/forecast",
+        "queries": {
+          "latitude": "@{string(triggerBody()?['latitude'])}",
+          "longitude": "@{string(triggerBody()?['longitude'])}",
+          "daily": "shortwave_radiation_sum",
+          "timezone": "America/Tegucigalpa",
+          "past_days": "92",
+          "forecast_days": "7"
+        }
+      }
+    },
+    "Respond_to_a_PowerApp_or_flow": {
+      "runAfter": { "HTTP_Get_Radiation": ["Succeeded", "Failed", "Skipped", "TimedOut"] },
+      "metadata": { "operationMetadataId": "3c4d5e6f-7081-4293-a4b5-c6d7e8f9a0b1" },
+      "type": "Response",
+      "kind": "PowerApp",
+      "inputs": {
+        "statusCode": 200,
+        "body": {
+          "weather": "@{string(setProperty(body('HTTP_Get_Weather'), 'radiation', coalesce(body('HTTP_Get_Radiation')?['daily'], json('null'))))}"
+        },
+        "schema": {
+          "type": "object",
+          "properties": { "weather": { "title": "weather", "type": "string", "x-ms-dynamically-added": true } }
+        }
+      }
+    },
+    "Respond_with_error": {
+      "runAfter": { "HTTP_Get_Weather": ["Failed", "Skipped", "TimedOut"] },
+      "metadata": { "operationMetadataId": "4d5e6f70-8192-43a4-b5c6-d7e8f9a0b1c2" },
+      "type": "Response",
+      "kind": "PowerApp",
+      "inputs": {
+        "statusCode": 200,
+        "body": {
+          "weather": "@{concat('{\"error\":true,\"status\":', string(coalesce(outputs('HTTP_Get_Weather')?['statusCode'], 0)), ',\"message\":\"Weather service unavailable\"}')}"
+        },
+        "schema": {
+          "type": "object",
+          "properties": { "weather": { "title": "weather", "type": "string", "x-ms-dynamically-added": true } }
+        }
+      }
+    }
+  }
+}
