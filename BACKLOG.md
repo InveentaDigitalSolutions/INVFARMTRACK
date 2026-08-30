@@ -1,13 +1,13 @@
 # Backlog
 
-What is open, as of **2026-08-29**. Items are grouped by whether they need a
+What is open, as of **2026-08-30**. Items are grouped by whether they need a
 decision, a build, or something entered. Anything here is understood — nothing
 is parked for want of analysis.
 
 A shareable version of this document lives at
 <https://claude.ai/code/artifact/7e8688fe-22df-41e0-9658-f3838177f593>.
 
-**Counts:** 6 blocked on Santiago · 7 decisions · 7 builds · 3 watching.
+**Counts:** 6 blocked on Santiago · 7 decisions · 5 builds · 3 watching.
 
 ---
 
