@@ -107,6 +107,10 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   layer, drawn by default. Turn Shade off before judging any lighting change —
   `NOSHADE=1 node scripts/test/shot3d.mjs` does it. Shadows work for anything
   bed-sized; 15 cm posts are below what one 4096 map resolves over 115 m.
+- **Read the whole `dataverse:apply` output, not a grep of it.** A column add
+  was missed because the run was piped through `grep -iE "error|added|renam"`
+  and the line did not match, so it looked applied and was not. `dry-run` says
+  what is outstanding — check it comes back with nothing after applying.
 - **A new Dataverse table needs registering with the CODE APP too.** Applying
   the schema is only half of it: the SDK reads `.power/schemas/appschemas/
   dataSourcesInfo.ts`, and a table missing from it fails at runtime with

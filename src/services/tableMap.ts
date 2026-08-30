@@ -354,14 +354,14 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // Lookup display text arrives via the formatted annotation on the
       // _value column, which DataverseStore unwraps.
       plant: "_bv_plantid_value", bed: "_bv_bedid_value", season: "_bv_seasonid_value",
-      // Where in the bed, and what for. A header seeding is interplanted among
+      // Where in the bed, and what for. A header planting is interplanted among
       // the main crop rather than replacing it, and propagation stock is mother
       // material — offering it to a customer as availability would be a lie.
       position: "bv_position",
       purpose: "bv_purpose",
-      // Whether this seeding is still the one on the bed. The form had a
+      // Whether this planting is still the one on the bed. The form had a
       // Status toggle bound to nothing, so it was dropped on every save and
-      // "Active Seedings" read zero for every real record.
+      // "Active Plantings" read zero for every real record.
       current: "bv_currentplanting",
     },
     primaryName: "bv_plantingdescription",

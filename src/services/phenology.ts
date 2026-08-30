@@ -1,5 +1,5 @@
 /**
- * How long a variety takes, given when it was seeded.
+ * How long a variety takes, given when it was planted.
  *
  * `bv_WeeksToFirstHarvest` used to answer this with one number for the whole
  * year, which the nursery's own figures say is wrong: the same cutting reaches
@@ -40,7 +40,7 @@ const num = (v: unknown): number | undefined => {
 };
 
 /**
- * Weeks from seeding to first cut, for the season the seeding falls in.
+ * Weeks from planting to first cut, for the season the planting falls in.
  *
  * Returns null when the variety has no figures recorded. That is deliberate: a
  * bed whose cycle is unknown can only be called "growing", and inventing a
@@ -48,10 +48,10 @@ const num = (v: unknown): number | undefined => {
  */
 export function growthWeeks(
   plant: PhenologyPlant | undefined,
-  seededOn: Date | string
+  plantedOn: Date | string
 ): GrowthWeeks | null {
   if (!plant) return null;
-  const season = seasonOf(seededOn);
+  const season = seasonOf(plantedOn);
 
   const min = num(season === "Mar-Aug" ? plant.growthWeeksMinMarAug : plant.growthWeeksMinSepFeb);
   const max = num(season === "Mar-Aug" ? plant.growthWeeksMaxMarAug : plant.growthWeeksMaxSepFeb);

@@ -28,8 +28,8 @@ for (const m of tableMap.matchAll(/^ {2}(\w+): \{\s*\n\s*dataSource: "(\w+)",([\
 // binding; listing them keeps the check honest rather than noisy.
 //
 // `status` used to be on this list, and that is how a Status control on the
-// seeding form shipped bound to no column at all: it was written on every save
-// and dropped, so "Active Seedings" read zero for every real record. Status is
+// planting form shipped bound to no column at all: it was written on every save
+// and dropped, so "Active Plantings" read zero for every real record. Status is
 // a genuine column on invoices, orders and shipments — allowlisting the name
 // everywhere hid the one place it was a fiction.
 const DERIVED = new Set(['actions', 'total', 'count', 'items', 'progress'])

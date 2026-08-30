@@ -114,7 +114,7 @@ const statusColors: Record<string, string> = {
 type MapLayer = "plantings" | "irrigation" | "treatments" | "harvest" | "revenue";
 
 const layerConfig: { id: MapLayer; label: string; icon: typeof Sprout; color: string }[] = [
-  { id: "plantings", label: "Seedings", icon: Sprout, color: "#3d8b40" },
+  { id: "plantings", label: "Plantings", icon: Sprout, color: "#3d8b40" },
   { id: "irrigation", label: "Irrigation", icon: Droplets, color: "#3b82f6" },
   { id: "treatments", label: "Treatments", icon: Bug, color: "#dc2626" },
   { id: "harvest", label: "Harvest", icon: Scissors, color: "#f59e0b" },

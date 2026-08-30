@@ -22,7 +22,7 @@ export interface PlantingLike {
   plant?: string;
   date?: string;
   qty?: number;
-  /** False once the seeding has been cleared off the bed. */
+  /** False once the planting has been cleared off the bed. */
   current?: boolean;
 }
 
@@ -104,8 +104,8 @@ export function cohorts(
 
     const cycle = cycleOf.get(p.plant);
     /**
-     * Seasonal, and a range rather than a point: a bed seeded in October takes
-     * longer to reach eight leaves than the same variety seeded in April, and
+     * Seasonal, and a range rather than a point: a bed planted in October takes
+     * longer to reach eight leaves than the same variety planted in April, and
      * the nursery's own figures are given as "8-10 weeks" for a reason.
      *
      * This window used to be first-cut plus "productive weeks", a single span

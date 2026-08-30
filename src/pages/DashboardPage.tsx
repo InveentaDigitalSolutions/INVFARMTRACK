@@ -276,7 +276,7 @@ export default function DashboardPage() {
           context={m.counted.value === undefined ? "not counted yet" : "cuttings"}
         />
         <StatCard
-          label="Active seedings"
+          label="Active plantings"
           value={m.activePlantings.value === undefined ? "—" : m.activePlantings.value}
           icon={Sprout}
           context={m.totalBeds ? `${m.planted.value ?? 0} of ${m.totalBeds} beds` : undefined}
@@ -535,7 +535,7 @@ export default function DashboardPage() {
               { label: "Treatments", value: String(m.totals.treatments), icon: Bug },
               { label: "Irrigation (L)", value: m.totals.irrigationLitres.toLocaleString(), icon: Droplets },
               { label: "Beds Planted", value: `${m.totals.bedsPlanted}/${m.totalBeds}`, icon: Layers },
-              { label: "Seedings", value: String(m.totals.plantings), icon: Leaf },
+              { label: "Plantings", value: String(m.totals.plantings), icon: Leaf },
             ].map((kpi) => {
               const Icon = kpi.icon;
               return (

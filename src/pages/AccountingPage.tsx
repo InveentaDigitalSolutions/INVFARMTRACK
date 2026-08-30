@@ -407,7 +407,7 @@ export default function AccountingPage() {
   /**
    * Invoices left in the authorised range.
    *
-   * This subtracted a literal 1461 — the start of the seeded CAI range — so it
+   * This subtracted a literal 1461 — the start of the planted CAI range — so it
    * only ever gave the right answer for that one authorisation. The range's
    * own start is the number to count from.
    */

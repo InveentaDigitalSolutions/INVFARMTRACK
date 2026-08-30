@@ -1,7 +1,7 @@
 /**
  * Row interfaces for every table the app reads, generated from the schema.
  *
- * The pages used to take their row shape from the demo array they were seeded
+ * The pages used to take their row shape from the demo array they were planted
  * with: empty the array and `ts.hours` becomes `unknown`, because nothing else
  * ever said what a timesheet is. Deriving it from the Dataverse schema says it
  * once, correctly, and makes a page that reads an unmapped field fail to

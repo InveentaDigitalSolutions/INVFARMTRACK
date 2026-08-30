@@ -52,7 +52,7 @@ export interface BedStatus {
  * Bed name -> what is on it and how it is doing.
  *
  * The cycle comes from the plant catalogue, and it depends on when the bed was
- * seeded: the same cutting takes 8-10 weeks to eight leaves between March and
+ * planted: the same cutting takes 8-10 weeks to eight leaves between March and
  * August and 10-12 between September and February. A variety with no figures
  * recorded can only be called "growing" — claiming it is ready would be a guess
  * dressed as a fact, and the nursery would go and cut it.
@@ -66,7 +66,7 @@ export function bedStatuses(input: {
   const today = input.today ?? new Date();
 
   // Keyed to the plant rather than to a single number, because how long it
-  // takes depends on the month the bed was seeded.
+  // takes depends on the month the bed was planted.
   const plantOf = new Map<string, PlantLike>();
   for (const p of input.plants) {
     const label = [p.name, p.variety].filter(Boolean).join(" / ");
@@ -75,7 +75,7 @@ export function bedStatuses(input: {
   }
 
   /**
-   * Every seeding still standing on each bed, oldest first.
+   * Every planting still standing on each bed, oldest first.
    *
    * A bed can carry more than one variety at a time — 4,000 of one and 200 of
    * another. This kept only the latest, so the second silently replaced the
@@ -101,14 +101,14 @@ export function bedStatuses(input: {
 
   const out = new Map<string, BedStatus>();
   for (const [bed, here] of standing) {
-    // The oldest standing seeding sets the bed's age and readiness — it is the
+    // The oldest standing planting sets the bed's age and readiness — it is the
     // one nearest to being cut. All the varieties are listed alongside.
     const planting = here[0];
     const varieties = [...new Set(here.map((p) => String(p.plant ?? "")).filter(Boolean))].sort();
     const variety = varieties.length === 1 ? varieties[0] : varieties.join(" + ");
     const planted = String(planting.date ?? "").slice(0, 10);
     // The cycle depends on the month it went in, so it is looked up against
-    // the seeding date rather than read off the variety as one flat number.
+    // the planting date rather than read off the variety as one flat number.
     const cycle = planted
       ? growthWeeks(plantOf.get(varieties[0] ?? variety), planted)?.expected
       : undefined;

@@ -13,16 +13,16 @@ const plantings = [
   { bed: 'E3-02', plant: 'Hawaiian', date: '2026-01-10' },
   { bed: 'C1-01', plant: 'Jade',     date: '2026-02-01' },
   // A second variety alongside the first — 4,000 of one and 200 of another is
-  // an ordinary seeding, not a replant.
+  // an ordinary planting, not a replant.
   { bed: 'E3-01', plant: 'Marble Queen', date: '2026-06-01' },
 ]
 eq('a bed carries every variety standing on it',
   varietiesByBed(plantings).get('E3-01'), ['Hawaiian', 'Marble Queen'])
 eq('a bed with one carries one', varietiesByBed(plantings).get('E3-02'), ['Hawaiian'])
-eq('a cleared seeding is not standing',
+eq('a cleared planting is not standing',
   varietiesByBed([...plantings, { bed:'C1-02', plant:'X', date:'2026-07-01', current:false }]).get('C1-02'),
   undefined)
-eq('the same variety seeded twice is still one variety',
+eq('the same variety planted twice is still one variety',
   varietiesByBed([{ bed:'A-01', plant:'Jade', date:'2026-01-01' },
                   { bed:'A-01', plant:'Jade', date:'2026-03-01' }]).get('A-01'), ['Jade'])
 

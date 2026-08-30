@@ -183,7 +183,7 @@ const status = bedStatuses({
 eq('a bed treated for pests is flagged', status.get('E3-01')?.state, 'issue')
 eq('freshly planted reads as planted', status.get('E3-02')?.state, 'planted')
 eq('no cycle on file means growing, never ready', status.get('E3-03')?.state, 'growing')
-eq('a cleared seeding leaves the bed out', status.has('E3-04'), false)
+eq('a cleared planting leaves the bed out', status.has('E3-04'), false)
 eq('the first cut is dated from the cycle', status.get('E3-02')?.expectedHarvest, '2026-11-12')
 
 const hist = bedHistory('E3-01', {
@@ -198,7 +198,7 @@ eq('a bed with nothing recorded has no history', bedHistory('E9-99', {}).length,
 
 console.log('\n— mixed beds —')
 // 4,000 of one variety and 200 of another on the same bed is an ordinary
-// seeding here, and every figure attributed through that bed has to cope.
+// planting here, and every figure attributed through that bed has to cope.
 const mixed = bedStatuses({
   plantings: [
     { bed: 'E3-01', plant: 'Pothos / Hawaiian', date: '2026-05-01', qty: 4000 },
@@ -213,7 +213,7 @@ eq('a mixed bed lists both varieties',
    mixed.get('E3-01')?.varieties, ['Pothos / Hawaiian', 'Pothos / Jade'])
 eq('and reads as both', mixed.get('E3-01')?.variety, 'Pothos / Hawaiian + Pothos / Jade')
 eq('a single-variety bed is unchanged', mixed.get('E3-02')?.varieties, ['Pothos / Jade'])
-eq('readiness follows the oldest seeding, the one nearest cutting',
+eq('readiness follows the oldest planting, the one nearest cutting',
    mixed.get('E3-01')?.plantedDate, '2026-05-01')
 
 console.log(failures === 0 ? '\n  all passed\n' : `\n  ${failures} FAILED\n`)

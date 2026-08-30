@@ -1,7 +1,7 @@
 /**
  * The moon, reduced to the handful of figures a nursery plans around.
  *
- * Not decoration: seeding, pruning and cutting are timed against the phase
+ * Not decoration: planting, pruning and cutting are timed against the phase
  * here, so what the schedule needs is how far off the next turning point is and
  * where in the cycle today sits.
  */

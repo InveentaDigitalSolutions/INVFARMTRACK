@@ -602,7 +602,7 @@
           "required": false,
           "minValue": 0,
           "maxValue": 104,
-          "description": "Weeks from seeding to 8 leaves in the bright half of the year, low end of the range."
+          "description": "Weeks from planting to 8 leaves in the bright half of the year, low end of the range."
         },
         {
           "schemaName": "bv_GrowthWeeksMaxMarAug",
@@ -611,7 +611,7 @@
           "required": false,
           "minValue": 0,
           "maxValue": 104,
-          "description": "Weeks from seeding to 8 leaves in the bright half of the year, high end of the range."
+          "description": "Weeks from planting to 8 leaves in the bright half of the year, high end of the range."
         },
         {
           "schemaName": "bv_HarvestWeeksMarAug",
@@ -638,7 +638,7 @@
           "required": false,
           "minValue": 0,
           "maxValue": 104,
-          "description": "Weeks from seeding to 8 leaves in the dark half of the year, low end of the range."
+          "description": "Weeks from planting to 8 leaves in the dark half of the year, low end of the range."
         },
         {
           "schemaName": "bv_GrowthWeeksMaxSepFeb",
@@ -647,7 +647,7 @@
           "required": false,
           "minValue": 0,
           "maxValue": 104,
-          "description": "Weeks from seeding to 8 leaves in the dark half of the year, high end of the range."
+          "description": "Weeks from planting to 8 leaves in the dark half of the year, high end of the range."
         },
         {
           "schemaName": "bv_HarvestWeeksSepFeb",
@@ -865,7 +865,7 @@
               "label": "Header"
             }
           ],
-          "description": "Where in the bed this seeding sits. The header is the starting part, where a second variety is interplanted among the main crop. One of: Whole bed, Header."
+          "description": "Where in the bed this planting sits. The header is the starting part, where a second variety is interplanted among the main crop. One of: Whole bed, Header."
         },
         {
           "schemaName": "bv_Purpose",
@@ -1701,7 +1701,7 @@
             },
             {
               "value": 187460007,
-              "label": "Seeding"
+              "label": "Planting"
             },
             {
               "value": 187460008,
@@ -1716,7 +1716,7 @@
               "label": "General Maintenance"
             }
           ],
-          "description": "One of: Watering, Fertilizing, Pruning, Repotting, Pest Control, Disease Treatment, Harvesting, Seeding, Packing, Inspection, General Maintenance."
+          "description": "One of: Watering, Fertilizing, Pruning, Repotting, Pest Control, Disease Treatment, Harvesting, Planting, Packing, Inspection, General Maintenance."
         },
         {
           "schemaName": "bv_PlantingId",

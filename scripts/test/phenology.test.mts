@@ -28,8 +28,8 @@ eq('a Date works as well as a string', seasonOf(new Date('2026-06-15T12:00:00Z')
 // The figure that replaced "weeks to first cut".
 const bright = growthWeeks(hawaiian, '2026-04-10')!
 const dark = growthWeeks(hawaiian, '2026-11-10')!
-eq('seeded in April it takes 8-10 weeks', [bright.min, bright.max], [8, 10])
-eq('seeded in November, 10-12', [dark.min, dark.max], [10, 12])
+eq('planted in April it takes 8-10 weeks', [bright.min, bright.max], [8, 10])
+eq('planted in November, 10-12', [dark.min, dark.max], [10, 12])
 eq('the expected figure is the middle of the range', bright.expected, 9)
 eq('and in the dark half', dark.expected, 11)
 eq('the season comes back with it', [bright.season, dark.season], ['Mar-Aug', 'Sep-Feb'])

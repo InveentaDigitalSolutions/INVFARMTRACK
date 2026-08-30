@@ -49,7 +49,7 @@ export interface Input {
   densityKgPerL?: number;
 }
 
-/** Standard oxide conversions, for seeding the catalogue. */
+/** Standard oxide conversions, for planting the catalogue. */
 export const ELEMENTAL_FACTORS: Record<string, { reportsAs: string; factor: number }> = {
   P2O5: { reportsAs: "P", factor: 0.4364 },
   K2O: { reportsAs: "K", factor: 0.8301 },

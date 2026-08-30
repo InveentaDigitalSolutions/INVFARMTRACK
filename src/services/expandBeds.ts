@@ -50,9 +50,9 @@ export interface PlantLineLike {
 }
 
 /**
- * Turning "I seeded two varieties into this bed" into two records.
+ * Turning "I planted two varieties into this bed" into two records.
  *
- * A seeding is one variety, one bed, one quantity — that is what the table
+ * A planting is one variety, one bed, one quantity — that is what the table
  * holds and what every reading of it assumes. But a bed genuinely carries
  * several at once, and making someone fill the form twice for the same bed on
  * the same day left nothing tying the two records together, and no way to see
@@ -75,7 +75,7 @@ export function expandPlantLines<T extends BedRecord & { lines?: unknown }>(
     ...(rest as Omit<T, "lines">),
     plant: line.plant,
     // Blank means "not counted", not zero — the store drops it either way,
-    // but a zero written here would read as a bed seeded with nothing.
+    // but a zero written here would read as a bed planted with nothing.
     qty: line.qty === "" || line.qty === undefined ? undefined : Number(line.qty),
     position: line.position || "Whole bed",
     purpose: line.purpose || "Production",

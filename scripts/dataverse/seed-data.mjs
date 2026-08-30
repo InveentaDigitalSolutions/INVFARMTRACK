@@ -60,7 +60,7 @@ async function api(method, path, body) {
  *
  * `rows` may be an array or a function, so the large generated sets (120 beds)
  * do not have to be written out. A `_ref` entry names a parent by its
- * descriptive value; the parent's GUID is resolved after that table is seeded
+ * descriptive value; the parent's GUID is resolved after that table is planted
  * and bound via @odata.bind, which is how Dataverse sets a lookup.
  */
 const PLOTS = [
@@ -618,7 +618,7 @@ const entitySets = (() => {
   return map
 })()
 
-/** Cache of seeded records per table: descriptive value -> GUID. */
+/** Cache of planted records per table: descriptive value -> GUID. */
 const idIndex = new Map()
 
 /** Dataverse names its key after the table: bv_bed -> bv_bedid. */
@@ -694,7 +694,7 @@ async function seedTable(plan) {
 }
 
 async function main() {
-  console.log(`Seeding ${DV_URL}`)
+  console.log(`Planting ${DV_URL}`)
   console.log(DRY_RUN ? 'MODE: dry run\n' : 'MODE: WRITE\n')
 
   token = await resolveToken(DV_URL)

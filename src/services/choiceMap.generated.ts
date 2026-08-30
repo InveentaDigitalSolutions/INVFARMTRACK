@@ -766,7 +766,7 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
     "bv_grownin": {
       "Ground": 187480000,
       "Basket": 187480001,
-      "Ground or Basket": 187480002
+      "Ground & Basket": 187480002
     },
     "bv_growthhabit": {
       "Upright": 121320000,
@@ -882,7 +882,7 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Pest Control": 187460004,
       "Disease Treatment": 187460005,
       "Harvesting": 187460006,
-      "Seeding": 187460007,
+      "Planting": 187460007,
       "Packing": 187460008,
       "Inspection": 187460009,
       "General Maintenance": 187460010

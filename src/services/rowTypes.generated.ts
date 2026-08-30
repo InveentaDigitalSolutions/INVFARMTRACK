@@ -404,6 +404,7 @@ export interface PlantsRow {
   patentHolder?: string;
   patentExpiry?: string;
   plantsPerBed?: number;
+  plantsPerBasketRow?: number;
   grownIn?: string;
   shadeNeeded?: string;
   growthWeeksMinMarAug?: number;
@@ -414,7 +415,6 @@ export interface PlantsRow {
   growthWeeksMaxSepFeb?: number;
   harvestWeeksSepFeb?: number;
   pruningWeeksSepFeb?: number;
-  productiveWeeks?: string;
   active?: boolean;
   [key: string]: unknown;
 }

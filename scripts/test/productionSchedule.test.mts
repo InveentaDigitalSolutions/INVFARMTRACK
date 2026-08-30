@@ -31,7 +31,7 @@ eq('a later wave is its own cohort', list.filter(c => c.plant==='Hawaiian').map(
 
 // projection only where a cycle time exists
 const hawaiian = list.find(c => c.plant==='Hawaiian')!
-// Seeded 5 January, so the dark half: 14-16 weeks, not the 12-14 of the bright
+// Planted 5 January, so the dark half: 14-16 weeks, not the 12-14 of the bright
 // one. The window is the two ends of the growth range — "productive weeks" was
 // retired because these are cut and pruned in cycles, not finished after a span.
 eq('first cut is the near end of the range', hawaiian.harvestFrom, '2026-04-13')

@@ -17,7 +17,7 @@ export interface PlantingLike {
   plant?: string;
   date?: string;
   qty?: number;
-  /** False once the seeding has been cleared off the bed. */
+  /** False once the planting has been cleared off the bed. */
   current?: boolean;
 }
 

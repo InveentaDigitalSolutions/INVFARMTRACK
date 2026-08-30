@@ -28,7 +28,7 @@ import type { FertilizationRow, HarvestRow, IrrigationRow, PlantingsRow, PlantsR
  */
 const tabs = [
   { id: "overview", label: "Overview" },
-  { id: "plantings", label: "Seedings" },
+  { id: "plantings", label: "Plantings" },
   { id: "care", label: "Crop Care" },
   { id: "harvest", label: "Harvest" },
   { id: "tasks", label: "Tasks" },
@@ -82,19 +82,19 @@ const workerOptionsFallback: { value: string; label: string }[] = [];
 
 // Form definitions
 const plantingFields = [
-  { title: "Seeding Details", columns: 2 as const, fields: [
+  { title: "Planting Details", columns: 2 as const, fields: [
     { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
     // A bed carries several varieties at once, each with its own quantity.
-    // Every line becomes its own seeding record.
+    // Every line becomes its own planting record.
     { key: "lines", label: "Plants and quantities", type: "plantlines" as const,
       options: plantOptionsFallback, optionsFrom: "plants", required: true, span: 2 as const },
     { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons", required: true },
-    { key: "date", label: "Seeding Date", type: "date" as const, required: true },
+    { key: "date", label: "Planting Date", type: "date" as const, required: true },
     // Baskets carry hanging pots in two shapes; the 3D view renders each.
     { key: "potType", label: "Pot Type", type: "toggle" as const, options: [
       { value: "round", label: "Round" }, { value: "square", label: "Square" },
     ] },
-    // A bed can carry several seedings at once — 4,000 of one variety and 200
+    // A bed can carry several plantings at once — 4,000 of one variety and 200
     // of another. This says which are still standing, not which is latest.
     { key: "current", label: "Still on this bed", type: "boolean" as const },
   ]},
@@ -150,7 +150,7 @@ const taskFormGroups = [
     { key: "type", label: "Type", type: "select" as const, options: [
       { value: "Watering", label: "Watering" }, { value: "Fertilizing", label: "Fertilizing" },
       { value: "Pruning", label: "Pruning" }, { value: "Pest Control", label: "Pest Control" },
-      { value: "Harvesting", label: "Harvesting" }, { value: "Seeding", label: "Seeding" },
+      { value: "Harvesting", label: "Harvesting" }, { value: "Planting", label: "Planting" },
       { value: "Packing", label: "Packing" }, { value: "General Maintenance", label: "General Maintenance" },
     ], required: true },
     { key: "due", label: "Due Date", type: "date" as const, required: true },
@@ -401,7 +401,7 @@ export default function ProductionPage() {
     handleSave(seasons, setSeasons, seasonForm, { ...values, name });
   };
 
-  // A new seeding is on the bed by definition, and starts with one blank line
+  // A new planting is on the bed by definition, and starts with one blank line
   // so the control has something to show.
   const plantingForm = useFormModal({ current: true, lines: [emptyLine()] });
   const treatmentForm = useFormModal(initTreatments[0]);
@@ -421,9 +421,9 @@ export default function ProductionPage() {
       updated[form.editIndex] = values as any;
       setData(updated);
     } else {
-      // One record per bed, then one per variety seeded into it. A bed is a
+      // One record per bed, then one per variety planted into it. A bed is a
       // single lookup, so an array saved as one record resolved to nothing and
-      // the bed was silently dropped; a seeding is one variety, so a bed
+      // the bed was silently dropped; a planting is one variety, so a bed
       // carrying two is two records.
       setData([...data, ...expandBeds(values).flatMap(expandPlantLines)]);
     }
@@ -431,13 +431,13 @@ export default function ProductionPage() {
   };
 
   /**
-   * Opening a seeding for edit.
+   * Opening a planting for edit.
    *
    * The record holds one variety and one quantity; the control speaks in
    * lines. Without this the form would open with the plant control empty and
    * quietly blank the variety on save.
    */
-  const openSeedingEdit = (row: Record<string, unknown>, index: number) => {
+  const openPlantingEdit = (row: Record<string, unknown>, index: number) => {
     plantingForm.openEdit(
       { ...row, lines: [{
         plant: String(row.plant ?? ""),
@@ -450,13 +450,13 @@ export default function ProductionPage() {
   };
 
   /**
-   * Saving a seeding.
+   * Saving a planting.
    *
    * Editing corrects the record in front of you — its first line. Any further
    * line is another variety going into the same bed on the same day, which is
-   * a new seeding record, not a change to this one.
+   * a new planting record, not a change to this one.
    */
-  const saveSeeding = (values: Record<string, unknown>) => {
+  const savePlanting = (values: Record<string, unknown>) => {
     const records = expandBeds(values).flatMap(expandPlantLines);
     if (records.length === 0 || !records[0].plant) {
       alert("Choose at least one plant.");
@@ -492,7 +492,7 @@ export default function ProductionPage() {
                 { key: "plant", label: "Plant" },
                 { key: "bed", label: "Bed" },
                 { key: "season", label: "Season" },
-                { key: "date", label: "Seeded" },
+                { key: "date", label: "Planted" },
                 { key: "qty", label: "Qty" },
                 { key: "position", label: "Position", render: (r) =>
                   r.position === "Header"
@@ -508,13 +508,13 @@ export default function ProductionPage() {
               ]}
               data={plantings}
               onAdd={plantingForm.openCreate}
-              onEdit={(row, i) => openSeedingEdit(row as Record<string, unknown>, i)}
+              onEdit={(row, i) => openPlantingEdit(row as Record<string, unknown>, i)}
               onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="New Seeding"
-              searchPlaceholder="Search seedings..."
+              addLabel="New Planting"
+              searchPlaceholder="Search plantings..."
             />
-            <FormModal open={plantingForm.open} onClose={plantingForm.close} title={plantingForm.isEdit ? "Edit Seeding" : "New Seeding"} groups={plantingFields} values={plantingForm.values} onChange={plantingForm.onChange} isEdit={plantingForm.isEdit} onSubmit={saveSeeding} />
-            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Seeding" message="Are you sure you want to delete this seeding record? This cannot be undone." onConfirm={() => handleDelete(plantings, setPlantings)} />
+            <FormModal open={plantingForm.open} onClose={plantingForm.close} title={plantingForm.isEdit ? "Edit Planting" : "New Planting"} groups={plantingFields} values={plantingForm.values} onChange={plantingForm.onChange} isEdit={plantingForm.isEdit} onSubmit={savePlanting} />
+            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Planting" message="Are you sure you want to delete this planting record? This cannot be undone." onConfirm={() => handleDelete(plantings, setPlantings)} />
           </>
         );
       case "overview":
@@ -797,9 +797,9 @@ export default function ProductionPage() {
   };
 
   return (
-    <PageShell title="Production" subtitle="Seedings, treatments, irrigation and harvest" icon={Sprout}>
+    <PageShell title="Production" subtitle="Plantings, treatments, irrigation and harvest" icon={Sprout}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard variant="hero" label="Active Seedings" value={plantings.filter((p) => p.current !== false).length} icon={Leaf} />
+        <StatCard variant="hero" label="Active Plantings" value={plantings.filter((p) => p.current !== false).length} icon={Leaf} />
         <StatCard label="Treatments (month)" value={treatments.length} icon={Bug} />
         <StatCard label="Water Used (L)" value={irrigation.reduce((s, i) => s + (i.liters ?? 0), 0).toLocaleString()} icon={Droplets} />
         <StatCard label="Harvested" value={harvest.reduce((s, h) => s + (h.qty ?? 0), 0).toLocaleString()} icon={Scissors} />

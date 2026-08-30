@@ -1,14 +1,14 @@
 import { Plus, X } from "lucide-react";
 
 /**
- * A bed's seeding, variety by variety.
+ * A bed's planting, variety by variety.
  *
  * A bed carries more than one: 4,000 of one and 200 of another is an ordinary
- * seeding here. One Plant field and one Quantity meant filling the form twice
+ * planting here. One Plant field and one Quantity meant filling the form twice
  * for the same bed on the same day, and nothing tied the two records together
- * as one act of seeding.
+ * as one act of planting.
  *
- * Each line becomes its own seeding record, because that is what a seeding is —
+ * Each line becomes its own planting record, because that is what a planting is —
  * this variety, this bed, this many. The form just stops making you say the
  * bed and the date twice.
  */
@@ -136,7 +136,7 @@ export default function PlantLines({
         </button>
 
         {/* Counted from lines with a variety chosen. A quantity typed against
-            no plant is not a seeding of anything yet. */}
+            no plant is not a planting of anything yet. */}
         {filled.length > 0 && (
           <span className="text-[12px] text-navy-500 tabular-nums">
             {filled.length} {filled.length === 1 ? "plant" : "plants"}
@@ -149,7 +149,7 @@ export default function PlantLines({
 
       {/* The same variety twice is only a mistake when it is in the same place
           for the same reason — Pothos filling the bed and Pothos on the header
-          are two real seedings. */}
+          are two real plantings. */}
       {duplicated.length > 0 && (
         <p className="text-[11px] text-amber-700">
           {duplicated[0]} is listed twice in the same position — combine the quantities into one line.

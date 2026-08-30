@@ -65,7 +65,7 @@ export default function ProductionOverview() {
      * Harvest by variety. The harvest record's own variety wins; the bed's
      * stands in only when that bed carries exactly one. A cut recorded against
      * a mixed bed with no variety is left out — crediting it to whichever
-     * seeding happened to be latest is how the figure used to lie.
+     * planting happened to be latest is how the figure used to lie.
      */
     const byVariety = new Map<string, number>();
     for (const h of harvests) {
@@ -151,7 +151,7 @@ export default function ProductionOverview() {
           context={model.totalBeds ? { label: "beds in total", value: String(model.totalBeds) } : undefined}
         />
         <MetricTile
-          label="Seeding waves"
+          label="Planting waves"
           value={String(model.waves.length)}
           icon={CalendarClock}
           context={
@@ -203,7 +203,7 @@ export default function ProductionOverview() {
       </div>
 
       {/* The moon sits with the figures rather than behind a tab of its own.
-          Seeding, pruning and cutting are timed against it, so it is context to
+          Planting, pruning and cutting are timed against it, so it is context to
           have in front of you while reading everything else — not somewhere to
           go and look. */}
       <MoonSection />

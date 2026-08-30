@@ -21,7 +21,7 @@ export interface BedPlanting {
   position?: string;
   /** "Production" is grown to sell; "Propagation" is mother material. */
   purpose?: string;
-  /** False once the seeding has been cleared off the bed. */
+  /** False once the planting has been cleared off the bed. */
   current?: boolean;
 }
 
@@ -64,7 +64,7 @@ export interface VarietyCoverage {
  * The varieties standing on each bed now — the link between beds and demand.
  *
  * A bed can carry more than one: 4,000 of one variety and 200 of another is an
- * ordinary seeding. This used to keep only the latest, so a second variety on
+ * ordinary planting. This used to keep only the latest, so a second variety on
  * a bed silently replaced the first and every figure attributed through that
  * bed was wrong without saying so.
  */

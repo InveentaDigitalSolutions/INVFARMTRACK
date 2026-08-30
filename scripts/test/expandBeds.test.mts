@@ -32,13 +32,13 @@ eq('an empty array counts as none', bedCount({ bed: [] }), 0)
 // ── expandPlantLines ────────────────────────────────────────────────────────
 // A bed carries several varieties at once — 4,000 of one and 200 of another.
 // The form collects them as lines; the table holds one variety per record.
-const seeding = { bed: 'E3-01', date: '2026-08-30', season: '2026-S2' }
+const planting = { bed: 'E3-01', date: '2026-08-30', season: '2026-S2' }
 
 eq('no lines passes straight through',
-   expandPlantLines(seeding), [seeding])
+   expandPlantLines(planting), [planting])
 
 const two = expandPlantLines({
-  ...seeding,
+  ...planting,
   lines: [{ plant: 'Hawaiian', qty: '4000' }, { plant: 'Jade', qty: '200' }],
 })
 eq('two varieties become two records', two.length, 2)
@@ -49,15 +49,15 @@ eq('the bed and date are on both',
 eq('the lines themselves never reach the record', 'lines' in two[0], false)
 
 eq('a line with no plant is someone mid-thought, not data',
-   expandPlantLines({ ...seeding, lines: [{ plant: 'Jade', qty: '5' }, { plant: '', qty: '' }] }).length, 1)
+   expandPlantLines({ ...planting, lines: [{ plant: 'Jade', qty: '5' }, { plant: '', qty: '' }] }).length, 1)
 eq('no filled line leaves the record alone',
-   expandPlantLines({ ...seeding, lines: [{ plant: '', qty: '' }] }), [seeding])
+   expandPlantLines({ ...planting, lines: [{ plant: '', qty: '' }] }), [planting])
 eq('a blank quantity is not counted, not zero',
-   expandPlantLines({ ...seeding, lines: [{ plant: 'Jade', qty: '' }] })[0].qty, undefined)
+   expandPlantLines({ ...planting, lines: [{ plant: 'Jade', qty: '' }] })[0].qty, undefined)
 eq('zero is a real answer where it is typed',
-   expandPlantLines({ ...seeding, lines: [{ plant: 'Jade', qty: '0' }] })[0].qty, 0)
+   expandPlantLines({ ...planting, lines: [{ plant: 'Jade', qty: '0' }] })[0].qty, 0)
 
-// Several beds each seeded with the same mix.
+// Several beds each planted with the same mix.
 const spread = expandBeds({ bed: ['E3-01', 'E3-02'], date: '2026-08-30' })
   .flatMap((r) => expandPlantLines({ ...r, lines: [{ plant: 'Hawaiian', qty: '100' }, { plant: 'Jade', qty: '20' }] }))
 eq('two beds and two varieties make four records', spread.length, 4)

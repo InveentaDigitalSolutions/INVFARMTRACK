@@ -2,7 +2,7 @@
  * The moon, as a planner reads it: today's figures on a line, and the days
  * ahead as a strip you can run out to three months.
  *
- * Seeding, pruning and cutting are timed against the phase here, so this is
+ * Planting, pruning and cutting are timed against the phase here, so this is
  * production information rather than an ornament. It lives in the Production
  * overview beside the other figures, not behind a tab of its own — a tab makes
  * it somewhere to go, and this is context you want in front of you while

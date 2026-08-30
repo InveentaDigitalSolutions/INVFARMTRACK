@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 49 |
-| Columns | 602 |
+| Columns | 601 |
 | Relationships | 68 |
 
 ## Conventions
@@ -33,7 +33,7 @@
 |---|---|---|---|---|
 | [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 9 | Physical growing structures in the nursery |
 | [Bed](#bed) | `bv_bed` | `BED-0001` | 12 | Growing beds within batches (Shadehouse > Batch > Bed) |
-| [Plant](#plant) | `bv_plant` | `PLT-0001` | 33 | Plant species, varieties, and patent catalog |
+| [Plant](#plant) | `bv_plant` | `PLT-0001` | 32 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
 | [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
 | [Planting](#planting) | `bv_planting` | `PLG-0001` | 11 | Records of plants placed in beds — central activity hub |
@@ -290,19 +290,18 @@ Plant species, varieties, and patent catalog
 | `bv_characteristics` | Characteristics | Text area(4000) |  | Long-form text. Characteristics for the Plant. |
 | `bv_imageurl` | Image URL | Text(500) |  | Short text value. Image URL for the Plant. |
 | `bv_isactive` | Is Active | Yes/No |  | Whether the record is currently in use. |
-| `bv_weekstofirstharvest` | Weeks to First Cut | Whole number |  | Weeks from planting a bed to its first cut. Without this a planting date says when work started but nothing about when stock arrives, so the schedule can only report the past. |
-| `bv_productiveweeks` | Productive Weeks | Whole number |  | How long a bed keeps yielding after the first cut. A cutting nursery harvests the same bed repeatedly, so the useful answer is a window rather than a date. Leave blank if the bed is cut once. |
-| `bv_plantsperbed` | Plants per Bed | Whole number |  | How many of this variety a bed holds. Every bed is the same size, so this is a property of the variety rather than of any particular bed — which is why it lives here and not on a bed-and-variety pairing. |
-| `bv_grownin` | Grown In | Choice |  | Where this variety can be grown. Some varieties are only ever hung in baskets and must never be offered for a ground bed. One of: Ground, Basket, Ground or Basket. |
+| `bv_plantsperbed` | Plants per Bed Row | Whole number |  | How many of this variety fit in one ground bed row. Every bed row is the same size, so this is a property of the variety. |
+| `bv_grownin` | Grown In | Choice |  | Where this variety can be grown — the ground, a basket, or both. Some varieties are only ever hung and must never be offered for a ground bed. One of: Ground, Basket, Ground & Basket. |
 | `bv_shadeneeded` | Shade Needed | Choice |  | Layers of 65% cloth this variety needs. Distinct from the shade a bed actually has: this is the requirement, that is the fact. One of: Single, Double, Triple. |
-| `bv_growthweeksminmaraug` | Growth Weeks Min (Mar-Aug) | Whole number |  | Weeks from seeding to 8 leaves in the bright half of the year, low end of the range. |
-| `bv_growthweeksmaxmaraug` | Growth Weeks Max (Mar-Aug) | Whole number |  | Weeks from seeding to 8 leaves in the bright half of the year, high end of the range. |
+| `bv_growthweeksminmaraug` | Growth Weeks Min (Mar-Aug) | Whole number |  | Weeks from planting to 8 leaves in the bright half of the year, low end of the range. |
+| `bv_growthweeksmaxmaraug` | Growth Weeks Max (Mar-Aug) | Whole number |  | Weeks from planting to 8 leaves in the bright half of the year, high end of the range. |
 | `bv_harvestweeksmaraug` | Harvest Weeks (Mar-Aug) | Whole number |  | Weeks between harvests once the plant is at 8 leaves, bright half of the year. |
 | `bv_pruningweeksmaraug` | Pruning Weeks (Mar-Aug) | Whole number |  | Weeks to recover after pruning back to 2 leaves, bright half of the year. |
-| `bv_growthweeksminsepfeb` | Growth Weeks Min (Sep-Feb) | Whole number |  | Weeks from seeding to 8 leaves in the dark half of the year, low end of the range. |
-| `bv_growthweeksmaxsepfeb` | Growth Weeks Max (Sep-Feb) | Whole number |  | Weeks from seeding to 8 leaves in the dark half of the year, high end of the range. |
+| `bv_growthweeksminsepfeb` | Growth Weeks Min (Sep-Feb) | Whole number |  | Weeks from planting to 8 leaves in the dark half of the year, low end of the range. |
+| `bv_growthweeksmaxsepfeb` | Growth Weeks Max (Sep-Feb) | Whole number |  | Weeks from planting to 8 leaves in the dark half of the year, high end of the range. |
 | `bv_harvestweekssepfeb` | Harvest Weeks (Sep-Feb) | Whole number |  | Weeks between harvests once the plant is at 8 leaves, dark half of the year. |
 | `bv_pruningweekssepfeb` | Pruning Weeks (Sep-Feb) | Whole number |  | Weeks to recover after pruning back to 2 leaves, dark half of the year. |
+| `bv_plantsperbasketrow` | Plants per Basket Row | Whole number |  | How many of this variety fit in one basket row. A basket holds a different number from a ground bed row, so a variety grown both ways carries both figures. |
 
 <details><summary>Choice values</summary>
 
@@ -358,7 +357,7 @@ Plant species, varieties, and patent catalog
 |---|---|
 | 187480000 | Ground |
 | 187480001 | Basket |
-| 187480002 | Ground or Basket |
+| 187480002 | Ground & Basket |
 
 **Shade Needed** (`bv_shadeneeded`)
 
@@ -426,7 +425,7 @@ Records of plants placed in beds — central activity hub
 | `bv_seasonid` | Season | Lookup → [Season](#season) | ✓ | Link to the related Season record. |
 | `bv_plantingdate` | Planting Date | Date only | ✓ | Date the event took place. |
 | `bv_quantity` | Quantity | Whole number |  | Amount recorded for this entry. |
-| `bv_position` | Position in bed | Choice |  | Where in the bed this seeding sits. The header is the starting part, where a second variety is interplanted among the main crop. One of: Whole bed, Header. |
+| `bv_position` | Position in bed | Choice |  | Where in the bed this planting sits. The header is the starting part, where a second variety is interplanted among the main crop. One of: Whole bed, Header. |
 | `bv_purpose` | Purpose | Choice |  | Production is stock grown to sell. Propagation is mother material grown to fill a bed later, and must not be offered to a customer as availability. One of: Production, Propagation. |
 | `bv_currentplanting` | Current Planting | Yes/No |  | Yes/no flag. Current Planting for the Planting. |
 | `bv_notes` | Notes | Text area(2000) |  | Free-text notes. |
@@ -686,7 +685,7 @@ Scheduled and assigned nursery tasks
 |---|---|---|:--:|---|
 | `bv_taskcode` 🔑 | Task ID | Autonumber | ✓ | Auto-generated identifier, format TSK-0001. |
 | `bv_tasktitle` | Task Title | Text(200) | ✓ | Short text value. Task Title for the Task. |
-| `bv_tasktype` | Task Type | Choice | ✓ | One of: Watering, Fertilizing, Pruning, Repotting, Pest Control, Disease Treatment, Harvesting, Seeding, Packing, Inspection, General Maintenance. |
+| `bv_tasktype` | Task Type | Choice | ✓ | One of: Watering, Fertilizing, Pruning, Repotting, Pest Control, Disease Treatment, Harvesting, Planting, Packing, Inspection, General Maintenance. |
 | `bv_plantingid` | Related Planting | Lookup → [Planting](#planting) |  | Link to the related Planting record. |
 | `bv_bedid` | Related Bed | Lookup → [Bed](#bed) |  | Link to the related Bed record. |
 | `bv_duedate` | Due Date | Date and time | ✓ | Date the event took place. |
@@ -709,7 +708,7 @@ Scheduled and assigned nursery tasks
 | 187460004 | Pest Control |
 | 187460005 | Disease Treatment |
 | 187460006 | Harvesting |
-| 187460007 | Seeding |
+| 187460007 | Planting |
 | 187460008 | Packing |
 | 187460009 | Inspection |
 | 187460010 | General Maintenance |
