@@ -54,6 +54,18 @@ system turned a working layout into a mess.
 
 What the survey is genuinely good for:
 
+- **Where the nursery is.** The sheet plots the control monument and prints its
+  coordinates beside it: NORTE 1656178.8321, ESTE 397522.0134, ELEV 563.899 —
+  UTM zone 16N, which converts to **14.9786°N, 87.9531°W, 563.9 m**. The app had
+  been using -87.85, about 11 km east. Now in `src/services/site.ts`.
+- **Which way the beds face.** The compass needle is drawn exactly along the
+  page axis, so north on the sheet is unambiguous. Inside "Viveros Existentes"
+  the bed grid resolves into two perpendicular families: 70 lines run one way
+  and 139 the other, and the 70 are the bed runs. They sit **18° off north**.
+  Applying the UTM convergence at this longitude (0.25°, grid north west of
+  true) gives a bed axis of **342.25° true — N17.75°W**, not north-south.
+  This is orientation, not layout, and it is what the solar model turns on.
+
 - **The floor falls 3.5 m** across the shadehouse, from 569.5 m down to 566.0 m.
   That is real and worth showing.
 - **Contours at 0.50 m**, extracted to `src/services/terrain.generated.ts` as a

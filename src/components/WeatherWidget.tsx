@@ -6,9 +6,12 @@ import {
   ChevronDown, ChevronUp, Sunrise, Sunset, CloudSun,
   Cloud, CloudDrizzle, CloudLightning, Snowflake, CloudFog,
 } from "lucide-react";
+import { SITE_LAT, SITE_LON } from "../services/site";
 
-const LAT = 14.97;
-const LNG = -87.85;
+// The nursery, from the survey's control monument. These were -87.85 before,
+// about 11 km east of here — a guess that predated having the survey.
+const LAT = SITE_LAT;
+const LNG = SITE_LON;
 
 interface CurrentWeather {
   temperature: number;

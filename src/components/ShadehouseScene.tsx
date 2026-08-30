@@ -5,6 +5,7 @@ import { Billboard, RoundedBox } from "@react-three/drei";
 // blocks, and the failure takes the whole scene down. See SceneText.
 import SceneText from "./SceneText";
 import { drawTerrainOverlay } from "../services/terrainTexture";
+import { bearingToModel } from "../services/site";
 import * as THREE from "three";
 import {
   LEVEL_HEIGHTS_M,
@@ -838,8 +839,17 @@ function PlotLabel({
   );
 }
 
+/**
+ * True north, not the model's own axes.
+ *
+ * The scene lays the beds along Z and it would be convenient if that were
+ * north. The survey says it is not: the beds run N17.75°W, so the whole
+ * compass is turned to match. Anyone reading a shadow off this view needs the
+ * real bearing, and 17.75° is a long way at a low sun.
+ */
 function Compass({ span, depth }: { span: number; depth: number }) {
   const half = { x: span / 2 + 3.5, z: depth / 2 + 3.5 };
+  const turn = -bearingToModel(0) * (Math.PI / 180);
   const marks: { label: string; pos: [number, number, number]; primary: boolean }[] = [
     { label: "N", pos: [0, 0.05, -half.z], primary: true },
     { label: "S", pos: [0, 0.05, half.z], primary: false },
@@ -848,7 +858,7 @@ function Compass({ span, depth }: { span: number; depth: number }) {
   ];
 
   return (
-    <group>
+    <group rotation={[0, turn, 0]}>
       {marks.map((m) => (
         <group key={m.label} position={m.pos}>
           <SceneText

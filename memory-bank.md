@@ -96,6 +96,17 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   layout. Rebuilding the geometry from it produced five wrong versions in a row
   while every unit test stayed green, because the survey's measurements span the
   whole footprint and its rotation is relative to the sheet, not to north.
+- **The beds do not run north-south.** They run **N17.75°W** (bed axis 342.25°
+  true), read off the survey's compass needle and bed grid. The 3D scene lays
+  them along its own Z axis and the compass is turned to compensate, so model
+  space and the real world are 17.75° apart — `services/site.ts` holds the
+  position and bearing and `bearingToModel()` converts between them. Anything
+  that has to point at the real sun goes through it.
+- **Solar position needs no network.** `services/solar.ts` is the NOAA
+  algorithm, checked against Greenwich at solar noon (179.98° — due south).
+  Note the site is inside the tropics: the noon sun passes **north** of overhead
+  from late April to mid-August, so shadows swing right through the compass
+  twice a year, and day length only varies 11.1 h to 12.9 h.
 - **The Terrain layer is deliberately 2D.** Contours are painted on the floor as
   a canvas texture, not displaced into a mesh: displacement would move every bed
   and reopen the layout. Beds fade to ~0.3 opacity while it is on, or they hide
