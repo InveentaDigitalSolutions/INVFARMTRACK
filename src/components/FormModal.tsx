@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronDown, Lock } from "lucide-react";
 import BedSelector from "./BedSelector";
+import PlantLines, { type PlantLine } from "./PlantLines";
 import { useLookupOptionsFor } from "../hooks/useLookupOptions";
 
 // Field definition types
@@ -51,6 +52,13 @@ interface SelectField extends BaseField {
   optionsWhen?: (values: Record<string, unknown>) => { value: string; label: string }[];
 }
 
+interface PlantLinesField extends BaseField {
+  type: "plantlines";
+  /** App table key whose rows are the varieties on offer. */
+  optionsFrom?: string;
+  options?: { value: string; label: string }[];
+}
+
 interface ToggleField extends BaseField {
   type: "toggle";
   options: { value: string; label: string }[];
@@ -92,6 +100,7 @@ export type FieldDef =
   | TextareaField
   | BooleanField
   | MultiSelectField
+  | PlantLinesField
   | BedSelectorField;
 
 interface FieldGroupDef {
@@ -254,6 +263,15 @@ function renderField(
           onChange={(beds) => onChange(field.key, beds)}
           multiSelect={field.multiSelect !== false}
           label=""
+        />
+      );
+
+    case "plantlines":
+      return (
+        <PlantLines
+          value={Array.isArray(v) ? (v as PlantLine[]) : []}
+          options={optionsFor(field as never)}
+          onChange={(lines) => onChange(field.key, lines)}
         />
       );
 

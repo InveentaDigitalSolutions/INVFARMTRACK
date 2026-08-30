@@ -13,7 +13,8 @@ import { useRecords } from "../hooks/useRecords";
 import { nextSeasonName } from "../services/infrastructureRules";
 import ProductionOverview from "../components/ProductionOverview";
 import { useInputNutrients } from "../hooks/useInputNutrients";
-import { expandBeds } from "../services/expandBeds";
+import { expandBeds, expandPlantLines } from "../services/expandBeds";
+import { emptyLine } from "../components/PlantLines";
 import type { FertilizationRow, HarvestRow, IrrigationRow, PlantingsRow, PlantsRow, PruningRow, SeasonsRow, TasksRow, TreatmentsRow } from "../services/rowTypes.generated";
 
 /**
@@ -77,11 +78,13 @@ const workerOptionsFallback: { value: string; label: string }[] = [];
 // Form definitions
 const plantingFields = [
   { title: "Seeding Details", columns: 2 as const, fields: [
-    { key: "plant", label: "Plant", type: "select" as const, options: plantOptionsFallback, optionsFrom: "plants", required: true },
     { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
+    // A bed carries several varieties at once, each with its own quantity.
+    // Every line becomes its own seeding record.
+    { key: "lines", label: "Plants and quantities", type: "plantlines" as const,
+      options: plantOptionsFallback, optionsFrom: "plants", required: true, span: 2 as const },
     { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons", required: true },
     { key: "date", label: "Seeding Date", type: "date" as const, required: true },
-    { key: "qty", label: "Quantity", type: "number" as const, min: 1 },
     // Air beds carry hanging pots in two shapes; the 3D view renders each.
     { key: "potType", label: "Pot Type", type: "select" as const, options: [
       { value: "round", label: "Round" }, { value: "square", label: "Square" },
@@ -311,7 +314,9 @@ export default function ProductionPage() {
     handleSave(seasons, setSeasons, seasonForm, { ...values, name });
   };
 
-  const plantingForm = useFormModal(initPlantings[0]);
+  // A new seeding is on the bed by definition, and starts with one blank line
+  // so the control has something to show.
+  const plantingForm = useFormModal({ current: true, lines: [emptyLine()] });
   const treatmentForm = useFormModal(initTreatments[0]);
   const irrigationForm = useFormModal(initIrrigation[0]);
   const harvestForm = useFormModal(initHarvest[0]);
@@ -328,11 +333,53 @@ export default function ProductionPage() {
       updated[form.editIndex] = values as any;
       setData(updated);
     } else {
-      // One record per bed. A bed is a single lookup, so an array saved as one
-      // record resolved to nothing and the bed was silently dropped.
-      setData([...data, ...expandBeds(values)]);
+      // One record per bed, then one per variety seeded into it. A bed is a
+      // single lookup, so an array saved as one record resolved to nothing and
+      // the bed was silently dropped; a seeding is one variety, so a bed
+      // carrying two is two records.
+      setData([...data, ...expandBeds(values).flatMap(expandPlantLines)]);
     }
     form.close();
+  };
+
+  /**
+   * Opening a seeding for edit.
+   *
+   * The record holds one variety and one quantity; the control speaks in
+   * lines. Without this the form would open with the plant control empty and
+   * quietly blank the variety on save.
+   */
+  const openSeedingEdit = (row: Record<string, unknown>, index: number) => {
+    plantingForm.openEdit(
+      { ...row, lines: [{ plant: String(row.plant ?? ""), qty: row.qty === undefined ? "" : String(row.qty) }] },
+      index
+    );
+  };
+
+  /**
+   * Saving a seeding.
+   *
+   * Editing corrects the record in front of you — its first line. Any further
+   * line is another variety going into the same bed on the same day, which is
+   * a new seeding record, not a change to this one.
+   */
+  const saveSeeding = (values: Record<string, unknown>) => {
+    const records = expandBeds(values).flatMap(expandPlantLines);
+    if (records.length === 0 || !records[0].plant) {
+      alert("Choose at least one plant.");
+      return;
+    }
+
+    if (plantingForm.isEdit && plantingForm.editIndex !== null) {
+      const updated = [...plantings];
+      updated[plantingForm.editIndex] = {
+        ...updated[plantingForm.editIndex], ...records[0],
+      } as never;
+      setPlantings([...updated, ...records.slice(1)] as never);
+    } else {
+      setPlantings([...plantings, ...records] as never);
+    }
+    plantingForm.close();
   };
 
   const handleDelete = (data: Record<string, unknown>[], setData: (d: any) => void) => {
@@ -358,12 +405,12 @@ export default function ProductionPage() {
               ]}
               data={plantings}
               onAdd={plantingForm.openCreate}
-              onEdit={(row, i) => plantingForm.openEdit(row as any, i)}
+              onEdit={(row, i) => openSeedingEdit(row as Record<string, unknown>, i)}
               onDelete={(row, i) => confirm.requestDelete(row, i)}
               addLabel="New Seeding"
               searchPlaceholder="Search seedings..."
             />
-            <FormModal open={plantingForm.open} onClose={plantingForm.close} title={plantingForm.isEdit ? "Edit Seeding" : "New Seeding"} groups={plantingFields} values={plantingForm.values} onChange={plantingForm.onChange} isEdit={plantingForm.isEdit} onSubmit={(v) => handleSave(plantings, setPlantings, plantingForm, v)} />
+            <FormModal open={plantingForm.open} onClose={plantingForm.close} title={plantingForm.isEdit ? "Edit Seeding" : "New Seeding"} groups={plantingFields} values={plantingForm.values} onChange={plantingForm.onChange} isEdit={plantingForm.isEdit} onSubmit={saveSeeding} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Seeding" message="Are you sure you want to delete this seeding record? This cannot be undone." onConfirm={() => handleDelete(plantings, setPlantings)} />
           </>
         );

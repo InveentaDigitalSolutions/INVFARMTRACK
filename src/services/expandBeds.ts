@@ -41,3 +41,39 @@ export function bedCount(values: BedRecord): number {
   if (Array.isArray(beds)) return beds.length;
   return beds ? 1 : 0;
 }
+
+export interface PlantLineLike {
+  plant?: string;
+  qty?: string | number;
+}
+
+/**
+ * Turning "I seeded two varieties into this bed" into two records.
+ *
+ * A seeding is one variety, one bed, one quantity — that is what the table
+ * holds and what every reading of it assumes. But a bed genuinely carries
+ * several at once, and making someone fill the form twice for the same bed on
+ * the same day left nothing tying the two records together, and no way to see
+ * the pair as one act.
+ *
+ * So the form collects the lines and this splits them, after the beds are
+ * split. A submission with no lines passes through untouched: most forms have
+ * none, and expanding them would be surprising.
+ */
+export function expandPlantLines<T extends BedRecord & { lines?: unknown }>(
+  values: T
+): Omit<T, "lines">[] {
+  const { lines, ...rest } = values as T & { lines?: PlantLineLike[] };
+  if (!Array.isArray(lines)) return [rest as Omit<T, "lines">];
+
+  const filled = lines.filter((l) => l && l.plant);
+  if (filled.length === 0) return [rest as Omit<T, "lines">];
+
+  return filled.map((line) => ({
+    ...(rest as Omit<T, "lines">),
+    plant: line.plant,
+    // Blank means "not counted", not zero — the store drops it either way,
+    // but a zero written here would read as a bed seeded with nothing.
+    qty: line.qty === "" || line.qty === undefined ? undefined : Number(line.qty),
+  }));
+}
