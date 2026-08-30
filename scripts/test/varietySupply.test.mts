@@ -73,5 +73,35 @@ eq('nothing asked for is said plainly',
 eq('fully covered and counted reads good',
   coverageVerdict([{ ...hawaiian, demand: 500, balance: 400, coverage: 100, assumed: false }]).tone, 'good')
 
+
+// ── interplanting on the header ─────────────────────────────────────────────
+// The header carries the main crop AND a second variety raised for stock. They
+// overlap: neither excludes the other, and only one of them is sellable.
+const header = [
+  { bed: 'E3-05', plant: 'Hawaiian',      position: 'Whole bed', purpose: 'Production' },
+  { bed: 'E3-05', plant: 'Dieffenbachia', position: 'Header',    purpose: 'Propagation' },
+]
+eq('a bed carries both the crop and the interplanted stock',
+   varietiesByBed(header).get('E3-05'), ['Dieffenbachia', 'Hawaiian'])
+eq('but only the crop is sellable',
+   varietiesByBed(header, { sellableOnly: true }).get('E3-05'), ['Hawaiian'])
+eq('and with the stock excluded the bed speaks for its records',
+   soleVarietyOf('E3-05', varietiesByBed(header, { sellableOnly: true })), 'Hawaiian')
+
+// A count on that bed must not be credited to the mother material.
+const headerRows = varietyCoverage({
+  plantings: header,
+  pruning: [],
+  counts: [{ bed: 'E3-05', week: 40, value: 3000 }],
+  demand: [{ plant: 'Hawaiian', week: 40, requested: 2000 },
+           { plant: 'Dieffenbachia', week: 40, requested: 500 }],
+  week: 40,
+})
+const byName = Object.fromEntries(headerRows.map((r) => [r.variety, r]))
+eq('the count goes to the crop', byName['Hawaiian'].supply, 3000)
+eq('the mother material offers nothing', byName['Dieffenbachia'].supply, 0)
+eq('so demand for it reads as a shortfall, not a promise',
+   byName['Dieffenbachia'].balance, -500)
+
 console.log(failures ? `\n  ${failures} failed` : '\n  all passed')
 process.exit(failures ? 1 : 0)

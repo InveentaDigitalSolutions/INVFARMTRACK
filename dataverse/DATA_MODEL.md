@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 47 |
-| Columns | 576 |
+| Columns | 578 |
 | Relationships | 67 |
 
 ## Conventions
@@ -36,7 +36,7 @@
 | [Plant](#plant) | `bv_plant` | `PLT-0001` | 23 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
 | [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
-| [Planting](#planting) | `bv_planting` | `PLG-0001` | 9 | Records of plants placed in beds — central activity hub |
+| [Planting](#planting) | `bv_planting` | `PLG-0001` | 11 | Records of plants placed in beds — central activity hub |
 | [Input](#input) | `bv_input` | `INP-0001` | 14 | Catalog of fertilizers, pesticides, and other inputs |
 | [Treatment](#treatment) | `bv_treatment` | `TRT-0001` | 14 | Treatment/fumigation applications to plantings |
 | [Irrigation](#irrigation) | `bv_irrigation` | `IRR-0001` | 12 | Watering events for plantings |
@@ -397,8 +397,28 @@ Records of plants placed in beds — central activity hub
 | `bv_seasonid` | Season | Lookup → [Season](#season) | ✓ | Link to the related Season record. |
 | `bv_plantingdate` | Planting Date | Date only | ✓ | Date the event took place. |
 | `bv_quantity` | Quantity | Whole number |  | Amount recorded for this entry. |
+| `bv_position` | Position in bed | Choice |  | Where in the bed this seeding sits. The header is the starting part, where a second variety is interplanted among the main crop. One of: Whole bed, Header. |
+| `bv_purpose` | Purpose | Choice |  | Production is stock grown to sell. Propagation is mother material grown to fill a bed later, and must not be offered to a customer as availability. One of: Production, Propagation. |
 | `bv_currentplanting` | Current Planting | Yes/No |  | Yes/no flag. Current Planting for the Planting. |
 | `bv_notes` | Notes | Text area(2000) |  | Free-text notes. |
+
+<details><summary>Choice values</summary>
+
+**Position in bed** (`bv_position`)
+
+| Value | Label |
+|---|---|
+| 121320000 | Whole bed |
+| 121320001 | Header |
+
+**Purpose** (`bv_purpose`)
+
+| Value | Label |
+|---|---|
+| 121320000 | Production |
+| 121320001 | Propagation |
+
+</details>
 
 **Referenced by:** Task (`bv_plantingid`)
 

@@ -45,6 +45,8 @@ export function bedCount(values: BedRecord): number {
 export interface PlantLineLike {
   plant?: string;
   qty?: string | number;
+  position?: string;
+  purpose?: string;
 }
 
 /**
@@ -75,5 +77,7 @@ export function expandPlantLines<T extends BedRecord & { lines?: unknown }>(
     // Blank means "not counted", not zero — the store drops it either way,
     // but a zero written here would read as a bed seeded with nothing.
     qty: line.qty === "" || line.qty === undefined ? undefined : Number(line.qty),
+    position: line.position || "Whole bed",
+    purpose: line.purpose || "Production",
   }));
 }

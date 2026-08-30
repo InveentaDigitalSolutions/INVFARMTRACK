@@ -351,7 +351,12 @@ export default function ProductionPage() {
    */
   const openSeedingEdit = (row: Record<string, unknown>, index: number) => {
     plantingForm.openEdit(
-      { ...row, lines: [{ plant: String(row.plant ?? ""), qty: row.qty === undefined ? "" : String(row.qty) }] },
+      { ...row, lines: [{
+        plant: String(row.plant ?? ""),
+        qty: row.qty === undefined ? "" : String(row.qty),
+        position: String(row.position ?? "Whole bed"),
+        purpose: String(row.purpose ?? "Production"),
+      }] },
       index
     );
   };
@@ -399,8 +404,18 @@ export default function ProductionPage() {
                 { key: "plant", label: "Plant" },
                 { key: "bed", label: "Bed" },
                 { key: "season", label: "Season" },
-                { key: "date", label: "Planted" },
+                { key: "date", label: "Seeded" },
                 { key: "qty", label: "Qty" },
+                { key: "position", label: "Position", render: (r) =>
+                  r.position === "Header"
+                    ? <Badge variant="blue">Header</Badge>
+                    : <span className="text-navy-500">Whole bed</span> },
+                // Propagation is worth picking out: it sits on the bed but is
+                // never offered to a customer as availability.
+                { key: "purpose", label: "Purpose", render: (r) =>
+                  r.purpose === "Propagation"
+                    ? <Badge variant="amber">Propagation</Badge>
+                    : <span className="text-navy-500">Production</span> },
                 { key: "current", label: "Status", render: (r) => <Badge variant={r.current === false ? "gray" : "green"}>{r.current === false ? "Cleared" : "Standing"}</Badge> },
               ]}
               data={plantings}

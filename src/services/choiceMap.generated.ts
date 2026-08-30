@@ -784,6 +784,16 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "High": 121320002
     }
   },
+  "bv_plantings": {
+    "bv_position": {
+      "Whole bed": 121320000,
+      "Header": 121320001
+    },
+    "bv_purpose": {
+      "Production": 121320000,
+      "Propagation": 121320001
+    }
+  },
   "bv_purchaseorders": {
     "bv_currency": {
       "HNL": 187460000,

@@ -17,6 +17,10 @@ export interface BedPlanting {
   bed?: string;
   plant?: string;
   date?: string;
+  /** "Whole bed", or "Header" where a variety is interplanted at the start. */
+  position?: string;
+  /** "Production" is grown to sell; "Propagation" is mother material. */
+  purpose?: string;
   /** False once the seeding has been cleared off the bed. */
   current?: boolean;
 }
@@ -64,10 +68,16 @@ export interface VarietyCoverage {
  * a bed silently replaced the first and every figure attributed through that
  * bed was wrong without saying so.
  */
-export function varietiesByBed(plantings: BedPlanting[]): Map<string, string[]> {
+export function varietiesByBed(
+  plantings: BedPlanting[],
+  { sellableOnly = false } = {}
+): Map<string, string[]> {
   const out = new Map<string, string[]>();
   for (const p of plantings) {
     if (!p.bed || !p.plant || p.current === false) continue;
+    // Mother material is on the bed but is not stock. Counting it as supply
+    // would offer a customer the plants the next bed is going to be grown from.
+    if (sellableOnly && p.purpose === "Propagation") continue;
     const here = out.get(p.bed) ?? [];
     if (!here.includes(p.plant)) here.push(p.plant);
     out.set(p.bed, here);
@@ -106,7 +116,8 @@ export function varietyCoverage(input: {
   week?: number;
 }): VarietyCoverage[] {
   const { week } = input;
-  const byBed = varietiesByBed(input.plantings);
+  // Fulfilment is about what can be shipped, so propagation stock is left out.
+  const byBed = varietiesByBed(input.plantings, { sellableOnly: true });
   const inWeek = <T extends { week?: number }>(rows: T[]) =>
     week === undefined ? rows : rows.filter((r) => Number(r.week) === week);
 

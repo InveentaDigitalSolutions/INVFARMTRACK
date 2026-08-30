@@ -16,9 +16,18 @@ import { Plus, X } from "lucide-react";
 export interface PlantLine {
   plant: string;
   qty: string;
+  /** Where in the bed. "Header" is the starting part, interplanted. */
+  position: string;
+  /** Production is grown to sell; Propagation is mother material. */
+  purpose: string;
 }
 
-export const emptyLine = (): PlantLine => ({ plant: "", qty: "" });
+export const emptyLine = (): PlantLine => ({
+  plant: "", qty: "", position: "Whole bed", purpose: "Production",
+});
+
+const POSITIONS = ["Whole bed", "Header"];
+const PURPOSES = ["Production", "Propagation"];
 
 /** Lines with a variety chosen. A blank row is someone mid-thought, not data. */
 export const filledLines = (lines: PlantLine[]): PlantLine[] =>
@@ -41,8 +50,10 @@ export default function PlantLines({
   const filled = filledLines(lines);
   const total = filled.reduce((s, l) => s + (Number(l.qty) || 0), 0);
   // The same variety twice is two rows that should have been one.
-  const chosen = lines.map((l) => l.plant).filter(Boolean);
-  const duplicated = chosen.filter((p, i) => chosen.indexOf(p) !== i);
+  const chosen = lines.filter((l) => l.plant).map((l) => `${l.plant}|${l.position || "Whole bed"}|${l.purpose || "Production"}`);
+  const duplicated = chosen
+    .filter((p, i) => chosen.indexOf(p) !== i)
+    .map((k) => k.split("|")[0]);
 
   return (
     <div className="space-y-2">
@@ -68,10 +79,35 @@ export default function PlantLines({
             value={line.qty}
             onChange={(e) => set(i, { qty: e.target.value })}
             placeholder="Quantity"
-            className="w-32 shrink-0 px-3 py-2.5 text-[13px] rounded-lg border border-sand-200
+            className="w-24 shrink-0 px-3 py-2.5 text-[13px] rounded-lg border border-sand-200
                        bg-white text-navy-900 tabular-nums focus:outline-none
                        focus:ring-2 focus:ring-lime-400/30"
           />
+
+          {/* Position and purpose belong to the variety, not the bed: the main
+              crop fills the bed for sale while a second is interplanted on the
+              header to raise stock. They overlap, so neither excludes the other. */}
+          <select
+            value={line.position || "Whole bed"}
+            onChange={(e) => set(i, { position: e.target.value })}
+            aria-label="Position in bed"
+            className="w-32 shrink-0 px-2.5 py-2.5 text-[12px] rounded-lg border border-sand-200
+                       bg-white text-navy-800 cursor-pointer focus:outline-none
+                       focus:ring-2 focus:ring-lime-400/30"
+          >
+            {POSITIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+          </select>
+
+          <select
+            value={line.purpose || "Production"}
+            onChange={(e) => set(i, { purpose: e.target.value })}
+            aria-label="Purpose"
+            className="w-32 shrink-0 px-2.5 py-2.5 text-[12px] rounded-lg border border-sand-200
+                       bg-white text-navy-800 cursor-pointer focus:outline-none
+                       focus:ring-2 focus:ring-lime-400/30"
+          >
+            {PURPOSES.map((o) => <option key={o} value={o}>{o}</option>)}
+          </select>
 
           <button
             type="button"
@@ -111,9 +147,19 @@ export default function PlantLines({
         )}
       </div>
 
+      {/* The same variety twice is only a mistake when it is in the same place
+          for the same reason — Pothos filling the bed and Pothos on the header
+          are two real seedings. */}
       {duplicated.length > 0 && (
         <p className="text-[11px] text-amber-700">
-          {duplicated[0]} is listed twice — combine the quantities into one line.
+          {duplicated[0]} is listed twice in the same position — combine the quantities into one line.
+        </p>
+      )}
+
+      {filled.some((l) => l.purpose === "Propagation") && (
+        <p className="text-[11px] text-navy-500">
+          Propagation stock is mother material. It is recorded on the bed but never
+          offered to a customer as availability.
         </p>
       )}
     </div>
