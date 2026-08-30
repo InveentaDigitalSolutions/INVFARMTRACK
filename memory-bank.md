@@ -17,7 +17,7 @@
 ## App
 - **App ID:** 90ac39b0-04e9-41ef-872e-2718ac678629
 - **Play URL:** https://apps.powerapps.com/play/e/default-47176c00-abb5-4125-8ce3-a795dffd8b87/app/90ac39b0-04e9-41ef-872e-2718ac678629
-- **Last deployed:** 2026-08-30 — shadehouse layout restored; posts across the whole house
+- **Last deployed:** 2026-08-30 — rate history chart, 2D terrain overlay
 
 ## Data
 - 47 Dataverse tables, 572 columns, 64 relationships — see `dataverse/DATA_MODEL.md`
