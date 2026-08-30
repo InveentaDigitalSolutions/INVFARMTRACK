@@ -104,7 +104,7 @@ export function fieldCapacityProblem(
  *
  * A field's rows are its ground beds: E3 row 1 is "E3-01", always level 0.
  * Air beds hang on cables above a ground row, up to three levels, and are
- * named for the row they sit over: "E3-01-1", "E3-01-2", "E3-01-3". Not every
+ * named for the row they sit over: "E3-01-1", "E3-01-2". Not every
  * row has air above it — the cables cover part of a field, not all of it — so
  * which rows do is recorded, never derived.
  */
@@ -117,7 +117,7 @@ export function bedName(fieldName: string, row: number, level: number = 0): stri
 export interface ParsedBed {
   field: string;
   row: number;
-  /** 0 for a ground bed, 1-3 for an air bed above it. */
+  /** 0 for a ground bed, 1 or 2 for an air bed above it. */
   level: number;
 }
 
@@ -130,7 +130,7 @@ export function parseBedName(name: string): ParsedBed | null {
   // Two digits or more: row numbers are padded to two, but a field with a
   // hundred rows would produce "E3-100" and a fixed \d{2} would refuse to
   // parse it — silently dropping every bed past 99 from position counts.
-  const match = /^(.+?)-(\d{2,})(?:-([1-3]))?$/.exec(String(name ?? "").trim());
+  const match = /^(.+?)-(\d{2,})(?:-([1-2]))?$/.exec(String(name ?? "").trim());
   if (!match) return null;
   return { field: match[1], row: Number(match[2]), level: match[3] ? Number(match[3]) : 0 };
 }
@@ -186,7 +186,8 @@ export function availableRows(
  * cannot be.
  */
 export function levelsFor(type: string | undefined): string[] {
-  return type === "Ground" ? ["0"] : ["1", "2", "3"];
+  // Never "3": that height carries the irrigation line, not a bed.
+  return type === "Ground" ? ["0"] : ["1", "2"];
 }
 
 /** A bed's type follows from its level, and nothing else. */
@@ -250,7 +251,7 @@ export function planBulkBeds(request: BulkBedRequest): BulkBedPlan {
     return { ...empty, problem: "Give a first and last row." };
   }
   if (toRow < fromRow) return { ...empty, problem: "The last row comes before the first." };
-  if (level < 0 || level > 3) return { ...empty, problem: "Levels run from 0 to 3." };
+  if (level < 0 || level > 2) return { ...empty, problem: "Levels run from 0 to 2 — level 3 is the irrigation line." };
 
   const taken = new Set(
     existing
@@ -377,8 +378,8 @@ export function planBedUpdate(request: BedUpdateRequest): BedUpdatePlan {
     return { ...empty, problem: "Give a first and last row." };
   }
   if (toRow < fromRow) return { ...empty, problem: "The last row comes before the first." };
-  if (level !== undefined && (level < 0 || level > 3)) {
-    return { ...empty, problem: "Levels run from 0 to 3." };
+  if (level !== undefined && (level < 0 || level > 2)) {
+    return { ...empty, problem: "Levels run from 0 to 2 — level 3 is the irrigation line." };
   }
 
   const parsed = existing

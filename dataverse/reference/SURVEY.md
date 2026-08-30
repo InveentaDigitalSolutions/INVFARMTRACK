@@ -29,7 +29,30 @@ Extracted from the vector data, not read off the image.
 | Rotation | 72° from the sheet | not axis-aligned |
 | Floor | 566.0 m – 569.5 m | **falls 3.5 m** |
 
-## The layout, derived
+## The layout — corrected 2026-08-30
+
+**This was built the wrong way round first.** The post counts fix which axis is
+which, and nothing else does:
+
+| | posts | over | spacing |
+|---|---|---|---|
+| along a bed | 12 | 104.28 m | 9.48 m |
+| perpendicular to the beds | 19 | 174.20 m | 9.68 m |
+
+So **a bed runs 104.28 m** and **all 120 beds sit side by side** across the
+174.20 m of posts. At their recorded widths those 120 measure 176.40 m — the
+posts, plus about 1.1 m of bed beyond the outermost line at each edge.
+
+The first attempt read the counts against the wrong axes and produced a 2 x 2
+of quadrants with a 16.08 m cross road and 79 m beds. That layout needs 12
+posts perpendicular to the beds, which is the opposite of how they are counted.
+`npm run test:geometry` now pins the axes to the counts.
+
+**Still to place: the logistics road.** 120 beds fill the block, so there is no
+room for a 16 m cross inside it. It runs outside the shaded block, or between
+fields as something much narrower.
+
+## The earlier derivation, kept for the record
 
 Santiago: the four fields sit inside this one block, with the logistics road as
 a cross between them, and the north–south arm falling after the 33rd bed of

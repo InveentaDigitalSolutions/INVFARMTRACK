@@ -1,15 +1,16 @@
 /**
  * The model must agree with the survey. Run: npm run test:geometry
  *
- * Every dimension in shadehouseLayout used to be measured off a photograph,
- * and bed length was wrong by more than half. These assertions tie the
- * constants to the topographic survey (Topografía CAPAZ, July 2025, 1:830) so
- * that changing one without the other fails rather than drifts.
+ * The layout was built the wrong way round once already — beds 79 m long in a
+ * 2 x 2 with a cross road — because the post counts were read against the wrong
+ * axes. These assertions pin the axes to the counts so it cannot happen twice.
  */
 import {
-  plotConfigs, POST_SPACING_M, BLOCK_ACROSS_M, BLOCK_ALONG_M,
+  plotConfigs, BED_LENGTH_M, BLOCK_WIDTH_M, POSTS_WIDTH_M,
+  POSTS_ALONG_BED, POSTS_ACROSS_BEDS, postLinesAcross, postLinesAlong,
+  fieldOffsets, postRowsIn, BED_LEVELS, IRRIGATION_LEVEL,
 } from '../../src/services/shadehouseLayout.ts'
-import { computeRoads, placeBeds } from '../../src/components/ShadehouseScene.tsx'
+import { placeBeds } from '../../src/components/ShadehouseScene.tsx'
 
 let failures = 0
 const eq = (label: string, got: unknown, want: unknown) => {
@@ -23,44 +24,56 @@ const near = (label: string, got: number, want: number, tol = 0.05) => {
   console.log(`  ${pass ? 'ok  ' : 'FAIL'} ${label.padEnd(58)} ${got.toFixed(2)}${pass ? '' : ` want ${want} +/-${tol}`}`)
 }
 
-const byId = Object.fromEntries(plotConfigs.map((p) => [p.id, p]))
-eq('four fields', plotConfigs.map((p) => p.id), ['E3', 'C3', 'E1', 'C1'])
-eq('E fields carry 33 beds', [byId.E3.bedCount, byId.E1.bedCount], [33, 33])
-eq('C fields carry 27 beds', [byId.C3.bedCount, byId.C1.bedCount], [27, 27])
+// Santiago counts 12 posts along a bed and 19 perpendicular to them. The survey
+// spreads 12 lines over 104.28 m and 19 over 174.20 m. Together those fix which
+// axis is which, and nothing else does.
+eq('twelve posts along a bed', POSTS_ALONG_BED, 12)
+eq('nineteen across the house', POSTS_ACROSS_BEDS, 19)
+near('a bed is as long as the posts that run along it', BED_LENGTH_M, 104.28)
+near('the posts reach this far across', POSTS_WIDTH_M, 174.20)
+near('spacing along a bed', BED_LENGTH_M / (POSTS_ALONG_BED - 1), 9.48)
+near('spacing across the house', POSTS_WIDTH_M / (POSTS_ACROSS_BEDS - 1), 9.68)
+eq('post lines along a bed', postLinesAlong().length, 12)
+eq('post lines across the house', postLinesAcross().length, 19)
 
-const eWidth = byId.E3.bedCount * byId.E3.bedWidth
-const cWidth = byId.C3.bedCount * byId.C3.bedWidth
-near('E field is 33 x 1.20 m', eWidth, 39.6)
-near('C field is 27 x 1.80 m', cWidth, 48.6)
+// All 120 beds side by side. 66 x 1.20 + 54 x 1.80 = 176.40 m, which is the
+// 174.20 m of posts plus an edge either side.
+const beds = plotConfigs.reduce((n, f) => n + f.bedCount, 0)
+eq('a hundred and twenty beds', beds, 120)
+near('and they span this far', plotConfigs.reduce((w, f) => w + f.bedCount * f.bedWidth, 0), BLOCK_WIDTH_M)
+near('a little wider than the posts reach', BLOCK_WIDTH_M - POSTS_WIDTH_M, 2.20, 0.01)
+eq('every field runs the full length',
+   [...new Set(plotConfigs.map((f) => f.bedLength))], [BED_LENGTH_M])
 
-const roads = computeRoads()
-near('the logistics road is what the survey leaves', roads.vertical.width, 16.08)
-near('block across matches the survey', eWidth + roads.vertical.width + cWidth, BLOCK_ACROSS_M)
-near('block along matches the survey', byId.E3.bedLength * 2 + roads.horizontal.width, BLOCK_ALONG_M)
-near('the surveyed values themselves', BLOCK_ACROSS_M * 1, 104.28)
-near('and along', BLOCK_ALONG_M * 1, 174.20)
-near('the post bay is the surveyed one', POST_SPACING_M, 9.72)
+// Fields sit end to end across the house, no gaps and no overlaps.
+const seats = fieldOffsets()
+const order = plotConfigs.map((f) => f.id)
+let cursor = -BLOCK_WIDTH_M / 2
+for (const id of order) {
+  near(`${id} starts where the last one ended`, seats[id].start, cursor)
+  cursor += seats[id].width
+}
+near('and the last one ends at the far edge', cursor, BLOCK_WIDTH_M / 2)
 
-// The bed length the survey forces, against the 37.20 m read off a photo.
-near('bed length comes from the survey, not a photograph', byId.E3.bedLength, 79.06)
+// A cable hangs between posts, so only some rows can carry an air bed.
+const postRows = order.flatMap((id) => postRowsIn(id))
+eq('nineteen post lines land somewhere in the beds', postRows.length, 19)
+eq('air beds go to two levels; the third is the irrigation line',
+   [BED_LEVELS, IRRIGATION_LEVEL], [[0, 1, 2], 3])
 
 // And the placement actually spans it.
-const beds = plotConfigs.flatMap((f) =>
+const placed = placeBeds(plotConfigs.flatMap((f) =>
   Array.from({ length: f.bedCount }, (_, i) => ({
     bedId: `${f.id}-${String(i + 1).padStart(2, '0')}`,
     fieldId: f.id, bedNumber: i + 1, level: 0 as const, type: 'ground' as const,
     widthM: f.bedWidth, lengthM: f.bedLength,
     state: 'empty' as const, variety: '', plantedDate: '', expectedHarvest: '', notes: '',
   }))
-)
-const placed = placeBeds(beds)
+))
 eq('every bed is placed', placed.length, 120)
 const xs = placed.map((p) => p.x)
-const zs = placed.map((p) => p.z)
-near('placed width spans the block',
-  (Math.max(...xs) - Math.min(...xs)) + byId.C3.bedWidth, BLOCK_ACROSS_M, 0.6)
-near('placed depth spans the block',
-  (Math.max(...zs) - Math.min(...zs)) + byId.E3.bedLength, BLOCK_ALONG_M, 0.6)
+near('placed beds span the house', Math.max(...xs) - Math.min(...xs) + 1.8, BLOCK_WIDTH_M, 0.6)
+eq('and all lie on one row', [...new Set(placed.map((p) => p.z))], [0])
 
 console.log(failures ? `\n  ${failures} failed` : '\n  all passed')
 process.exit(failures ? 1 : 0)

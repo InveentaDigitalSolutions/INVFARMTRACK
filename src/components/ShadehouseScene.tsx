@@ -9,6 +9,8 @@ import {
   LEVEL_HEIGHTS_M,
   stateColors,
   plotConfigs,
+  fieldOffsets,
+  BLOCK_WIDTH_M,
   postLinesAcross,
   postLinesAlong,
   SHADE_COLOR,
@@ -217,67 +219,29 @@ function fieldLayout(fieldId: string, beds: ShadehouseBed[]) {
   };
 }
 
-/** Fields with no plan geometry, in a stable order. */
-function unknownFields(beds: ShadehouseBed[]): string[] {
-  return [...new Set(beds.map((b) => b.fieldId))]
-    .filter((id) => id && !plotConfigs.some((p) => p.id === id))
-    .sort();
-}
 
 export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
-  const widthOf = (fieldId: string) => {
-    const field = fieldLayout(fieldId, beds);
-    return field.bedCount * field.bedWidth;
-  };
-
-  const westWidth = Math.max(widthOf("E3"), widthOf("E1"));
-  const eastWidth = Math.max(widthOf("C3"), widthOf("C1"));
-  const totalWidth = westWidth + ROAD_M + eastWidth;
-
-  // Where the south band for unfamiliar fields starts, and how they stack.
-  const NEW_FIELD_BAND = plotConfigs[0]?.bedLength ?? 37.2;
-  const extra = unknownFields(beds);
+  const offsets = fieldOffsets();
 
   return beds.map((bed) => {
     const field = fieldLayout(bed.fieldId, beds);
-    const isSouth = field.position === "SOUTH";
-    const isEast = field.position === "NE" || field.position === "SE";
-    const isNorth = field.position === "NW" || field.position === "NE";
+    const seat = offsets[bed.fieldId];
 
-    if (isSouth) {
-      // One band per unfamiliar field, laid out below the measured block so it
-      // can never sit on top of a field that is already there.
-      const seat = extra.indexOf(bed.fieldId);
-      const rowStart = NEW_FIELD_BAND + PLOT_GAP_M * 1.5;
-      return {
-        bed,
-        x: -totalWidth / 2 + (bed.bedNumber - 0.5) * field.bedWidth,
-        z: rowStart + seat * (field.bedLength + PLOT_GAP_M) + field.bedLength / 2,
-        y: LEVEL_HEIGHTS_M[bed.level] + groundAt(
-          -totalWidth / 2 + (bed.bedNumber - 0.5) * field.bedWidth,
-          rowStart + seat * (field.bedLength + PLOT_GAP_M) + field.bedLength / 2
-        ),
-        width: field.bedWidth * 0.86,
-        length: field.bedLength,
-      };
-    }
-
-    const columnStart = isEast
-      ? -totalWidth / 2 + westWidth + ROAD_M
-      : -totalWidth / 2;
-
-    // Beds run along Z; consecutive beds step along X.
-    const x = columnStart + (bed.bedNumber - 0.5) * field.bedWidth;
-    const z = isNorth
-      ? -(field.bedLength / 2 + PLOT_GAP_M / 2)
-      : field.bedLength / 2 + PLOT_GAP_M / 2;
+    // Fields sit side by side across the house and every bed runs its full
+    // length. This used to place them in quadrants either side of a cross
+    // road, which needed the posts counted the other way round.
+    const start = seat
+      ? seat.start
+      // A field with no place of its own goes beyond the last one.
+      : BLOCK_WIDTH_M / 2 + 2;
+    const x = start + (bed.bedNumber - 0.5) * field.bedWidth;
+    const z = 0;
 
     return {
       bed,
       x,
       z,
-      // The bed sits on the ground, which is not level. Without this the rows
-      // float over a sloping floor at the low end and sink into it at the high.
+      // The bed sits on the ground, which is not level.
       y: LEVEL_HEIGHTS_M[bed.level] + groundAt(x, z),
       // Leave a sliver between beds so rows stay individually readable.
       width: field.bedWidth * 0.86,

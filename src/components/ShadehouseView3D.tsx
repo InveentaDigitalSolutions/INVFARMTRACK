@@ -17,7 +17,9 @@ import { useCurrentWeather } from "../hooks/useCurrentWeather";
 import { SceneErrorBoundary, WebglUnavailable, useWebgl } from "./WebglGuard";
 import { precipitationKind, windDirectionLabel } from "../services/weather";
 
-const ALL_LEVELS: BedLevel[] = [0, 1, 2, 3];
+// Two air levels. The third is where the irrigation line runs, above
+// everything that grows, so it is never a bed.
+const ALL_LEVELS: BedLevel[] = [0, 1, 2];
 const LEVEL_LABELS: Record<BedLevel, string> = {
   0: "Ground",
   1: "Air L1",

@@ -16,6 +16,17 @@
 // Bed data model
 export type BedLevel = 0 | 1 | 2 | 3;
 
+/**
+ * The levels a bed can occupy: the ground, and two cable lines above it.
+ *
+ * Level 3 is not a bed. It is where the irrigation line runs, above everything
+ * that grows — which is why it has a height but never a crop.
+ */
+export const BED_LEVELS: BedLevel[] = [0, 1, 2];
+
+/** The irrigation line's level. Always a pipe, never a bed. */
+export const IRRIGATION_LEVEL: BedLevel = 3;
+
 /** Nursery uses both round and square hanging pots; the shape is per planting. */
 export type PotType = "round" | "square";
 
@@ -28,7 +39,7 @@ export interface ShadehouseBed {
   bedId: string;
   fieldId: string;
   bedNumber: number;
-  /** 0 = ground bed; 1-3 = cable lines strung above that same footprint. */
+  /** 0 = ground bed; 1-2 = cable lines above the same footprint. Never 3. */
   level: BedLevel;
   /** Ground beds are planted in soil; air beds carry hanging pots on a cable. */
   type: "ground" | "air";
@@ -69,7 +80,12 @@ export const SHADE_COLOR = "#20302a";
 /** Cloth sits above the highest cable line, clear of every bed. */
 export const SHADE_HEIGHT_M = 3.1;
 
-/** Cable heights above the ground bed, in metres. Measured off the photos. */
+/**
+ * Heights above the ground bed, in metres.
+ *
+ * 1 and 2 are the cable lines that carry hanging pots. 3 is the irrigation
+ * line, which runs above them and holds no crop.
+ */
 export const LEVEL_HEIGHTS_M: Record<BedLevel, number> = { 0: 0, 1: 1.15, 2: 1.75, 3: 2.35 };
 
 export interface PlotConfig {
@@ -96,24 +112,30 @@ export const plotConfigs: PlotConfig[] = [
   // widths measure 88.20 m, which with the 16.08 m road is the 104.28 m the
   // survey gives across. Bed length was 37.20 m, measured off a photograph;
   // the survey makes it 79.06 m — the model was less than half the real run.
-  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 79.06, label: "E3" },
-  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 79.06, label: "C3" },
-  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 79.06, label: "E1" },
-  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 79.06, label: "C1" },
+  // Side by side across the house, all beds running its full length. The
+  // quadrant positions are kept only because the plan view still reads them.
+  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 104.28, label: "E3" },
+  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 104.28, label: "E1" },
+  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 104.28, label: "C3" },
+  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 104.28, label: "C1" },
 ];
 
 /**
  * The posts, counted by Santiago and confirmed by the survey.
  *
- * Twelve post lines run north-south, spaced across the 104.28 m width; nineteen
- * run east-west, spaced along the 174.20 m length. That gives 228 posts and
- * bays of 9.48 m and 9.68 m — which is the 9.72 m the survey measures.
+ * Twelve stand along a bed's length; nineteen run perpendicular to the beds,
+ * across the whole house. The survey spreads 12 post lines over 104.28 m and
+ * 19 over 174.20 m, which fixes both: a bed runs 104.28 m, and the 120 beds
+ * sit side by side across 174.20 m of posts.
  *
- * Read the other way round the numbers give 15.8 m and 5.8 m, which the
- * survey's uniform grid rules out.
+ * This was built the other way round first — beds 79 m long in a 2 x 2 with a
+ * cross road. That needed 12 posts perpendicular to the beds, which is the
+ * opposite of how they are actually counted.
  */
-export const POSTS_ACROSS = 12;
-export const POSTS_ALONG = 19;
+/** Posts along a bed, over its length. */
+export const POSTS_ALONG_BED = 12;
+/** Posts across the house, perpendicular to the beds. */
+export const POSTS_ACROSS_BEDS = 19;
 
 /**
  * The structural bay, measured from the survey.
@@ -131,8 +153,16 @@ export const POST_SPACING_M = 9.72;
  * they close on the bed arithmetic exactly: 33 x 1.20 + 16.08 + 27 x 1.80 =
  * 104.28 across, and 79.06 + 16.08 + 79.06 = 174.20 along.
  */
-export const BLOCK_ACROSS_M = 104.28;
-export const BLOCK_ALONG_M = 174.20;
+/**
+ * How far the posts reach, perpendicular to the beds. The beds themselves run
+ * a little wider than the outermost post line — 120 at their recorded widths
+ * measure 176.40 m, which is the 174.20 m of posts plus an edge either side.
+ */
+export const POSTS_WIDTH_M = 174.20;
+/** A bed's length, which is also how far the posts run along it. */
+export const BED_LENGTH_M = 104.28;
+/** All 120 beds side by side: 66 x 1.20 + 54 x 1.80. */
+export const BLOCK_WIDTH_M = 176.40;
 
 /** Degrees the structure sits off grid north. The model draws it square. */
 export const BLOCK_BEARING_DEG = 72;
@@ -162,20 +192,12 @@ export function postEveryFor(fieldId: string): number {
  */
 export function postRowsIn(fieldId: string): number[] {
   const field = plotConfigs.find((p) => p.id === fieldId);
-  if (!field) return [];
-
-  // Fields are laid west to east: E beds, the road, then C beds.
-  const west = plotConfigs.filter((p) => p.position === "NW" || p.position === "SW");
-  const isWest = west.some((p) => p.id === fieldId);
-  const westWidth = Math.max(...west.map((p) => p.bedCount * p.bedWidth));
-  const start = isWest
-    ? -BLOCK_ACROSS_M / 2
-    : -BLOCK_ACROSS_M / 2 + westWidth + (BLOCK_ACROSS_M - westWidth -
-        Math.max(...plotConfigs.filter((p) => !west.includes(p)).map((p) => p.bedCount * p.bedWidth)));
+  const seat = fieldOffsets()[fieldId];
+  if (!field || !seat) return [];
 
   const rows = new Set<number>();
   for (const x of postLinesAcross()) {
-    const row = Math.round((x - start) / field.bedWidth + 0.5);
+    const row = Math.round((x - seat.start) / field.bedWidth + 0.5);
     if (row >= 1 && row <= field.bedCount) rows.add(row);
   }
   return [...rows].sort((a, b) => a - b);
@@ -204,14 +226,26 @@ export function airLevelsFor(bed: ShadehouseBed, all: ShadehouseBed[]): BedLevel
     .sort((a, z) => a - z);
 }
 
-/** Where the post lines fall across the block, in model x. */
+/** Post lines perpendicular to the beds, in model x. Nineteen of them. */
 export function postLinesAcross(): number[] {
-  const step = BLOCK_ACROSS_M / (POSTS_ACROSS - 1);
-  return Array.from({ length: POSTS_ACROSS }, (_, i) => -BLOCK_ACROSS_M / 2 + i * step);
+  const step = POSTS_WIDTH_M / (POSTS_ACROSS_BEDS - 1);
+  return Array.from({ length: POSTS_ACROSS_BEDS }, (_, i) => -POSTS_WIDTH_M / 2 + i * step);
 }
 
-/** Where the post lines fall along the block, in model z. */
+/** Post lines along a bed, in model z. Twelve of them. */
 export function postLinesAlong(): number[] {
-  const step = BLOCK_ALONG_M / (POSTS_ALONG - 1);
-  return Array.from({ length: POSTS_ALONG }, (_, i) => -BLOCK_ALONG_M / 2 + i * step);
+  const step = BED_LENGTH_M / (POSTS_ALONG_BED - 1);
+  return Array.from({ length: POSTS_ALONG_BED }, (_, i) => -BED_LENGTH_M / 2 + i * step);
+}
+
+/** Where each field starts, measured across the house from the west edge. */
+export function fieldOffsets(): Record<string, { start: number; width: number }> {
+  const out: Record<string, { start: number; width: number }> = {};
+  let x = -BLOCK_WIDTH_M / 2;
+  for (const f of plotConfigs) {
+    const width = f.bedCount * f.bedWidth;
+    out[f.id] = { start: x, width };
+    x += width;
+  }
+  return out;
 }
