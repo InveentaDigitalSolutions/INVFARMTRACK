@@ -404,9 +404,32 @@ export interface PlantsRow {
   patentHolder?: string;
   patentExpiry?: string;
   plantsPerBed?: number;
-  weeksToFirstHarvest?: number;
-  productiveWeeks?: number;
+  grownIn?: string;
+  shadeNeeded?: string;
+  growthWeeksMinMarAug?: number;
+  growthWeeksMaxMarAug?: number;
+  harvestWeeksMarAug?: number;
+  pruningWeeksMarAug?: number;
+  growthWeeksMinSepFeb?: number;
+  growthWeeksMaxSepFeb?: number;
+  harvestWeeksSepFeb?: number;
+  pruningWeeksSepFeb?: number;
+  productiveWeeks?: string;
   active?: boolean;
+  [key: string]: unknown;
+}
+
+export interface PlantSizesRow {
+  id: string;
+  code?: string;
+  plant?: string;
+  size?: string;
+  cuttingsPerBox?: number;
+  bundleSize?: number;
+  productType?: string;
+  cuttingType?: string;
+  active?: boolean;
+  notes?: string;
   [key: string]: unknown;
 }
 

@@ -29,7 +29,7 @@ import { cohorts, missingCycles } from "../services/productionSchedule";
 
 interface HarvestRow { id: string; date?: string; qty?: number; bed?: string; plant?: string }
 interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; qty?: number; current?: boolean }
-interface PlantRow extends PhenologyPlant { id: string; name?: string; variety?: string; productiveWeeks?: number }
+interface PlantRow extends PhenologyPlant { id: string; name?: string; variety?: string }
 interface CountRow { id: string; week?: number; counted?: number }
 
 const monthKey = (d: string) => String(d).slice(0, 7);
@@ -87,7 +87,6 @@ export default function ProductionOverview() {
         growthWeeksMaxMarAug: p.growthWeeksMaxMarAug,
         growthWeeksMinSepFeb: p.growthWeeksMinSepFeb,
         growthWeeksMaxSepFeb: p.growthWeeksMaxSepFeb,
-        productiveWeeks: p.productiveWeeks,
       }))
     );
 

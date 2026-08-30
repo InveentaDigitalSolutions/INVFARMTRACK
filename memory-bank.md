@@ -126,6 +126,11 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   held it yet so nothing migrated. `apply-schema.mjs` now renames an option by
   *value* instead of inserting a second one on a taken value, so this cannot
   regress. Bed names are unchanged (`E3-01-1`).
+- **Say shade as what it BLOCKS, not what it passes.** Cloth is sold as "65%
+  shade cloth", so the forms read Single 65%, Double 87.75%, Triple 95.71%. The
+  light model works in transmission underneath — 35%, 12.25%, 4.29% — and those
+  are the same fact the other way round. Labelling them as transmission read as
+  wrong to the nursery, and they were right.
 - **The shade cloth is 65% netting, and layers multiply.** Single passes 35%,
   double 0.35² = 12.25%, triple 0.35³ = 4.29% — a factor of **eight** across the
   house, far larger than the seasonal swing (about 30%) or the terrain (1-4%).

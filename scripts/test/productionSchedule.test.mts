@@ -19,7 +19,7 @@ const plantings = [
   { bed:'E3-09', plant:'Hawaiian', date:'2026-03-02', qty:380 },   // a later wave
   { bed:'C1-01', plant:'Jade',     date:'2026-01-05', qty:300 },   // different variety, same week
 ]
-const cycles = [{ plant:'Hawaiian', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:12, growthWeeksMinSepFeb:12, growthWeeksMaxSepFeb:12, productiveWeeks:20 }]
+const cycles = [{ plant:'Hawaiian', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:14, growthWeeksMinSepFeb:14, growthWeeksMaxSepFeb:16 }]
 const list = cohorts(plantings, cycles)
 
 eq('beds planted days apart are one wave', list.filter(c => c.plant==='Hawaiian').length, 2)
@@ -31,8 +31,11 @@ eq('a later wave is its own cohort', list.filter(c => c.plant==='Hawaiian').map(
 
 // projection only where a cycle time exists
 const hawaiian = list.find(c => c.plant==='Hawaiian')!
-eq('first cut is planting + 12 weeks', hawaiian.harvestFrom, '2026-03-30')
-eq('window ends after the productive weeks', hawaiian.harvestTo, '2026-08-17')
+// Seeded 5 January, so the dark half: 14-16 weeks, not the 12-14 of the bright
+// one. The window is the two ends of the growth range — "productive weeks" was
+// retired because these are cut and pruned in cycles, not finished after a span.
+eq('first cut is the near end of the range', hawaiian.harvestFrom, '2026-04-13')
+eq('and the window closes at the far end', hawaiian.harvestTo, '2026-04-27')
 eq('and it is scheduled', hawaiian.unscheduled, false)
 
 const jade = list.find(c => c.plant==='Jade')!

@@ -7,6 +7,13 @@ import { useLookupOptionsFor } from "../hooks/useLookupOptions";
 
 // Field definition types
 interface BaseField {
+  /**
+   * Show this field only when the form is in a particular state — the basket
+   * capacity is meaningless for a variety grown only in the ground. On the base
+   * so every kind of field can use it; putting it on one variant left the union
+   * unable to see it at all.
+   */
+  showWhen?: (values: Record<string, unknown>) => boolean;
   key: string;
   label: string;
   required?: boolean;
@@ -83,6 +90,13 @@ interface PlantLinesField extends BaseField {
 interface ToggleField extends BaseField {
   type: "toggle";
   options: { value: string; label: string }[];
+  /**
+   * Let several be chosen at once. The value stored is the chosen labels joined
+   * by `join`, so the combination is itself a valid choice label in Dataverse —
+   * "Ground", "Basket", or "Ground & Basket" — and needs no mapping either way.
+   */
+  multi?: boolean;
+  join?: string;
 }
 
 interface TextareaField extends BaseField {
@@ -299,11 +313,15 @@ function renderField(
         </div>
       );
 
-    case "toggle":
+    case "toggle": {
+      const join = field.join ?? " & ";
+      const chosen = field.multi
+        ? String(v ?? "").split(join).map((x) => x.trim()).filter(Boolean)
+        : [];
       return (
         <div className="flex flex-wrap gap-1.5" role="group" aria-label={field.label}>
           {optionsFor(field).map((o) => {
-            const selected = String(v) === o.value;
+            const selected = field.multi ? chosen.includes(o.value) : String(v) === o.value;
             return (
               <button
                 key={o.value}
@@ -312,7 +330,20 @@ function renderField(
                 // Tapping the chosen option clears it. A dropdown always had a
                 // "Select..." to go back to; without this, an optional field
                 // could be set once and never unset again.
-                onClick={() => onChange(field.key, selected && !field.required ? "" : o.value)}
+                onClick={() => {
+                  if (!field.multi) {
+                    onChange(field.key, selected && !field.required ? "" : o.value);
+                    return;
+                  }
+                  // Keep the option order the form declares, so "Ground & Basket"
+                  // never comes out as "Basket & Ground" and fails to match the
+                  // choice label.
+                  const order = optionsFor(field).map((x) => x.value);
+                  const next = selected
+                    ? chosen.filter((x) => x !== o.value)
+                    : [...chosen, o.value];
+                  onChange(field.key, order.filter((x) => next.includes(x)).join(join));
+                }}
                 className={`flex-1 min-w-[5.5rem] py-2.5 px-2 text-[13px] font-medium rounded-lg border
                   transition-colors cursor-pointer focus:outline-none
                   focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
@@ -327,6 +358,7 @@ function renderField(
           })}
         </div>
       );
+    }
 
     case "textarea":
       return (
@@ -486,13 +518,22 @@ export default function FormModal({
 
               {/* Body */}
               <div className="px-6 py-5 space-y-6">
-                {groups.map((group, gi) => (
+                {groups.map((group, gi) => {
+                  // A field can rule itself out of the form — the basket
+                  // capacity means nothing for a variety grown in the ground.
+                  // A group with nothing left to show is dropped along with its
+                  // heading, rather than leaving a title over empty space.
+                  const shown = group.fields.filter(
+                    (f) => !f.showWhen || f.showWhen(values)
+                  );
+                  if (shown.length === 0) return null;
+                  return (
                   <div key={gi}>
                     <p className="text-[10px] font-semibold text-navy-400 uppercase tracking-[0.1em] mb-3">
                       {group.title}
                     </p>
                     <div className={`grid ${colsClass[group.columns ?? 2]} gap-4`}>
-                      {group.fields.map((field) => (
+                      {shown.map((field) => (
                         <div key={field.key} className={spanClass[field.span ?? 1]}>
                           <label className="block text-[12px] font-medium text-navy-600 mb-1.5">
                             {field.label}
@@ -503,7 +544,8 @@ export default function FormModal({
                       ))}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Footer */}

@@ -545,31 +545,13 @@
           "description": "Whether the record is currently in use."
         },
         {
-          "schemaName": "bv_WeeksToFirstHarvest",
-          "displayName": "Weeks to First Cut",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 520,
-          "description": "Weeks from planting a bed to its first cut. Without this a planting date says when work started but nothing about when stock arrives, so the schedule can only report the past."
-        },
-        {
-          "schemaName": "bv_ProductiveWeeks",
-          "displayName": "Productive Weeks",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 520,
-          "description": "How long a bed keeps yielding after the first cut. A cutting nursery harvests the same bed repeatedly, so the useful answer is a window rather than a date. Leave blank if the bed is cut once."
-        },
-        {
           "schemaName": "bv_PlantsPerBed",
-          "displayName": "Plants per Bed",
+          "displayName": "Plants per Bed Row",
           "type": "integer",
           "required": false,
           "minValue": 0,
           "maxValue": 1000000,
-          "description": "How many of this variety a bed holds. Every bed is the same size, so this is a property of the variety rather than of any particular bed \u2014 which is why it lives here and not on a bed-and-variety pairing."
+          "description": "How many of this variety fit in one ground bed row. Every bed row is the same size, so this is a property of the variety."
         },
         {
           "schemaName": "bv_GrownIn",
@@ -587,10 +569,10 @@
             },
             {
               "value": 187480002,
-              "label": "Ground or Basket"
+              "label": "Ground & Basket"
             }
           ],
-          "description": "Where this variety can be grown. Some varieties are only ever hung in baskets and must never be offered for a ground bed. One of: Ground, Basket, Ground or Basket."
+          "description": "Where this variety can be grown \u2014 the ground, a basket, or both. Some varieties are only ever hung and must never be offered for a ground bed. One of: Ground, Basket, Ground & Basket."
         },
         {
           "schemaName": "bv_ShadeNeeded",
@@ -684,6 +666,15 @@
           "minValue": 0,
           "maxValue": 104,
           "description": "Weeks to recover after pruning back to 2 leaves, dark half of the year."
+        },
+        {
+          "schemaName": "bv_PlantsPerBasketRow",
+          "displayName": "Plants per Basket Row",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 100000,
+          "description": "How many of this variety fit in one basket row. A basket holds a different number from a ground bed row, so a variety grown both ways carries both figures."
         }
       ]
     },

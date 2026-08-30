@@ -33,7 +33,6 @@ export interface PlantCycle {
   growthWeeksMaxMarAug?: number;
   growthWeeksMinSepFeb?: number;
   growthWeeksMaxSepFeb?: number;
-  productiveWeeks?: number;
 }
 
 export interface Cohort {
@@ -46,7 +45,7 @@ export interface Cohort {
   qty: number;
   /** First cut, when the variety has a cycle time. */
   harvestFrom?: string;
-  /** End of the productive window, when one is recorded. */
+  /** Latest the first cut is expected — the far end of the growth range. */
   harvestTo?: string;
   /** True when no cycle time is known, so nothing after planting is drawn. */
   unscheduled: boolean;
@@ -104,10 +103,20 @@ export function cohorts(
     }
 
     const cycle = cycleOf.get(p.plant);
-    // Seasonal: a bed seeded in October takes longer to reach eight leaves
-    // than the same variety seeded in April, and the schedule has to say so.
-    const weeks = growthWeeks(cycle, start)?.expected;
-    const productive = cycle?.productiveWeeks;
+    /**
+     * Seasonal, and a range rather than a point: a bed seeded in October takes
+     * longer to reach eight leaves than the same variety seeded in April, and
+     * the nursery's own figures are given as "8-10 weeks" for a reason.
+     *
+     * This window used to be first-cut plus "productive weeks", a single span
+     * after which the plant was implicitly finished. That is not how these
+     * grow — they are cut every few weeks, pruned back to two leaves and go
+     * again — so the field was retired and the window is now the two ends of
+     * the growth range, which is a thing the nursery actually recorded.
+     */
+    const span = growthWeeks(cycle, start);
+    const weeks = span?.min;
+    const latest = span?.max;
 
     grouped.set(key, {
       plant: p.plant,
@@ -116,7 +125,7 @@ export function cohorts(
       beds: p.bed ? [p.bed] : [],
       qty: p.qty ?? 0,
       harvestFrom: weeks ? addWeeks(start, weeks) : undefined,
-      harvestTo: weeks && productive ? addWeeks(start, weeks + productive) : undefined,
+      harvestTo: latest ? addWeeks(start, latest) : undefined,
       unscheduled: !weeks,
     });
   }

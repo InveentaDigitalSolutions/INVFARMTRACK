@@ -23,6 +23,11 @@ await page.waitForTimeout(700)
 if (process.env.SUB) { await page.getByRole('button', { name: process.env.SUB, exact: true }).first().click(); await page.waitForTimeout(600) }
 await page.getByRole('button', { name: process.env.ADD ?? 'Add Plant' }).first().click()
 await page.waitForTimeout(900)
+// Optionally press some toggles first, so conditional fields can be seen.
+for (const label of (process.env.CLICKS ?? '').split(',').filter(Boolean)) {
+  await page.getByRole('button', { name: label, exact: true }).first().click()
+  await page.waitForTimeout(350)
+}
 const dlg = page.locator('[role=dialog]').first()
 await (await dlg.count() ? dlg : page).screenshot({ path: process.argv[2] })
 console.log('errors:', errs.length ? errs.slice(0,3) : 'none')

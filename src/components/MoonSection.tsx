@@ -12,8 +12,6 @@
  */
 
 import { useMemo } from "react";
-import { Moon, MoonStar, Sunrise, Clock } from "lucide-react";
-import MetricTile from "./MetricTile";
 import { MoonDisc } from "./MoonPanel";
 import { moonKpis, moonCalendar } from "../services/moonInsight";
 
@@ -30,97 +28,68 @@ const shortDate = (iso: string | null) =>
         day: "numeric", month: "short", timeZone: "UTC",
       })
     : "—";
-const monthOf = (iso: string) =>
-  new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
-
 export default function MoonSection({ dateISO }: { dateISO?: string }) {
   const today = dateISO ?? new Date().toISOString().slice(0, 10);
   const k = useMemo(() => moonKpis(today), [today]);
-  const days = useMemo(() => moonCalendar(today), [today]);
+  const days = useMemo(() => moonCalendar(today, 3, 17), [today]);
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <MetricTile
-          label="Moon phase"
-          value={k.phase.name}
-          icon={Moon}
-          comparison={{
-            label: k.phase.waxing ? "waxing" : "waning",
-            value: `${(k.phase.illumination * 100).toFixed(0)}% lit`,
-            direction: k.phase.waxing ? "up" : "down",
-          }}
-          context={{ label: "up today", value: `${k.hoursUp.toFixed(1)} h` }}
-        />
-        <MetricTile
-          label="Day of cycle"
-          value={k.phase.age.toFixed(1)}
-          icon={MoonStar}
-          context={{ label: "of the cycle", value: "29.5 days" }}
-        />
-        <MetricTile
-          label="Next full moon"
-          value={k.daysToFull === 0 ? "Today" : `${k.daysToFull} days`}
-          icon={Moon}
-          context={{ label: "on", value: shortDate(k.nextFullISO) }}
-        />
-        <MetricTile
-          label="Next new moon"
-          value={k.daysToNew === 0 ? "Today" : `${k.daysToNew} days`}
-          icon={Moon}
-          context={{ label: "on", value: shortDate(k.nextNewISO) }}
-        />
-      </div>
-
-      <div className="bg-white rounded-xl border border-sand-200 p-5">
-        <div className="flex flex-wrap items-baseline justify-between gap-3 mb-1">
-          <h3 className="text-[15px] font-bold text-navy-900">The month ahead</h3>
-          <span className="inline-flex items-center gap-3 text-[11px] text-navy-400 tabular-nums">
-            <span className="inline-flex items-center gap-1"><Sunrise className="w-3 h-3" /> rises {clock(k.moonrise)}</span>
-            <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> up {k.hoursUp.toFixed(1)} h</span>
-          </span>
-        </div>
-        <p className="text-[11px] text-navy-400 mb-3.5">
-          Six days back and four weeks on. Turning points — new, both quarters and
-          full — are marked.
-        </p>
-
-        {/* Horizontal because a lunar cycle is a run, not a grid of weeks: what
-            matters is how far today sits from the next turning point. */}
-        <div className="overflow-x-auto -mx-1 px-1">
-          <div className="flex gap-1.5 min-w-max pb-1">
-            {days.map((d) => (
-              <div
-                key={d.dateISO}
-                title={`${d.dateISO} · ${d.phase.name} · ${(d.phase.illumination * 100).toFixed(0)}% lit`}
-                className={`flex flex-col items-center gap-1 px-1.5 py-2 rounded-lg w-[46px] shrink-0 transition-colors ${
-                  d.isToday
-                    ? "bg-navy-900 ring-1 ring-navy-700"
-                    : d.isTurning
-                      ? "bg-sand-100 ring-1 ring-sand-300/70"
-                      : "hover:bg-sand-50"
-                }`}
-              >
-                <span className={`text-[9px] uppercase tracking-[0.06em] tabular-nums ${
-                  d.isToday ? "text-white/50" : "text-navy-300"}`}>
-                  {dayNum(d.dateISO) === 1 || d.dateISO === days[0].dateISO
-                    ? monthOf(d.dateISO) : " "}
-                </span>
-                <MoonDisc phase={d.phase} size={26} />
-                <span className={`text-[10px] font-semibold tabular-nums ${
-                  d.isToday ? "text-white" : d.isTurning ? "text-navy-800" : "text-navy-500"}`}>
-                  {dayNum(d.dateISO)}
-                </span>
-                {d.isTurning && (
-                  <span className={`text-[8px] leading-tight text-center ${
-                    d.isToday ? "text-lime-300" : "text-navy-400"}`}>
-                    {d.phase.name.replace(" moon", "").replace("First ", "1st ").replace("Last ", "Last ")}
-                  </span>
-                )}
-              </div>
-            ))}
+    <div className="bg-white rounded-xl border border-sand-200/80 shadow-sm px-5 py-4">
+      {/* One row rather than four tiles and a banner. The moon is context for
+          reading the rest of the page, and four full-size cards made it the
+          subject — which is exactly what it is not. */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div className="flex items-center gap-3">
+          <MoonDisc phase={k.phase} size={38} />
+          <div>
+            <p className="text-[13px] font-semibold text-navy-900 leading-tight">
+              {k.phase.name}
+            </p>
+            <p className="text-[11px] text-navy-400 tabular-nums">
+              {(k.phase.illumination * 100).toFixed(0)}% lit ·{" "}
+              day {k.phase.age.toFixed(1)} of 29.5
+            </p>
           </div>
         </div>
+
+        <dl className="flex flex-wrap gap-x-6 gap-y-1.5 text-[11px]">
+          {[
+            ["Next full", k.daysToFull === 0 ? "Today" : `${k.daysToFull} d · ${shortDate(k.nextFullISO)}`],
+            ["Next new", k.daysToNew === 0 ? "Today" : `${k.daysToNew} d · ${shortDate(k.nextNewISO)}`],
+            ["Rises", clock(k.moonrise)],
+            ["Up today", `${k.hoursUp.toFixed(1)} h`],
+          ].map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-[9px] uppercase tracking-[0.09em] text-navy-300">{label}</dt>
+              <dd className="font-medium text-navy-700 tabular-nums">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      {/* Three weeks, not five: enough to see the next turning point coming
+          without the strip running the width of the screen. */}
+      <div className="overflow-x-auto -mx-1 px-1 mt-3.5 pt-3.5 border-t border-sand-200/70">
+        <div className="flex gap-1 min-w-max">
+          {days.map((d) => (
+            <div
+              key={d.dateISO}
+              title={`${d.dateISO} · ${d.phase.name} · ${(d.phase.illumination * 100).toFixed(0)}% lit`}
+              className={`flex flex-col items-center gap-0.5 px-1 py-1.5 rounded-md w-[34px] shrink-0 ${
+                d.isToday ? "bg-navy-900" : d.isTurning ? "bg-sand-100" : ""
+              }`}
+            >
+              <MoonDisc phase={d.phase} size={18} />
+              <span className={`text-[9px] tabular-nums ${
+                d.isToday ? "text-white font-semibold" : d.isTurning ? "text-navy-700 font-semibold" : "text-navy-400"}`}>
+                {dayNum(d.dateISO)}
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="text-[10px] text-navy-300 mt-1.5">
+          Three weeks of the cycle. Today is filled; the turning points are shaded.
+        </p>
       </div>
     </div>
   );

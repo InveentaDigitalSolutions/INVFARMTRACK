@@ -29,7 +29,6 @@ interface PlantRow {
   growthWeeksMaxMarAug?: number;
   growthWeeksMinSepFeb?: number;
   growthWeeksMaxSepFeb?: number;
-  productiveWeeks?: number;
 }
 
 const day = 86_400_000;
@@ -49,7 +48,6 @@ export default function ProductionSchedule() {
         growthWeeksMaxMarAug: p.growthWeeksMaxMarAug,
         growthWeeksMinSepFeb: p.growthWeeksMinSepFeb,
         growthWeeksMaxSepFeb: p.growthWeeksMaxSepFeb,
-        productiveWeeks: p.productiveWeeks,
       })),
     [plants]
   );

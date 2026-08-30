@@ -309,8 +309,9 @@ async function ensureTable(table) {
 }
 
 /**
- * Adds option values present in the schema but missing from the environment.
- * Additive only — removing a value would break rows already holding it.
+ * Brings an option set in line with the schema: renames a value whose label has
+ * changed, and adds ones that are missing. Never removes — a value that rows
+ * already hold cannot be taken away without losing what they mean.
  */
 async function syncOptions(entityLogicalName, col) {
   const attribute = logical(col.schemaName)
@@ -335,14 +336,18 @@ async function syncOptions(entityLogicalName, col) {
   for (const option of col.options) {
     const existingLabel = byValue.get(option.value)
     if (existingLabel !== undefined && existingLabel !== option.label) {
-      console.log(`      ~ renaming ${option.value} from "${existingLabel}" to "${option.label}"`)
       await api('POST', 'UpdateOptionValue', {
-        EntityLogicalName: table.logicalName,
-        AttributeLogicalName: col.schemaName.toLowerCase(),
+        // `entityLogicalName` is what this function is given; `table` is not in
+        // scope here, and `attribute` already ran the schema name through
+        // logical(). Getting both wrong made the rename throw where nothing
+        // was watching, so it printed that it had renamed and had not.
+        EntityLogicalName: entityLogicalName,
+        AttributeLogicalName: attribute,
         Value: option.value,
         Label: label(option.label),
         MergeLabels: false,
       })
+      console.log(`      ~ renamed ${option.value} from "${existingLabel}" to "${option.label}"`)
       continue
     }
     if (present.has(option.label)) continue

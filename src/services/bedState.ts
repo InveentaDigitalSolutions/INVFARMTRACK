@@ -19,7 +19,6 @@ export interface PlantingLike { bed?: string; plant?: string; date?: string; qty
 export interface PlantLike extends PhenologyPlant {
   name?: string;
   variety?: string;
-  productiveWeeks?: number;
 }
 export interface DatedBedRecord { bed?: string; date?: string; type?: string }
 

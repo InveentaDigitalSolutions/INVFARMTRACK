@@ -233,23 +233,32 @@ const plantFields = [
     // What the variety asks for. The bed records what it actually has, and the
     // two are different facts — a basket-only variety offered for a ground bed
     // is a mistake nothing could catch before this existed.
-    // Three options each: a segmented row shows all of them at once, where a
-    // dropdown hides two thirds of the answer behind a click.
-    { key: "grownIn", label: "Grown In", type: "toggle" as const, options: [
+    // Two things you can pick, and both together. Choosing both stores
+    // "Ground & Basket", which is itself one of the three choice labels, so
+    // nothing has to be mapped on the way in or out.
+    { key: "grownIn", label: "Grown In", type: "toggle" as const, multi: true, options: [
       { value: "Ground", label: "Ground" },
       { value: "Basket", label: "Basket" },
-      { value: "Ground or Basket", label: "Either" },
     ] },
+    /**
+     * Shade cloth is sold and spoken about by how much it BLOCKS — 65% cloth —
+     * so that is what these say. They read as transmission before, which is the
+     * same fact upside down and the wrong way round for anyone in the nursery.
+     * The light model still works in transmission underneath: 35%, 12.25%,
+     * 4.29%.
+     */
     { key: "shadeNeeded", label: "Shade Needed", type: "toggle" as const, options: [
-      // Short enough not to wrap onto a second line at this width.
-      { value: "Single", label: "Single · 35%" },
-      { value: "Double", label: "Double · 12%" },
-      { value: "Triple", label: "Triple · 4%" },
+      { value: "Single", label: "Single · 65%" },
+      { value: "Double", label: "Double · 87.75%" },
+      { value: "Triple", label: "Triple · 95.71%" },
     ] },
-    // Every bed is the same size, so how many fit is a property of the
-    // variety rather than of any particular bed.
-    { key: "plantsPerBed", label: "Plants per Bed", type: "number" as const, min: 0 },
-    { key: "productiveWeeks", label: "Productive Weeks", type: "number" as const, min: 0 },
+    // Capacity depends on which of the two it is: a basket row holds a
+    // different number from a ground bed row. A variety grown both ways carries
+    // both figures, and each only appears when it applies.
+    { key: "plantsPerBed", label: "Plants per Bed Row", type: "number" as const, min: 0,
+      showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Ground") },
+    { key: "plantsPerBasketRow", label: "Plants per Basket Row", type: "number" as const, min: 0,
+      showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Basket") },
   ]},
   /**
    * Production knowledge, and it is genuinely per variety — the figures happen
@@ -691,14 +700,15 @@ export default function ProductionPage() {
                 { key: "name", label: "Name" },
                 { key: "latin", label: "Latin Name" },
                 { key: "variety", label: "Variety" },
-                { key: "plantsPerBed", label: "Per Bed" },
+                { key: "grownIn", label: "Grown In" },
+                { key: "plantsPerBed", label: "Per Bed Row" },
+                { key: "plantsPerBasketRow", label: "Per Basket Row" },
                 // The seasonal pair replaced a single "weeks to first cut":
                 // the same cutting takes 8-10 weeks in the bright half of the
                 // year and 10-12 in the dark, so one number was always wrong
                 // for half the year.
                 { key: "growthWeeksMinMarAug", label: "Mar–Aug wks" },
                 { key: "growthWeeksMinSepFeb", label: "Sep–Feb wks" },
-                { key: "productiveWeeks", label: "Productive" },
                 { key: "patent", label: "Patented", render: (r) => (
                   <Badge variant={r.patent ? "amber" : "gray"}>{r.patent ? "Yes" : "No"}</Badge>
                 ) },

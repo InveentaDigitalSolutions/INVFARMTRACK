@@ -58,6 +58,7 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       patentHolder: "bv_patentholder",
       patentExpiry: "bv_patentexpiry",
       plantsPerBed: "bv_plantsperbed",
+      plantsPerBasketRow: "bv_plantsperbasketrow",
       // Where it may be grown, and what it needs over it. The bed records what
       // it actually has; these two record what the variety asks for.
       grownIn: "bv_grownin",
@@ -72,7 +73,6 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       growthWeeksMaxSepFeb: "bv_growthweeksmaxsepfeb",
       harvestWeeksSepFeb: "bv_harvestweekssepfeb",
       pruningWeeksSepFeb: "bv_pruningweekssepfeb",
-      productiveWeeks: "bv_productiveweeks",
       active: "bv_isactive",
     },
   },
