@@ -42,9 +42,10 @@ await page.evaluate(() => {
     for (let r = 1; r <= rows; r++)
       beds.push({ id: `${f}-${String(r).padStart(2, '0')}`, name: `${f}-${String(r).padStart(2, '0')}`,
                   field: f, fieldName: f, row: r, level: 0, type: 'Ground', status: 'Active',
-                  // The bands Santiago gave: 1-4 double, 5-8 single, and so on.
-                  shade: [1,2,3,4,9,10,11,12,17,18,19,20,21,26,27,28,29].includes(r)
-                    ? 'Double' : 'Single' })
+                  // Exactly as Dataverse holds it: E fields banded into eight
+                  // runs, C fields uniform — which is one panel spanning 49 m.
+                  shade: f.startsWith('C') ? 'Single'
+                    : ([1,2,3,4,9,10,11,12,17,18,19,20,21,26,27,28,29].includes(r) ? 'Double' : 'Single') })
   localStorage.setItem('dni_beds', JSON.stringify(beds))
   localStorage.setItem('dni_fields', JSON.stringify(
     fields.map(([n, rows]) => ({ id: n, name: n, fieldName: n, rows, shadehouse: 'SH-0001' }))))
@@ -79,6 +80,13 @@ if (process.env.TERRAIN) {
 }
 const out = process.argv[2]
 const canvas = page.locator('canvas').first()
+if (process.env.ORBIT) {
+  const box = await canvas.boundingBox()
+  const cx = box.x + box.width / 2, cy = box.y + box.height / 2
+  await page.mouse.move(cx, cy); await page.mouse.down()
+  await page.mouse.move(cx + Number(process.env.ORBIT), cy, { steps: 20 })
+  await page.mouse.up(); await page.waitForTimeout(1200)
+}
 if (process.env.ZOOM) {
   const box = await canvas.boundingBox()
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)

@@ -29,7 +29,7 @@ const shortDate = (iso: string | null) =>
     : "—";
 
 /** The lit disc, drawn to the actual phase. */
-function MoonDisc({ phase, size = 46 }: { phase: MoonPhase; size?: number }) {
+export function MoonDisc({ phase, size = 46 }: { phase: MoonPhase; size?: number }) {
   const r = 22;
   // How far the terminator bulges. At the quarters it is a straight line, so
   // the ellipse collapses to zero width rather than jumping.

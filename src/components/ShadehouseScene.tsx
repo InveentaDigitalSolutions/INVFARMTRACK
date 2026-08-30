@@ -1051,22 +1051,45 @@ function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
     }[] = [];
 
     let run: BedPlacement[] = [];
+
+    /**
+     * Emit a run as several panels rather than one.
+     *
+     * C1 and C3 carry the same cloth over all 27 beds, which used to draw as a
+     * single sheet 49 m across; E1 and E3 are banded into eight. The big sheet
+     * flickered as the camera moved and the small ones never did, and that is
+     * the whole difference: three.js sorts transparent objects by the distance
+     * to their centre, and one point cannot stand in for 49 m of surface, so
+     * the sheet's place in the order swung about against the beds under it —
+     * which are transparent too, whatever their opacity.
+     *
+     * Segments of a few beds each put every panel's centre near its own
+     * surface. The overhang is added only at the two real ends of the run: a
+     * segment that overlapped its neighbour would blend twice and draw a dark
+     * seam down the field.
+     */
+    const SEGMENT_BEDS = 6;
     const flush = () => {
       if (run.length === 0) return;
       const first = run[0];
-      const xs = run.map((p) => p.x);
-      const halfWidth = first.width / 2;
-      const left = Math.min(...xs) - halfWidth;
-      const right = Math.max(...xs) + halfWidth;
-      out.push({
-        key: `${first.bed.fieldId}-${first.bed.bedNumber}-${first.bed.shade}`,
-        x: (left + right) / 2,
-        z: first.z,
-        // A little wider than the beds, the way cloth overhangs its posts.
-        width: right - left + 0.4,
-        length: first.length + 0.6,
-        shade: first.bed.shade as ShadeLevel,
-      });
+      const half = first.width / 2;
+
+      for (let i = 0; i < run.length; i += SEGMENT_BEDS) {
+        const seg = run.slice(i, i + SEGMENT_BEDS);
+        const xs = seg.map((p) => p.x);
+        const atStart = i === 0;
+        const atEnd = i + SEGMENT_BEDS >= run.length;
+        const left = Math.min(...xs) - half - (atStart ? 0.2 : 0);
+        const right = Math.max(...xs) + half + (atEnd ? 0.2 : 0);
+        out.push({
+          key: `${first.bed.fieldId}-${seg[0].bed.bedNumber}-${first.bed.shade}`,
+          x: (left + right) / 2,
+          z: first.z,
+          width: right - left,
+          length: first.length + 0.6,
+          shade: first.bed.shade as ShadeLevel,
+        });
+      }
       run = [];
     };
 
@@ -1093,6 +1116,10 @@ function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
           key={panel.key}
           position={[panel.x, SHADE_HEIGHT_M, panel.z]}
           rotation={[-Math.PI / 2, 0, 0]}
+          // The cloth is above everything, so it is drawn last whatever the
+          // sort makes of it. Without this it could be ordered behind the beds
+          // it covers and simply not appear.
+          renderOrder={900}
         >
           <planeGeometry args={[panel.width, panel.length]} />
           <meshStandardMaterial
