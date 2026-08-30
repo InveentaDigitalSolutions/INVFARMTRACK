@@ -9,7 +9,8 @@ import {
   LEVEL_HEIGHTS_M,
   stateColors,
   plotConfigs,
-  POST_SPACING_M,
+  postLinesAcross,
+  postLinesAlong,
   SHADE_COLOR,
   SHADE_HEIGHT_M,
   SHADE_OPACITY,
@@ -18,6 +19,8 @@ import {
   type ShadehouseBed,
 } from "../services/shadehouseLayout";
 import { zoneStatusColors, type ZoneReading } from "../services/irrigation";
+import { groundAt, elevationFraction, TERRAIN_MEAN_M } from "../services/terrain";
+import { TERRAIN_ACROSS, TERRAIN_ALONG } from "../services/terrain.generated";
 import WeatherLayer from "./WeatherLayer";
 import type { CurrentConditions } from "../services/weather";
 
@@ -250,7 +253,10 @@ export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
         bed,
         x: -totalWidth / 2 + (bed.bedNumber - 0.5) * field.bedWidth,
         z: rowStart + seat * (field.bedLength + PLOT_GAP_M) + field.bedLength / 2,
-        y: LEVEL_HEIGHTS_M[bed.level],
+        y: LEVEL_HEIGHTS_M[bed.level] + groundAt(
+          -totalWidth / 2 + (bed.bedNumber - 0.5) * field.bedWidth,
+          rowStart + seat * (field.bedLength + PLOT_GAP_M) + field.bedLength / 2
+        ),
         width: field.bedWidth * 0.86,
         length: field.bedLength,
       };
@@ -270,7 +276,9 @@ export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
       bed,
       x,
       z,
-      y: LEVEL_HEIGHTS_M[bed.level],
+      // The bed sits on the ground, which is not level. Without this the rows
+      // float over a sloping floor at the low end and sink into it at the high.
+      y: LEVEL_HEIGHTS_M[bed.level] + groundAt(x, z),
       // Leave a sliver between beds so rows stay individually readable.
       width: field.bedWidth * 0.86,
       length: field.bedLength,
@@ -621,6 +629,50 @@ function AirLine({
 }
 
 /** Structural context: posts and the shade-cloth roof from the photos. */
+/**
+ * The floor, with its 4 m of fall.
+ *
+ * A flat plane was a convenient lie: the nursery drops from 569 m at one corner
+ * to 565 m at the other, and on a growing site that is where the water goes.
+ * The mesh is displaced from the survey's contours and shaded by height, so the
+ * slope reads without having to hunt for a number.
+ */
+function Ground({ span, depth }: { span: number; depth: number }) {
+  const geometry = useMemo(() => {
+    const w = span + 8;
+    const d = depth + 8;
+    const g = new THREE.PlaneGeometry(w, d, TERRAIN_ACROSS - 1, TERRAIN_ALONG - 1);
+    const pos = g.attributes.position;
+    const colours = new Float32Array(pos.count * 3);
+
+    // Low ground reads cooler and darker, high ground warmer and paler — the
+    // same convention a paper contour plan uses, so it needs no legend.
+    const low = new THREE.Color("#b9bfae");
+    const high = new THREE.Color("#e9e4d4");
+
+    for (let i = 0; i < pos.count; i++) {
+      // The plane is built in XY and laid flat, so its y is the model's z.
+      const x = pos.getX(i);
+      const z = pos.getY(i);
+      const h = groundAt(x, -z);
+      pos.setZ(i, h);
+      const c = low.clone().lerp(high, elevationFraction(h + TERRAIN_MEAN_M));
+      colours[i * 3] = c.r;
+      colours[i * 3 + 1] = c.g;
+      colours[i * 3 + 2] = c.b;
+    }
+    g.setAttribute("color", new THREE.BufferAttribute(colours, 3));
+    g.computeVertexNormals();
+    return g;
+  }, [span, depth]);
+
+  return (
+    <mesh geometry={geometry} position={[0, -0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <meshStandardMaterial vertexColors roughness={1} />
+    </mesh>
+  );
+}
+
 function Structure({
   span,
   depth,
@@ -633,22 +685,26 @@ function Structure({
   /** x position, z extent and cable levels of each post line. */
   postLines: { x: number; z: number; length: number; levels: BedLevel[] }[];
 }) {
-  /** Posts every 6 m along each line, tall enough to carry its top cable. */
+  /**
+   * Every post in the house: 12 lines north-south by 19 east-west.
+   *
+   * They used to be derived from the air beds, so a house with no cables strung
+   * yet had no posts at all — and the shade cloth floated. The posts are the
+   * structure; they stand whether or not anything hangs from them.
+   */
   const posts = useMemo(() => {
-    const out: { x: number; z: number; height: number }[] = [];
-    // Posts follow the surveyed bay rather than a round number.
-    const step = POST_SPACING_M;
-    for (const line of postLines) {
-      const top = Math.max(...line.levels.map((l) => LEVEL_HEIGHTS_M[l]), 0);
-      // A post stands proud of the cable it carries, as a real one does.
-      const height = top + 0.45;
-      const start = line.z - line.length / 2;
-      for (let z = start; z <= line.z + line.length / 2 + 0.01; z += step) {
-        out.push({ x: line.x, z, height });
-      }
-    }
-    return out;
-  }, [postLines]);
+    const xs = postLinesAcross();
+    const zs = postLinesAlong();
+    return xs.flatMap((x) =>
+      zs.map((z) => ({
+        x, z,
+        // A post carries the cloth, so it reaches it and stands a little proud.
+        height: SHADE_HEIGHT_M + 0.25,
+        // On the ground where it is, not on an average of the site.
+        base: groundAt(x, z),
+      }))
+    );
+  }, []);
 
   /** One cable per level per line, running the length of the row. */
   const cables = useMemo(
@@ -668,7 +724,7 @@ function Structure({
   return (
     <group>
       {posts.map((post, i) => (
-        <mesh key={i} position={[post.x, post.height / 2, post.z]} castShadow>
+        <mesh key={i} position={[post.x, post.base + post.height / 2, post.z]} castShadow>
           <cylinderGeometry args={[0.075, 0.095, post.height, 14]} />
           <meshStandardMaterial color="#7a6048" roughness={0.85} />
         </mesh>
@@ -678,7 +734,7 @@ function Structure({
       {cables.map((cable) => (
         <mesh
           key={cable.key}
-          position={[cable.x, cable.y, cable.z]}
+          position={[cable.x, cable.y + groundAt(cable.x, cable.z), cable.z]}
           rotation={[Math.PI / 2, 0, 0]}
         >
           <cylinderGeometry args={[0.016, 0.016, cable.length, 6]} />
@@ -696,10 +752,7 @@ function Structure({
           />
         </mesh>
       )}
-      <mesh position={[0, -0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[span + 8, depth + 8]} />
-        <meshStandardMaterial color={PLAN_COLORS.ground} roughness={1} />
-      </mesh>
+      <Ground span={span} depth={depth} />
     </group>
   );
 }
@@ -883,7 +936,7 @@ function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
       {panels.map((panel) => (
         <mesh
           key={panel.key}
-          position={[panel.x, SHADE_HEIGHT_M, panel.z]}
+          position={[panel.x, SHADE_HEIGHT_M + groundAt(panel.x, panel.z), panel.z]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
           <planeGeometry args={[panel.width, panel.length]} />

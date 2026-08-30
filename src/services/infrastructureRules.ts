@@ -8,6 +8,8 @@
  * ground level.
  */
 
+import { postRowsIn } from "./shadehouseLayout";
+
 export interface SeasonLike {
   id?: string;
   name?: string;
@@ -163,8 +165,16 @@ export function availableRows(
       .filter((p): p is ParsedBed => p !== null && p.field === field.name && p.level === level)
       .map((p) => p.row)
   );
+  // An air bed hangs on a cable, and a cable is strung between posts. Offering
+  // a row with no post above it invites a bed that cannot physically exist.
+  const carriesCable = level > 0 ? new Set(postRowsIn(String(field.name ?? ""))) : null;
+
   const free: number[] = [];
-  for (let row = 1; row <= field.rows; row++) if (!taken.has(row)) free.push(row);
+  for (let row = 1; row <= field.rows; row++) {
+    if (taken.has(row)) continue;
+    if (carriesCable && !carriesCable.has(row)) continue;
+    free.push(row);
+  }
   return free;
 }
 

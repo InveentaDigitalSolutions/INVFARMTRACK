@@ -53,11 +53,22 @@ eq('type follows the level, air', typeForLevel(2), 'Air')
 const beds = [{name:'E3-01',field:'E3'},{name:'E3-03',field:'E3'}]
 eq('free ground rows skip the taken ones', availableRows({name:'E3',rows:5}, beds), [2,4,5])
 eq('no row count -> offer nothing', availableRows({name:'E3'}, beds), [])
-// a ground bed in row 1 does not stop an air bed hanging above it
-eq('levels are counted separately', availableRows({name:'E3',rows:3}, beds, 1), [1,2,3])
-const mixed = [{name:'E3-01'},{name:'E3-01-1'},{name:'E3-02-1'}]
-eq('level 1 free rows', availableRows({name:'E3',rows:3}, mixed, 1), [3])
-eq('level 2 is untouched by level 1', availableRows({name:'E3',rows:3}, mixed, 2), [1,2,3])
+// A ground bed in row 1 does not stop an air bed hanging above it — but an air
+// bed can only hang where a cable is, and a cable is strung between posts. In
+// E3 the post lines fall on rows 1, 8, 16, 24 and 32.
+eq('ground rows are every free row', availableRows({name:'E3',rows:33}, beds), 
+   Array.from({length:33},(_,i)=>i+1).filter(r=>r!==1&&r!==3))
+eq('air rows are only the ones carrying a cable',
+   availableRows({name:'E3',rows:33}, beds, 1), [1,8,16,24,32])
+const mixed = [{name:'E3-01'},{name:'E3-01-1'},{name:'E3-08-1'}]
+eq('and a taken cable row drops out',
+   availableRows({name:'E3',rows:33}, mixed, 1), [16,24,32])
+eq('a ground bed below does not block the cable above',
+   availableRows({name:'E3',rows:33}, [{name:'E3-16'}], 1), [1,8,16,24,32])
+eq('level 2 is untouched by what hangs at level 1',
+   availableRows({name:'E3',rows:33}, mixed, 2), [1,8,16,24,32])
+eq('C fields have their own post rows',
+   availableRows({name:'C3',rows:27}, [], 1), [1,6,12,17,22,27])
 eq('ground free rows ignore air beds', availableRows({name:'E3',rows:3}, mixed, 0), [2,3])
 eq('ground beds are level 0 only', levelsFor('Ground'), ['0'])
 eq('air beds cannot be level 0', levelsFor('Air'), ['1','2','3'])

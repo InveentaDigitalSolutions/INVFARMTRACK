@@ -72,7 +72,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const [showIrrigation, setShowIrrigation] = useState(true);
   const [lens, setLens] = useState<LensMode>("state");
   const [showPlotLabels, setShowPlotLabels] = useState(true);
-  const [showBedNumbers, setShowBedNumbers] = useState(false);
+  // On by default: a bed you cannot name is a bed you cannot go and find.
+  const [showBedNumbers, setShowBedNumbers] = useState(true);
   const [showCompass, setShowCompass] = useState(true);
   // The cloth is the point of a shadehouse, so it is on by default.
   const [showShade, setShowShade] = useState(true);
