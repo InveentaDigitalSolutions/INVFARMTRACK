@@ -107,6 +107,12 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   Note the site is inside the tropics: the noon sun passes **north** of overhead
   from late April to mid-August, so shadows swing right through the compass
   twice a year, and day length only varies 11.1 h to 12.9 h.
+- **Transparent objects in the scene need their draw order thought about.** The
+  contour overlay was invisible under the two far fields and fine under the near
+  two: three.js draws transparent meshes back-to-front, so the far beds were
+  drawn first and wrote depth, and the overlay failed the depth test behind
+  them. The overlay now has `renderOrder={-1}` and `depthWrite={false}`, and a
+  faded bed writes no depth either.
 - **The Terrain layer is deliberately 2D.** Contours are painted on the floor as
   a canvas texture, not displaced into a mesh: displacement would move every bed
   and reopen the layout. Beds fade to ~0.3 opacity while it is on, or they hide

@@ -11,7 +11,7 @@
  */
 
 import { useMemo, useState } from "react";
-import { TrendingDown, TrendingUp, Minus } from "lucide-react";
+import { TrendingDown, TrendingUp, Minus, X } from "lucide-react";
 import {
   RANGES, rateSeries, withinRange, rateStats, plotPoints,
   type RangeKey, type RatePoint,
@@ -28,9 +28,12 @@ const day = (iso: string) =>
 
 export interface RateHistoryChartProps {
   rows: { date?: unknown; value?: unknown }[];
+  /** Dismiss the chart. Given a button of its own, because hovering away is
+      not obvious once the chart has been clicked open. */
+  onClose?: () => void;
 }
 
-export default function RateHistoryChart({ rows }: RateHistoryChartProps) {
+export default function RateHistoryChart({ rows, onClose }: RateHistoryChartProps) {
   const [range, setRange] = useState<RangeKey>("3M");
   /** Which point the pointer is nearest, or null when it is away. */
   const [hover, setHover] = useState<number | null>(null);
@@ -94,7 +97,8 @@ export default function RateHistoryChart({ rows }: RateHistoryChartProps) {
           )}
         </div>
 
-        <div className="flex bg-white/5 rounded-md p-0.5 shrink-0" role="group" aria-label="Range">
+        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex bg-white/5 rounded-md p-0.5" role="group" aria-label="Range">
           {RANGES.map((r) => (
             <button
               key={r.key}
@@ -113,6 +117,18 @@ export default function RateHistoryChart({ rows }: RateHistoryChartProps) {
               {r.key}
             </button>
           ))}
+        </div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="p-1 rounded text-white/40 hover:text-white/80 cursor-pointer
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/50"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
         </div>
       </div>
 

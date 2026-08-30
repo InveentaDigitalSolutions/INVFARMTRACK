@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Leaf,
@@ -128,7 +128,30 @@ export default function DashboardPage() {
   // the chart's own range buttons without it vanishing on the way.
   const [fxHover, setFxHover] = useState(false);
   const [fxPinned, setFxPinned] = useState(false);
-  const fxOpen = fxHover || fxPinned;
+  /**
+   * Set when the chart is dismissed while the pointer is still on the chip.
+   * Without it the click unpinned the chart and the pointer immediately
+   * reopened it, so it could not be closed at all — only by leaving the page.
+   */
+  const [fxDismissed, setFxDismissed] = useState(false);
+  const fxOpen = fxPinned || (fxHover && !fxDismissed);
+  const closeFx = () => { setFxPinned(false); setFxDismissed(true); };
+
+  // Escape closes it wherever the focus happens to be, and so does a click
+  // anywhere else on the page.
+  useEffect(() => {
+    if (!fxOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeFx(); };
+    const onDown = (e: MouseEvent) => {
+      if (!(e.target as Element)?.closest?.("[data-fx-popover]")) closeFx();
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [fxOpen]);
   return (
     <motion.div
       initial="hidden"
@@ -153,12 +176,17 @@ export default function DashboardPage() {
               is worth a different figure now. */}
           <div
             className="relative"
+            data-fx-popover
             onMouseEnter={() => setFxHover(true)}
-            onMouseLeave={() => setFxHover(false)}
+            onMouseLeave={() => { setFxHover(false); setFxDismissed(false); }}
           >
             <button
               type="button"
-              onClick={() => setFxPinned((pinned) => !pinned)}
+              // Pinned, not open: hovering has already opened it by the time a
+              // click lands, so testing `fxOpen` here made the first click
+              // close what the pointer had just opened. The first click pins;
+              // the second closes.
+              onClick={() => { if (fxPinned) closeFx(); else { setFxPinned(true); setFxDismissed(false); } }}
               onFocus={() => setFxHover(true)}
               onBlur={(e) => {
                 // Focus moving into the chart itself must not close it.
@@ -204,9 +232,8 @@ export default function DashboardPage() {
               <div
                 className="absolute right-0 top-full mt-2 z-30 rounded-xl bg-navy-900
                   ring-1 ring-navy-700/60 shadow-xl shadow-navy-950/30"
-                onKeyDown={(e) => { if (e.key === "Escape") { setFxPinned(false); setFxHover(false); } }}
               >
-                <RateHistoryChart rows={fxRows} />
+                <RateHistoryChart rows={fxRows} onClose={closeFx} />
               </div>
             )}
           </div>

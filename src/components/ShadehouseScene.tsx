@@ -436,6 +436,7 @@ function Bed({
           emissive={base}
           transparent
           opacity={dimmed ? 0.12 : faded ? 0.34 : 1}
+          depthWrite={!faded && !dimmed}
           roughness={0.62}
           metalness={0.02}
         />
@@ -650,12 +651,26 @@ function Topography({ span, depth }: { span: number; depth: number }) {
   return (
     // Just above the ground plane. polygonOffset rather than a larger gap, so
     // it cannot be seen floating when the camera drops to eye level.
-    <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow={false}>
+    //
+    // renderOrder and depthWrite are what make it visible under the far fields.
+    // Transparent objects are drawn back-to-front, so the beds at the back of
+    // the house were drawn BEFORE this plane and wrote themselves into the
+    // depth buffer; the overlay then failed the depth test behind them and was
+    // never painted. E3 and C3 stayed opaque while E1 and C1 showed through.
+    // Drawing the overlay first, and letting it write no depth of its own, puts
+    // it under every bed instead of only the near ones.
+    <mesh
+      position={[0, 0.01, 0]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      renderOrder={-1}
+      receiveShadow={false}
+    >
       <planeGeometry args={[span + 8, depth + 8]} />
       <meshBasicMaterial
         map={texture}
         transparent
         opacity={0.85}
+        depthWrite={false}
         polygonOffset
         polygonOffsetFactor={-2}
         toneMapped={false}
