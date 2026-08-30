@@ -480,7 +480,7 @@ const POT_PITCH_M = 0.45;
 const POT_DROP_M = 0.22;
 
 /**
- * An basket is a cable strung through the posts with terracotta pots hooked
+ * A basket is a cable strung through the posts with terracotta pots hooked
  * along it — not a solid bar. Pots are instanced so several thousand of them
  * cost one draw call.
  */
@@ -1040,7 +1040,7 @@ function CameraHeading({ onChange }: { onChange: (deg: number) => void }) {
 
 function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
   const panels = useMemo(() => {
-    // Ground beds carry the run's identity; an basket above one sits under
+    // Ground beds carry the run's identity; a basket above one sits under
     // the same cloth, so counting both would draw the panel twice.
     const ground = placements
       .filter((p) => p.bed.type === "ground" && p.bed.shade)

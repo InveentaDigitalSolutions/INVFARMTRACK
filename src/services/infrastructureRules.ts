@@ -4,7 +4,7 @@
  *
  * These were all free text before, which is how the nursery ended up with
  * fields called "Plot E3" while everyone says "E3", and why nothing stopped a
- * bed being numbered past the end of its field or an basket being put at
+ * bed being numbered past the end of its field or a basket being put at
  * ground level.
  */
 
@@ -115,13 +115,13 @@ export function bedName(fieldName: string, row: number, level: number = 0): stri
 export interface ParsedBed {
   field: string;
   row: number;
-  /** 0 for a ground bed, 1 or 2 for an basket above it. */
+  /** 0 for a ground bed, 1 or 2 for a basket above it. */
   level: number;
 }
 
 /**
  * Reads a bed name back apart. Both shapes have to be handled by one parser:
- * treating the trailing "-1" of an basket as its row would put E3-01-1 in
+ * treating the trailing "-1" of a basket as its row would put E3-01-1 in
  * row 1 and E3-12-3 in row 3, quietly corrupting every count per row.
  */
 export function parseBedName(name: string): ParsedBed | null {
@@ -148,7 +148,7 @@ export function levelOf(name: string): number | null {
  *
  * Bounded by the field's own row count, so a bed cannot be numbered past the
  * end of the field. Levels are counted separately: row 7 having a ground bed
- * does not stop an basket hanging above it, and an basket on level 1 does
+ * does not stop a basket hanging above it, and a basket on level 1 does
  * not block level 2.
  */
 export function availableRows(
@@ -196,7 +196,7 @@ export function levelProblem(type: string | undefined, level: string | number | 
   const value = String(level ?? "");
   if (!type || !value) return null;
   if (type === "Ground" && value !== "0") return "A ground bed is planted in the earth, so it is always level 0.";
-  if (type === "Basket" && value === "0") return "An basket hangs above the ground, so it cannot be level 0.";
+  if (type === "Basket" && value === "0") return "A basket hangs above the ground, so it cannot be level 0.";
   // Three cable lines are strung above each row, but the top one carries the
   // irrigation, so only the first two ever hold a bed.
   if (type === "Basket" && value === "3") return "Level 3 carries the irrigation line, not a bed. Baskets go up to level 2.";

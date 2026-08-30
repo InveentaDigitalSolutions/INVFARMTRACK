@@ -55,7 +55,7 @@ eq('type follows the level, air', typeForLevel(2), 'Basket')
 const beds = [{name:'E3-01',field:'E3'},{name:'E3-03',field:'E3'}]
 eq('free ground rows skip the taken ones', availableRows({name:'E3',rows:5}, beds), [2,4,5])
 eq('no row count -> offer nothing', availableRows({name:'E3'}, beds), [])
-// a ground bed in row 1 does not stop an basket hanging above it
+// a ground bed in row 1 does not stop a basket hanging above it
 eq('levels are counted separately', availableRows({name:'E3',rows:3}, beds, 1), [1,2,3])
 const mixed = [{name:'E3-01'},{name:'E3-01-1'},{name:'E3-02-1'}]
 eq('level 1 free rows', availableRows({name:'E3',rows:3}, mixed, 1), [3])
@@ -76,7 +76,7 @@ eq('a new ground bed on a full floor is refused',
 eq('re-adding a row that already exists is not new ground',
   bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120, ['E3-99']), null)
 // the bug Santiago hit: baskets were refused because the floor looked full
-eq('an basket above an existing row is allowed on a full floor',
+eq('a basket above an existing row is allowed on a full floor',
   bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120, ['E3-01-1']), null)
 eq('a whole run of baskets is allowed too',
   bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120,

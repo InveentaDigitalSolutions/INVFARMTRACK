@@ -67,7 +67,7 @@ interface BedRow { id?: string; name?: string; field?: string; type?: string; le
 
 /**
  * Built as a function because the controls depend on each other: the level
- * decides whether this is a ground or an basket, and the rows on offer are
+ * decides whether this is a ground or a basket, and the rows on offer are
  * the ones free in the chosen field at that level.
  */
 /**
@@ -164,7 +164,7 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
       { value: "1", label: "1 — basket" },
       { value: "2", label: "2 — basket" },
     ] },
-    // Free rows at this level. A ground bed in row 7 does not stop an basket
+    // Free rows at this level. A ground bed in row 7 does not stop a basket
     // hanging above it, so each level is counted separately.
     { key: "row", label: "Row", type: "select" as const, required: true, options: [],
       emptyHint: "Choose a field and a level first",
@@ -173,7 +173,7 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
         // asked for the free ground rows, and with all 120 ground beds already
         // created that is none — so opening the form and picking a field left
         // Row empty and disabled with nothing to explain it. This is what made
-        // adding an basket look impossible.
+        // adding a basket look impossible.
         const level = Number(values.level);
         if (!values.field || values.level === "" || values.level == null || !Number.isFinite(level)) {
           return [];
@@ -189,7 +189,7 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
           .map((row) => ({ value: String(row), label: String(row).padStart(2, "0") }));
       } },
     { key: "name", label: "Bed Name", type: "text" as const, readOnly: true,
-      placeholder: "E3-01, or E3-01-2 for an basket" },
+      placeholder: "E3-01, or E3-01-2 for a basket" },
     { key: "shade", label: "Shade", type: "select" as const, options: [
       { value: "Single", label: "Single" }, { value: "Double", label: "Double" },
       { value: "Triple", label: "Triple" },
@@ -399,7 +399,7 @@ export default function InfrastructurePage() {
       (h) => h.name === (fields as FieldRow[]).find((f) => f.name === fieldName)?.shadehouse
     );
     if (!bedForm.isEdit) {
-      // Positions, not records: an basket above an existing row needs no new
+      // Positions, not records: a basket above an existing row needs no new
       // ground, so it must not be refused because the floor is full.
       const full = bedCapacityProblem(shadehouse as never, beds as BedRow[], [name]);
       if (full) { alert(full); return; }
@@ -410,7 +410,7 @@ export default function InfrastructurePage() {
       name,
       level: String(level),
       // Type is not asked for: a bed on the ground is a ground bed and one on
-      // a cable above it is an basket. Storing it keeps the column usable for
+      // a cable above it is a basket. Storing it keeps the column usable for
       // filtering without ever letting it disagree with the level.
       type: typeForLevel(level),
     });

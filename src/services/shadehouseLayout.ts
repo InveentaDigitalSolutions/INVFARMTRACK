@@ -123,7 +123,7 @@ export function postEveryFor(fieldId: string): number {
 }
 
 /**
- * Cables are strung THROUGH the posts, so an basket can only exist where a
+ * Cables are strung THROUGH the posts, so a basket can only exist where a
  * post line stands — not above every ground bed.
  */
 export function isPostLine(bed: ShadehouseBed): boolean {

@@ -159,7 +159,7 @@ const infra = infrastructureSummary({
   ],
   plantings: [{ bed: 'E3-01', plant: 'Hawaiian' }],
 })
-eq('an basket above a ground bed is one position', infra.positions, 3)
+eq('a basket above a ground bed is one position', infra.positions, 3)
 eq('positions against capacity, not records', infra.utilisation, 30)
 eq('ground and air split', [infra.ground, infra.air], [3, 1])
 eq('beds carrying a crop', [infra.planted, infra.idle], [1, 3])
