@@ -57,6 +57,13 @@ const ROAD_M = 3.5;
 const PLOT_GAP_M = 3.5;
 /** Height of the shade cloth, and so of the posts that hold it up. */
 const ROOF_HEIGHT_M = 3.1;
+/**
+ * Shadow map resolution. Over a house 110 m across this is about 2.7 cm per
+ * texel — a post is 15 cm wide, so it covers five of them. At the default 512
+ * one texel is 22 cm, wider than the post itself, which is why the posts cast
+ * nothing while a 14 m test cube cast perfectly.
+ */
+const SHADOW_MAP = 4096;
 
 export interface RoadLayout {
   vertical: { x: number; width: number; length: number };
@@ -697,9 +704,13 @@ function Topography({ span, depth }: { span: number; depth: number }) {
  * This takes the sun's actual position for the moment being shown, so the
  * direction and colour of the light are the real ones.
  *
- * Cast shadows do NOT yet render — that fault predates this and is not the
- * sun's doing. Until it is fixed, this shows where the light comes from rather
- * than where the shade lands.
+ * Shadows are cast by anything bed-sized or larger, which is what matters: an
+ * air bed shades the ground bed beneath it, and that is a real term in the
+ * light a crop receives. The 15 cm posts do not resolve — one 4096 shadow map
+ * stretched over a house 115 m across gives 2.8 cm per texel, and a post
+ * silhouette five texels wide does not survive the filtering at a low sun.
+ * Their shadows are physically negligible anyway, so this is left as it is
+ * rather than chased with a second cascade.
  *
  * The arc is drawn because a single sun is a snapshot and the question is
  * always "and where does it go next" — at this latitude that answer changes
@@ -734,8 +745,16 @@ function Sun({
    */
   const light = useRef<THREE.DirectionalLight>(null);
   useEffect(() => {
-    const cam = light.current?.shadow?.camera;
-    if (cam) cam.updateProjectionMatrix();
+    const l = light.current;
+    if (!l) return;
+    // The shadow map is allocated the first time the light renders, and after
+    // that setting mapSize does nothing — the texture keeps whatever size it
+    // was created at. Dropping it makes three.js allocate a new one.
+    l.shadow.mapSize.set(SHADOW_MAP, SHADOW_MAP);
+    l.shadow.map?.dispose();
+    l.shadow.map = null;
+    l.shadow.camera.updateProjectionMatrix();
+    l.shadow.needsUpdate = true;
   }, [span, depth, radius]);
 
   /** The day's whole path, sampled every ten minutes while the sun is up. */
@@ -776,7 +795,7 @@ function Sun({
         intensity={night ? 0 : 0.35 + height * 1.15}
         color={colour}
         castShadow
-        shadow-mapSize={[4096, 4096]}
+        shadow-mapSize={[SHADOW_MAP, SHADOW_MAP]}
         // Fitted to the house, not to twice it. The frustum was ±span by
         // ±depth — four times the area it needed — which put a 15 cm post
         // inside a single shadow texel, and the blur then erased it. Half the
@@ -789,8 +808,8 @@ function Sun({
         shadow-camera-far={radius * 2.5}
         // A low sun throws long shadows across a shallow surface, which is
         // exactly where a constant bias detaches them from what casts them.
-        shadow-bias={-0.0002}
-        shadow-normalBias={0.06}
+        shadow-bias={-0.00008}
+        shadow-normalBias={0.008}
       />
 
       {!night && (

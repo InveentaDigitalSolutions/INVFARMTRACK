@@ -102,6 +102,11 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   space and the real world are 17.75° apart — `services/site.ts` holds the
   position and bearing and `bearingToModel()` converts between them. Anything
   that has to point at the real sun goes through it.
+- **Do not mistake the shade-cloth panels for shadows.** Hours went into "the
+  scene casts no shadows" when the dark bands across the beds were the cloth
+  layer, drawn by default. Turn Shade off before judging any lighting change —
+  `NOSHADE=1 node scripts/test/shot3d.mjs` does it. Shadows work for anything
+  bed-sized; 15 cm posts are below what one 4096 map resolves over 115 m.
 - **The shade cloth is 65% netting, and layers multiply.** Single passes 35%,
   double 0.35² = 12.25%, triple 0.35³ = 4.29% — a factor of **eight** across the
   house, far larger than the seasonal swing (about 30%) or the terrain (1-4%).

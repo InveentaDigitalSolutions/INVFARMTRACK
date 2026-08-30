@@ -228,16 +228,22 @@ Two things would make it what actually landed:
 Then `accumulatedLight()` over a planting's life is what a growth model should
 count in, instead of calendar days.
 
-### PRK-6 · The 3D scene casts no shadows — **build**
+### PRK-6 · Posts cast no shadow — **watching, fixed 2026-08-30**
 
-Nothing in the scene has ever cast one: not the posts, not the beds, with the
-sun rig or with the fixed lamp it replaced. Ruled out so far — the Canvas shadow
-type, the shadow-camera frustum size, the light's position and distance, and the
-missing `updateProjectionMatrix` call (added anyway, correct on its own terms).
+Shadows do work. The earlier reading — "nothing casts one" — was wrong: the dark
+bands taken for shadows were the shade-cloth panels, and with that layer off a
+test caster shadowed the beds clearly.
 
-This blocks the real prize. The sun rig knows exactly where the sun is at any
-moment and the day slider drives it, but *where the shade falls* is the question
-worth answering, and that needs cast shadows working.
+What was actually wrong was the shadow map: allocated at its default over a
+house 115 m across. It is now 4096 with the frustum fitted to the block, giving
+2.8 cm per texel, and **anything bed-sized or larger casts properly** — verified
+with a 1.5 x 30 m slab at air-bed height, which shadows the ground bed beneath
+it. That is the case that matters, because it is a real term in the light a crop
+receives.
+
+The 15 cm posts still do not resolve: a silhouette five texels wide does not
+survive filtering at a low sun. Their shadows are physically negligible over a
+1.2 m bed, so this is left rather than chased with a second shadow cascade.
 
 ### PRK-4 · The irrigation layer is simulated — **watching**
 

@@ -32,7 +32,7 @@ process.on('uncaughtException', (e) => { stop(); console.error(e); process.exit(
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1500, height: 950 } })
 const errs = []
-page.on('console', m => { if (m.type() === 'error') errs.push(m.text()) })
+page.on('console', m => { const t = m.text(); if (t.includes('SHADOWDBG')) console.log(t); if (m.type() === 'error') errs.push(t) })
 // Seed the local store with the real 120 ground beds so the layout is visible.
 await page.goto('http://localhost:4179/', { waitUntil: 'domcontentloaded' })
 await page.evaluate(() => {
@@ -54,6 +54,10 @@ await page.getByRole('button', { name: 'Infrastructure' }).first().click()
 await page.waitForTimeout(800)
 await page.getByRole('button', { name: '3D', exact: true }).click()
 await page.waitForTimeout(2500)
+if (process.env.NOSHADE) {
+  await page.getByRole('button', { name: 'Shade', exact: true }).first().click()
+  await page.waitForTimeout(600)
+}
 if (process.env.LENS) {
   await page.getByRole('button', { name: process.env.LENS, exact: true }).click()
   await page.waitForTimeout(900)
@@ -75,6 +79,14 @@ if (process.env.TERRAIN) {
 }
 const out = process.argv[2]
 const canvas = page.locator('canvas').first()
+if (process.env.ZOOM) {
+  const box = await canvas.boundingBox()
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  for (let i = 0; i < Number(process.env.ZOOM); i++) {
+    await page.mouse.wheel(0, -240); await page.waitForTimeout(120)
+  }
+  await page.waitForTimeout(1200)
+}
 const target = process.env.FULL ? page
   : process.env.CLIP ? page.locator('canvas').first().locator('xpath=..')
   : canvas
