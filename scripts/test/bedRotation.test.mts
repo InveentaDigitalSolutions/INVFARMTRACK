@@ -1,5 +1,6 @@
 /** Checks the bed rotation maths. Run: npm run test:rotation */
 import { occupancies, rotationSummary, spanFraction } from '../../src/services/bedRotation.ts'
+import { bedStatuses } from '../../src/services/bedState.ts'
 
 let failures = 0
 const eq = (label: string, got: unknown, want: unknown) => {
@@ -47,6 +48,26 @@ eq('a span entirely before the window disappears',
   spanFraction({ from:'2025-01-01', to:'2025-06-01' }, START, END), null)
 eq('a zero-length span disappears',
   spanFraction({ from:'2026-03-01', to:'2026-03-01' }, START, END), null)
+
+// --- cleared beds -----------------------------------------------------------
+// A planting is standing until the day it comes off. The end date replaced a
+// yes/no, which said whether a bed was clear now and never when it was cleared.
+{
+  const plants = [{ name: 'Pothos', variety: 'Jade',
+    growthWeeksMinMarAug: 8, growthWeeksMaxMarAug: 10,
+    growthWeeksMinSepFeb: 10, growthWeeksMaxSepFeb: 12 }]
+  const today = new Date('2026-06-01T12:00:00Z')
+  const at = (p: Record<string, unknown>) =>
+    bedStatuses({ plantings: [{ bed: 'E3-01', plant: 'Jade', date: '2026-03-01', ...p }], plants, today })
+
+  eq('no end date means still standing', at({}).has('E3-01'), true)
+  eq('cleared in the past is gone', at({ endDate: '2026-05-01' }).has('E3-01'), false)
+  eq('cleared today is gone today', at({ endDate: '2026-06-01' }).has('E3-01'), false)
+  // The case a boolean cannot express at all: a bed booked to be cleared next
+  // month is still carrying a crop right now.
+  eq('an end date in the future is still standing', at({ endDate: '2026-08-01' }).has('E3-01'), true)
+  eq('a blank end date is not read as cleared', at({ endDate: '' }).has('E3-01'), true)
+}
 
 console.log(failures ? `\n  ${failures} failed` : '\n  all passed')
 process.exit(failures ? 1 : 0)

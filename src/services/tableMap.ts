@@ -362,7 +362,10 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // Whether this planting is still the one on the bed. The form had a
       // Status toggle bound to nothing, so it was dropped on every save and
       // "Active Plantings" read zero for every real record.
-      current: "bv_currentplanting",
+      // Empty while the planting is still standing; the day it came off the
+      // bed once it has. Replaced a yes/no, which could say the bed was clear
+      // and never when it was cleared.
+      endDate: "bv_enddate",
     },
     primaryName: "bv_plantingdescription",
     nameFrom: ["plant", "bed", "date"],

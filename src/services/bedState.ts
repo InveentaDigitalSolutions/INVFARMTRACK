@@ -15,7 +15,7 @@ import type { PhenologyPlant } from "./rowTypes.helpers";
 
 export type BedState = "empty" | "planted" | "growing" | "harvest-ready" | "issue";
 
-export interface PlantingLike { bed?: string; plant?: string; date?: string; qty?: number; current?: boolean }
+export interface PlantingLike { bed?: string; plant?: string; date?: string; qty?: number; endDate?: string }
 export interface PlantLike extends PhenologyPlant {
   name?: string;
   variety?: string;
@@ -64,6 +64,7 @@ export function bedStatuses(input: {
   today?: Date;
 }): Map<string, BedStatus> {
   const today = input.today ?? new Date();
+  const todayISO = today.toISOString().slice(0, 10);
 
   // Keyed to the plant rather than to a single number, because how long it
   // takes depends on the month the bed was planted.
@@ -84,7 +85,11 @@ export function bedStatuses(input: {
    */
   const standing = new Map<string, PlantingLike[]>();
   for (const p of [...input.plantings].sort((a, b) => (String(a.date ?? "") < String(b.date ?? "") ? -1 : 1))) {
-    if (!p.bed || p.current === false) continue;
+    // Standing means it has not been cleared yet. An end date in the future is
+    // still standing today, which a yes/no could never express.
+    if (!p.bed) continue;
+    const cleared = String(p.endDate ?? "").slice(0, 10);
+    if (cleared && cleared <= todayISO) continue;
     const here = standing.get(String(p.bed)) ?? [];
     here.push(p);
     standing.set(String(p.bed), here);

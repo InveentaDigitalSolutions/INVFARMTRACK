@@ -171,7 +171,7 @@ const status = bedStatuses({
     { bed: 'E3-01', plant: 'Pothos / Hawaiian', date: '2026-01-05' },
     { bed: 'E3-02', plant: 'Pothos / Jade', date: '2026-08-20' },
     { bed: 'E3-03', plant: 'Pothos / Neon', date: '2026-03-01' },
-    { bed: 'E3-04', plant: 'Pothos / Jade', date: '2026-01-01', current: false },
+    { bed: 'E3-04', plant: 'Pothos / Jade', date: '2026-01-01', endDate: '2026-01-01' },
   ],
   plants: [
     { name: 'Pothos', variety: 'Hawaiian', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:12, growthWeeksMinSepFeb:12, growthWeeksMaxSepFeb:12 },

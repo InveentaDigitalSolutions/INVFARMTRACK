@@ -381,10 +381,10 @@ export const COLUMN_KIND: Record<string, Record<string, ColumnKind>> = {
     "bv_bedid": "lookup",
     "bv_seasonid": "lookup",
     "bv_plantingdate": "date",
+    "bv_enddate": "date",
     "bv_quantity": "number",
     "bv_position": "choice",
     "bv_purpose": "choice",
-    "bv_currentplanting": "boolean",
     "bv_notes": "text",
   },
   "bv_plants": {

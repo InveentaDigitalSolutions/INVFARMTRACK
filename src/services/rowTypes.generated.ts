@@ -388,7 +388,7 @@ export interface PlantingsRow {
   season?: string;
   position?: string;
   purpose?: string;
-  current?: boolean;
+  current?: string;
   primaryName?: string;
   [key: string]: unknown;
 }

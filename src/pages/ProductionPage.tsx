@@ -94,9 +94,15 @@ const plantingFields = [
     { key: "potType", label: "Pot Type", type: "toggle" as const, options: [
       { value: "round", label: "Round" }, { value: "square", label: "Square" },
     ] },
-    // A bed can carry several plantings at once — 4,000 of one variety and 200
-    // of another. This says which are still standing, not which is latest.
-    { key: "current", label: "Still on this bed", type: "boolean" as const },
+    /**
+     * The day it came off the bed. Left empty while it is still standing.
+     *
+     * This was a yes/no, which answers whether the bed is clear now and never
+     * when it was cleared — so nothing could say what stood on a bed last
+     * March, and the light a planting received had no end to add up to.
+     */
+    { key: "endDate", label: "Cleared On", type: "date" as const,
+      placeholder: "leave empty while it is still standing" },
   ]},
 ];
 
@@ -403,7 +409,7 @@ export default function ProductionPage() {
 
   // A new planting is on the bed by definition, and starts with one blank line
   // so the control has something to show.
-  const plantingForm = useFormModal({ current: true, lines: [emptyLine()] });
+  const plantingForm = useFormModal({ lines: [emptyLine()] });
   const treatmentForm = useFormModal(initTreatments[0]);
   const irrigationForm = useFormModal(initIrrigation[0]);
   const harvestForm = useFormModal(initHarvest[0]);
@@ -504,7 +510,15 @@ export default function ProductionPage() {
                   r.purpose === "Propagation"
                     ? <Badge variant="amber">Propagation</Badge>
                     : <span className="text-navy-500">Production</span> },
-                { key: "current", label: "Status", render: (r) => <Badge variant={r.current === false ? "gray" : "green"}>{r.current === false ? "Cleared" : "Standing"}</Badge> },
+                // Status is read off the date rather than stored beside it.
+                // Two fields that can disagree is a contradiction waiting to be
+                // typed — "cleared" with no date, or a date and still standing.
+                { key: "endDate", label: "Status", render: (r) => {
+                  const cleared = String(r.endDate ?? "").slice(0, 10);
+                  return cleared
+                    ? <Badge variant="gray">Cleared {cleared}</Badge>
+                    : <Badge variant="green">Standing</Badge>;
+                } },
               ]}
               data={plantings}
               onAdd={plantingForm.openCreate}
@@ -799,7 +813,7 @@ export default function ProductionPage() {
   return (
     <PageShell title="Production" subtitle="Plantings, treatments, irrigation and harvest" icon={Sprout}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard variant="hero" label="Active Plantings" value={plantings.filter((p) => p.current !== false).length} icon={Leaf} />
+        <StatCard variant="hero" label="Active Plantings" value={plantings.filter((p) => !String((p as { endDate?: unknown }).endDate ?? "")).length} icon={Leaf} />
         <StatCard label="Treatments (month)" value={treatments.length} icon={Bug} />
         <StatCard label="Water Used (L)" value={irrigation.reduce((s, i) => s + (i.liters ?? 0), 0).toLocaleString()} icon={Droplets} />
         <StatCard label="Harvested" value={harvest.reduce((s, h) => s + (h.qty ?? 0), 0).toLocaleString()} icon={Scissors} />

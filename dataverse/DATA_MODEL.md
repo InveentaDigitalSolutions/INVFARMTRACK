@@ -424,10 +424,10 @@ Records of plants placed in beds — central activity hub
 | `bv_bedid` | Bed | Lookup → [Bed](#bed) | ✓ | Link to the related Bed record. |
 | `bv_seasonid` | Season | Lookup → [Season](#season) | ✓ | Link to the related Season record. |
 | `bv_plantingdate` | Planting Date | Date only | ✓ | Date the event took place. |
+| `bv_enddate` | Cleared On | Date only |  | The day this planting came off the bed. Empty means it is still standing. A date rather than a yes/no: a boolean says whether the bed is clear now and never what was on it last March, and the light a planting received needs both ends of its life to add up. |
 | `bv_quantity` | Quantity | Whole number |  | Amount recorded for this entry. |
 | `bv_position` | Position in bed | Choice |  | Where in the bed this planting sits. The header is the starting part, where a second variety is interplanted among the main crop. One of: Whole bed, Header. |
 | `bv_purpose` | Purpose | Choice |  | Production is stock grown to sell. Propagation is mother material grown to fill a bed later, and must not be offered to a customer as availability. One of: Production, Propagation. |
-| `bv_currentplanting` | Current Planting | Yes/No |  | Yes/no flag. Current Planting for the Planting. |
 | `bv_notes` | Notes | Text area(2000) |  | Free-text notes. |
 
 <details><summary>Choice values</summary>
