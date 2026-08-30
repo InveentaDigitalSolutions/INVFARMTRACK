@@ -50,6 +50,8 @@ interface SelectField extends BaseField {
    * picked yet for it to depend on.
    */
   optionsWhen?: (values: Record<string, unknown>) => { value: string; label: string }[];
+  /** Shown in place of "Select..." when there is nothing to offer. */
+  emptyHint?: string;
 }
 
 interface PlantLinesField extends BaseField {
@@ -214,7 +216,14 @@ function renderField(
                        text-navy-900 appearance-none cursor-pointer
                        focus:outline-none focus:ring-2 focus:ring-lime-400/30 focus:border-lime-400 transition-all"
           >
-            <option value="">Select...</option>
+            {/* An empty list is not "Select..." — there is nothing to select.
+                Saying so is the difference between a control that looks broken
+                and one that is waiting on something. */}
+            <option value="">
+              {optionsFor(field).length === 0
+                ? (field.emptyHint ?? "Nothing to choose yet")
+                : "Select..."}
+            </option>
             {optionsFor(field).map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
@@ -432,8 +441,9 @@ export default function FormModal({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 text-[13px] font-semibold text-navy-900 bg-lime-400 rounded-lg
-                             hover:bg-lime-300 cursor-pointer transition-colors shadow-sm"
+                  className="px-5 py-2.5 text-[13px] font-semibold text-white bg-navy-800 rounded-lg
+                             hover:bg-navy-700 cursor-pointer transition-colors shadow-sm
+                             focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/50"
                 >
                   {isEdit ? "Update" : submitLabel}
                 </button>

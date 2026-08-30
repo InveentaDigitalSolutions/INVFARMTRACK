@@ -51,12 +51,26 @@ await page.getByRole('button', { name: 'Infrastructure' }).first().click()
 await page.waitForTimeout(800)
 await page.getByRole('button', { name: '3D', exact: true }).click()
 await page.waitForTimeout(2500)
+if (process.env.SUN) {
+  await page.getByRole('button', { name: 'Sun', exact: true }).click()
+  await page.waitForTimeout(800)
+  if (process.env.SUNDATE) await page.locator('input[type=date]').fill(process.env.SUNDATE)
+  if (process.env.SUNHOUR) {
+    await page.locator('input[type=range][aria-label="Time of day"]')
+      .fill(process.env.SUNHOUR)
+    await page.locator('input[type=range][aria-label="Time of day"]').dispatchEvent('input')
+  }
+  await page.waitForTimeout(1500)
+}
 if (process.env.TERRAIN) {
   await page.getByRole('button', { name: 'Terrain' }).click()
   await page.waitForTimeout(2000)
 }
 const out = process.argv[2]
 const canvas = page.locator('canvas').first()
-await canvas.screenshot({ path: out })
+const target = process.env.FULL ? page
+  : process.env.CLIP ? page.locator('canvas').first().locator('xpath=..')
+  : canvas
+await target.screenshot({ path: out })
 console.log('errors:', errs.length ? errs.slice(0, 5) : 'none')
 await browser.close(); server.kill('SIGTERM')

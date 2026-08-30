@@ -167,12 +167,18 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
     // Free rows at this level. A ground bed in row 7 does not stop an air bed
     // hanging above it, so each level is counted separately.
     { key: "row", label: "Row", type: "select" as const, required: true, options: [],
+      emptyHint: "Choose a field and a level first",
       optionsWhen: (values: Record<string, unknown>) => {
-        const free = availableRows(
-          fields.find((f) => f.name === values.field),
-          beds,
-          Number(values.level ?? 0)
-        );
+        // A level that has not been chosen is NOT level 0. Coercing it there
+        // asked for the free ground rows, and with all 120 ground beds already
+        // created that is none — so opening the form and picking a field left
+        // Row empty and disabled with nothing to explain it. This is what made
+        // adding an air bed look impossible.
+        const level = Number(values.level);
+        if (!values.field || values.level === "" || values.level == null || !Number.isFinite(level)) {
+          return [];
+        }
+        const free = availableRows(fields.find((f) => f.name === values.field), beds, level);
         // A bed being edited occupies its own row, so that row is not free —
         // without adding it back the control would have no option matching
         // the bed's actual value.

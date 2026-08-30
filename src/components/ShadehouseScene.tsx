@@ -5,7 +5,8 @@ import { Billboard, RoundedBox } from "@react-three/drei";
 // blocks, and the failure takes the whole scene down. See SceneText.
 import SceneText from "./SceneText";
 import { drawTerrainOverlay } from "../services/terrainTexture";
-import { bearingToModel } from "../services/site";
+import { BED_AXIS_BEARING_DEG } from "../services/site";
+import { sunVector, atLocal } from "../services/solar";
 import * as THREE from "three";
 import {
   LEVEL_HEIGHTS_M,
@@ -679,6 +680,127 @@ function Topography({ span, depth }: { span: number; depth: number }) {
   );
 }
 
+/**
+ * The real sun over the nursery, and the arc it travels that day.
+ *
+ * The scene used to light from a fixed lamp at [34, 42, 22], which looks fine
+ * and tells you nothing: the light fell the same way in December as in June.
+ * This takes the sun's actual position for the moment being shown, so the
+ * direction and colour of the light are the real ones.
+ *
+ * Cast shadows do NOT yet render — that fault predates this and is not the
+ * sun's doing. Until it is fixed, this shows where the light comes from rather
+ * than where the shade lands.
+ *
+ * The arc is drawn because a single sun is a snapshot and the question is
+ * always "and where does it go next" — at this latitude that answer changes
+ * side of the sky twice a year.
+ */
+function Sun({
+  at,
+  span,
+  depth,
+  showArc,
+}: {
+  at: Date;
+  span: number;
+  depth: number;
+  /** The whole day's path, not just this instant. */
+  showArc: boolean;
+}) {
+  // Far enough out to read as a direction rather than a lamp in the room.
+  const radius = Math.max(span, depth) * 0.95;
+  const modelNorth = BED_AXIS_BEARING_DEG;
+
+  const dir = useMemo(() => sunVector(at, modelNorth), [at, modelNorth]);
+
+  /**
+   * Tell the shadow camera its frustum changed: react-three-fiber writes
+   * `shadow-camera-*` onto the camera without calling updateProjectionMatrix.
+   *
+   * Correct to do, but NOT the reason nothing casts a shadow here. The scene
+   * has never drawn one, with the fixed lamp either, and neither this, the
+   * Canvas shadow type, the frustum size nor the light position changes that.
+   * Still open — see BACKLOG.
+   */
+  const light = useRef<THREE.DirectionalLight>(null);
+  useEffect(() => {
+    const cam = light.current?.shadow?.camera;
+    if (cam) cam.updateProjectionMatrix();
+  }, [span, depth, radius]);
+
+  /** The day's whole path, sampled every ten minutes while the sun is up. */
+  const arc = useMemo(() => {
+    if (!showArc) return [];
+    const iso = at.toISOString().slice(0, 10);
+    const points: THREE.Vector3[] = [];
+    for (let minutes = 0; minutes <= 1440; minutes += 10) {
+      const v = sunVector(atLocal(iso, minutes / 60), modelNorth);
+      if (v) points.push(new THREE.Vector3(...v).multiplyScalar(radius));
+    }
+    return points;
+  }, [at, showArc, radius, modelNorth]);
+
+  const arcGeometry = useMemo(
+    () => (arc.length ? new THREE.BufferGeometry().setFromPoints(arc) : null),
+    [arc]
+  );
+  useEffect(() => () => arcGeometry?.dispose(), [arcGeometry]);
+
+  // Below the horizon there is no direct sun. Lighting the beds anyway — the
+  // obvious shortcut — would put a sun under the ground and shadows upward.
+  const night = dir === null;
+  const position: [number, number, number] = night
+    ? [0, radius, 0]
+    : [dir[0] * radius, dir[1] * radius, dir[2] * radius];
+
+  // Low sun is redder and weaker, as it is through more atmosphere.
+  const height = night ? 0 : dir[1];
+  const warmth = 1 - Math.min(1, height * 1.6);
+  const colour = new THREE.Color().setRGB(1, 0.97 - warmth * 0.22, 0.92 - warmth * 0.42);
+
+  return (
+    <group>
+      <directionalLight
+        ref={light}
+        position={position}
+        intensity={night ? 0 : 0.35 + height * 1.15}
+        color={colour}
+        castShadow
+        shadow-mapSize={[4096, 4096]}
+        // Fitted to the house, not to twice it. The frustum was ±span by
+        // ±depth — four times the area it needed — which put a 15 cm post
+        // inside a single shadow texel, and the blur then erased it. Half the
+        // extent plus a margin is what actually has to be covered.
+        shadow-camera-left={-(span / 2 + 10)}
+        shadow-camera-right={span / 2 + 10}
+        shadow-camera-top={depth / 2 + 10}
+        shadow-camera-bottom={-(depth / 2 + 10)}
+        shadow-camera-near={1}
+        shadow-camera-far={radius * 2.5}
+        // A low sun throws long shadows across a shallow surface, which is
+        // exactly where a constant bias detaches them from what casts them.
+        shadow-bias={-0.0002}
+        shadow-normalBias={0.06}
+      />
+
+      {!night && (
+        <mesh position={position}>
+          <sphereGeometry args={[radius * 0.035, 20, 16]} />
+          <meshBasicMaterial color={colour} toneMapped={false} />
+        </mesh>
+      )}
+
+      {arcGeometry && (
+        <line>
+          <primitive object={arcGeometry} attach="geometry" />
+          <lineBasicMaterial color="#e0b64a" transparent opacity={0.5} />
+        </line>
+      )}
+    </group>
+  );
+}
+
 /** Structural context: posts and the shade-cloth roof from the photos. */
 function Structure({
   span,
@@ -862,54 +984,32 @@ function PlotLabel({
  * compass is turned to match. Anyone reading a shadow off this view needs the
  * real bearing, and 17.75° is a long way at a low sun.
  */
-function Compass({ span, depth }: { span: number; depth: number }) {
-  const half = { x: span / 2 + 3.5, z: depth / 2 + 3.5 };
-  const turn = -bearingToModel(0) * (Math.PI / 180);
-  const marks: { label: string; pos: [number, number, number]; primary: boolean }[] = [
-    { label: "N", pos: [0, 0.05, -half.z], primary: true },
-    { label: "S", pos: [0, 0.05, half.z], primary: false },
-    { label: "E", pos: [half.x, 0.05, 0], primary: false },
-    { label: "W", pos: [-half.x, 0.05, 0], primary: false },
-  ];
-
-  return (
-    <group rotation={[0, turn, 0]}>
-      {marks.map((m) => (
-        <group key={m.label} position={m.pos}>
-          <SceneText
-            rotation={[-Math.PI / 2, 0, 0]}
-            fontSize={m.primary ? 4 : 3}
-            color={m.primary ? "#3d8b40" : "#8a9aae"}
-            weight={700}
-            outlineWidth={0.16}
-            outlineColor="#ffffff"
-          >
-            {m.label}
-          </SceneText>
-          {m.primary && (
-            // Arrow pointing north, as on the plan.
-            <mesh position={[0, 0, -3.4]} rotation={[-Math.PI / 2, 0, 0]}>
-              <coneGeometry args={[1.1, 2.6, 3]} />
-              <meshBasicMaterial color="#3d8b40" />
-            </mesh>
-          )}
-        </group>
-      ))}
-    </group>
-  );
+/**
+ * Reports which way the camera is facing, so the compass can be drawn on the
+ * screen rather than on the ground.
+ *
+ * A compass laid flat in the scene was the wrong idea twice over: a bed in
+ * front of it hid it, and it shrank to nothing as soon as you zoomed out. A
+ * rose in the corner is always legible and always there, which is the whole
+ * job of a compass.
+ */
+function CameraHeading({ onChange }: { onChange: (deg: number) => void }) {
+  const last = useRef(999);
+  useFrame(({ camera, controls }) => {
+    const target = (controls as unknown as { target?: THREE.Vector3 })?.target;
+    const dx = camera.position.x - (target?.x ?? 0);
+    const dz = camera.position.z - (target?.z ?? 0);
+    // The model bearing the camera looks along: it sits opposite its target.
+    const heading = ((Math.atan2(-dx, dz) * 180) / Math.PI + 360) % 360;
+    // A tenth of a degree is far below what the eye reads, and re-rendering
+    // the page on every frame of an orbit is not free.
+    if (Math.abs(heading - last.current) < 0.1) return;
+    last.current = heading;
+    onChange(heading);
+  });
+  return null;
 }
 
-/**
- * The shade cloth, drawn where it actually is.
- *
- * Cloth is strung in strips over runs of beds, so this groups the beds by
- * field and shade level and draws one panel per contiguous run rather than one
- * per bed — four panels instead of thirty-three, and it reads as cloth rather
- * than as tiling.
- *
- * A bed with no shade recorded gets no panel. Drawing a default over it would
- * put cloth in the model that nobody has said is there.
- */
 function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
   const panels = useMemo(() => {
     // Ground beds carry the run's identity; an air bed above one sits under
@@ -992,8 +1092,11 @@ export default function ShadehouseScene({
   nowMs,
   showPlotLabels,
   showBedNumbers,
-  showCompass,
+  showCompass: _showCompass,
+  onCameraHeading,
   showTopography,
+  sunAt,
+  showSunPath,
   weather,
   selectedBedId,
   onSelect,
@@ -1009,8 +1112,14 @@ export default function ShadehouseScene({
   showPlotLabels: boolean;
   showBedNumbers: boolean;
   showCompass: boolean;
+  /** Called as the camera orbits, so the corner rose can turn with it. */
+  onCameraHeading?: (deg: number) => void;
   /** The survey contours, painted flat on the floor. */
   showTopography: boolean;
+  /** The moment to light the scene from, or null for the neutral studio lamp. */
+  sunAt: Date | null;
+  /** Draw the sun's whole path for that day. */
+  showSunPath: boolean;
   /** Null when the weather layer is off or the feed has not landed. */
   weather: CurrentConditions | null;
   selectedBedId: string | null;
@@ -1088,22 +1197,33 @@ export default function ShadehouseScene({
 
   return (
     <>
-      <hemisphereLight args={["#eaf4ff", "#c9c3b4", 1.0]} />
-      <ambientLight intensity={0.42} />
-      <directionalLight
-        position={[34, 42, 22]}
-        intensity={1.05}
-        color="#fff8ec"
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-radius={4}
-        shadow-camera-left={-60}
-        shadow-camera-right={60}
-        shadow-camera-top={60}
-        shadow-camera-bottom={-60}
-        shadow-bias={-0.0006}
-      />
-      <directionalLight position={[-24, 18, -16]} intensity={0.3} color="#cfe3ff" />
+      {/* Sky light stays whatever the sun is doing: even under cloud, and even
+          at dusk, the beds are not lit only by the beam. It dims with the sun
+          rather than going out. */}
+      <hemisphereLight args={["#eaf4ff", "#c9c3b4", sunAt ? 0.55 : 1.0]} />
+      <ambientLight intensity={sunAt ? 0.26 : 0.42} />
+
+      {sunAt ? (
+        <Sun at={sunAt} span={span} depth={depth} showArc={showSunPath} />
+      ) : (
+        <>
+          {/* The studio lamp, for reading the layout rather than the light. */}
+          <directionalLight
+            position={[34, 42, 22]}
+            intensity={1.05}
+            color="#fff8ec"
+            castShadow
+            shadow-mapSize={[2048, 2048]}
+            shadow-radius={4}
+            shadow-camera-left={-60}
+            shadow-camera-right={60}
+            shadow-camera-top={60}
+            shadow-camera-bottom={-60}
+            shadow-bias={-0.0006}
+          />
+          <directionalLight position={[-24, 18, -16]} intensity={0.3} color="#cfe3ff" />
+        </>
+      )}
 
       <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} />
       {showShade && <ShadeCloth placements={placements} />}
@@ -1156,7 +1276,7 @@ export default function ShadehouseScene({
       ))}
 
       {showTopography && <Topography span={span} depth={depth} />}
-      {showCompass && <Compass span={span} depth={depth} />}
+      {onCameraHeading && <CameraHeading onChange={onCameraHeading} />}
 
       {showPlotLabels &&
         plotAnchors.map((a) => (

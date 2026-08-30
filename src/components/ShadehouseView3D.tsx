@@ -1,8 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain, Mountain } from "lucide-react";
+import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain, Mountain, Sun } from "lucide-react";
 import { terrainFall } from "../services/terrain";
+import { atLocal, sunPosition, dayArc } from "../services/solar";
+import SceneCompass from "./SceneCompass";
+
+/** Decimal local hours as a clock reading: 6.75 -> "06:45". */
+function fmtHour(hours: number): string {
+  const total = Math.round(hours * 60);
+  return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
 import {
   stateColors,
   potTypeLabels,
@@ -79,6 +87,26 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const [showCompass, setShowCompass] = useState(true);
   // Off by default: it is reference, and it competes with the bed colours.
   const [showTopography, setShowTopography] = useState(false);
+  /** Which way the camera faces, so the corner rose can turn with it. */
+  const [heading, setHeading] = useState(0);
+
+  /**
+   * Sun simulation. Off by default — the studio lamp reads the layout better —
+   * but once on, the scene is lit by where the sun actually is at that moment,
+   * so the shadows are the real ones.
+   */
+  const [showSun, setShowSun] = useState(false);
+  const [sunHour, setSunHour] = useState(12);
+  const [sunDate, setSunDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [showSunPath, setShowSunPath] = useState(true);
+
+  const sunAt = useMemo(
+    () => (showSun ? atLocal(sunDate, sunHour) : null),
+    [showSun, sunDate, sunHour]
+  );
+  /** Where the sun stands at that moment, for the readout beside the slider. */
+  const sunNow = useMemo(() => (sunAt ? sunPosition(sunAt) : null), [sunAt]);
+  const arc = useMemo(() => (showSun ? dayArc(sunDate) : null), [showSun, sunDate]);
   // The cloth is the point of a shadehouse, so it is on by default.
   const [showShade, setShowShade] = useState(true);
   const [showWeather, setShowWeather] = useState(true);
@@ -154,6 +182,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             ground rows plus cable lines above · drag to orbit
           </p>
         </div>
+
 
         <div className="flex items-center gap-2">
           <button
@@ -242,6 +271,15 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           Shade
         </button>
         <button
+          onClick={() => setShowSun((v) => !v)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+            showSun ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+          }`}
+        >
+          <Sun className="w-3 h-3" />
+          Sun
+        </button>
+        <button
           onClick={() => setShowTopography((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
             showTopography ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
@@ -259,6 +297,17 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           <Tag className="w-3 h-3" />
           Bed numbers
         </button>
+
+        {showSun && arc && sunNow && (
+          <span className="inline-flex items-center gap-2 ml-auto px-2.5 py-1 rounded-md bg-amber-50 ring-1 ring-amber-200/70">
+            <span className="text-[10px] text-amber-900 tabular-nums whitespace-nowrap">
+              {/* Sunrise and sunset for the date being simulated, so the
+                  slider's ends mean something. */}
+              {fmtHour(arc.sunrise ?? 0)}–{fmtHour(arc.sunset ?? 0)} ·
+              {" "}{arc.daylight.toFixed(1)} h of daylight
+            </span>
+          </span>
+        )}
 
         {showTopography && (
           <span className="inline-flex items-center gap-2 ml-auto px-2.5 py-1 rounded-md bg-sand-100 ring-1 ring-sand-300/70">
@@ -320,6 +369,62 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         )}
       </div>
 
+      {/* ── The day, as a slider ────────────────────────────────────────────
+          Where the shade falls at any hour is the whole question, and it is
+          not a thing to be read off a table. Drag it and watch. */}
+      {showSun && sunNow && arc && (
+        <div className="mx-5 mb-3 p-3 rounded-lg bg-navy-900 ring-1 ring-navy-700/50">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <label className="flex items-center gap-2 text-[11px] text-white/55">
+              Date
+              <input
+                type="date"
+                value={sunDate}
+                onChange={(e) => e.target.value && setSunDate(e.target.value)}
+                className="bg-white/10 text-white rounded px-2 py-1 text-[11px]
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/50"
+              />
+            </label>
+
+            <div className="flex items-baseline gap-2 tabular-nums">
+              <span className="text-[17px] font-bold text-white">{fmtHour(sunHour)}</span>
+              <span className="text-[11px] text-white/50">
+                {sunNow.altitude > 0
+                  ? `sun ${sunNow.altitude.toFixed(0)}° up, bearing ${sunNow.azimuth.toFixed(0)}°`
+                  : "below the horizon"}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowSunPath((v) => !v)}
+              aria-pressed={showSunPath}
+              className={`ml-auto px-2 py-1 rounded text-[10px] font-semibold cursor-pointer transition-colors
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/50 ${
+                showSunPath ? "bg-lime-400 text-navy-900" : "bg-white/10 text-white/55 hover:text-white/85"
+              }`}
+            >
+              Sun path
+            </button>
+          </div>
+
+          <input
+            type="range"
+            min={0}
+            max={24}
+            step={0.25}
+            value={sunHour}
+            onChange={(e) => setSunHour(Number(e.target.value))}
+            aria-label="Time of day"
+            className="w-full mt-2.5 accent-lime-400 cursor-pointer"
+          />
+
+          <div className="flex justify-between mt-1 text-[10px] text-white/35 tabular-nums">
+            {[0, 6, 12, 18, 24].map((h) => <span key={h}>{fmtHour(h)}</span>)}
+          </div>
+        </div>
+      )}
+
       {/* Scene */}
       <div className="relative h-[460px] bg-gradient-to-b from-sand-50 to-sand-100">
         {!webgl.ok ? (
@@ -346,7 +451,10 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             showPlotLabels={showPlotLabels}
             showBedNumbers={showBedNumbers}
             showCompass={showCompass}
+            onCameraHeading={showCompass ? setHeading : undefined}
             showTopography={showTopography}
+            sunAt={sunAt}
+            showSunPath={showSunPath}
             weather={showWeather ? weather : null}
             selectedBedId={selectedBedId}
             onSelect={setSelectedBedId}
@@ -360,6 +468,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             target={[0, 0.8, 0]}
           />
         </Canvas>
+
+        {showCompass && <SceneCompass heading={heading} />}
         </SceneErrorBoundary>
         )}
 

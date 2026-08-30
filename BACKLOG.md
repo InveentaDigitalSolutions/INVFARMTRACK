@@ -209,6 +209,17 @@ The two things next to it are done: the **Terrain** layer paints the survey's
 contours flat on the floor (`services/terrain.ts` + `terrainTexture.ts`), and
 the dashboard's rate chip opens its **history** over 3M / 6M / 1Y.
 
+### PRK-6 · The 3D scene casts no shadows — **build**
+
+Nothing in the scene has ever cast one: not the posts, not the beds, with the
+sun rig or with the fixed lamp it replaced. Ruled out so far — the Canvas shadow
+type, the shadow-camera frustum size, the light's position and distance, and the
+missing `updateProjectionMatrix` call (added anyway, correct on its own terms).
+
+This blocks the real prize. The sun rig knows exactly where the sun is at any
+moment and the day slider drives it, but *where the shade falls* is the question
+worth answering, and that needs cast shadows working.
+
 ### PRK-4 · The irrigation layer is simulated — **watching**
 
 Drawn from bed geometry rather than from recorded irrigation lines. It illustrates
