@@ -32,6 +32,25 @@ interface NumberInputField extends BaseField {
   placeholder?: string;
 }
 
+/**
+ * A bounded number, set by dragging.
+ *
+ * Only for figures with real ends: weeks in a growth cycle, a bundle size, a
+ * percentage. A slider on an unbounded quantity — cuttings packed, plants per
+ * bed — is worse than a text box, because it makes an exact number hard to hit
+ * and hides the range it is really drawn from. The typed box stays alongside,
+ * so the slider is the quick way in and never the only way.
+ */
+interface RangeField extends BaseField {
+  type: "range";
+  min: number;
+  max: number;
+  step?: number;
+  suffix?: string;
+  /** Labels under the ends, e.g. "faster" / "slower". */
+  hint?: string;
+}
+
 interface SelectField extends BaseField {
   type: "select";
   /** Fallback choices, used until the live ones load and in demo mode. */
@@ -103,6 +122,7 @@ export type FieldDef =
   | BooleanField
   | MultiSelectField
   | PlantLinesField
+  | RangeField
   | BedSelectorField;
 
 interface FieldGroupDef {
@@ -183,6 +203,53 @@ function renderField(
         />
       );
 
+    case "range": {
+      const n = v === "" || v === null || v === undefined ? null : Number(v);
+      const shown = n === null || !Number.isFinite(n) ? field.min : n;
+      return (
+        <div>
+          <div className="flex items-center gap-3">
+            <input
+              type="range"
+              min={field.min}
+              max={field.max}
+              step={field.step ?? 1}
+              value={shown}
+              onChange={(e) => onChange(field.key, Number(e.target.value))}
+              aria-label={field.label}
+              className="flex-1 accent-lime-400 cursor-pointer"
+            />
+            {/* The typed box is not decoration: it is how an exact value gets
+                set, and how "not filled in yet" stays distinguishable from the
+                slider's resting position at the minimum. */}
+            <input
+              type="number"
+              value={n === null || !Number.isFinite(n) ? "" : String(n)}
+              onChange={(e) => onChange(field.key, e.target.value === "" ? "" : Number(e.target.value))}
+              min={field.min}
+              max={field.max}
+              step={field.step ?? 1}
+              placeholder="—"
+              aria-label={`${field.label}, exact value`}
+              className="w-[4.5rem] px-2 py-1.5 text-[13px] text-center rounded-lg border border-sand-200
+                         bg-white text-navy-900 tabular-nums placeholder:text-navy-300
+                         focus:outline-none focus:ring-2 focus:ring-lime-400/30 focus:border-lime-400
+                         [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none
+                         [&::-webkit-inner-spin-button]:appearance-none transition-all"
+            />
+            {field.suffix && (
+              <span className="text-[11px] text-navy-400 shrink-0">{field.suffix}</span>
+            )}
+          </div>
+          <div className="flex justify-between mt-1 text-[10px] text-navy-300 tabular-nums">
+            <span>{field.min}</span>
+            {field.hint && <span className="text-navy-400">{field.hint}</span>}
+            <span>{field.max}</span>
+          </div>
+        </div>
+      );
+    }
+
     case "number":
       return (
         <div className="relative">
@@ -234,21 +301,30 @@ function renderField(
 
     case "toggle":
       return (
-        <div className="flex gap-1.5">
-          {optionsFor(field).map((o) => (
-            <button
-              key={o.value}
-              type="button"
-              onClick={() => onChange(field.key, o.value)}
-              className={`flex-1 py-2.5 text-[13px] font-medium rounded-lg border transition-colors cursor-pointer ${
-                String(v) === o.value
-                  ? "chip-selected"
-                  : "bg-white text-navy-600 border-sand-200 hover:border-lime-300"
-              }`}
-            >
-              {o.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label={field.label}>
+          {optionsFor(field).map((o) => {
+            const selected = String(v) === o.value;
+            return (
+              <button
+                key={o.value}
+                type="button"
+                aria-pressed={selected}
+                // Tapping the chosen option clears it. A dropdown always had a
+                // "Select..." to go back to; without this, an optional field
+                // could be set once and never unset again.
+                onClick={() => onChange(field.key, selected && !field.required ? "" : o.value)}
+                className={`flex-1 min-w-[5.5rem] py-2.5 px-2 text-[13px] font-medium rounded-lg border
+                  transition-colors cursor-pointer focus:outline-none
+                  focus-visible:ring-2 focus-visible:ring-lime-400/40 ${
+                  selected
+                    ? "chip-selected"
+                    : "bg-white text-navy-600 border-sand-200 hover:border-lime-300"
+                }`}
+              >
+                {o.label}
+              </button>
+            );
+          })}
         </div>
       );
 

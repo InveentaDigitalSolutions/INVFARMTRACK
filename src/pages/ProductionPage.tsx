@@ -95,7 +95,7 @@ const plantingFields = [
     { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons", required: true },
     { key: "date", label: "Seeding Date", type: "date" as const, required: true },
     // Baskets carry hanging pots in two shapes; the 3D view renders each.
-    { key: "potType", label: "Pot Type", type: "select" as const, options: [
+    { key: "potType", label: "Pot Type", type: "toggle" as const, options: [
       { value: "round", label: "Round" }, { value: "square", label: "Square" },
     ] },
     // A bed can carry several seedings at once — 4,000 of one variety and 200
@@ -108,7 +108,7 @@ const treatmentFields = [
   { title: "Treatment Details", columns: 2 as const, fields: [
     { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
     { key: "input", label: "Input (Chemical)", type: "select" as const, options: inputOptionsFallback, optionsFrom: "inputs", required: true },
-    { key: "type", label: "Type", type: "select" as const, options: [
+    { key: "type", label: "Type", type: "toggle" as const, options: [
       { value: "Insecticide", label: "Insecticide" }, { value: "Fungicide", label: "Fungicide" },
       { value: "Herbicide", label: "Herbicide" }, { value: "Regulator", label: "Regulator" },
     ], required: true },
@@ -198,12 +198,14 @@ const plantSizeFields = [
     { key: "code", label: "Size ID", type: "text" as const, readOnly: true, placeholder: "PS-0001 (auto)" },
     { key: "plant", label: "Plant", type: "select" as const, required: true,
       options: [], optionsFrom: "plants" },
-    { key: "size", label: "Size", type: "select" as const, required: true, options: [
-      { value: "Large", label: "Large (LRG)" },
-      { value: "Regular", label: "Regular (REG)" },
-      { value: "California", label: "California (CAL)" },
-      { value: "Small", label: "Small (SML)" },
-      { value: "Petit", label: "Petit (PET)" },
+    // Five sizes, always the same five: a row of buttons is quicker to hit and
+    // shows the whole range at once.
+    { key: "size", label: "Size", type: "toggle" as const, required: true, span: 2 as const, options: [
+      { value: "Large", label: "LRG" },
+      { value: "Regular", label: "REG" },
+      { value: "California", label: "CAL" },
+      { value: "Small", label: "SML" },
+      { value: "Petit", label: "PET" },
     ] },
     { key: "active", label: "Offered", type: "boolean" as const },
   ]},
@@ -211,11 +213,13 @@ const plantSizeFields = [
     // The number an order line is checked against: 40 boxes of Regular
     // Hawaiian is 80,000 cuttings, and nothing could say so before this.
     { key: "cuttingsPerBox", label: "Cuttings per Box", type: "number" as const, min: 1, required: true },
-    { key: "bundleSize", label: "Bundle Size", type: "number" as const, min: 1 },
-    { key: "productType", label: "Product Type", type: "select" as const, options: [
+    // Bounded and small, so it drags. Cuttings per box stays a typed box: it
+    // runs to 2,500 and an exact figure matters more than a quick one.
+    { key: "bundleSize", label: "Bundle Size", type: "range" as const, min: 1, max: 25, suffix: "per bundle" },
+    { key: "productType", label: "Product Type", type: "toggle" as const, options: [
       { value: "URC", label: "URC — unrooted cutting" },
     ] },
-    { key: "cuttingType", label: "Cutting Type", type: "select" as const, options: [
+    { key: "cuttingType", label: "Cutting Type", type: "toggle" as const, options: [
       { value: "L/E", label: "L/E — leaf and eye" },
     ] },
     { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
@@ -233,15 +237,18 @@ const plantFields = [
     // What the variety asks for. The bed records what it actually has, and the
     // two are different facts — a basket-only variety offered for a ground bed
     // is a mistake nothing could catch before this existed.
-    { key: "grownIn", label: "Grown In", type: "select" as const, options: [
+    // Three options each: a segmented row shows all of them at once, where a
+    // dropdown hides two thirds of the answer behind a click.
+    { key: "grownIn", label: "Grown In", type: "toggle" as const, options: [
       { value: "Ground", label: "Ground" },
       { value: "Basket", label: "Basket" },
-      { value: "Ground or Basket", label: "Ground or basket" },
+      { value: "Ground or Basket", label: "Either" },
     ] },
-    { key: "shadeNeeded", label: "Shade Needed", type: "select" as const, options: [
-      { value: "Single", label: "Single — 35% of daylight" },
-      { value: "Double", label: "Double — 12.25%" },
-      { value: "Triple", label: "Triple — 4.3%" },
+    { key: "shadeNeeded", label: "Shade Needed", type: "toggle" as const, options: [
+      // Short enough not to wrap onto a second line at this width.
+      { value: "Single", label: "Single · 35%" },
+      { value: "Double", label: "Double · 12%" },
+      { value: "Triple", label: "Triple · 4%" },
     ] },
     // Every bed is the same size, so how many fit is a property of the
     // variety rather than of any particular bed.
@@ -257,21 +264,23 @@ const plantFields = [
    * year: measured daylight here averages 45.3 mol/m2 a day from March to
    * August and 34.7 from September to February.
    */
-  { title: "Production — March to August", columns: 3 as const, fields: [
-    { key: "growthWeeksMinMarAug", label: "Growth wks to 8 leaves — from", type: "number" as const, min: 0 },
-    { key: "growthWeeksMaxMarAug", label: "to", type: "number" as const, min: 0 },
-    { key: "harvestWeeksMarAug", label: "Harvest every (wks)", type: "number" as const, min: 0 },
-    { key: "pruningWeeksMarAug", label: "Pruning back to 2 leaves (wks)", type: "number" as const, min: 0, span: 3 as const },
+  { title: "Production — March to August", columns: 2 as const, fields: [
+    { key: "growthWeeksMinMarAug", label: "Growth to 8 leaves — from", type: "range" as const, min: 0, max: 30, suffix: "wks", hint: "weeks" },
+    { key: "growthWeeksMaxMarAug", label: "…to", type: "range" as const, min: 0, max: 30, suffix: "wks" },
+    { key: "harvestWeeksMarAug", label: "Harvest every", type: "range" as const, min: 0, max: 20, suffix: "wks" },
+    { key: "pruningWeeksMarAug", label: "Back to 2 leaves after", type: "range" as const, min: 0, max: 20, suffix: "wks" },
   ]},
-  { title: "Production — September to February", columns: 3 as const, fields: [
-    { key: "growthWeeksMinSepFeb", label: "Growth wks to 8 leaves — from", type: "number" as const, min: 0 },
-    { key: "growthWeeksMaxSepFeb", label: "to", type: "number" as const, min: 0 },
-    { key: "harvestWeeksSepFeb", label: "Harvest every (wks)", type: "number" as const, min: 0 },
-    { key: "pruningWeeksSepFeb", label: "Pruning back to 2 leaves (wks)", type: "number" as const, min: 0, span: 3 as const },
+  { title: "Production — September to February", columns: 2 as const, fields: [
+    { key: "growthWeeksMinSepFeb", label: "Growth to 8 leaves — from", type: "range" as const, min: 0, max: 30, suffix: "wks", hint: "weeks" },
+    { key: "growthWeeksMaxSepFeb", label: "…to", type: "range" as const, min: 0, max: 30, suffix: "wks" },
+    { key: "harvestWeeksSepFeb", label: "Harvest every", type: "range" as const, min: 0, max: 20, suffix: "wks" },
+    { key: "pruningWeeksSepFeb", label: "Back to 2 leaves after", type: "range" as const, min: 0, max: 20, suffix: "wks" },
   ]},
-  { title: "Legacy", columns: 2 as const, fields: [
-    // Superseded by the seasonal figures above, kept because the schedule and
-    // availability services still read it. Remove once they take the pair.
+  // "Legacy" was the heading here, which is a word for us and not for whoever
+  // is filling the form in. Superseded by the seasonal figures above and kept
+  // because the schedule and availability services still read it; remove the
+  // group once they take the seasonal pair.
+  { title: "Schedule", columns: 2 as const, fields: [
     { key: "weeksToFirstHarvest", label: "Weeks to First Cut", type: "number" as const, min: 0 },
   ]},
   { title: "Patent & Status", columns: 2 as const, fields: [

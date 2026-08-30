@@ -82,14 +82,37 @@ export function moonCalendar(todayISO: string, back = 6, forward = 29): MoonCale
   const out: MoonCalendarDay[] = [];
   for (let i = -back; i <= forward; i++) {
     const at = new Date(t0 + i * 86_400_000);
-    const dateISO = at.toISOString().slice(0, 10);
-    const phase = moonPhase(at);
     out.push({
-      dateISO,
-      phase,
-      isTurning: TURNING.includes(phase.name),
+      dateISO: at.toISOString().slice(0, 10),
+      phase: moonPhase(at),
+      isTurning: false,
       isToday: i === 0,
     });
+  }
+
+  /**
+   * Mark one day per turning point, not every day that qualifies.
+   *
+   * The naming window is a little under a day either side of the exact
+   * instant, so a full moon falling near midnight satisfies it on two
+   * consecutive dates — and the strip then showed "Full" twice in a row, which
+   * reads as a fault. Of each run, only the day closest to the exact point is
+   * marked.
+   */
+  const distanceToPoint = (fraction: number) =>
+    Math.min(...[0, 0.25, 0.5, 0.75, 1].map((p) => Math.abs(fraction - p)));
+
+  let i = 0;
+  while (i < out.length) {
+    if (!TURNING.includes(out[i].phase.name)) { i++; continue; }
+    let j = i;
+    while (j + 1 < out.length && out[j + 1].phase.name === out[i].phase.name) j++;
+    let best = i;
+    for (let k = i; k <= j; k++) {
+      if (distanceToPoint(out[k].phase.fraction) < distanceToPoint(out[best].phase.fraction)) best = k;
+    }
+    out[best].isTurning = true;
+    i = j + 1;
   }
   return out;
 }
