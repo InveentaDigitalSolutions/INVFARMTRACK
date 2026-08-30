@@ -102,6 +102,11 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   space and the real world are 17.75° apart — `services/site.ts` holds the
   position and bearing and `bearingToModel()` converts between them. Anything
   that has to point at the real sun goes through it.
+- **The shade cloth is 65% netting, and layers multiply.** Single passes 35%,
+  double 0.35² = 12.25%, triple 0.35³ = 4.29% — a factor of **eight** across the
+  house, far larger than the seasonal swing (about 30%) or the terrain (1-4%).
+  `services/bedLight.ts` holds it. Clear-day DLI at this site: about 52 mol/m²
+  open sky at the equinox, so 18 under single shade and 2.2 under triple.
 - **Solar position needs no network.** `services/solar.ts` is the NOAA
   algorithm, checked against Greenwich at solar noon (179.98° — due south).
   Note the site is inside the tropics: the noon sun passes **north** of overhead

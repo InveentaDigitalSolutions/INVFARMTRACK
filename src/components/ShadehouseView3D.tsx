@@ -5,6 +5,7 @@ import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, Clou
 import { terrainFall } from "../services/terrain";
 import { atLocal, sunPosition, dayArc } from "../services/solar";
 import SceneCompass from "./SceneCompass";
+import { dayLight, clothTransmission, SHADE_LAYERS } from "../services/bedLight";
 
 /** Decimal local hours as a clock reading: 6.75 -> "06:45". */
 function fmtHour(hours: number): string {
@@ -52,6 +53,7 @@ const LENSES: { id: LensMode; label: string }[] = [
   { id: "irrigated", label: "Last irrigated" },
   { id: "issues", label: "Issues" },
   { id: "shade", label: "Shade" },
+  { id: "light", label: "Light" },
 ];
 
 const LENS_SCALES: Record<Exclude<LensMode, "state">, { low: string; high: string; gradient: string }> = {
@@ -60,6 +62,7 @@ const LENS_SCALES: Record<Exclude<LensMode, "state">, { low: string; high: strin
   irrigated: { low: "Just watered", high: "12h+ dry", gradient: "linear-gradient(90deg,#38bdf8,#d6c7a0)" },
   issues: { low: "Healthy", high: "Needs attention", gradient: "linear-gradient(90deg,#c8cec4,#dc2626)" },
   shade: { low: "Single", high: "Triple", gradient: "linear-gradient(90deg,#c2cfc4,#7d9384,#3f5348)" },
+  light: { low: "Triple · 4.3%", high: "Single · 35%", gradient: "linear-gradient(90deg,#26364a,#7d8a6a,#fad652)" },
 };
 
 function Row({ label, value }: { label: string; value: string }) {
@@ -535,6 +538,22 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
                 </span>
               </div>
 
+              {selected.shade && (
+                <>
+                  {/* The number that matters for growth. Days in a triple-shade
+                      bed are not the same as days in a single-shade one, and
+                      this is by how much. */}
+                  <Row
+                    label="Light today"
+                    value={`${dayLight(sunDate, selected.shade).atBed.toFixed(1)} mol/m²`}
+                  />
+                  <Row
+                    label="Through cloth"
+                    value={`${(clothTransmission(selected.shade) * 100).toFixed(2)}% · ${
+                      SHADE_LAYERS[selected.shade]} layer${SHADE_LAYERS[selected.shade] > 1 ? "s" : ""} at 65%`}
+                  />
+                </>
+              )}
               {selected.variety && (
                 <Row label="Variety" value={selected.variety} />
               )}

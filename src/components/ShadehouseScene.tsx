@@ -7,6 +7,7 @@ import SceneText from "./SceneText";
 import { drawTerrainOverlay } from "../services/terrainTexture";
 import { BED_AXIS_BEARING_DEG } from "../services/site";
 import { sunVector, atLocal } from "../services/solar";
+import { relativeLight } from "../services/bedLight";
 import * as THREE from "three";
 import {
   LEVEL_HEIGHTS_M,
@@ -280,7 +281,7 @@ export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
  * idea God's Eye View uses for its sensor modes. Only this function changes
  * per lens; the scene, layers and selection are untouched.
  */
-export type LensMode = "state" | "age" | "harvest" | "irrigated" | "issues" | "shade";
+export type LensMode = "state" | "age" | "harvest" | "irrigated" | "issues" | "shade" | "light";
 
 /** Sequential ramp, pale to saturated, for a normalised 0-1 value. */
 function ramp(t: number, from: [number, number, number], to: [number, number, number]) {
@@ -339,6 +340,14 @@ export function colorForLens(
       return new THREE.Color(
         bed.shade === "Triple" ? "#3f5348" : bed.shade === "Double" ? "#7d9384" : "#c2cfc4"
       );
+    }
+
+    case "light": {
+      // How much daylight actually reaches the bed through its cloth. Shade
+      // says how many layers; this says what that costs — and at 65% netting
+      // the answer is a factor of eight from one end of the house to the other.
+      if (!bed.shade) return NO_DATA;
+      return ramp(relativeLight(bed.shade), [38, 54, 74], [250, 214, 82]);
     }
 
     case "issues":

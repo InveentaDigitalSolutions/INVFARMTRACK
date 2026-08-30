@@ -41,7 +41,10 @@ await page.evaluate(() => {
   for (const [f, rows] of fields)
     for (let r = 1; r <= rows; r++)
       beds.push({ id: `${f}-${String(r).padStart(2, '0')}`, name: `${f}-${String(r).padStart(2, '0')}`,
-                  field: f, fieldName: f, row: r, level: 0, type: 'Ground', status: 'Active' })
+                  field: f, fieldName: f, row: r, level: 0, type: 'Ground', status: 'Active',
+                  // The bands Santiago gave: 1-4 double, 5-8 single, and so on.
+                  shade: [1,2,3,4,9,10,11,12,17,18,19,20,21,26,27,28,29].includes(r)
+                    ? 'Double' : 'Single' })
   localStorage.setItem('dni_beds', JSON.stringify(beds))
   localStorage.setItem('dni_fields', JSON.stringify(
     fields.map(([n, rows]) => ({ id: n, name: n, fieldName: n, rows, shadehouse: 'SH-0001' }))))
@@ -51,6 +54,10 @@ await page.getByRole('button', { name: 'Infrastructure' }).first().click()
 await page.waitForTimeout(800)
 await page.getByRole('button', { name: '3D', exact: true }).click()
 await page.waitForTimeout(2500)
+if (process.env.LENS) {
+  await page.getByRole('button', { name: process.env.LENS, exact: true }).click()
+  await page.waitForTimeout(900)
+}
 if (process.env.SUN) {
   await page.getByRole('button', { name: 'Sun', exact: true }).click()
   await page.waitForTimeout(800)

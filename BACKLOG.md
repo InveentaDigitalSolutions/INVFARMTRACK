@@ -209,6 +209,25 @@ The two things next to it are done: the **Terrain** layer paints the survey's
 contours flat on the floor (`services/terrain.ts` + `terrainTexture.ts`), and
 the dashboard's rate chip opens its **history** over 3M / 6M / 1Y.
 
+### PRK-7 · Light per bed is clear-sky only — **build**
+
+`services/bedLight.ts` gives each bed its daily light integral from the sun's
+path and its cloth: about 18 mol/m²/day under single shade at the equinox, 6.4
+under double, 2.2 under triple. That is the light available when nothing is in
+the way but air and cloth.
+
+Two things would make it what actually landed:
+
+- **Cloud.** Open-Meteo returns measured and forecast shortwave radiation, and
+  the weather flow already talks to it. Multiply the clear-sky figure by the
+  day's real radiation and the rainy season stops being invisible.
+- **Structure.** Air beds shade the ground beds beneath them, and posts shade
+  their neighbours at a low sun. Neither is modelled, and no air beds are
+  recorded yet, so today the cloth is the only term that varies between beds.
+
+Then `accumulatedLight()` over a planting's life is what a growth model should
+count in, instead of calendar days.
+
 ### PRK-6 · The 3D scene casts no shadows — **build**
 
 Nothing in the scene has ever cast one: not the posts, not the beds, with the
