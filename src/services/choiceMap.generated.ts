@@ -523,7 +523,7 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Silty": 121320005
     },
     "bv_type": {
-      "Air": 121320000,
+      "Basket": 121320000,
       "Ground": 121320001
     }
   },

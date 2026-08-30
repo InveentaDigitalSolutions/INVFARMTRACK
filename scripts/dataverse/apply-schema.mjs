@@ -325,10 +325,26 @@ async function syncOptions(entityLogicalName, col) {
     return // not a picklist, or not readable — nothing to sync
   }
 
-  const present = new Set(
-    (live.OptionSet?.Options ?? []).map((o) => o.Label?.UserLocalizedLabel?.Label)
-  )
+  const options = live.OptionSet?.Options ?? []
+  const present = new Set(options.map((o) => o.Label?.UserLocalizedLabel?.Label))
+  const byValue = new Map(options.map((o) => [o.Value, o.Label?.UserLocalizedLabel?.Label]))
+  // Keyed by value, not by label: renaming an option in the schema must rename
+  // it in place, not insert a second one on a value that is already taken.
+  // "Air" became "Basket" that way — the 120 beds holding the old value were
+  // never touched.
   for (const option of col.options) {
+    const existingLabel = byValue.get(option.value)
+    if (existingLabel !== undefined && existingLabel !== option.label) {
+      console.log(`      ~ renaming ${option.value} from "${existingLabel}" to "${option.label}"`)
+      await api('POST', 'UpdateOptionValue', {
+        EntityLogicalName: table.logicalName,
+        AttributeLogicalName: col.schemaName.toLowerCase(),
+        Value: option.value,
+        Label: label(option.label),
+        MergeLabels: false,
+      })
+      continue
+    }
     if (present.has(option.label)) continue
     await api('POST', 'InsertOptionValue', {
       AttributeLogicalName: attribute,

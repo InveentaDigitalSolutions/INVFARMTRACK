@@ -480,11 +480,11 @@ const POT_PITCH_M = 0.45;
 const POT_DROP_M = 0.22;
 
 /**
- * An air bed is a cable strung through the posts with terracotta pots hooked
+ * An basket is a cable strung through the posts with terracotta pots hooked
  * along it — not a solid bar. Pots are instanced so several thousand of them
  * cost one draw call.
  */
-function AirLine({
+function BasketLine({
   placement,
   reading,
   showIrrigation,
@@ -705,7 +705,7 @@ function Topography({ span, depth }: { span: number; depth: number }) {
  * direction and colour of the light are the real ones.
  *
  * Shadows are cast by anything bed-sized or larger, which is what matters: an
- * air bed shades the ground bed beneath it, and that is a real term in the
+ * basket shades the ground bed beneath it, and that is a real term in the
  * light a crop receives. The 15 cm posts do not resolve — one 4096 shadow map
  * stretched over a house 115 m across gives 2.8 cm per texel, and a post
  * silhouette five texels wide does not survive the filtering at a low sun.
@@ -846,8 +846,8 @@ function Structure({
    * The posts of the house: nineteen lines across the beds by twelve along
    * them, as Santiago counts them on the ground.
    *
-   * They used to be derived from the air beds — a post appeared only where a
-   * cable hung — so a house with no air beds recorded yet had no structure at
+   * They used to be derived from the baskets — a post appeared only where a
+   * cable hung — so a house with no baskets recorded yet had no structure at
    * all. The posts carry the shade cloth; they stand whether or not anything is
    * strung between them.
    */
@@ -1040,7 +1040,7 @@ function CameraHeading({ onChange }: { onChange: (deg: number) => void }) {
 
 function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
   const panels = useMemo(() => {
-    // Ground beds carry the run's identity; an air bed above one sits under
+    // Ground beds carry the run's identity; an basket above one sits under
     // the same cloth, so counting both would draw the panel twice.
     const ground = placements
       .filter((p) => p.bed.type === "ground" && p.bed.shade)
@@ -1210,7 +1210,7 @@ export default function ShadehouseScene({
   const postLines = useMemo(() => {
     const seen = new Map<string, { x: number; z: number; length: number; levels: BedLevel[] }>();
     for (const p of placements) {
-      if (p.bed.type !== "air") continue;
+      if (p.bed.type !== "basket") continue;
       const key = `${p.x.toFixed(2)}:${p.z.toFixed(2)}`;
       const line = seen.get(key);
       if (line) {
@@ -1273,7 +1273,7 @@ export default function ShadehouseScene({
             onSelect={onSelect}
           />
         ) : (
-          <AirLine
+          <BasketLine
             key={placement.bed.bedId}
             placement={placement}
             reading={readings.get(placement.bed.bedId)}
@@ -1295,7 +1295,7 @@ export default function ShadehouseScene({
             <BedLabel
               key={`lbl-${p.bed.bedId}`}
               placement={p}
-              compact={p.bed.type === "air"}
+              compact={p.bed.type === "basket"}
             />
           ))}
 

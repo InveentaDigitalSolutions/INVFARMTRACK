@@ -224,7 +224,7 @@ export default function InvoiceGenerator({
         weekNumber: getWeekNumber(String(shipment.date ?? "")),
         etd: String(shipment.etd ?? shipment.date ?? ""),
         eta: String(shipment.eta ?? ""),
-        shippedVia: "Air",
+        shippedVia: "Basket",
         carrier: String(shipment.carrier ?? ""),
         awbNumber: String(shipment.awb ?? ""),
         terms: String(customer?.terms ?? ""),

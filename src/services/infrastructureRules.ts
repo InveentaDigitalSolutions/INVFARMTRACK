@@ -4,7 +4,7 @@
  *
  * These were all free text before, which is how the nursery ended up with
  * fields called "Plot E3" while everyone says "E3", and why nothing stopped a
- * bed being numbered past the end of its field or an air bed being put at
+ * bed being numbered past the end of its field or an basket being put at
  * ground level.
  */
 
@@ -101,7 +101,7 @@ export function fieldCapacityProblem(
  * How a bed is named.
  *
  * A field's rows are its ground beds: E3 row 1 is "E3-01", always level 0.
- * Air beds hang on cables above a ground row, up to three levels, and are
+ * Baskets hang on cables above a ground row, up to three levels, and are
  * named for the row they sit over: "E3-01-1", "E3-01-2", "E3-01-3". Not every
  * row has air above it — the cables cover part of a field, not all of it — so
  * which rows do is recorded, never derived.
@@ -115,13 +115,13 @@ export function bedName(fieldName: string, row: number, level: number = 0): stri
 export interface ParsedBed {
   field: string;
   row: number;
-  /** 0 for a ground bed, 1 or 2 for an air bed above it. */
+  /** 0 for a ground bed, 1 or 2 for an basket above it. */
   level: number;
 }
 
 /**
  * Reads a bed name back apart. Both shapes have to be handled by one parser:
- * treating the trailing "-1" of an air bed as its row would put E3-01-1 in
+ * treating the trailing "-1" of an basket as its row would put E3-01-1 in
  * row 1 and E3-12-3 in row 3, quietly corrupting every count per row.
  */
 export function parseBedName(name: string): ParsedBed | null {
@@ -148,7 +148,7 @@ export function levelOf(name: string): number | null {
  *
  * Bounded by the field's own row count, so a bed cannot be numbered past the
  * end of the field. Levels are counted separately: row 7 having a ground bed
- * does not stop an air bed hanging above it, and an air bed on level 1 does
+ * does not stop an basket hanging above it, and an basket on level 1 does
  * not block level 2.
  */
 export function availableRows(
@@ -172,7 +172,7 @@ export function availableRows(
  * The levels a bed of this type may sit at.
  *
  * Ground beds are planted in the earth, so level 0 is the only thing they can
- * be. Air beds are pots hanging on cables above it, so 0 is the one level they
+ * be. Baskets are pots hanging on cables above it, so 0 is the one level they
  * cannot be.
  */
 export function levelsFor(type: string | undefined): string[] {
@@ -181,10 +181,10 @@ export function levelsFor(type: string | undefined): string[] {
 }
 
 /** A bed's type follows from its level, and nothing else. */
-export function typeForLevel(level: number | string | undefined): "Ground" | "Air" | undefined {
+export function typeForLevel(level: number | string | undefined): "Ground" | "Basket" | undefined {
   const value = Number(level);
   if (!Number.isFinite(value)) return undefined;
-  return value === 0 ? "Ground" : "Air";
+  return value === 0 ? "Ground" : "Basket";
 }
 
 /** The level a bed of this type should default to. */
@@ -196,10 +196,10 @@ export function levelProblem(type: string | undefined, level: string | number | 
   const value = String(level ?? "");
   if (!type || !value) return null;
   if (type === "Ground" && value !== "0") return "A ground bed is planted in the earth, so it is always level 0.";
-  if (type === "Air" && value === "0") return "An air bed hangs above the ground, so it cannot be level 0.";
+  if (type === "Basket" && value === "0") return "An basket hangs above the ground, so it cannot be level 0.";
   // Three cable lines are strung above each row, but the top one carries the
   // irrigation, so only the first two ever hold a bed.
-  if (type === "Air" && value === "3") return "Level 3 carries the irrigation line, not a bed. Air beds go up to level 2.";
+  if (type === "Basket" && value === "3") return "Level 3 carries the irrigation line, not a bed. Baskets go up to level 2.";
   return null;
 }
 
@@ -226,7 +226,7 @@ export interface BulkBedPlan {
 /**
  * Works out which beds a bulk request would actually create.
  *
- * Air beds come in runs — a cable spans rows 1 to 20 of a field — so entering
+ * Baskets come in runs — a cable spans rows 1 to 20 of a field — so entering
  * them one at a time is a hundred clicks for something better said once. The
  * plan is returned rather than acted on so the form can show exactly what will
  * happen before anything is written: which rows are new, which already have a
@@ -263,7 +263,7 @@ export function planBulkBeds(request: BulkBedRequest): BulkBedPlan {
   }
 
   // Checked against the whole batch, not one bed at a time, and in positions
-  // rather than records — a run of air beds over existing rows takes no new
+  // rather than records — a run of baskets over existing rows takes no new
   // ground and must not be refused for capacity.
   const capacity = bedCapacityProblem(shadehouse, existing, create);
   if (capacity) return { create: [], alreadyThere, outOfRange, problem: capacity };
@@ -278,9 +278,9 @@ export function planBulkBeds(request: BulkBedRequest): BulkBedPlan {
  *
  * A shadehouse's capacity is a number of positions on the ground, not a number
  * of bed records. E3 row 33 is one position whether it carries a ground bed
- * alone or a ground bed with three air beds stacked above it; the cables use
+ * alone or a ground bed with three baskets stacked above it; the cables use
  * the same floor. Counting records instead made a shadehouse of 120 positions
- * look full the moment the ground beds existed, refusing every air bed.
+ * look full the moment the ground beds existed, refusing every basket.
  *
  * Production treats each level as its own bed — a planting goes in E3-01-2,
  * not in "E3-01" — which is why they are separate records. Only the capacity

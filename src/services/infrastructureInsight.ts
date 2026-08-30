@@ -4,7 +4,7 @@
  * Infrastructure listed shadehouses, fields and beds without ever saying how
  * they add up. The figures that matter when planning a season are the position
  * count against the shadehouse's capacity, and the split between ground and
- * air — because air beds are the expansion the nursery pays for and the ground
+ * air — because baskets are the expansion the nursery pays for and the ground
  * is what it already has.
  */
 import { positionCount, parseBedName } from "./infrastructureRules";

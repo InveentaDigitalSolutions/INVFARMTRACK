@@ -189,7 +189,7 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 | `bv_bedcode` 🔑 | Bed ID | Autonumber | ✓ | Auto-generated identifier, format BED-0001. |
 | `bv_bedname` | Bed Name | Text(100) | ✓ | Descriptive name, shown wherever the record is listed. |
 | `bv_fieldid` | Field | Lookup → [Field](#field) | ✓ | Link to the related Field record. |
-| `bv_type` | Type | Choice |  | Whether this is a ground bed planted in soil, or an air bed of hanging pots on a cable. One of: Air, Ground. |
+| `bv_type` | Type | Choice |  | Whether this is a ground bed planted in soil, or a basket hung on the cables above it. Some varieties are only grown in baskets. The option value is unchanged from when these were called air beds. One of: Basket, Ground. |
 | `bv_level` | Level | Choice |  | Vertical level: 0 is the ground bed, 1-3 are the cable lines strung above it. One of: 0, 1, 2, 3. |
 | `bv_shadelevel` | Shade | Choice |  | How many layers of shade cloth are strung over the bed. One of: Single, Double, Triple. |
 | `bv_capacity` | Capacity | Whole number |  | Maximum the unit can hold. |
@@ -205,7 +205,7 @@ Growing beds within batches (Shadehouse > Batch > Bed)
 
 | Value | Label |
 |---|---|
-| 121320000 | Air |
+| 121320000 | Basket |
 | 121320001 | Ground |
 
 **Level** (`bv_level`)

@@ -13,7 +13,7 @@ const NURSERY_CENTER: [number, number] = [-87.8500, 14.9700];
 interface BedData {
   id: string;
   name: string;
-  type: "Air" | "Ground";
+  type: "Basket" | "Ground";
   level: number;
   plant: string;
   status: "active" | "empty" | "harvesting" | "irrigating" | "treating";
@@ -43,21 +43,21 @@ const shadehouses: ShadehouseData[] = [
     coordinates: [-87.8505, 14.9705], width: 40, length: 70, rotation: 15,
     fields: [
       { id: "B-N1", name: "Field N1", quadrant: "NW", beds: [
-        { id: "B3A", name: "Bed 3-A", type: "Air", level: 1, plant: "Pothos / Hawaiian", status: "active", utilization: 95 },
-        { id: "B3B", name: "Bed 3-B", type: "Air", level: 2, plant: "Pothos / Hawaiian", status: "irrigating", utilization: 90 },
+        { id: "B3A", name: "Bed 3-A", type: "Basket", level: 1, plant: "Pothos / Hawaiian", status: "active", utilization: 95 },
+        { id: "B3B", name: "Bed 3-B", type: "Basket", level: 2, plant: "Pothos / Hawaiian", status: "irrigating", utilization: 90 },
         { id: "B3C", name: "Bed 3-C", type: "Ground", level: 0, plant: "Pothos / Neon", status: "active", utilization: 80 },
       ]},
       { id: "B-N2", name: "Field N2", quadrant: "NE", beds: [
-        { id: "B1A", name: "Bed 1-A", type: "Air", level: 1, plant: "Pothos / Marble Queen", status: "treating", utilization: 85 },
+        { id: "B1A", name: "Bed 1-A", type: "Basket", level: 1, plant: "Pothos / Marble Queen", status: "treating", utilization: 85 },
         { id: "B1B", name: "Bed 1-B", type: "Ground", level: 0, plant: "Pothos / Jade", status: "active", utilization: 70 },
       ]},
       { id: "B-N3", name: "Field N3", quadrant: "SW", beds: [
-        { id: "B4A", name: "Bed 4-A", type: "Air", level: 1, plant: "Pothos / N'Joy", status: "harvesting", utilization: 100 },
-        { id: "B4B", name: "Bed 4-B", type: "Air", level: 2, plant: "Pothos / High Color", status: "active", utilization: 60 },
+        { id: "B4A", name: "Bed 4-A", type: "Basket", level: 1, plant: "Pothos / N'Joy", status: "harvesting", utilization: 100 },
+        { id: "B4B", name: "Bed 4-B", type: "Basket", level: 2, plant: "Pothos / High Color", status: "active", utilization: 60 },
         { id: "B4C", name: "Bed 4-C", type: "Ground", level: 0, plant: "", status: "empty", utilization: 0 },
       ]},
       { id: "B-N4", name: "Field N4", quadrant: "SE", beds: [
-        { id: "B2A", name: "Bed 2-A", type: "Air", level: 1, plant: "Pothos / Golden Glen", status: "active", utilization: 75 },
+        { id: "B2A", name: "Bed 2-A", type: "Basket", level: 1, plant: "Pothos / Golden Glen", status: "active", utilization: 75 },
         { id: "B2B", name: "Bed 2-B", type: "Ground", level: 0, plant: "Sansevieria / Sansevieria", status: "active", utilization: 50 },
       ]},
     ],
@@ -67,14 +67,14 @@ const shadehouses: ShadehouseData[] = [
     coordinates: [-87.8493, 14.9693], width: 35, length: 60, rotation: 15,
     fields: [
       { id: "B-S1", name: "Field S1", quadrant: "NW", beds: [
-        { id: "B5A", name: "Bed 5-A", type: "Air", level: 1, plant: "Pothos / Hawaiian", status: "active", utilization: 90 },
-        { id: "B5B", name: "Bed 5-B", type: "Air", level: 2, plant: "Pothos / Marble Queen", status: "active", utilization: 85 },
+        { id: "B5A", name: "Bed 5-A", type: "Basket", level: 1, plant: "Pothos / Hawaiian", status: "active", utilization: 90 },
+        { id: "B5B", name: "Bed 5-B", type: "Basket", level: 2, plant: "Pothos / Marble Queen", status: "active", utilization: 85 },
       ]},
       { id: "B-S2", name: "Field S2", quadrant: "NE", beds: [
         { id: "B5C", name: "Bed 5-C", type: "Ground", level: 0, plant: "Pothos / Jade", status: "irrigating", utilization: 70 },
       ]},
       { id: "B-S3", name: "Field S3", quadrant: "SW", beds: [
-        { id: "B6A", name: "Bed 6-A", type: "Air", level: 1, plant: "Pothos / Neon", status: "active", utilization: 65 },
+        { id: "B6A", name: "Bed 6-A", type: "Basket", level: 1, plant: "Pothos / Neon", status: "active", utilization: 65 },
       ]},
       { id: "B-S4", name: "Field S4", quadrant: "SE", beds: [
         { id: "B6B", name: "Bed 6-B", type: "Ground", level: 0, plant: "", status: "empty", utilization: 0 },
@@ -86,13 +86,13 @@ const shadehouses: ShadehouseData[] = [
     coordinates: [-87.8486, 14.9701], width: 35, length: 55, rotation: 15,
     fields: [
       { id: "B-E1", name: "Field E1", quadrant: "NW", beds: [
-        { id: "B7A", name: "Bed 7-A", type: "Air", level: 1, plant: "Pothos / Hawaiian", status: "active", utilization: 50 },
+        { id: "B7A", name: "Bed 7-A", type: "Basket", level: 1, plant: "Pothos / Hawaiian", status: "active", utilization: 50 },
       ]},
       { id: "B-E2", name: "Field E2", quadrant: "NE", beds: [
         { id: "B7B", name: "Bed 7-B", type: "Ground", level: 0, plant: "", status: "empty", utilization: 0 },
       ]},
       { id: "B-E3", name: "Field E3", quadrant: "SW", beds: [
-        { id: "B8A", name: "Bed 8-A", type: "Air", level: 1, plant: "Pothos / High Color", status: "active", utilization: 40 },
+        { id: "B8A", name: "Bed 8-A", type: "Basket", level: 1, plant: "Pothos / High Color", status: "active", utilization: 40 },
       ]},
       { id: "B-E4", name: "Field E4", quadrant: "SE", beds: [
         { id: "B8B", name: "Bed 8-B", type: "Ground", level: 0, plant: "", status: "empty", utilization: 0 },

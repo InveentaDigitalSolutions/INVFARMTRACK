@@ -45,13 +45,13 @@ export interface ShadehouseBed {
   bedNumber: number;
   /** 0 = ground bed; 1-2 = cable lines above it. Never 3 — that is irrigation. */
   level: BedLevel;
-  /** Ground beds are planted in soil; air beds carry hanging pots on a cable. */
-  type: "ground" | "air";
+  /** Ground beds are planted in soil; baskets carry hanging pots on a cable. */
+  type: "ground" | "basket";
   widthM: number;
   lengthM: number;
-  /** Air beds only — pots hooked along the cable run. */
+  /** Baskets only — pots hooked along the cable run. */
   potCount?: number;
-  /** Air beds only — pot shape chosen when the planting is created. */
+  /** Baskets only — pot shape chosen when the planting is created. */
   potType?: PotType;
   /** Layers of shade cloth strung over the bed; undefined when not recorded. */
   shade?: ShadeLevel;
@@ -123,7 +123,7 @@ export function postEveryFor(fieldId: string): number {
 }
 
 /**
- * Cables are strung THROUGH the posts, so an air bed can only exist where a
+ * Cables are strung THROUGH the posts, so an basket can only exist where a
  * post line stands — not above every ground bed.
  */
 export function isPostLine(bed: ShadehouseBed): boolean {
@@ -131,7 +131,7 @@ export function isPostLine(bed: ShadehouseBed): boolean {
 }
 
 /**
- * Air beds: cable runs carrying hanging pots, strung between posts along the
+ * Baskets: cable runs carrying hanging pots, strung between posts along the
  * length of the house. How many levels a given post line carries varies — some
  * carry none, others up to three.
  */

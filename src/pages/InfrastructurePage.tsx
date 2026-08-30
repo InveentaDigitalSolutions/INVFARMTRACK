@@ -67,13 +67,13 @@ interface BedRow { id?: string; name?: string; field?: string; type?: string; le
 
 /**
  * Built as a function because the controls depend on each other: the level
- * decides whether this is a ground or an air bed, and the rows on offer are
+ * decides whether this is a ground or an basket, and the rows on offer are
  * the ones free in the chosen field at that level.
  */
 /**
  * Adding beds a run at a time.
  *
- * Air beds come in runs — a cable spans rows 1 to 20 of a field — so entering
+ * Baskets come in runs — a cable spans rows 1 to 20 of a field — so entering
  * them one by one is a hundred identical form submissions. Soil and irrigation
  * are set for the whole batch because in practice a run shares them.
  */
@@ -83,8 +83,8 @@ const bulkBedFormGroups = [
       options: fieldOptions, optionsFrom: "fields", required: true },
     { key: "level", label: "Level", type: "select" as const, required: true, options: [
       { value: "0", label: "0 — ground beds" },
-      { value: "1", label: "1 — air beds" },
-      { value: "2", label: "2 — air beds" },
+      { value: "1", label: "1 — baskets" },
+      { value: "2", label: "2 — baskets" },
     ] },
     { key: "fromRow", label: "First Row", type: "number" as const, min: 1, required: true },
     { key: "toRow", label: "Last Row", type: "number" as const, min: 1, required: true },
@@ -126,8 +126,8 @@ const bedRunFormGroups = [
     { key: "level", label: "Level", type: "select" as const, options: [
       { value: "", label: "Every level" },
       { value: "0", label: "0 — ground beds" },
-      { value: "1", label: "1 — air beds" },
-      { value: "2", label: "2 — air beds" },
+      { value: "1", label: "1 — baskets" },
+      { value: "2", label: "2 — baskets" },
     ] },
     { key: "fromRow", label: "First Row", type: "number" as const, min: 1, required: true },
     { key: "toRow", label: "Last Row", type: "number" as const, min: 1, required: true },
@@ -157,14 +157,14 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
   { title: "Bed Details", columns: 2 as const, fields: [
     { key: "field", label: "Field", type: "select" as const,
       options: fieldOptions, optionsFrom: "fields", required: true },
-    // Level first: a field's rows are its ground beds, and air beds hang on
+    // Level first: a field's rows are its ground beds, and baskets hang on
     // cables above some of them. Type follows from this, not the other way.
     { key: "level", label: "Level", type: "select" as const, required: true, options: [
       { value: "0", label: "0 — ground bed" },
-      { value: "1", label: "1 — air bed" },
-      { value: "2", label: "2 — air bed" },
+      { value: "1", label: "1 — basket" },
+      { value: "2", label: "2 — basket" },
     ] },
-    // Free rows at this level. A ground bed in row 7 does not stop an air bed
+    // Free rows at this level. A ground bed in row 7 does not stop an basket
     // hanging above it, so each level is counted separately.
     { key: "row", label: "Row", type: "select" as const, required: true, options: [],
       emptyHint: "Choose a field and a level first",
@@ -173,7 +173,7 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
         // asked for the free ground rows, and with all 120 ground beds already
         // created that is none — so opening the form and picking a field left
         // Row empty and disabled with nothing to explain it. This is what made
-        // adding an air bed look impossible.
+        // adding an basket look impossible.
         const level = Number(values.level);
         if (!values.field || values.level === "" || values.level == null || !Number.isFinite(level)) {
           return [];
@@ -189,7 +189,7 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
           .map((row) => ({ value: String(row), label: String(row).padStart(2, "0") }));
       } },
     { key: "name", label: "Bed Name", type: "text" as const, readOnly: true,
-      placeholder: "E3-01, or E3-01-2 for an air bed" },
+      placeholder: "E3-01, or E3-01-2 for an basket" },
     { key: "shade", label: "Shade", type: "select" as const, options: [
       { value: "Single", label: "Single" }, { value: "Double", label: "Double" },
       { value: "Triple", label: "Triple" },
@@ -399,7 +399,7 @@ export default function InfrastructurePage() {
       (h) => h.name === (fields as FieldRow[]).find((f) => f.name === fieldName)?.shadehouse
     );
     if (!bedForm.isEdit) {
-      // Positions, not records: an air bed above an existing row needs no new
+      // Positions, not records: an basket above an existing row needs no new
       // ground, so it must not be refused because the floor is full.
       const full = bedCapacityProblem(shadehouse as never, beds as BedRow[], [name]);
       if (full) { alert(full); return; }
@@ -410,7 +410,7 @@ export default function InfrastructurePage() {
       name,
       level: String(level),
       // Type is not asked for: a bed on the ground is a ground bed and one on
-      // a cable above it is an air bed. Storing it keeps the column usable for
+      // a cable above it is an basket. Storing it keeps the column usable for
       // filtering without ever letting it disagree with the level.
       type: typeForLevel(level),
     });
@@ -433,9 +433,9 @@ export default function InfrastructurePage() {
 
   /**
    * Utilisation counted bed records against capacity, but a shadehouse's
-   * capacity is measured in positions — field plus row — and three air beds
+   * capacity is measured in positions — field plus row — and three baskets
    * hanging above one ground bed are one position, not four. Counting records
-   * put the house over 100% the moment air beds went in.
+   * put the house over 100% the moment baskets went in.
    */
   const infra = useMemo(
     () => infrastructureSummary({
@@ -505,7 +505,7 @@ export default function InfrastructurePage() {
           <>
             <DataTable columns={[
               { key: "name", label: "Name" }, { key: "field", label: "Field" },
-              { key: "type", label: "Type", render: (r) => <Badge variant={r.type === "Air" ? "blue" : "green"}>{r.type as string}</Badge> },
+              { key: "type", label: "Type", render: (r) => <Badge variant={r.type === "Basket" ? "blue" : "green"}>{r.type as string}</Badge> },
               { key: "level", label: "Level" },
               { key: "shade", label: "Shade", render: (r) => r.shade
                 ? <Badge variant={r.shade === "Triple" ? "green" : r.shade === "Double" ? "blue" : "gray"}>{r.shade as string}</Badge>

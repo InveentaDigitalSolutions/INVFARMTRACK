@@ -3,12 +3,12 @@
  *
  * This is not the inference that had to be undone. A field's rows are its
  * ground beds by definition — E3 has 33 rows, so it has 33 ground beds, all at
- * level 0. Air beds hang above some of those rows and are separate records
+ * level 0. Baskets hang above some of those rows and are separate records
  * named E3-01-1 and so on; none exist yet, and which rows carry them has to
  * come from the nursery rather than from a rule.
  *
  * Only beds whose name has no level suffix are touched, so re-running after
- * air beds exist leaves them alone.
+ * baskets exist leaves them alone.
  *
  * Usage: node scripts/dataverse/set-ground-beds.mjs [--dry-run]
  */
@@ -49,4 +49,4 @@ for (const bed of beds) {
   set++
 }
 console.log(`${DRY ? 'Would mark' : 'Marked'} ${set} beds as Ground at level 0.`)
-if (skipped) console.log(`${skipped} left alone (air beds, or already set).`)
+if (skipped) console.log(`${skipped} left alone (baskets, or already set).`)

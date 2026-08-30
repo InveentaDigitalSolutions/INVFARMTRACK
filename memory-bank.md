@@ -107,6 +107,11 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   layer, drawn by default. Turn Shade off before judging any lighting change —
   `NOSHADE=1 node scripts/test/shot3d.mjs` does it. Shadows work for anything
   bed-sized; 15 cm posts are below what one 4096 map resolves over 115 m.
+- **They are baskets, not air beds.** Renamed 2026-08-30, in the app and in the
+  `bv_Bed.bv_Type` choice — label only, value 121320000 unchanged, and no bed
+  held it yet so nothing migrated. `apply-schema.mjs` now renames an option by
+  *value* instead of inserting a second one on a taken value, so this cannot
+  regress. Bed names are unchanged (`E3-01-1`).
 - **The shade cloth is 65% netting, and layers multiply.** Single passes 35%,
   double 0.35² = 12.25%, triple 0.35³ = 4.29% — a factor of **eight** across the
   house, far larger than the seasonal swing (about 30%) or the terrain (1-4%).

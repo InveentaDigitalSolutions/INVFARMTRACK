@@ -584,10 +584,10 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
               {selected.expectedHarvest && (
                 <Row label="Harvest due" value={selected.expectedHarvest} />
               )}
-              {selected.type === "air" && selected.potType && (
+              {selected.type === "basket" && selected.potType && (
                 <Row label="Pot type" value={potTypeLabels[selected.potType]} />
               )}
-              {selected.type === "air" && (
+              {selected.type === "basket" && (
                 <Row
                   label="Height"
                   value={`${LEVEL_HEIGHTS_M[selected.level].toFixed(2)} m`}

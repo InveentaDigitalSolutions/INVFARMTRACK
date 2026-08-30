@@ -40,9 +40,9 @@ eq('row parsed back out', rowOf('E3-07'), 7)
 eq('a ground bed is level 0', levelOf('E3-07'), 0)
 
 // beds — air, named for the row they hang over
-eq('air bed on level 1', bedName('E3', 1, 1), 'E3-01-1')
-eq('air bed on level 2, row 12', bedName('E3', 12, 2), 'E3-12-2')
-eq('air bed parses to its row, not its level', rowOf('E3-01-1'), 1)
+eq('basket on level 1', bedName('E3', 1, 1), 'E3-01-1')
+eq('basket on level 2, row 12', bedName('E3', 12, 2), 'E3-12-2')
+eq('basket parses to its row, not its level', rowOf('E3-01-1'), 1)
 eq('the trap: E3-12-2 is row 12, not row 2', rowOf('E3-12-2'), 12)
 eq('and its level is 2', levelOf('E3-12-2'), 2)
 // Level 3 exists in the house but carries irrigation, so it is not a bed name.
@@ -50,24 +50,24 @@ eq('level 3 is the irrigation line, not a bed', parseBedName('E3-12-3'), null)
 eq('full parse', parseBedName('C1-27-2'), {field:'C1', row:27, level:2})
 eq('a name that is not a bed', parseBedName('nonsense'), null)
 eq('type follows the level', typeForLevel(0), 'Ground')
-eq('type follows the level, air', typeForLevel(2), 'Air')
+eq('type follows the level, air', typeForLevel(2), 'Basket')
 
 const beds = [{name:'E3-01',field:'E3'},{name:'E3-03',field:'E3'}]
 eq('free ground rows skip the taken ones', availableRows({name:'E3',rows:5}, beds), [2,4,5])
 eq('no row count -> offer nothing', availableRows({name:'E3'}, beds), [])
-// a ground bed in row 1 does not stop an air bed hanging above it
+// a ground bed in row 1 does not stop an basket hanging above it
 eq('levels are counted separately', availableRows({name:'E3',rows:3}, beds, 1), [1,2,3])
 const mixed = [{name:'E3-01'},{name:'E3-01-1'},{name:'E3-02-1'}]
 eq('level 1 free rows', availableRows({name:'E3',rows:3}, mixed, 1), [3])
 eq('level 2 is untouched by level 1', availableRows({name:'E3',rows:3}, mixed, 2), [1,2,3])
-eq('ground free rows ignore air beds', availableRows({name:'E3',rows:3}, mixed, 0), [2,3])
+eq('ground free rows ignore baskets', availableRows({name:'E3',rows:3}, mixed, 0), [2,3])
 eq('ground beds are level 0 only', levelsFor('Ground'), ['0'])
-eq('air beds cannot be level 0', levelsFor('Air'), ['1','2'])
-eq('and never level 3 — that is irrigation', !!levelProblem('Air','3'), true)
+eq('baskets cannot be level 0', levelsFor('Basket'), ['1','2'])
+eq('and never level 3 — that is irrigation', !!levelProblem('Basket','3'), true)
 eq('ground defaults to 0', defaultLevel('Ground'), '0')
-eq('air at level 0 refused', !!levelProblem('Air','0'), true)
+eq('air at level 0 refused', !!levelProblem('Basket','0'), true)
 eq('ground at level 2 refused', !!levelProblem('Ground','2'), true)
-eq('air at level 2 fine', levelProblem('Air','2'), null)
+eq('air at level 2 fine', levelProblem('Basket','2'), null)
 // capacity is a number of positions on the ground, not of bed records
 const full120 = Array.from({length:120},(_,i)=>({name:`E3-${String(i+1).padStart(2,'0')}`}))
 eq('120 ground beds occupy 120 positions', positionCount(full120), 120)
@@ -75,10 +75,10 @@ eq('a new ground bed on a full floor is refused',
   !!bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120, ['C1-01']), true)
 eq('re-adding a row that already exists is not new ground',
   bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120, ['E3-99']), null)
-// the bug Santiago hit: air beds were refused because the floor looked full
-eq('an air bed above an existing row is allowed on a full floor',
+// the bug Santiago hit: baskets were refused because the floor looked full
+eq('an basket above an existing row is allowed on a full floor',
   bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120, ['E3-01-1']), null)
-eq('a whole run of air beds is allowed too',
+eq('a whole run of baskets is allowed too',
   bedCapacityProblem({name:'Shadehouse 1',capacity:120}, full120,
     ['E3-01-1','E3-02-1','E3-03-1']), null)
 eq('levels stacked on one row are still one position',
@@ -87,7 +87,7 @@ eq('levels stacked on one row are still one position',
 // bulk add — how the real layout gets entered
 const E3 = { name: 'E3', rows: 33 }
 const none: { name?: string }[] = []
-eq('a clean run of air beds',
+eq('a clean run of baskets',
   planBulkBeds({field:E3, level:1, fromRow:1, toRow:3, existing:none}).create,
   ['E3-01-1','E3-02-1','E3-03-1'])
 eq('ground beds have no level suffix',
@@ -118,9 +118,9 @@ eq('a ground run that overflows the floor is refused',
 eq('and nothing is created when it is',
   planBulkBeds({field:{name:'E3',rows:33}, level:0, fromRow:1, toRow:20, existing:nearlyFull,
     shadehouse:{name:'Shadehouse 1', capacity:120}}).create, [])
-// air beds over rows that already exist take no new ground
+// baskets over rows that already exist take no new ground
 const groundE3 = Array.from({length:33},(_,i)=>({name:`E3-${String(i+1).padStart(2,'0')}`}))
-eq('a full run of air beds over existing rows is allowed',
+eq('a full run of baskets over existing rows is allowed',
   planBulkBeds({field:E3, level:1, fromRow:1, toRow:33, existing:groundE3,
     shadehouse:{name:'Shadehouse 1', capacity:33}}).create.length, 33)
 

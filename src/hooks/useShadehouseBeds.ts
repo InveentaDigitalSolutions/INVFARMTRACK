@@ -57,7 +57,7 @@ export function useShadehouseBeds(): {
           fieldId,
           bedNumber: parsed?.row ?? 0,
           level,
-          type: level === 0 ? ("ground" as const) : ("air" as const),
+          type: level === 0 ? ("ground" as const) : ("basket" as const),
           // A field with no geometry on file falls back to the common bed size
           // rather than to zero, which would draw the map as a hairline.
           widthM: geometry?.bedWidth ?? 1.2,

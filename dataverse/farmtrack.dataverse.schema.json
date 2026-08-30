@@ -125,14 +125,14 @@
           "options": [
             {
               "value": 121320000,
-              "label": "Air"
+              "label": "Basket"
             },
             {
               "value": 121320001,
               "label": "Ground"
             }
           ],
-          "description": "Whether this is a ground bed planted in soil, or an air bed of hanging pots on a cable. One of: Air, Ground."
+          "description": "Whether this is a ground bed planted in soil, or a basket hung on the cables above it. Some varieties are only grown in baskets. The option value is unchanged from when these were called air beds. One of: Basket, Ground."
         },
         {
           "schemaName": "bv_Level",

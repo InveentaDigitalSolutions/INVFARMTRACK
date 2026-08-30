@@ -85,7 +85,7 @@ const plantingFields = [
       options: plantOptionsFallback, optionsFrom: "plants", required: true, span: 2 as const },
     { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons", required: true },
     { key: "date", label: "Seeding Date", type: "date" as const, required: true },
-    // Air beds carry hanging pots in two shapes; the 3D view renders each.
+    // Baskets carry hanging pots in two shapes; the 3D view renders each.
     { key: "potType", label: "Pot Type", type: "select" as const, options: [
       { value: "round", label: "Round" }, { value: "square", label: "Square" },
     ] },
