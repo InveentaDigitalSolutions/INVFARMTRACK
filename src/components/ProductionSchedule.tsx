@@ -25,7 +25,10 @@ interface PlantRow {
   id: string;
   name?: string;
   variety?: string;
-  weeksToFirstHarvest?: number;
+  growthWeeksMinMarAug?: number;
+  growthWeeksMaxMarAug?: number;
+  growthWeeksMinSepFeb?: number;
+  growthWeeksMaxSepFeb?: number;
   productiveWeeks?: number;
 }
 
@@ -42,7 +45,10 @@ export default function ProductionSchedule() {
     () =>
       plants.map((p) => ({
         plant: [p.name, p.variety].filter(Boolean).join(" / "),
-        weeksToFirstHarvest: p.weeksToFirstHarvest,
+        growthWeeksMinMarAug: p.growthWeeksMinMarAug,
+        growthWeeksMaxMarAug: p.growthWeeksMaxMarAug,
+        growthWeeksMinSepFeb: p.growthWeeksMinSepFeb,
+        growthWeeksMaxSepFeb: p.growthWeeksMaxSepFeb,
         productiveWeeks: p.productiveWeeks,
       })),
     [plants]

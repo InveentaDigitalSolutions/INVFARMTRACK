@@ -15,6 +15,8 @@
  * unknown, rather than drawing a plausible bar nobody entered.
  */
 
+import { growthWeeks } from "./phenology";
+
 export interface PlantingLike {
   bed?: string;
   plant?: string;
@@ -27,7 +29,10 @@ export interface PlantingLike {
 export interface PlantCycle {
   /** Variety name as it appears on a planting. */
   plant: string;
-  weeksToFirstHarvest?: number;
+  growthWeeksMinMarAug?: number;
+  growthWeeksMaxMarAug?: number;
+  growthWeeksMinSepFeb?: number;
+  growthWeeksMaxSepFeb?: number;
   productiveWeeks?: number;
 }
 
@@ -99,7 +104,9 @@ export function cohorts(
     }
 
     const cycle = cycleOf.get(p.plant);
-    const weeks = cycle?.weeksToFirstHarvest;
+    // Seasonal: a bed seeded in October takes longer to reach eight leaves
+    // than the same variety seeded in April, and the schedule has to say so.
+    const weeks = growthWeeks(cycle, start)?.expected;
     const productive = cycle?.productiveWeeks;
 
     grouped.set(key, {

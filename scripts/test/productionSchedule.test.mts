@@ -19,7 +19,7 @@ const plantings = [
   { bed:'E3-09', plant:'Hawaiian', date:'2026-03-02', qty:380 },   // a later wave
   { bed:'C1-01', plant:'Jade',     date:'2026-01-05', qty:300 },   // different variety, same week
 ]
-const cycles = [{ plant:'Hawaiian', weeksToFirstHarvest:12, productiveWeeks:20 }]
+const cycles = [{ plant:'Hawaiian', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:12, growthWeeksMinSepFeb:12, growthWeeksMaxSepFeb:12, productiveWeeks:20 }]
 const list = cohorts(plantings, cycles)
 
 eq('beds planted days apart are one wave', list.filter(c => c.plant==='Hawaiian').length, 2)

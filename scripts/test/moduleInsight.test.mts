@@ -174,8 +174,8 @@ const status = bedStatuses({
     { bed: 'E3-04', plant: 'Pothos / Jade', date: '2026-01-01', current: false },
   ],
   plants: [
-    { name: 'Pothos', variety: 'Hawaiian', weeksToFirstHarvest: 12 },
-    { name: 'Pothos', variety: 'Jade', weeksToFirstHarvest: 12 },
+    { name: 'Pothos', variety: 'Hawaiian', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:12, growthWeeksMinSepFeb:12, growthWeeksMaxSepFeb:12 },
+    { name: 'Pothos', variety: 'Jade', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:12, growthWeeksMinSepFeb:12, growthWeeksMaxSepFeb:12 },
   ],
   treatments: [{ bed: 'E3-01', date: '2026-08-20', type: 'Pest control' }],
   today: TODAY,
@@ -205,8 +205,8 @@ const mixed = bedStatuses({
     { bed: 'E3-01', plant: 'Pothos / Jade', date: '2026-05-20', qty: 200 },
     { bed: 'E3-02', plant: 'Pothos / Jade', date: '2026-05-01', qty: 3000 },
   ],
-  plants: [{ name: 'Pothos', variety: 'Hawaiian', weeksToFirstHarvest: 12 },
-           { name: 'Pothos', variety: 'Jade', weeksToFirstHarvest: 12 }],
+  plants: [{ name: 'Pothos', variety: 'Hawaiian', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:12, growthWeeksMinSepFeb:12, growthWeeksMaxSepFeb:12 },
+           { name: 'Pothos', variety: 'Jade', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:12, growthWeeksMinSepFeb:12, growthWeeksMaxSepFeb:12 }],
   today: TODAY,
 })
 eq('a mixed bed lists both varieties',

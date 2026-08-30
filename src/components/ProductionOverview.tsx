@@ -12,6 +12,7 @@
  */
 
 import { useMemo } from "react";
+import type { PhenologyPlant } from "../services/rowTypes.helpers";
 import { Scissors, Sprout, Layers, Boxes, CalendarClock } from "lucide-react";
 import { useRecords } from "../hooks/useRecords";
 import { useNurseryBeds } from "../hooks/useNurseryBeds";
@@ -28,7 +29,7 @@ import { cohorts, missingCycles } from "../services/productionSchedule";
 
 interface HarvestRow { id: string; date?: string; qty?: number; bed?: string; plant?: string }
 interface PlantingRow { id: string; bed?: string; plant?: string; date?: string; qty?: number; current?: boolean }
-interface PlantRow { id: string; name?: string; variety?: string; weeksToFirstHarvest?: number; productiveWeeks?: number }
+interface PlantRow extends PhenologyPlant { id: string; name?: string; variety?: string; productiveWeeks?: number }
 interface CountRow { id: string; week?: number; counted?: number }
 
 const monthKey = (d: string) => String(d).slice(0, 7);
@@ -82,7 +83,10 @@ export default function ProductionOverview() {
       plantings,
       plants.map((p) => ({
         plant: [p.name, p.variety].filter(Boolean).join(" / "),
-        weeksToFirstHarvest: p.weeksToFirstHarvest,
+        growthWeeksMinMarAug: p.growthWeeksMinMarAug,
+        growthWeeksMaxMarAug: p.growthWeeksMaxMarAug,
+        growthWeeksMinSepFeb: p.growthWeeksMinSepFeb,
+        growthWeeksMaxSepFeb: p.growthWeeksMaxSepFeb,
         productiveWeeks: p.productiveWeeks,
       }))
     );

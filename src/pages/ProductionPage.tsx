@@ -272,13 +272,6 @@ const plantFields = [
     { key: "harvestWeeksSepFeb", label: "Harvest every", type: "range" as const, min: 0, max: 20, suffix: "wks" },
     { key: "pruningWeeksSepFeb", label: "Back to 2 leaves after", type: "range" as const, min: 0, max: 20, suffix: "wks" },
   ]},
-  // "Legacy" was the heading here, which is a word for us and not for whoever
-  // is filling the form in. Superseded by the seasonal figures above and kept
-  // because the schedule and availability services still read it; remove the
-  // group once they take the seasonal pair.
-  { title: "Schedule", columns: 2 as const, fields: [
-    { key: "weeksToFirstHarvest", label: "Weeks to First Cut", type: "number" as const, min: 0 },
-  ]},
   { title: "Patent & Status", columns: 2 as const, fields: [
     // bv_IsPatented is a boolean; the form used to offer "Yes"/"No" strings,
     // which is why the column was never bound and the table showed nothing.
@@ -699,7 +692,12 @@ export default function ProductionPage() {
                 { key: "latin", label: "Latin Name" },
                 { key: "variety", label: "Variety" },
                 { key: "plantsPerBed", label: "Per Bed" },
-                { key: "weeksToFirstHarvest", label: "Wks to Cut" },
+                // The seasonal pair replaced a single "weeks to first cut":
+                // the same cutting takes 8-10 weeks in the bright half of the
+                // year and 10-12 in the dark, so one number was always wrong
+                // for half the year.
+                { key: "growthWeeksMinMarAug", label: "Mar–Aug wks" },
+                { key: "growthWeeksMinSepFeb", label: "Sep–Feb wks" },
                 { key: "productiveWeeks", label: "Productive" },
                 { key: "patent", label: "Patented", render: (r) => (
                   <Badge variant={r.patent ? "amber" : "gray"}>{r.patent ? "Yes" : "No"}</Badge>

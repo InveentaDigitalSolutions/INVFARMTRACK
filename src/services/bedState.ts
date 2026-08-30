@@ -10,10 +10,17 @@
  * somebody records a harvest and forgets to change a dropdown.
  */
 
+import { growthWeeks } from "./phenology";
+import type { PhenologyPlant } from "./rowTypes.helpers";
+
 export type BedState = "empty" | "planted" | "growing" | "harvest-ready" | "issue";
 
 export interface PlantingLike { bed?: string; plant?: string; date?: string; qty?: number; current?: boolean }
-export interface PlantLike { name?: string; variety?: string; weeksToFirstHarvest?: number; productiveWeeks?: number }
+export interface PlantLike extends PhenologyPlant {
+  name?: string;
+  variety?: string;
+  productiveWeeks?: number;
+}
 export interface DatedBedRecord { bed?: string; date?: string; type?: string }
 
 /** Treatments that mean something is wrong, rather than routine feeding. */
@@ -45,9 +52,11 @@ export interface BedStatus {
 /**
  * Bed name -> what is on it and how it is doing.
  *
- * `weeksToFirstHarvest` comes from the plant catalogue. A variety with no
- * cycle recorded can only be called "growing" — claiming it is ready would be
- * a guess dressed as a fact, and the nursery would go and cut it.
+ * The cycle comes from the plant catalogue, and it depends on when the bed was
+ * seeded: the same cutting takes 8-10 weeks to eight leaves between March and
+ * August and 10-12 between September and February. A variety with no figures
+ * recorded can only be called "growing" — claiming it is ready would be a guess
+ * dressed as a fact, and the nursery would go and cut it.
  */
 export function bedStatuses(input: {
   plantings: PlantingLike[];
@@ -57,11 +66,13 @@ export function bedStatuses(input: {
 }): Map<string, BedStatus> {
   const today = input.today ?? new Date();
 
-  const cycleOf = new Map<string, number | undefined>();
+  // Keyed to the plant rather than to a single number, because how long it
+  // takes depends on the month the bed was seeded.
+  const plantOf = new Map<string, PlantLike>();
   for (const p of input.plants) {
     const label = [p.name, p.variety].filter(Boolean).join(" / ");
-    if (label) cycleOf.set(label, p.weeksToFirstHarvest);
-    if (p.variety) cycleOf.set(p.variety, p.weeksToFirstHarvest);
+    if (label) plantOf.set(label, p);
+    if (p.variety) plantOf.set(p.variety, p);
   }
 
   /**
@@ -97,7 +108,11 @@ export function bedStatuses(input: {
     const varieties = [...new Set(here.map((p) => String(p.plant ?? "")).filter(Boolean))].sort();
     const variety = varieties.length === 1 ? varieties[0] : varieties.join(" + ");
     const planted = String(planting.date ?? "").slice(0, 10);
-    const cycle = cycleOf.get(varieties[0] ?? variety);
+    // The cycle depends on the month it went in, so it is looked up against
+    // the seeding date rather than read off the variety as one flat number.
+    const cycle = planted
+      ? growthWeeks(plantOf.get(varieties[0] ?? variety), planted)?.expected
+      : undefined;
     const age = planted ? weeksBetween(planted, today) : 0;
 
     let expectedHarvest = "";

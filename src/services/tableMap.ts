@@ -72,7 +72,6 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       growthWeeksMaxSepFeb: "bv_growthweeksmaxsepfeb",
       harvestWeeksSepFeb: "bv_harvestweekssepfeb",
       pruningWeeksSepFeb: "bv_pruningweekssepfeb",
-      weeksToFirstHarvest: "bv_weekstofirstharvest",
       productiveWeeks: "bv_productiveweeks",
       active: "bv_isactive",
     },
