@@ -4,6 +4,7 @@ import { Billboard, RoundedBox } from "@react-three/drei";
 // Not drei's <Text>: troika fetches a font index from a CDN, which the player
 // blocks, and the failure takes the whole scene down. See SceneText.
 import SceneText from "./SceneText";
+import { drawTerrainOverlay } from "../services/terrainTexture";
 import * as THREE from "three";
 import {
   LEVEL_HEIGHTS_M,
@@ -371,6 +372,7 @@ function Bed({
   lens,
   nowMs,
   dimmed,
+  faded,
   selected,
   onSelect,
 }: {
@@ -380,6 +382,8 @@ function Bed({
   lens: LensMode;
   nowMs: number;
   dimmed: boolean;
+  /** Half-transparent so the contour overlay reads through the bed. */
+  faded: boolean;
   selected: boolean;
   onSelect: (bedId: string) => void;
 }) {
@@ -430,7 +434,7 @@ function Bed({
           color={base}
           emissive={base}
           transparent
-          opacity={dimmed ? 0.12 : 1}
+          opacity={dimmed ? 0.12 : faded ? 0.34 : 1}
           roughness={0.62}
           metalness={0.02}
         />
@@ -468,6 +472,7 @@ function AirLine({
   lens,
   nowMs,
   dimmed,
+  faded,
   selected,
   onSelect,
 }: {
@@ -477,6 +482,8 @@ function AirLine({
   lens: LensMode;
   nowMs: number;
   dimmed: boolean;
+  /** Half-transparent so the contour overlay reads through the bed. */
+  faded: boolean;
   selected: boolean;
   onSelect: (bedId: string) => void;
 }) {
@@ -538,7 +545,7 @@ function AirLine({
   });
 
   if (!matrices.length) return null;
-  const opacity = dimmed ? 0.1 : 1;
+  const opacity = dimmed ? 0.1 : faded ? 0.32 : 1;
 
   return (
     <group
@@ -606,11 +613,53 @@ function AirLine({
           emissive={foliage}
           emissiveIntensity={selected ? 0.45 : 0}
           transparent
-          opacity={dimmed ? 0.1 : 0.95}
+          opacity={dimmed ? 0.1 : faded ? 0.3 : 0.95}
           roughness={0.9}
         />
       </instancedMesh>
     </group>
+  );
+}
+
+/**
+ * The survey's contours, painted flat on the floor.
+ *
+ * Two-dimensional on purpose. Displacing the ground would move every bed with
+ * it and reopen a layout that is settled; a contour overlay says the same thing
+ * about where water runs and where the ground is high, and says it on a plan
+ * the nursery already reads.
+ */
+function Topography({ span, depth }: { span: number; depth: number }) {
+  const texture = useMemo(() => {
+    const canvas = drawTerrainOverlay();
+    if (!canvas) return null;
+    const map = new THREE.CanvasTexture(canvas);
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.minFilter = THREE.LinearFilter;
+    map.magFilter = THREE.LinearFilter;
+    map.anisotropy = 8;
+    return map;
+  }, []);
+
+  // A texture holds a GPU allocation; dropping the reference is not enough.
+  useEffect(() => () => texture?.dispose(), [texture]);
+
+  if (!texture) return null;
+
+  return (
+    // Just above the ground plane. polygonOffset rather than a larger gap, so
+    // it cannot be seen floating when the camera drops to eye level.
+    <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow={false}>
+      <planeGeometry args={[span + 8, depth + 8]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0.85}
+        polygonOffset
+        polygonOffsetFactor={-2}
+        toneMapped={false}
+      />
+    </mesh>
   );
 }
 
@@ -919,6 +968,7 @@ export default function ShadehouseScene({
   showPlotLabels,
   showBedNumbers,
   showCompass,
+  showTopography,
   weather,
   selectedBedId,
   onSelect,
@@ -934,6 +984,8 @@ export default function ShadehouseScene({
   showPlotLabels: boolean;
   showBedNumbers: boolean;
   showCompass: boolean;
+  /** The survey contours, painted flat on the floor. */
+  showTopography: boolean;
   /** Null when the weather layer is off or the feed has not landed. */
   weather: CurrentConditions | null;
   selectedBedId: string | null;
@@ -1043,6 +1095,7 @@ export default function ShadehouseScene({
             lens={lens}
             nowMs={nowMs}
             dimmed={!visibleLevels.has(placement.bed.level)}
+            faded={showTopography}
             selected={selectedBedId === placement.bed.bedId}
             onSelect={onSelect}
           />
@@ -1055,6 +1108,7 @@ export default function ShadehouseScene({
             lens={lens}
             nowMs={nowMs}
             dimmed={!visibleLevels.has(placement.bed.level)}
+            faded={showTopography}
             selected={selectedBedId === placement.bed.bedId}
             onSelect={onSelect}
           />
@@ -1076,6 +1130,7 @@ export default function ShadehouseScene({
         <PlotOutline key={`outline-${a.id}`} x={a.x} z={a.z} width={a.width} length={a.length} />
       ))}
 
+      {showTopography && <Topography span={span} depth={depth} />}
       {showCompass && <Compass span={span} depth={depth} />}
 
       {showPlotLabels &&

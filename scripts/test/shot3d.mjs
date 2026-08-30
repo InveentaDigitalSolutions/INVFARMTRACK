@@ -15,10 +15,20 @@ import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 
 const server = spawn('npx', ['vite', 'preview', '--port', '4179', '--strictPort'], { cwd: process.cwd() })
-await new Promise((res, rej) => {
-  const t = setTimeout(() => rej(new Error('no server')), 30000)
-  server.stdout.on('data', d => { if (String(d).includes('localhost:4179')) { clearTimeout(t); res() } })
-})
+// Poll the port rather than parse the server's banner: vite does not always
+// write it to stdout, and a missed line looked exactly like a dead server.
+for (let i = 0; ; i++) {
+  try { await fetch('http://localhost:4179/'); break } catch {
+    if (i > 60) throw new Error('preview server did not start')
+    await new Promise((r) => setTimeout(r, 500))
+  }
+}
+// A failed run used to leave the preview server holding its port, so the next
+// run could not start. Kill it however this process ends.
+const stop = () => { try { server.kill('SIGKILL') } catch { /* already gone */ } }
+process.on('exit', stop); process.on('SIGINT', () => { stop(); process.exit(1) })
+process.on('uncaughtException', (e) => { stop(); console.error(e); process.exit(1) })
+
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1500, height: 950 } })
 const errs = []
@@ -40,7 +50,11 @@ await page.goto('http://localhost:4179/', { waitUntil: 'networkidle' })
 await page.getByRole('button', { name: 'Infrastructure' }).first().click()
 await page.waitForTimeout(800)
 await page.getByRole('button', { name: '3D', exact: true }).click()
-await page.waitForTimeout(3500)
+await page.waitForTimeout(2500)
+if (process.env.TERRAIN) {
+  await page.getByRole('button', { name: 'Terrain' }).click()
+  await page.waitForTimeout(2000)
+}
 const out = process.argv[2]
 const canvas = page.locator('canvas').first()
 await canvas.screenshot({ path: out })

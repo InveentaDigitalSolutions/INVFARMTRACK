@@ -96,6 +96,10 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   layout. Rebuilding the geometry from it produced five wrong versions in a row
   while every unit test stayed green, because the survey's measurements span the
   whole footprint and its rotation is relative to the sheet, not to north.
+- **The Terrain layer is deliberately 2D.** Contours are painted on the floor as
+  a canvas texture, not displaced into a mesh: displacement would move every bed
+  and reopen the layout. Beds fade to ~0.3 opacity while it is on, or they hide
+  the thing being looked at.
 - **Look at the 3D view before believing it.** `node scripts/test/shot3d.mjs
   out.png` renders it headless and writes a PNG. Build with an empty
   `VITE_DATAVERSE_URL` first or the preview has no session and draws an empty

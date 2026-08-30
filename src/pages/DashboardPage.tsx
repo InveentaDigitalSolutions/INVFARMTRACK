@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Leaf,
@@ -22,7 +22,8 @@ import ShadehouseView from "../components/ShadehouseView";
 import InsightPanel, { deriveShadehouseInsight } from "../components/InsightPanel";
 import BedWaffle from "../components/BedWaffle";
 import WeatherWidget from "../components/WeatherWidget";
-import { useExchangeRate } from "../hooks/useExchangeRate";
+import { useExchangeRate, type ExchangeRateRow } from "../hooks/useExchangeRate";
+import RateHistoryChart from "../components/RateHistoryChart";
 import { useDashboardMetrics } from "../hooks/useDashboardMetrics";
 import { useShadehouseBeds } from "../hooks/useShadehouseBeds";
 import { useRecords } from "../hooks/useRecords";
@@ -120,6 +121,14 @@ export default function DashboardPage() {
   );
   const insight = useMemo(() => deriveShadehouseInsight(beds), [beds]);
   const { rate: exchangeRate, loading: fxLoading, isLive: fxLive, staleDays: fxStaleDays } = useExchangeRate();
+  // The same rows the rate itself comes from, charted rather than reduced to
+  // one number. Open on hover or on click, and reachable from the keyboard.
+  const [fxRows] = useRecords<ExchangeRateRow>("exchangeRates", []);
+  // Hovering shows the history; clicking pins it open so the pointer can go to
+  // the chart's own range buttons without it vanishing on the way.
+  const [fxHover, setFxHover] = useState(false);
+  const [fxPinned, setFxPinned] = useState(false);
+  const fxOpen = fxHover || fxPinned;
   return (
     <motion.div
       initial="hidden"
@@ -138,35 +147,67 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Reference rate lives with the other page context, not in the body. */}
-          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-navy-800 ring-1 ring-navy-700/50">
-            <DollarSign className="w-4 h-4 text-lime-400 shrink-0" />
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-[10px] text-white/45 uppercase tracking-[0.1em]">USD/HNL</span>
-              <span className="text-[15px] font-bold text-white tabular-nums">
-                {fxLoading ? "…" : exchangeRate ? `L ${exchangeRate.value.toFixed(4)}` : "—"}
-              </span>
-            </div>
-            {exchangeRate && (
-              <span className="flex items-center gap-1.5 pl-2.5 border-l border-white/10">
-                <span
-                  className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                    !fxLive || fxStaleDays > 4 ? "bg-amber-400" : "bg-green-400"
-                  }`}
-                />
-                {/* The rate's own publication date, not when the app read it.
-                    A figure fetched a minute ago can still be a week old, and
-                    that is what would put the wrong number on an invoice. */}
-                <span className="text-[10px] text-white/50 whitespace-nowrap">
-                  {fxLive ? "BCH" : "No rate stored"} ·{" "}
-                  {new Date(exchangeRate.dateISO).toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                  {fxStaleDays > 4 ? ` · ${fxStaleDays} days old` : ""}
+          {/* Reference rate lives with the other page context, not in the body.
+              The chip opens its own history: today's number says nothing about
+              which way the rate is going, and a receivable raised months ago
+              is worth a different figure now. */}
+          <div
+            className="relative"
+            onMouseEnter={() => setFxHover(true)}
+            onMouseLeave={() => setFxHover(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setFxPinned((pinned) => !pinned)}
+              onFocus={() => setFxHover(true)}
+              onBlur={(e) => {
+                // Focus moving into the chart itself must not close it.
+                if (!e.currentTarget.parentElement?.contains(e.relatedTarget)) setFxHover(false);
+              }}
+              aria-expanded={fxOpen}
+              aria-label="Exchange rate history"
+              className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-navy-800 ring-1 ring-navy-700/50
+                cursor-pointer transition-colors hover:ring-lime-400/40
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/50"
+            >
+              <DollarSign className="w-4 h-4 text-lime-400 shrink-0" />
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-[10px] text-white/45 uppercase tracking-[0.1em]">USD/HNL</span>
+                <span className="text-[15px] font-bold text-white tabular-nums">
+                  {fxLoading ? "…" : exchangeRate ? `L ${exchangeRate.value.toFixed(4)}` : "—"}
                 </span>
-              </span>
+              </div>
+              {exchangeRate && (
+                <span className="flex items-center gap-1.5 pl-2.5 border-l border-white/10">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      !fxLive || fxStaleDays > 4 ? "bg-amber-400" : "bg-green-400"
+                    }`}
+                  />
+                  {/* The rate's own publication date, not when the app read it.
+                      A figure fetched a minute ago can still be a week old, and
+                      that is what would put the wrong number on an invoice. */}
+                  <span className="text-[10px] text-white/50 whitespace-nowrap">
+                    {fxLive ? "BCH" : "No rate stored"} ·{" "}
+                    {new Date(exchangeRate.dateISO).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                    {fxStaleDays > 4 ? ` · ${fxStaleDays} days old` : ""}
+                  </span>
+                </span>
+              )}
+            </button>
+
+            {fxOpen && (
+              <div
+                className="absolute right-0 top-full mt-2 z-30 rounded-xl bg-navy-900
+                  ring-1 ring-navy-700/60 shadow-xl shadow-navy-950/30"
+                onKeyDown={(e) => { if (e.key === "Escape") { setFxPinned(false); setFxHover(false); } }}
+              >
+                <RateHistoryChart rows={fxRows} />
+              </div>
             )}
           </div>
 

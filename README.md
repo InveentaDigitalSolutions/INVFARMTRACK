@@ -73,6 +73,14 @@ metadata into `src/services/choiceMap.generated.ts`.
 `src/services/writeErrors.ts` into a banner naming the table and the reason. A
 render-time exception is caught by `ErrorBoundary` rather than blanking the app.
 
+**The survey is drawn flat.** The **Terrain** layer paints the topographic
+contours onto the floor as a canvas texture rather than displacing the ground —
+`services/terrain.ts` traces them by marching squares, `terrainTexture.ts` draws
+them. Displacing the floor would move every bed with it. The survey covers more
+ground than the modelled block, so the overlay is stretched onto it: where the
+ground is high is right, a distance measured off it is not, and the legend says
+so.
+
 **The shadehouse layout has one source.** `src/services/shadehouseLayout.ts` —
 four fields in a 2 x 2 around a crossing logistics road, from the nursery's own
 plan. The topographic survey in `dataverse/reference/SURVEY.md` is reference for
@@ -114,7 +122,7 @@ run locally against real data, use the Local Play URL that `npm run dev` prints.
 ## Checks
 
 ```bash
-npm test                            # 305 assertions, 13 pure-logic suites
+npm test                            # 15 pure-logic suites
 npm run test:smoke                  # builds, opens all 11 modules in chromium,
                                     #   fails on any console error or blank screen
 npm run build                       # tsc -b && vite build
@@ -124,7 +132,8 @@ npm run test:sandbox                # fails if a CDN reference returns to the bu
 # Renders the 3D shadehouse headless and writes a PNG, so the layout can be
 # looked at rather than assumed. Build with an empty VITE_DATAVERSE_URL first.
 VITE_DATAVERSE_URL= npx vite build --mode development
-node scripts/test/shot3d.mjs out.png
+node scripts/test/shot3d.mjs out.png            # add TERRAIN=1 for the contour layer
+node scripts/test/shotrate.mjs out.png          # the rate-history popover
 
 npm run dataverse:check             # every choice label the app can send is one Dataverse accepts
 npm run dataverse:check-columns     # every displayed column exists in its binding

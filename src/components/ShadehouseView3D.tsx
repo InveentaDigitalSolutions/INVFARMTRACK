@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain } from "lucide-react";
+import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain, Mountain } from "lucide-react";
+import { terrainFall } from "../services/terrain";
 import {
   stateColors,
   potTypeLabels,
@@ -76,6 +77,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   // On by default: a bed you cannot name is a bed you cannot go and find.
   const [showBedNumbers, setShowBedNumbers] = useState(true);
   const [showCompass, setShowCompass] = useState(true);
+  // Off by default: it is reference, and it competes with the bed colours.
+  const [showTopography, setShowTopography] = useState(false);
   // The cloth is the point of a shadehouse, so it is on by default.
   const [showShade, setShowShade] = useState(true);
   const [showWeather, setShowWeather] = useState(true);
@@ -239,6 +242,15 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           Shade
         </button>
         <button
+          onClick={() => setShowTopography((v) => !v)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+            showTopography ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+          }`}
+        >
+          <Mountain className="w-3 h-3" />
+          Terrain
+        </button>
+        <button
           onClick={() => setShowBedNumbers((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
             showBedNumbers ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
@@ -247,6 +259,23 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           <Tag className="w-3 h-3" />
           Bed numbers
         </button>
+
+        {showTopography && (
+          <span className="inline-flex items-center gap-2 ml-auto px-2.5 py-1 rounded-md bg-sand-100 ring-1 ring-sand-300/70">
+            {/* Say what the reader is looking at, and what it is not. The
+                survey covers the whole nursery, so the overlay is stretched
+                onto this block: where the ground is high is right, a distance
+                measured off it is not. */}
+            <span
+              className="w-8 h-2 rounded-sm"
+              style={{ background: "linear-gradient(90deg, rgb(122 148 154), rgb(166 178 150), rgb(198 176 132))" }}
+            />
+            <span className="text-[10px] text-navy-500 whitespace-nowrap">
+              Survey contours · 0.5 m · falls {terrainFall().fall.toFixed(1)} m
+              <span className="text-navy-400"> · indicative, not to scale</span>
+            </span>
+          </span>
+        )}
 
         {showIrrigation && (
           <span className="inline-flex items-center gap-2 ml-auto px-2.5 py-1 rounded-md bg-sky-50 ring-1 ring-sky-200/60">
@@ -317,6 +346,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             showPlotLabels={showPlotLabels}
             showBedNumbers={showBedNumbers}
             showCompass={showCompass}
+            showTopography={showTopography}
             weather={showWeather ? weather : null}
             selectedBedId={selectedBedId}
             onSelect={setSelectedBedId}

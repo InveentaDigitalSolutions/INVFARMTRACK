@@ -200,18 +200,14 @@ invoice prints them as fixed text.
 
 **Decide:** do these vary per box? If so they belong on the packing form.
 
-### PRK-5 · Terrain and contours in the 3D view — **build**
+### PRK-5 · A measurements layer for the 3D view — **build**
 
-The survey gives the shadehouse floor a 3.5 m fall and contours every 0.50 m,
-already extracted to `src/services/terrain.generated.ts`. Nothing reads it yet.
-The floor is drawn flat.
+Bed and road dimensions written on the plan, so the view can be read as a
+drawing rather than only looked at. Asked for; not built.
 
-Worth building as an **additive** layer — a relief exaggeration slider over the
-existing ground plane — and explicitly not as a source of layout. See
-`dataverse/reference/SURVEY.md` for why that distinction is load-bearing.
-
-Alongside it: a measurements layer (bed and road dimensions on the plan), and
-the exchange-rate history chart on hover — both asked for, neither built.
+The two things next to it are done: the **Terrain** layer paints the survey's
+contours flat on the floor (`services/terrain.ts` + `terrainTexture.ts`), and
+the dashboard's rate chip opens its **history** over 3M / 6M / 1Y.
 
 ### PRK-4 · The irrigation layer is simulated — **watching**
 
