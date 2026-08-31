@@ -87,6 +87,7 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_availabilities": "bv_availabilityname",
   "bv_bankaccounts": "bv_bankaccountname",
   "bv_bankstatementlines": "bv_bankstatementlinecode",
+  "bv_basketsizes": "bv_basketsizename",
   "bv_beds": "bv_bedname",
   "bv_bedcompositions": "bv_bedcompositionname",
   "bv_bedcounts": "bv_bedcountname",
@@ -114,7 +115,10 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_orderitems": "bv_orderitemname",
   "bv_packings": "bv_packingcode",
   "bv_payments": "bv_paymentcode",
+  "bv_phenologies": "bv_phenologycode",
   "bv_plants": "bv_plantname",
+  "bv_plantaliases": "bv_plantaliascode",
+  "bv_plantbasketdensities": "bv_plantbasketdensitycode",
   "bv_plantings": "bv_plantingcode",
   "bv_plantprices": "bv_plantpricename",
   "bv_plantsizes": "bv_plantsizecode",
@@ -133,11 +137,7 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_tasks": "bv_taskcode",
   "bv_timesheets": "bv_timesheetname",
   "bv_treatments": "bv_treatmentname",
-  "bv_workers": "bv_workername",
-  "bv_basketsizes": "bv_basketsizename",
-  "bv_plantbasketdensities": "bv_plantbasketdensitycode",
-  "bv_plantaliases": "bv_plantaliascode",
-  "bv_phenologies": "bv_phenologycode"
+  "bv_workers": "bv_workername"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -365,6 +365,32 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "targetSet": "bv_invoices"
     }
   },
+  "bv_phenologies": {
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
+  },
+  "bv_plantaliases": {
+    "_bv_customerid_value": {
+      "nav": "bv_CustomerId",
+      "targetSet": "bv_customers"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
+  },
+  "bv_plantbasketdensities": {
+    "_bv_basketsizeid_value": {
+      "nav": "bv_BasketSizeId",
+      "targetSet": "bv_basketsizes"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
+  },
   "bv_plantings": {
     "_bv_basketsizeid_value": {
       "nav": "bv_BasketSizeId",
@@ -504,32 +530,6 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "nav": "bv_InputId",
       "targetSet": "bv_inputs"
     }
-  },
-  "bv_plantbasketdensities": {
-    "_bv_basketsizeid_value": {
-      "nav": "bv_BasketSizeId",
-      "targetSet": "bv_basketsizes"
-    },
-    "_bv_plantid_value": {
-      "nav": "bv_PlantId",
-      "targetSet": "bv_plants"
-    }
-  },
-  "bv_plantaliases": {
-    "_bv_customerid_value": {
-      "nav": "bv_CustomerId",
-      "targetSet": "bv_customers"
-    },
-    "_bv_plantid_value": {
-      "nav": "bv_PlantId",
-      "targetSet": "bv_plants"
-    }
-  },
-  "bv_phenologies": {
-    "_bv_plantid_value": {
-      "nav": "bv_PlantId",
-      "targetSet": "bv_plants"
-    }
   }
 };
 
@@ -556,6 +556,12 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
     "bv_currency": {
       "HNL": 187460000,
       "USD": 187460001
+    }
+  },
+  "bv_basketsizes": {
+    "bv_shape": {
+      "Round": 187530000,
+      "Square": 187530001
     }
   },
   "bv_beds": {
@@ -875,13 +881,17 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Grafting": 121320003,
       "Tissue Culture": 121320004
     },
-    "bv_shadeneeded": {
-      "Single": 187490000,
-      "Double": 187490001,
-      "Triple": 187490002,
-      "Single & Double": 187490003,
-      "Double & Triple": 187490004,
-      "Single & Double & Triple": 187490005
+    "bv_shademax": {
+      "Full sun": 187490010,
+      "Single": 187490011,
+      "Double": 187490012,
+      "Triple": 187490013
+    },
+    "bv_shademin": {
+      "Full sun": 187490010,
+      "Single": 187490011,
+      "Double": 187490012,
+      "Triple": 187490013
     },
     "bv_soiltype": {
       "Sandy": 121320000,
@@ -900,6 +910,13 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Low": 121320000,
       "Medium": 121320001,
       "High": 121320002
+    }
+  },
+  "bv_plantaliases": {
+    "bv_aliastype": {
+      "Trade name": 187560000,
+      "Breeder code": 187560001,
+      "Customer spelling": 187560002
     }
   },
   "bv_plantings": {
@@ -1072,25 +1089,6 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Supervisor": 187460004,
       "Driver": 187460005,
       "General": 187460006
-    }
-  },
-  "bv_basketsizes": {
-    "bv_shape": {
-      "Round": 187530000,
-      "Square": 187530001
-    }
-  },
-  "bv_plantaliases": {
-    "bv_aliastype": {
-      "Trade name": 187560000,
-      "Breeder code": 187560001,
-      "Customer spelling": 187560002
-    }
-  },
-  "bv_phenologies": {
-    "bv_seasonhalf": {
-      "Mar-Aug": 187570000,
-      "Sep-Feb": 187570001
     }
   }
 };

@@ -53,6 +53,19 @@ interface NumberInputField extends BaseField {
  * and hides the range it is really drawn from. The typed box stays alongside,
  * so the slider is the quick way in and never the only way.
  */
+/**
+ * A control that writes more than one key — a scale with two ends, a pair that
+ * only makes sense together. `render` gets the whole form and sets what it
+ * needs, rather than the single value a normal field owns.
+ */
+interface CustomField extends BaseField {
+  type: "custom";
+  render: (
+    values: Record<string, unknown>,
+    onChange: (key: string, value: unknown) => void
+  ) => React.ReactNode;
+}
+
 interface RangeField extends BaseField {
   type: "range";
   min: number;
@@ -142,6 +155,7 @@ export type FieldDef =
   | MultiSelectField
   | PlantLinesField
   | RangeField
+  | CustomField
   | BedSelectorField;
 
 interface FieldGroupDef {
@@ -221,6 +235,9 @@ function renderField(
                      focus:outline-none focus:ring-2 focus:ring-lime-400/30 focus:border-lime-400 transition-all"
         />
       );
+
+    case "custom":
+      return field.render(values, onChange);
 
     case "range": {
       const n = v === "" || v === null || v === undefined ? null : Number(v);

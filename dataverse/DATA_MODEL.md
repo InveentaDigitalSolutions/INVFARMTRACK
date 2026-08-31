@@ -33,7 +33,7 @@
 |---|---|---|---|---|
 | [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 9 | Physical growing structures in the nursery |
 | [Bed](#bed) | `bv_bed` | `BED-0001` | 12 | Growing beds within batches (Shadehouse > Batch > Bed) |
-| [Plant](#plant) | `bv_plant` | `PLT-0001` | 23 | Plant species, varieties, and patent catalog |
+| [Plant](#plant) | `bv_plant` | `PLT-0001` | 24 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
 | [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
 | [Planting](#planting) | `bv_planting` | `PLG-0001` | 12 | Records of plants placed in beds — central activity hub |
@@ -84,7 +84,7 @@
 | [Basket Size](#basket-size) | `bv_basketsize` | `BSK-{SEQNUM:3}` | 7 | A size of hanging basket the nursery uses. Kept as a table because the sizes change, and because how many fit on a cable is a fact about the basket rather than about any variety. |
 | [Basket Density](#basket-density) | `bv_plantbasketdensity` | `BD-0001` | 5 | How densely one variety is planted in one size of basket. A row per variety and size, because the density differs between them — the ground has a single figure, but a small basket does not fill at the same rate as a large one. |
 | [Plant Alias](#plant-alias) | `bv_plantalias` | `ALS-0001` | 6 | Another name for a variety. Customers order by their own trade names — Summer Nights is Hawaiian, Snowy Morning is Marble Queen, Off to Oz is Neon — and breeders use codes like UF-Ea-0317. Without these, every order import is matched by hand and a near-miss like 'Njoy' against 'N'Joy' goes unnoticed. |
-| [Phenology](#phenology) | `bv_phenology` | `PH-0001` | 10 | How long a variety takes, in one half of the year. A table rather than columns on the plant because the stage itself varies: most varieties are grown to eight leaves, some to three, and a column called 'weeks to 8 leaves' cannot hold that. One row per variety per season. |
+| [Phenology](#phenology) | `bv_phenology` | `PH-0001` | 9 | How long a variety takes and to what stage. One row per variety — the season is not recorded because it is measured: the app knows the light each bed actually received, and a planting in the dark half reaches the same stage later on its own. |
 
 ## Relationships
 
@@ -307,7 +307,8 @@ Plant species, varieties, and patent catalog
 | `bv_imageurl` | Image URL | Text(500) |  | Short text value. Image URL for the Plant. |
 | `bv_isactive` | Is Active | Yes/No |  | Whether the record is currently in use. |
 | `bv_grownin` | Grown In | Choice |  | Where this variety can be grown — the ground, a basket, or both. Some varieties are only ever hung and must never be offered for a ground bed. One of: Ground, Basket, Ground & Basket. |
-| `bv_shadeneeded` | Shade Needed | Choice |  | Layers of 65% cloth this variety needs, and the combinations where more than one will do. Distinct from the shade a bed actually has: this is the requirement, that is the fact. |
+| `bv_shademin` | Shade — least | Choice |  | The least shade this variety will take. Shade is an ordered scale — full sun, then one, two or three layers of 65% cloth — so a variety that will grow under either single or double is a range on it rather than a set of separate answers. One of: Full sun, Single, Double, Triple. |
+| `bv_shademax` | Shade — most | Choice |  | The most shade this variety will take. Equal to the least where only one suits it. One of: Full sun, Single, Double, Triple. |
 | `bv_plantspersqm` | Plants per m² | Decimal(2) |  | Planting density on the ground, in plants per square metre. Held as a density rather than a count per row because the rows are not the same size: an E row is 1.20 x 37.20 m and a C row 1.80 x 37.20, so one count is wrong by half for half the nursery. |
 
 <details><summary>Choice values</summary>
@@ -366,16 +367,23 @@ Plant species, varieties, and patent catalog
 | 187480001 | Basket |
 | 187480002 | Ground & Basket |
 
-**Shade Needed** (`bv_shadeneeded`)
+**Shade — least** (`bv_shademin`)
 
 | Value | Label |
 |---|---|
-| 187490000 | Single |
-| 187490001 | Double |
-| 187490002 | Triple |
-| 187490003 | Single & Double |
-| 187490004 | Double & Triple |
-| 187490005 | Single & Double & Triple |
+| 187490010 | Full sun |
+| 187490011 | Single |
+| 187490012 | Double |
+| 187490013 | Triple |
+
+**Shade — most** (`bv_shademax`)
+
+| Value | Label |
+|---|---|
+| 187490010 | Full sun |
+| 187490011 | Single |
+| 187490012 | Double |
+| 187490013 | Triple |
 
 </details>
 
@@ -2281,7 +2289,7 @@ Another name for a variety. Customers order by their own trade names — Summer 
 
 `bv_phenology` · User-owned
 
-How long a variety takes, in one half of the year. A table rather than columns on the plant because the stage itself varies: most varieties are grown to eight leaves, some to three, and a column called 'weeks to 8 leaves' cannot hold that. One row per variety per season.
+How long a variety takes and to what stage. One row per variety — the season is not recorded because it is measured: the app knows the light each bed actually received, and a planting in the dark half reaches the same stage later on its own.
 
 **Record ID:** `bv_phenologycode` — format `PH-{SEQNUM:4}`, e.g. `PH-0001`.
 
@@ -2289,22 +2297,10 @@ How long a variety takes, in one half of the year. A table rather than columns o
 |---|---|---|:--:|---|
 | `bv_phenologycode` 🔑 | Phenology ID | Autonumber | ✓ | Auto-generated identifier, format PH-0001. |
 | `bv_plantid` | Plant | Lookup → [Plant](#plant) | ✓ | The variety these figures describe. |
-| `bv_seasonhalf` | Season | Choice | ✓ | Which half of the year. The same cutting takes longer in the dark half — measured daylight here is 45.3 mol/m2 a day from March to August against 34.7 from September to February. One of: Mar-Aug, Sep-Feb. |
 | `bv_targetleaves` | Grown to (leaves) | Whole number |  | The leaf count this variety is grown to before it is cut. Eight for most, three for some — which is why it is a field and not a heading. |
-| `bv_growthweeksmin` | Growth weeks (from) | Whole number |  | Weeks from planting to that leaf count, fastest. |
-| `bv_growthweeksmax` | Growth weeks (to) | Whole number |  | Weeks from planting to that leaf count, slowest. |
+| `bv_growthweeksmin` | Growth weeks (from) | Whole number |  | Weeks from planting to that leaf count in a normal year, fastest. The seasonal difference comes from measured light, not from a second row. |
+| `bv_growthweeksmax` | Growth weeks (to) | Whole number |  | Weeks from planting to that leaf count in a normal year, slowest. |
 | `bv_harvestweeks` | Harvest every (weeks) | Whole number |  | Weeks between cuts once the plant is at that stage. |
 | `bv_prunetoleaves` | Pruned back to (leaves) | Whole number |  | The leaf count it is cut back to. Two on the current table, but no more fixed than the target. |
 | `bv_pruningweeks` | Recovery after pruning (weeks) | Whole number |  | Weeks to grow back from the pruned stage to the target one. |
 | `bv_notes` | Notes | Text area(2000) |  |  |
-
-<details><summary>Choice values</summary>
-
-**Season** (`bv_seasonhalf`)
-
-| Value | Label |
-|---|---|
-| 187570000 | Mar-Aug |
-| 187570001 | Sep-Feb |
-
-</details>

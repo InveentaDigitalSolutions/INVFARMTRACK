@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Sprout, Leaf, Bug, Droplets, Scissors} from "lucide-react";
 import PageShell from "../components/PageShell";
 import CapacityPreview from "../components/CapacityPreview";
+import ShadeScale from "../components/ShadeScale";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
 import Badge from "../components/Badge";
@@ -315,11 +316,16 @@ const plantFields = [
     // Multi-select, because a variety may take more than one. The combinations
     // exist as their own choice values, so "Single & Double" is stored as one
     // label rather than needing to be taken apart and put back together.
-    { key: "shadeNeeded", label: "Shade Needed", type: "toggle" as const, multi: true, options: [
-      { value: "Single", label: "Single · 65%" },
-      { value: "Double", label: "Double · 87.75%" },
-      { value: "Triple", label: "Triple · 95.71%" },
-    ] },
+    // Shade is an ordered scale, so it is one control writing two ends rather
+    // than a set of independent boxes. Full sun is the zero of it.
+    { key: "shadeMin", label: "Shade needed", type: "custom" as const, span: 2 as const,
+      render: (v: Record<string, unknown>, set: (k: string, value: unknown) => void) => (
+        <ShadeScale
+          min={v.shadeMin}
+          max={v.shadeMax}
+          onChange={(lo, hi) => { set("shadeMin", lo); set("shadeMax", hi); }}
+        />
+      ) },
     /**
      * Density, not a count per row.
      *

@@ -64,7 +64,10 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // Where it may be grown, and what it needs over it. The bed records what
       // it actually has; these two record what the variety asks for.
       grownIn: "bv_grownin",
-      shadeNeeded: "bv_shadeneeded",
+      // Two ends of an ordered scale — full sun through triple — because a
+      // variety that takes single or double is describing a range on it.
+      shadeMin: "bv_shademin",
+      shadeMax: "bv_shademax",
       // Production knowledge lives in its own table now: the stage varies —
       // most varieties are grown to eight leaves, some to three — so it cannot
       // be columns named after one of them.

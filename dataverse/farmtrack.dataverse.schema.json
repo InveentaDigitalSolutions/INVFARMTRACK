@@ -566,37 +566,54 @@
           "description": "Where this variety can be grown \u2014 the ground, a basket, or both. Some varieties are only ever hung and must never be offered for a ground bed. One of: Ground, Basket, Ground & Basket."
         },
         {
-          "schemaName": "bv_ShadeNeeded",
-          "displayName": "Shade Needed",
+          "schemaName": "bv_ShadeMin",
+          "displayName": "Shade \u2014 least",
           "type": "choice",
           "required": false,
           "options": [
             {
-              "value": 187490000,
+              "value": 187490010,
+              "label": "Full sun"
+            },
+            {
+              "value": 187490011,
               "label": "Single"
             },
             {
-              "value": 187490001,
+              "value": 187490012,
               "label": "Double"
             },
             {
-              "value": 187490002,
+              "value": 187490013,
               "label": "Triple"
-            },
-            {
-              "value": 187490003,
-              "label": "Single & Double"
-            },
-            {
-              "value": 187490004,
-              "label": "Double & Triple"
-            },
-            {
-              "value": 187490005,
-              "label": "Single & Double & Triple"
             }
           ],
-          "description": "Layers of 65% cloth this variety needs, and the combinations where more than one will do. Distinct from the shade a bed actually has: this is the requirement, that is the fact."
+          "description": "The least shade this variety will take. Shade is an ordered scale \u2014 full sun, then one, two or three layers of 65% cloth \u2014 so a variety that will grow under either single or double is a range on it rather than a set of separate answers. One of: Full sun, Single, Double, Triple."
+        },
+        {
+          "schemaName": "bv_ShadeMax",
+          "displayName": "Shade \u2014 most",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187490010,
+              "label": "Full sun"
+            },
+            {
+              "value": 187490011,
+              "label": "Single"
+            },
+            {
+              "value": 187490012,
+              "label": "Double"
+            },
+            {
+              "value": 187490013,
+              "label": "Triple"
+            }
+          ],
+          "description": "The most shade this variety will take. Equal to the least where only one suits it. One of: Full sun, Single, Double, Triple."
         },
         {
           "schemaName": "bv_PlantsPerSqM",
