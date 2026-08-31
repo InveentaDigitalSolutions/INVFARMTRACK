@@ -50,11 +50,15 @@ const catalogViews = [
   // is reference data typed once and read constantly, the same reason Seasons
   // is here rather than under Accounting.
   { id: "sizes", label: "Sizes & Packing" },
+  // Density in a basket is per variety AND per size — a small basket does not
+  // fill at the same rate as a large one — so it cannot live on the plant.
+  { id: "basketDensity", label: "Basket Density" },
   { id: "seasons", label: "Seasons" },
 ] as const;
 
 // Initial data
 const initPlantSizes: Record<string, unknown>[] = [];
+const initBasketDensities: Record<string, unknown>[] = [];
 const initPlantings: PlantingsRow[] = [];
 const initTreatments: TreatmentsRow[] = [];
 const initIrrigation: IrrigationRow[] = [];
@@ -89,6 +93,11 @@ const plantingFields = [
     // Every line becomes its own planting record.
     { key: "lines", label: "Plants and quantities", type: "plantlines" as const,
       options: plantOptionsFallback, optionsFrom: "plants", required: true, span: 2 as const },
+    // Which size went in. It is what decides the density, and so how many
+    // plants that cable holds — so it is asked at planting, not inferred.
+    { key: "basketSize", label: "Basket Size", type: "select" as const,
+      options: [], optionsFrom: "basketSizes",
+      placeholder: "only for a basket bed" },
     { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons", required: true },
     { key: "date", label: "Planting Date", type: "date" as const, required: true },
     // Baskets carry hanging pots in two shapes; the 3D view renders each.
@@ -196,6 +205,20 @@ const pruningFields = [
  * than the variety name: "Neon" is both a Pothos and a Philodendron, and a form
  * that matched on the name would quietly merge the two.
  */
+const basketDensityFields = [
+  { title: "Which variety, in which basket", columns: 2 as const, fields: [
+    { key: "code", label: "Density ID", type: "text" as const, readOnly: true, placeholder: "BD-0001 (auto)" },
+    { key: "plant", label: "Plant", type: "select" as const, required: true, options: [], optionsFrom: "plants" },
+    { key: "basketSize", label: "Basket Size", type: "select" as const, required: true,
+      options: [], optionsFrom: "basketSizes" },
+    // The same figure the ground uses, counted the same way — but for this
+    // size of basket, because they do not fill at the same rate.
+    { key: "plantsPerSqM", label: "Plants per m²", type: "number" as const, min: 0, required: true,
+      suffix: "per m²" },
+    { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
+  ]},
+];
+
 const plantSizeFields = [
   { title: "Which product", columns: 2 as const, fields: [
     { key: "code", label: "Size ID", type: "text" as const, readOnly: true, placeholder: "PS-0001 (auto)" },
@@ -278,18 +301,11 @@ const plantFields = [
     // One density for everything, because it is what the nursery counts when
     // it plants. A ground row multiplies it by width x length; a cable by the
     // area of a basket times how many hang on it.
-    { key: "plantsPerSqM", label: "Plants per m²", type: "number" as const, min: 0, span: 2 as const,
+    { key: "plantsPerSqM", label: "Plants per m² (ground)", type: "number" as const, min: 0, span: 2 as const,
       suffix: "per m²",
-      below: (v: Record<string, unknown>) => (
-        <>
-          {String(v.grownIn ?? "").includes("Ground") && (
-            <CapacityPreview plant={{ plantsPerSqM: Number(v.plantsPerSqM) }} />
-          )}
-          {String(v.grownIn ?? "").includes("Basket") && (
-            <CapacityPreview plant={{ plantsPerSqM: Number(v.plantsPerSqM) }} kind="basket" />
-          )}
-        </>
-      ) },
+      showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Ground"),
+      below: (v: Record<string, unknown>) =>
+        <CapacityPreview plant={{ plantsPerSqM: Number(v.plantsPerSqM) }} /> },
   ]},
   /**
    * Production knowledge, and it is genuinely per variety — the figures happen
@@ -421,6 +437,7 @@ export default function ProductionPage() {
   const { elementsFor, hasCompositions } = useInputNutrients();
   const [plants, setPlants] = useRecords("plants", initPlants);
   const [plantSizes, setPlantSizes] = useRecords("plantSizes", initPlantSizes);
+  const [basketDensities, setBasketDensities] = useRecords("basketDensities", initBasketDensities);
 
   /** Names a new season from its start date; an existing one keeps its name. */
   const saveSeason = (values: Record<string, unknown>) => {
@@ -443,6 +460,7 @@ export default function ProductionPage() {
   const fertilizationForm = useFormModal(initFertilization[0]);
   const plantForm = useFormModal(initPlants[0]);
   const plantSizeForm = useFormModal(initPlantSizes[0]);
+  const basketDensityForm = useFormModal(initBasketDensities[0]);
   const seasonForm = useFormModal(initSeasons[0]);
   const confirm = useConfirmDialog();
 
@@ -806,6 +824,45 @@ export default function ProductionPage() {
               open={confirm.open} onClose={confirm.close} title="Delete Size"
               message="Remove this size from the catalogue?"
               onConfirm={() => handleDelete(plantSizes, setPlantSizes)}
+            />
+          </>
+        );
+      case "basketDensity":
+        return (
+          <>
+            <div className="mb-3 text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3.5 py-2.5">
+              How densely each variety is planted in each size of basket. The
+              basket's own measurements — width and how many fit on a cable —
+              live under <b>Infrastructure → Basket Sizes</b>; together they give
+              the capacity of a cable.
+            </div>
+            <DataTable
+              columns={[
+                { key: "plant", label: "Plant" },
+                { key: "basketSize", label: "Basket Size" },
+                { key: "plantsPerSqM", label: "Per m²", render: (r) => (
+                  <span className="font-mono tabular-nums text-navy-700">{String(r.plantsPerSqM ?? "—")}</span>
+                ) },
+                { key: "notes", label: "Notes" },
+              ]}
+              data={basketDensities}
+              onAdd={basketDensityForm.openCreate}
+              onEdit={(row, i) => basketDensityForm.openEdit(row as any, i)}
+              onDelete={(row, i) => confirm.requestDelete(row, i)}
+              addLabel="Add Density"
+              searchPlaceholder="Search densities..."
+            />
+            <FormModal
+              open={basketDensityForm.open} onClose={basketDensityForm.close}
+              title={basketDensityForm.isEdit ? "Edit Basket Density" : "Add Basket Density"}
+              groups={basketDensityFields} values={basketDensityForm.values}
+              onChange={basketDensityForm.onChange} isEdit={basketDensityForm.isEdit}
+              onSubmit={(v) => handleSave(basketDensities, setBasketDensities, basketDensityForm, v)}
+            />
+            <ConfirmDialog
+              open={confirm.open} onClose={confirm.close} title="Delete Density"
+              message="Remove this basket density?"
+              onConfirm={() => handleDelete(basketDensities, setBasketDensities)}
             />
           </>
         );

@@ -11,26 +11,12 @@ import { capacityByField, type PlantDensity } from "../services/bedCapacity";
 
 export interface CapacityPreviewProps {
   plant: PlantDensity;
-  kind?: "ground" | "basket";
 }
 
-export default function CapacityPreview({ plant, kind = "ground" }: CapacityPreviewProps) {
-  const rows = capacityByField(plant, kind);
+export default function CapacityPreview({ plant }: CapacityPreviewProps) {
+  const rows = capacityByField(plant);
   const anything = rows.some((r) => r.perRow !== null);
 
-  // A density is entered but the baskets have not been measured, so nothing can
-  // be worked out. Say that, rather than showing nothing and letting it read as
-  // "no baskets".
-  if (!anything && kind === "basket" && Number(plant.plantsPerSqM) > 0) {
-    return (
-      <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200/70 px-3 py-2">
-        <p className="text-[11px] text-amber-900">
-          Basket capacity needs the basket measured — width across the top and
-          the spacing along the cable. Not recorded yet.
-        </p>
-      </div>
-    );
-  }
   if (!anything) return null;
 
   const total = rows.reduce((sum, r) => sum + (r.perField ?? 0), 0);
@@ -38,7 +24,7 @@ export default function CapacityPreview({ plant, kind = "ground" }: CapacityPrev
   return (
     <div className="mt-2 rounded-lg bg-sand-50 border border-sand-200 px-3 py-2">
       <p className="text-[10px] uppercase tracking-[0.09em] text-navy-400 mb-1.5">
-        {kind === "ground" ? "That works out as" : "Per cable, that is"}
+        On the ground that works out as
       </p>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         {rows.map((r) => (
@@ -46,13 +32,12 @@ export default function CapacityPreview({ plant, kind = "ground" }: CapacityPrev
             <b className="font-semibold text-navy-800">{r.fieldId}</b>{" "}
             {r.perRow?.toLocaleString() ?? "—"}
             <span className="text-navy-400">
-              {" "}per {kind === "ground" ? "row" : "cable"}
-              {kind === "ground" && ` · ${r.widthM}×${r.lengthM} m`}
+              {" "}per row · {r.widthM}×{r.lengthM} m
             </span>
           </span>
         ))}
       </div>
-      {kind === "ground" && total > 0 && (
+      {total > 0 && (
         <p className="text-[10px] text-navy-400 mt-1.5">
           {total.toLocaleString()} plants if every ground bed carried this variety.
         </p>

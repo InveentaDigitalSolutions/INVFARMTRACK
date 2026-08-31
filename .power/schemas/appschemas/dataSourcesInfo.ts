@@ -26,6 +26,20 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_plantbasketdensities": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_plantbasketdensityid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
+  "bv_basketsizes": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_basketsizeid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_bedcapacities": {
     "tableId": "",
     "version": "",

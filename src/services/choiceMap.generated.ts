@@ -17,6 +17,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_availabilities",
   "bv_bankaccounts",
   "bv_bankstatementlines",
+  "bv_basketsizes",
   "bv_bedcompositions",
   "bv_bedcounts",
   "bv_beds",
@@ -44,6 +45,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_orders",
   "bv_packings",
   "bv_payments",
+  "bv_plantbasketdensities",
   "bv_plantings",
   "bv_plantprices",
   "bv_plants",
@@ -104,6 +106,7 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_inputcomponents": "bv_inputcomponentcode",
   "bv_invoices": "bv_invoicenumber",
   "bv_irrigations": "bv_irrigationname",
+  "bv_materials": "bv_materialname",
   "bv_nutrientbalances": "bv_nutrientbalancename",
   "bv_orders": "bv_ordernumber",
   "bv_orderitems": "bv_orderitemname",
@@ -112,24 +115,25 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_plants": "bv_plantname",
   "bv_plantings": "bv_plantingcode",
   "bv_plantprices": "bv_plantpricename",
+  "bv_plantsizes": "bv_plantsizecode",
+  "bv_ports": "bv_portname",
   "bv_prunings": "bv_pruningname",
   "bv_pruningcurves": "bv_pruningcurvename",
   "bv_purchaseorders": "bv_ponumber",
   "bv_seasons": "bv_seasonname",
   "bv_shadehouses": "bv_shadehousename",
+  "bv_shipments": "bv_shipmentcode",
   "bv_soilanalysises": "bv_soilanalysisname",
+  "bv_solarradiations": "bv_solarradiationcode",
+  "bv_stockmovements": "bv_stockmovementname",
   "bv_substratematerials": "bv_substratematerialname",
   "bv_suppliers": "bv_suppliername",
   "bv_tasks": "bv_taskcode",
   "bv_timesheets": "bv_timesheetname",
   "bv_treatments": "bv_treatmentname",
   "bv_workers": "bv_workername",
-  "bv_materials": "bv_materialname",
-  "bv_stockmovements": "bv_stockmovementname",
-  "bv_shipments": "bv_shipmentcode",
-  "bv_solarradiations": "bv_solarradiationcode",
-  "bv_plantsizes": "bv_plantsizecode",
-  "bv_ports": "bv_portname"
+  "bv_basketsizes": "bv_basketsizename",
+  "bv_plantbasketdensities": "bv_plantbasketdensitycode"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -277,6 +281,12 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "targetSet": "bv_beds"
     }
   },
+  "bv_materials": {
+    "_bv_supplierid_value": {
+      "nav": "bv_SupplierId",
+      "targetSet": "bv_suppliers"
+    }
+  },
   "bv_nutrientbalances": {
     "_bv_bedid_value": {
       "nav": "bv_BedId",
@@ -348,6 +358,10 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     }
   },
   "bv_plantings": {
+    "_bv_basketsizeid_value": {
+      "nav": "bv_BasketSizeId",
+      "targetSet": "bv_basketsizes"
+    },
     "_bv_bedid_value": {
       "nav": "bv_BedId",
       "targetSet": "bv_beds"
@@ -383,6 +397,12 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "targetSet": "bv_seasons"
     }
   },
+  "bv_plantsizes": {
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
+  },
   "bv_prunings": {
     "_bv_bedid_value": {
       "nav": "bv_BedId",
@@ -409,10 +429,42 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "targetSet": "bv_suppliers"
     }
   },
+  "bv_shipments": {
+    "_bv_customerid_value": {
+      "nav": "bv_CustomerId",
+      "targetSet": "bv_customers"
+    },
+    "_bv_invoiceid_value": {
+      "nav": "bv_InvoiceId",
+      "targetSet": "bv_invoices"
+    },
+    "_bv_orderid_value": {
+      "nav": "bv_OrderId",
+      "targetSet": "bv_orders"
+    }
+  },
   "bv_soilanalysises": {
     "_bv_bedid_value": {
       "nav": "bv_BedId",
       "targetSet": "bv_beds"
+    }
+  },
+  "bv_stockmovements": {
+    "_bv_bedid_value": {
+      "nav": "bv_BedId",
+      "targetSet": "bv_beds"
+    },
+    "_bv_inputid_value": {
+      "nav": "bv_InputId",
+      "targetSet": "bv_inputs"
+    },
+    "_bv_materialid_value": {
+      "nav": "bv_MaterialId",
+      "targetSet": "bv_materials"
+    },
+    "_bv_purchaseorderid_value": {
+      "nav": "bv_PurchaseOrderId",
+      "targetSet": "bv_purchaseorders"
     }
   },
   "bv_tasks": {
@@ -445,45 +497,11 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "targetSet": "bv_inputs"
     }
   },
-  "bv_materials": {
-    "_bv_supplierid_value": {
-      "nav": "bv_SupplierId",
-      "targetSet": "bv_suppliers"
-    }
-  },
-  "bv_stockmovements": {
-    "_bv_bedid_value": {
-      "nav": "bv_BedId",
-      "targetSet": "bv_beds"
+  "bv_plantbasketdensities": {
+    "_bv_basketsizeid_value": {
+      "nav": "bv_BasketSizeId",
+      "targetSet": "bv_basketsizes"
     },
-    "_bv_inputid_value": {
-      "nav": "bv_InputId",
-      "targetSet": "bv_inputs"
-    },
-    "_bv_materialid_value": {
-      "nav": "bv_MaterialId",
-      "targetSet": "bv_materials"
-    },
-    "_bv_purchaseorderid_value": {
-      "nav": "bv_PurchaseOrderId",
-      "targetSet": "bv_purchaseorders"
-    }
-  },
-  "bv_shipments": {
-    "_bv_customerid_value": {
-      "nav": "bv_CustomerId",
-      "targetSet": "bv_customers"
-    },
-    "_bv_invoiceid_value": {
-      "nav": "bv_InvoiceId",
-      "targetSet": "bv_invoices"
-    },
-    "_bv_orderid_value": {
-      "nav": "bv_OrderId",
-      "targetSet": "bv_orders"
-    }
-  },
-  "bv_plantsizes": {
     "_bv_plantid_value": {
       "nav": "bv_PlantId",
       "targetSet": "bv_plants"
@@ -724,6 +742,29 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Aborted": 121320103
     }
   },
+  "bv_materials": {
+    "bv_category": {
+      "Irrigation": 187460000,
+      "Packaging": 187460001,
+      "Structure & Shade": 187460002,
+      "Plumbing": 187460003,
+      "Tools & Equipment": 187460004,
+      "Substrate & Pots": 187460005,
+      "Consumables": 187460006,
+      "Other": 187460007
+    },
+    "bv_unit": {
+      "Each": 187460000,
+      "Metre": 187460001,
+      "Roll": 187460002,
+      "Box": 187460003,
+      "Sack": 187460004,
+      "Kilogram": 187460005,
+      "Litre": 187460006,
+      "Pair": 187460007,
+      "Set": 187460008
+    }
+  },
   "bv_orders": {
     "bv_status": {
       "Draft": 187460000,
@@ -841,6 +882,25 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Propagation": 121320001
     }
   },
+  "bv_plantsizes": {
+    "bv_cuttingtype": {
+      "L&E": 187520000,
+      "E": 187520001,
+      "Bulbs": 187520002,
+      "Tips": 187520003
+    },
+    "bv_producttype": {
+      "URC": 187510000,
+      "RC": 187510001
+    },
+    "bv_size": {
+      "Large": 187500000,
+      "Regular": 187500001,
+      "California": 187500002,
+      "Small": 187500003,
+      "Petit": 187500004
+    }
+  },
   "bv_purchaseorders": {
     "bv_currency": {
       "HNL": 187460000,
@@ -852,6 +912,32 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Confirmed": 187460002,
       "Received": 187460003,
       "Cancelled": 187460004
+    }
+  },
+  "bv_shipments": {
+    "bv_status": {
+      "Draft": 187460000,
+      "Packing": 187460001,
+      "Packed": 187460002,
+      "Shipped": 187460003,
+      "Delivered": 187460004,
+      "Cancelled": 187460005
+    }
+  },
+  "bv_solarradiations": {
+    "bv_radiationsource": {
+      "Open-Meteo": 187470000,
+      "Manual": 187470001
+    }
+  },
+  "bv_stockmovements": {
+    "bv_type": {
+      "Received": 187460000,
+      "Issued": 187460001,
+      "Returned": 187460002,
+      "Written off": 187460003,
+      "Adjustment up": 187460004,
+      "Adjustment down": 187460005
     }
   },
   "bv_substratematerials": {
@@ -950,72 +1036,10 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "General": 187460006
     }
   },
-  "bv_materials": {
-    "bv_category": {
-      "Irrigation": 187460000,
-      "Packaging": 187460001,
-      "Structure & Shade": 187460002,
-      "Plumbing": 187460003,
-      "Tools & Equipment": 187460004,
-      "Substrate & Pots": 187460005,
-      "Consumables": 187460006,
-      "Other": 187460007
-    },
-    "bv_unit": {
-      "Each": 187460000,
-      "Metre": 187460001,
-      "Roll": 187460002,
-      "Box": 187460003,
-      "Sack": 187460004,
-      "Kilogram": 187460005,
-      "Litre": 187460006,
-      "Pair": 187460007,
-      "Set": 187460008
-    }
-  },
-  "bv_stockmovements": {
-    "bv_type": {
-      "Received": 187460000,
-      "Issued": 187460001,
-      "Returned": 187460002,
-      "Written off": 187460003,
-      "Adjustment up": 187460004,
-      "Adjustment down": 187460005
-    }
-  },
-  "bv_shipments": {
-    "bv_status": {
-      "Draft": 187460000,
-      "Packing": 187460001,
-      "Packed": 187460002,
-      "Shipped": 187460003,
-      "Delivered": 187460004,
-      "Cancelled": 187460005
-    }
-  },
-  "bv_solarradiations": {
-    "bv_radiationsource": {
-      "Open-Meteo": 187470000,
-      "Manual": 187470001
-    }
-  },
-  "bv_plantsizes": {
-    "bv_cuttingtype": {
-      "L&E": 187520000,
-      "E": 187520001,
-      "Bulbs": 187520002,
-      "Tips": 187520003
-    },
-    "bv_producttype": {
-      "URC": 187510000,
-      "RC": 187510001
-    },
-    "bv_size": {
-      "Large": 187500000,
-      "Regular": 187500001,
-      "California": 187500002,
-      "Small": 187500003,
-      "Petit": 187500004
+  "bv_basketsizes": {
+    "bv_shape": {
+      "Round": 187530000,
+      "Square": 187530001
     }
   }
 };

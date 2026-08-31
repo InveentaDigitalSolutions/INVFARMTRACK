@@ -34,32 +34,6 @@ export const POSTS_ACROSS_BEDS = 19;
 /** Nursery uses both round and square hanging pots; the shape is per planting. */
 export type PotType = "round" | "square";
 
-/**
- * The hanging baskets, measured.
- *
- * Capacity works the same way everywhere: plants per square metre — which the
- * nursery counts when planting — times the area available. A ground row's area
- * is its width by its length. A cable's is the area of one basket times the
- * number of baskets hanging on it, because a basket is a small area and a cable
- * is a series of them.
- *
- * Null until the baskets are measured. Left null on purpose rather than filled
- * with a plausible figure: a made-up basket size would produce a confident
- * capacity for every hanging variety in the nursery, and nothing on screen
- * would say it was invented.
- */
-export interface BasketGeometry {
-  /** Across the top, in metres — the diameter of a round one, the side of a square. */
-  widthM: number;
-  /** Centre to centre along the cable, in metres. Decides how many fit. */
-  pitchM: number;
-}
-
-export const BASKET_GEOMETRY: Record<PotType, BasketGeometry | null> = {
-  round: null,
-  square: null,
-};
-
 export const potTypeLabels: Record<PotType, string> = {
   round: "Round",
   square: "Square",

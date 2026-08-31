@@ -21,11 +21,33 @@ const tabs = [
   { id: "shadehouses", label: "Shadehouses" },
   { id: "fields", label: "Fields" },
   { id: "beds", label: "Beds" },
+  // The physical baskets, beside the beds and fields — kit, not catalogue. How
+  // densely each variety fills one is per variety and lives under
+  // Production → Catalog → Basket Density.
+  { id: "basketSizes", label: "Basket Sizes" },
+];
+
+const basketSizeFields = [
+  { title: "Basket", columns: 2 as const, fields: [
+    { key: "code", label: "Basket Size ID", type: "text" as const, readOnly: true, placeholder: "BSK-001 (auto)" },
+    { key: "name", label: "Name", type: "text" as const, required: true, placeholder: "Small, Large, 8 inch" },
+    // Round uses the circle inside the width and square the whole square — a
+    // fifth of the area between them, so it is asked rather than assumed.
+    { key: "shape", label: "Shape", type: "toggle" as const, options: [
+      { value: "Round", label: "Round" }, { value: "Square", label: "Square" },
+    ] },
+    { key: "widthCm", label: "Width across the top", type: "number" as const, min: 0, suffix: "cm" },
+    // Counted, not worked out from a spacing: the nursery knows it directly.
+    { key: "basketsPerCable", label: "Baskets per cable", type: "number" as const, min: 1 },
+    { key: "active", label: "In use", type: "boolean" as const },
+    { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
+  ]},
 ];
 
 const initShadehouses: ShadehousesRow[] = [];
 const initFieldes: FieldsRow[] = [];
 const initBeds: BedsRow[] = [];
+const initBasketSizes: Record<string, unknown>[] = [];
 
 // No fallback lists. Both come from the live tables through `optionsFrom`;
 // the value must be the NAME, since that is what a bed's lookup resolves
@@ -219,6 +241,7 @@ export default function InfrastructurePage() {
   const [shadehouses, setShadehouses] = useRecords("shadehouses", initShadehouses);
   const [fields, setFieldes] = useRecords("fields", initFieldes);
   const [beds, setBeds] = useRecords("beds", initBeds);
+  const [basketSizes, setBasketSizes] = useRecords("basketSizes", initBasketSizes);
   // Read-only here: which beds carry a crop is the other half of "how much of
   // the nursery is in use", and it lives on the planting, not the bed.
   const [plantings] = useRecords<PlantingsRow>("plantings", []);
@@ -419,6 +442,7 @@ export default function InfrastructurePage() {
   const shForm = useFormModal(initShadehouses[0]);
   const fieldForm = useFormModal(initFieldes[0]);
   const bedForm = useFormModal(initBeds[0]);
+  const basketSizeForm = useFormModal(initBasketSizes[0]);
   const confirm = useConfirmDialog();
 
   const save = (data: any[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
@@ -498,6 +522,54 @@ export default function InfrastructurePage() {
             ]} data={fields} onAdd={fieldForm.openCreate} onEdit={(r, i) => fieldForm.openEdit(r as any, i)} onDelete={(r, i) => confirm.requestDelete(r, i)} addLabel="Add Field" searchPlaceholder="Search fields..." />
             <FormModal open={fieldForm.open} onClose={fieldForm.close} title={fieldForm.isEdit ? "Edit Field" : "Add Field"} groups={fieldFormGroups} values={fieldForm.values} onChange={fieldForm.onChange} isEdit={fieldForm.isEdit} onSubmit={(v) => saveField(v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Field" message="Delete this field?" onConfirm={() => del(fields, setFieldes)} />
+          </>
+        );
+      case "basketSizes":
+        return (
+          <>
+            <div className="mb-3 text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3.5 py-2.5">
+              The baskets themselves. Width and shape give the area a planting
+              density is multiplied by; baskets per cable turns that into the
+              capacity of a whole cable. How densely each variety fills one is
+              per variety, under <b>Production → Catalog → Basket Density</b>.
+            </div>
+            <DataTable
+              columns={[
+                { key: "name", label: "Name" },
+                { key: "shape", label: "Shape", render: (r) => (
+                  <Badge variant="blue">{String(r.shape ?? "—")}</Badge>
+                ) },
+                { key: "widthCm", label: "Width", render: (r) => (
+                  <span className="font-mono tabular-nums text-navy-700">
+                    {r.widthCm ? `${r.widthCm} cm` : "—"}
+                  </span>
+                ) },
+                { key: "basketsPerCable", label: "Per cable" },
+                { key: "active", label: "In use", render: (r) => (
+                  <Badge variant={r.active === false ? "gray" : "green"}>
+                    {r.active === false ? "No" : "Yes"}
+                  </Badge>
+                ) },
+              ]}
+              data={basketSizes}
+              onAdd={basketSizeForm.openCreate}
+              onEdit={(row, i) => basketSizeForm.openEdit(row as any, i)}
+              onDelete={(row, i) => confirm.requestDelete(row, i)}
+              addLabel="Add Basket Size"
+              searchPlaceholder="Search basket sizes..."
+            />
+            <FormModal
+              open={basketSizeForm.open} onClose={basketSizeForm.close}
+              title={basketSizeForm.isEdit ? "Edit Basket Size" : "Add Basket Size"}
+              groups={basketSizeFields} values={basketSizeForm.values}
+              onChange={basketSizeForm.onChange} isEdit={basketSizeForm.isEdit}
+              onSubmit={(v) => save(basketSizes, setBasketSizes, basketSizeForm, v)}
+            />
+            <ConfirmDialog
+              open={confirm.open} onClose={confirm.close} title="Delete Basket Size"
+              message="Remove this basket size?"
+              onConfirm={() => del(basketSizes, setBasketSizes)}
+            />
           </>
         );
       case "beds":

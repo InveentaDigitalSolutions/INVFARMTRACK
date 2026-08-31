@@ -239,6 +239,16 @@
           "entitySetName": "bv_solarradiations",
           "logicalName": "bv_solarradiation",
           "isHidden": false
+        },
+        "basketsizes": {
+          "entitySetName": "bv_basketsizes",
+          "logicalName": "bv_basketsize",
+          "isHidden": false
+        },
+        "basketdensities": {
+          "entitySetName": "bv_plantbasketdensities",
+          "logicalName": "bv_plantbasketdensity",
+          "isHidden": false
         }
       }
     }

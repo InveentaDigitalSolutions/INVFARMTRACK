@@ -388,7 +388,7 @@ export interface PlantingsRow {
   season?: string;
   position?: string;
   purpose?: string;
-  current?: string;
+  endDate?: string;
   primaryName?: string;
   [key: string]: unknown;
 }
@@ -403,8 +403,7 @@ export interface PlantsRow {
   patentNum?: string;
   patentHolder?: string;
   patentExpiry?: string;
-  plantsPerBed?: number;
-  plantsPerBasketRow?: number;
+  plantsPerSqM?: number;
   grownIn?: string;
   shadeNeeded?: string;
   growthWeeksMinMarAug?: number;

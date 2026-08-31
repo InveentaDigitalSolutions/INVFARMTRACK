@@ -9,9 +9,9 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 50 |
-| Columns | 610 |
-| Relationships | 72 |
+| Tables | 52 |
+| Columns | 622 |
+| Relationships | 75 |
 
 ## Conventions
 
@@ -33,10 +33,10 @@
 |---|---|---|---|---|
 | [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 9 | Physical growing structures in the nursery |
 | [Bed](#bed) | `bv_bed` | `BED-0001` | 12 | Growing beds within batches (Shadehouse > Batch > Bed) |
-| [Plant](#plant) | `bv_plant` | `PLT-0001` | 32 | Plant species, varieties, and patent catalog |
+| [Plant](#plant) | `bv_plant` | `PLT-0001` | 31 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
 | [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
-| [Planting](#planting) | `bv_planting` | `PLG-0001` | 11 | Records of plants placed in beds — central activity hub |
+| [Planting](#planting) | `bv_planting` | `PLG-0001` | 12 | Records of plants placed in beds — central activity hub |
 | [Input](#input) | `bv_input` | `INP-0001` | 14 | Catalog of fertilizers, pesticides, and other inputs |
 | [Treatment](#treatment) | `bv_treatment` | `TRT-0001` | 14 | Treatment/fumigation applications to plantings |
 | [Irrigation](#irrigation) | `bv_irrigation` | `IRR-0001` | 12 | Watering events for plantings |
@@ -81,6 +81,8 @@
 | [Solar Radiation](#solar-radiation) | `bv_solarradiation` | `SR-{SEQNUM:5}` | 5 | Measured shortwave radiation for one day at the nursery. Kept as history for the same reason the exchange rate is: the light a planting actually received is a fact about the past, and the weather service only offers a 92-day window. Without this, a crop older than that accumulates on clear-sky assumptions. |
 | [Plant Size](#plant-size) | `bv_plantsize` | `PS-0001` | 9 | What a box of one variety at one size holds. The catalogue counterpart to Packing: packing records what WAS in a box, this records what a box SHOULD hold, which is what makes an order line checkable. |
 | [Port](#port) | `bv_port` | `PRT-{SEQNUM:3}` | 5 | A destination port. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does. Kept as a table rather than a fixed list so a new one can be added without a schema change. |
+| [Basket Size](#basket-size) | `bv_basketsize` | `BSK-{SEQNUM:3}` | 7 | A size of hanging basket the nursery uses. Kept as a table because the sizes change, and because how many fit on a cable is a fact about the basket rather than about any variety. |
+| [Basket Density](#basket-density) | `bv_plantbasketdensity` | `BD-0001` | 5 | How densely one variety is planted in one size of basket. A row per variety and size, because the density differs between them — the ground has a single figure, but a small basket does not fill at the same rate as a large one. |
 
 ## Relationships
 
@@ -90,6 +92,7 @@
 | Field | `bv_shadehouseid` | Shadehouse | Restrict |
 | Planting | `bv_plantid` | Plant | Restrict |
 | Planting | `bv_bedid` | Bed | Restrict |
+| Planting | `bv_basketsizeid` | Basket Size | Remove link |
 | Planting | `bv_seasonid` | Season | Restrict |
 | Treatment | `bv_bedid` | Bed | Restrict |
 | Treatment | `bv_inputid` | Input | Remove link |
@@ -158,6 +161,8 @@
 | Shipment | `bv_orderid` | Order | Remove link |
 | Shipment | `bv_invoiceid` | Invoice | Remove link |
 | Plant Size | `bv_plantid` | Plant | Restrict |
+| Basket Density | `bv_plantid` | Plant | Restrict |
+| Basket Density | `bv_basketsizeid` | Basket Size | Restrict |
 
 ---
 
@@ -298,7 +303,6 @@ Plant species, varieties, and patent catalog
 | `bv_grownin` | Grown In | Choice |  | Where this variety can be grown — the ground, a basket, or both. Some varieties are only ever hung and must never be offered for a ground bed. One of: Ground, Basket, Ground & Basket. |
 | `bv_shadeneeded` | Shade Needed | Choice |  | Layers of 65% cloth this variety needs, and the combinations where more than one will do. Distinct from the shade a bed actually has: this is the requirement, that is the fact. |
 | `bv_plantspersqm` | Plants per m² | Decimal(2) |  | Planting density on the ground, in plants per square metre. Held as a density rather than a count per row because the rows are not the same size: an E row is 1.20 x 37.20 m and a C row 1.80 x 37.20, so one count is wrong by half for half the nursery. |
-| `bv_plantspercablem` | Plants per metre of cable | Decimal(2) |  | Density in a basket, in plants per metre of cable. Per metre and not per square metre because a cable is a line: pots hang along it at a spacing, and it has no width to multiply by. |
 | `bv_growthweeksminmaraug` | Growth Weeks Min (Mar-Aug) | Whole number |  | Weeks from planting to 8 leaves in the bright half of the year, low end of the range. |
 | `bv_growthweeksmaxmaraug` | Growth Weeks Max (Mar-Aug) | Whole number |  | Weeks from planting to 8 leaves in the bright half of the year, high end of the range. |
 | `bv_harvestweeksmaraug` | Harvest Weeks (Mar-Aug) | Whole number |  | Weeks between harvests once the plant is at 8 leaves, bright half of the year. |
@@ -377,7 +381,7 @@ Plant species, varieties, and patent catalog
 
 </details>
 
-**Referenced by:** Planting (`bv_plantid`), Harvest (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Pruning (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`), Bed Count (`bv_plantid`), Plant Size (`bv_plantid`)
+**Referenced by:** Planting (`bv_plantid`), Harvest (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Pruning (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`), Bed Count (`bv_plantid`), Plant Size (`bv_plantid`), Basket Density (`bv_plantid`)
 
 ## Season
 
@@ -430,6 +434,7 @@ Records of plants placed in beds — central activity hub
 | `bv_plantingdescription` | Planting Description | Text(200) | ✓ | Short text value. Planting Description for the Planting. |
 | `bv_plantid` | Plant | Lookup → [Plant](#plant) | ✓ | Link to the related Plant record. |
 | `bv_bedid` | Bed | Lookup → [Bed](#bed) | ✓ | Link to the related Bed record. |
+| `bv_basketsizeid` | Basket Size | Lookup → [Basket Size](#basket-size) |  | Which size of basket this went into. Only meaningful on a basket bed, and it is what decides the density and so the capacity of that cable. |
 | `bv_seasonid` | Season | Lookup → [Season](#season) | ✓ | Link to the related Season record. |
 | `bv_plantingdate` | Planting Date | Date only | ✓ | Date the event took place. |
 | `bv_enddate` | Cleared On | Date only |  | The day this planting came off the bed. Empty means it is still standing. A date rather than a yes/no: a boolean says whether the bed is clear now and never what was on it last March, and the light a planting received needs both ends of its life to add up. |
@@ -2167,3 +2172,50 @@ A destination port. Price depends on it — the same variety to the same custome
 | `bv_notes` | Notes | Text area(2000) |  |  |
 
 **Referenced by:** Order (`bv_portid`), Plant Price (`bv_portid`)
+
+## Basket Size
+
+`bv_basketsize` · User-owned
+
+A size of hanging basket the nursery uses. Kept as a table because the sizes change, and because how many fit on a cable is a fact about the basket rather than about any variety.
+
+**Record ID:** `bv_basketsizecode` — format `BSK-{SEQNUM:3}`, e.g. `BSK-{SEQNUM:3}`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_basketsizecode` 🔑 | Basket Size ID | Autonumber | ✓ | Auto-generated identifier, format BSK-001. |
+| `bv_basketsizename` | Name | Text(60) | ✓ | What the nursery calls it — Small, Large, 8 inch. |
+| `bv_widthcm` | Width across the top (cm) | Decimal(1) |  | Diameter of a round basket, or the side of a square one. With the shape it gives the area a density is multiplied by. |
+| `bv_shape` | Shape | Choice |  | Round uses the circle inside the width; square uses the whole square. One of: Round, Square. |
+| `bv_basketspercable` | Baskets per cable | Whole number |  | How many hang on one cable. Counted rather than derived from a spacing, because the nursery knows it directly. |
+| `bv_isactive` | Active | Yes/No |  |  |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Shape** (`bv_shape`)
+
+| Value | Label |
+|---|---|
+| 187530000 | Round |
+| 187530001 | Square |
+
+</details>
+
+**Referenced by:** Planting (`bv_basketsizeid`), Basket Density (`bv_basketsizeid`)
+
+## Basket Density
+
+`bv_plantbasketdensity` · User-owned
+
+How densely one variety is planted in one size of basket. A row per variety and size, because the density differs between them — the ground has a single figure, but a small basket does not fill at the same rate as a large one.
+
+**Record ID:** `bv_plantbasketdensitycode` — format `BD-{SEQNUM:4}`, e.g. `BD-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_plantbasketdensitycode` 🔑 | Density ID | Autonumber | ✓ | Auto-generated identifier, format BD-0001. |
+| `bv_plantid` | Plant | Lookup → [Plant](#plant) | ✓ | The variety. |
+| `bv_basketsizeid` | Basket Size | Lookup → [Basket Size](#basket-size) | ✓ | Which size of basket. |
+| `bv_plantspersqm` | Plants per m² | Decimal(2) | ✓ | Counted when planting, as on the ground — but for this size of basket. |
+| `bv_notes` | Notes | Text area(2000) |  |  |

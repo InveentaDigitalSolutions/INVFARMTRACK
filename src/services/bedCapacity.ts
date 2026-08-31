@@ -19,7 +19,7 @@
  * the same density applies inside it.
  */
 
-import { plotConfigs, BASKET_GEOMETRY, type PotType } from "./shadehouseLayout";
+import { plotConfigs } from "./shadehouseLayout";
 
 export interface PlantDensity {
   /** Plants per square metre, counted when planting. The only density there is. */
@@ -56,36 +56,59 @@ export function groundCapacity(plant: PlantDensity | undefined, fieldId: string)
   return Math.round(density * geometry.widthM * geometry.lengthM);
 }
 
-/** How many baskets hang on one cable, or null until they are measured. */
-export function basketsPerCable(fieldId: string, potType: PotType = "round"): number | null {
-  const basket = BASKET_GEOMETRY[potType];
-  const geometry = geometryOf(fieldId);
-  if (!basket || !geometry || basket.pitchM <= 0) return null;
-  return Math.floor(geometry.lengthM / basket.pitchM);
+/** A size of hanging basket, as recorded in Basket Sizes. */
+export interface BasketSize {
+  name?: string;
+  /** Across the top, in centimetres. */
+  widthCm?: number;
+  shape?: string;
+  /** Counted, not derived from a spacing — the nursery knows it directly. */
+  basketsPerCable?: number;
 }
 
 /**
- * Capacity of one cable: the same density, over the area of the baskets that
- * hang on it.
+ * The planting area of one basket, in square metres.
  *
- * Null while the baskets are unmeasured. That is the honest answer — a guessed
- * basket size would give every hanging variety a confident capacity with
- * nothing on screen to say it was invented.
+ * A round basket only uses the circle inside its width; a square one uses the
+ * whole square. Null when the size has not been measured — an assumed shape
+ * would change every capacity by a fifth without saying so.
+ */
+export function basketAreaSqM(size: BasketSize | undefined): number | null {
+  const cm = positive(size?.widthCm);
+  if (cm === undefined) return null;
+  const m = cm / 100;
+  return String(size?.shape).toLowerCase() === "square"
+    ? m * m
+    : Math.PI * (m / 2) ** 2;
+}
+
+/**
+ * Capacity of one cable: the density for THAT basket size, over the area of the
+ * baskets, times how many hang on the cable.
+ *
+ * Every part comes from a recorded figure. Null if any is missing, because a
+ * capacity assembled from a guess reads exactly like one that is measured.
  */
 export function cableCapacity(
-  plant: PlantDensity | undefined,
-  fieldId: string,
-  potType: PotType = "round"
+  plantsPerSqM: number | undefined,
+  size: BasketSize | undefined
 ): number | null {
-  const density = positive(plant?.plantsPerSqM);
-  const basket = BASKET_GEOMETRY[potType];
-  const count = basketsPerCable(fieldId, potType);
-  if (density === undefined || !basket || count === null) return null;
-  // Square baskets use the full square; round ones only the circle inside it.
-  const area = potType === "round"
-    ? Math.PI * (basket.widthM / 2) ** 2
-    : basket.widthM ** 2;
-  return Math.round(density * area * count);
+  const density = positive(plantsPerSqM);
+  const area = basketAreaSqM(size);
+  const perCable = positive(size?.basketsPerCable);
+  if (density === undefined || area === null || perCable === undefined) return null;
+  return Math.round(density * area * perCable);
+}
+
+/** What one basket of this size holds for this variety. */
+export function basketCapacity(
+  plantsPerSqM: number | undefined,
+  size: BasketSize | undefined
+): number | null {
+  const density = positive(plantsPerSqM);
+  const area = basketAreaSqM(size);
+  if (density === undefined || area === null) return null;
+  return Math.round(density * area);
 }
 
 export interface FieldCapacity {
@@ -104,14 +127,9 @@ export interface FieldCapacity {
  * density on the form so a number typed once can be sanity-checked against the
  * beds it will be applied to.
  */
-export function capacityByField(
-  plant: PlantDensity | undefined,
-  kind: "ground" | "basket" = "ground"
-): FieldCapacity[] {
+export function capacityByField(plant: PlantDensity | undefined): FieldCapacity[] {
   return plotConfigs.map((plot) => {
-    const perRow = kind === "ground"
-      ? groundCapacity(plant, plot.id)
-      : cableCapacity(plant, plot.id);
+    const perRow = groundCapacity(plant, plot.id);
     return {
       fieldId: plot.id,
       widthM: plot.bedWidth,

@@ -833,6 +833,14 @@
           "description": "Link to the related Bed record."
         },
         {
+          "schemaName": "bv_BasketSizeId",
+          "displayName": "Basket Size",
+          "type": "lookup",
+          "relatedTable": "bv_BasketSize",
+          "required": false,
+          "description": "Which size of basket this went into. Only meaningful on a basket bed, and it is what decides the density and so the capacity of that cable."
+        },
+        {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
@@ -6520,6 +6528,132 @@
           "type": "boolean",
           "required": false,
           "description": "Whether the nursery currently ships there."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "bv_BasketSize",
+      "displayName": "Basket Size",
+      "displayCollectionName": "Basket Sizes",
+      "ownershipType": "UserOwned",
+      "description": "A size of hanging basket the nursery uses. Kept as a table because the sizes change, and because how many fit on a cable is a fact about the basket rather than about any variety.",
+      "columns": [
+        {
+          "schemaName": "bv_BasketSizeCode",
+          "displayName": "Basket Size ID",
+          "type": "autonumber",
+          "autoNumberFormat": "BSK-{SEQNUM:3}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format BSK-001."
+        },
+        {
+          "schemaName": "bv_BasketSizeName",
+          "displayName": "Name",
+          "type": "string",
+          "maxLength": 60,
+          "required": true,
+          "description": "What the nursery calls it \u2014 Small, Large, 8 inch."
+        },
+        {
+          "schemaName": "bv_WidthCm",
+          "displayName": "Width across the top (cm)",
+          "type": "decimal",
+          "required": false,
+          "precision": 1,
+          "minValue": 0,
+          "maxValue": 500,
+          "description": "Diameter of a round basket, or the side of a square one. With the shape it gives the area a density is multiplied by."
+        },
+        {
+          "schemaName": "bv_Shape",
+          "displayName": "Shape",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187530000,
+              "label": "Round"
+            },
+            {
+              "value": 187530001,
+              "label": "Square"
+            }
+          ],
+          "description": "Round uses the circle inside the width; square uses the whole square. One of: Round, Square."
+        },
+        {
+          "schemaName": "bv_BasketsPerCable",
+          "displayName": "Baskets per cable",
+          "type": "integer",
+          "required": false,
+          "minValue": 1,
+          "maxValue": 1000,
+          "description": "How many hang on one cable. Counted rather than derived from a spacing, because the nursery knows it directly."
+        },
+        {
+          "schemaName": "bv_IsActive",
+          "displayName": "Active",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "bv_PlantBasketDensity",
+      "displayName": "Basket Density",
+      "displayCollectionName": "Basket Densities",
+      "ownershipType": "UserOwned",
+      "description": "How densely one variety is planted in one size of basket. A row per variety and size, because the density differs between them \u2014 the ground has a single figure, but a small basket does not fill at the same rate as a large one.",
+      "columns": [
+        {
+          "schemaName": "bv_PlantBasketDensityCode",
+          "displayName": "Density ID",
+          "type": "autonumber",
+          "autoNumberFormat": "BD-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format BD-0001."
+        },
+        {
+          "schemaName": "bv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "bv_Plant",
+          "required": true,
+          "description": "The variety."
+        },
+        {
+          "schemaName": "bv_BasketSizeId",
+          "displayName": "Basket Size",
+          "type": "lookup",
+          "relatedTable": "bv_BasketSize",
+          "required": true,
+          "description": "Which size of basket."
+        },
+        {
+          "schemaName": "bv_PlantsPerSqM",
+          "displayName": "Plants per m\u00b2",
+          "type": "decimal",
+          "required": true,
+          "precision": 2,
+          "minValue": 0,
+          "maxValue": 10000,
+          "description": "Counted when planting, as on the ground \u2014 but for this size of basket."
         },
         {
           "schemaName": "bv_Notes",

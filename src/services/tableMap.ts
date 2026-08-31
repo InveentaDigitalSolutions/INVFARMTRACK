@@ -352,6 +352,7 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     dataSource: "bv_plantings",
     primaryKey: "bv_plantingid",
     fields: {
+      basketSize: "_bv_basketsizeid_value",
       date: "bv_plantingdate", qty: "bv_quantity",
       // Lookup display text arrives via the formatted annotation on the
       // _value column, which DataverseStore unwraps.
@@ -748,6 +749,32 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       notes: "bv_notes",
     },
   },
+  /** The sizes of hanging basket in use, and how many fit on a cable. */
+  basketSizes: {
+    dataSource: "bv_basketsizes",
+    primaryKey: "bv_basketsizeid",
+    fields: {
+      code: "bv_basketsizecode",
+      name: "bv_basketsizename",
+      widthCm: "bv_widthcm",
+      shape: "bv_shape",
+      basketsPerCable: "bv_basketspercable",
+      active: "bv_isactive",
+      notes: "bv_notes",
+    },
+  },
+  /** How densely one variety is planted in one size of basket. */
+  basketDensities: {
+    dataSource: "bv_plantbasketdensities",
+    primaryKey: "bv_plantbasketdensityid",
+    fields: {
+      code: "bv_plantbasketdensitycode",
+      plant: "_bv_plantid_value",
+      basketSize: "_bv_basketsizeid_value",
+      plantsPerSqM: "bv_plantspersqm",
+      notes: "bv_notes",
+    },
+  },
   caiNumbers: {
     dataSource: "bv_cainumbers",
     primaryKey: "bv_cainumberid",
@@ -863,6 +890,8 @@ export const ENABLED_TABLES = new Set<string>([
   "bedCompositions",
   "caiNumbers",
   "exchangeRates",
+  "basketSizes",
+  "basketDensities",
   "plantSizes",
   "solarRadiation",
   "bedCounts",
