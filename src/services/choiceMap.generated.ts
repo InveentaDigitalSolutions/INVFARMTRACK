@@ -45,6 +45,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_orders",
   "bv_packings",
   "bv_payments",
+  "bv_plantaliases",
   "bv_plantbasketdensities",
   "bv_plantings",
   "bv_plantprices",
@@ -133,7 +134,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_treatments": "bv_treatmentname",
   "bv_workers": "bv_workername",
   "bv_basketsizes": "bv_basketsizename",
-  "bv_plantbasketdensities": "bv_plantbasketdensitycode"
+  "bv_plantbasketdensities": "bv_plantbasketdensitycode",
+  "bv_plantaliases": "bv_plantaliascode"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -315,6 +317,10 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_plantid_value": {
       "nav": "bv_PlantId",
       "targetSet": "bv_plants"
+    },
+    "_bv_plantsizeid_value": {
+      "nav": "bv_PlantSizeId",
+      "targetSet": "bv_plantsizes"
     }
   },
   "bv_packings": {
@@ -501,6 +507,16 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_basketsizeid_value": {
       "nav": "bv_BasketSizeId",
       "targetSet": "bv_basketsizes"
+    },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
+  },
+  "bv_plantaliases": {
+    "_bv_customerid_value": {
+      "nav": "bv_CustomerId",
+      "targetSet": "bv_customers"
     },
     "_bv_plantid_value": {
       "nav": "bv_PlantId",
@@ -776,6 +792,12 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Shipped": 187460006
     }
   },
+  "bv_orderitems": {
+    "bv_linetype": {
+      "Current order": 187550000,
+      "Additional request": 187550001
+    }
+  },
   "bv_packings": {
     "bv_cuttingtype": {
       "L/E": 187460000,
@@ -1048,6 +1070,13 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
     "bv_shape": {
       "Round": 187530000,
       "Square": 187530001
+    }
+  },
+  "bv_plantaliases": {
+    "bv_aliastype": {
+      "Trade name": 187560000,
+      "Breeder code": 187560001,
+      "Customer spelling": 187560002
     }
   }
 };

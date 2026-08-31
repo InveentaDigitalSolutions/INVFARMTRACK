@@ -450,6 +450,13 @@ export const COLUMN_KIND: Record<string, Record<string, ColumnKind>> = {
     "bv_isactive": "boolean",
     "bv_notes": "text",
   },
+  "bv_ports": {
+    "bv_portcode": "text",
+    "bv_portname": "text",
+    "bv_country": "text",
+    "bv_isactive": "boolean",
+    "bv_notes": "text",
+  },
   "bv_plantprices": {
     "bv_plantpricecode": "text",
     "bv_plantpricename": "text",

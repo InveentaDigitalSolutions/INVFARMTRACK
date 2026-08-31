@@ -236,6 +236,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_plantaliases": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_plantaliasid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_plantings": {
     "tableId": "",
     "version": "",

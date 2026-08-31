@@ -254,6 +254,11 @@
           "entitySetName": "bv_ports",
           "logicalName": "bv_port",
           "isHidden": false
+        },
+        "plantaliases": {
+          "entitySetName": "bv_plantaliases",
+          "logicalName": "bv_plantalias",
+          "isHidden": false
         }
       }
     }

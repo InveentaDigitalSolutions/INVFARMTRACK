@@ -455,8 +455,21 @@ export interface PlantSizesRow {
   [key: string]: unknown;
 }
 
+export interface PortsRow {
+  id: string;
+  code?: string;
+  name?: string;
+  country?: string;
+  active?: boolean;
+  notes?: string;
+  [key: string]: unknown;
+}
+
 export interface PricesRow {
   id: string;
+  port?: string;
+  product?: string;
+  size?: string;
   plant?: string;
   season?: string;
   customer?: string;

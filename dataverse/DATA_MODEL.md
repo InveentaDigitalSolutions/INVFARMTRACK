@@ -9,9 +9,9 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 52 |
-| Columns | 623 |
-| Relationships | 75 |
+| Tables | 53 |
+| Columns | 634 |
+| Relationships | 78 |
 
 ## Conventions
 
@@ -45,7 +45,7 @@
 | [Task](#task) | `bv_task` | `TSK-0001` | 11 | Scheduled and assigned nursery tasks |
 | [Customer](#customer) | `bv_customer` | `CUS-0001` | 13 | Nursery customers for orders and invoicing |
 | [Order](#order) | `bv_order` | `ORD-0001` | 8 | Customer orders |
-| [Order Item](#order-item) | `bv_orderitem` | `OIT-0001` | 7 | Line items within an order |
+| [Order Item](#order-item) | `bv_orderitem` | `OIT-0001` | 12 | One line of an order: a variety, a week, and a quantity. Customers order week by week across a year or more — the 2027 book runs 66 weeks — so the week is part of the key and not a note on the side. |
 | [Packing](#packing) | `bv_packing` | `PCK-0001` | 25 | Per-box packing records — each record is one box with full traceability |
 | [Fiscal Authorization](#fiscal-authorization) | `bv_fiscalauthorization` | `FIS-0001` | 11 | Honduras SAR CAI authorizations — invoice number ranges and expiration dates |
 | [Invoice](#invoice) | `bv_invoice` | `INV-0001` | 34 | Export invoices with shipping, fiscal, and payment tracking |
@@ -83,6 +83,7 @@
 | [Port](#port) | `bv_port` | `PRT-{SEQNUM:3}` | 5 | A destination port. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does. Kept as a table rather than a fixed list so a new one can be added without a schema change. |
 | [Basket Size](#basket-size) | `bv_basketsize` | `BSK-{SEQNUM:3}` | 7 | A size of hanging basket the nursery uses. Kept as a table because the sizes change, and because how many fit on a cable is a fact about the basket rather than about any variety. |
 | [Basket Density](#basket-density) | `bv_plantbasketdensity` | `BD-0001` | 5 | How densely one variety is planted in one size of basket. A row per variety and size, because the density differs between them — the ground has a single figure, but a small basket does not fill at the same rate as a large one. |
+| [Plant Alias](#plant-alias) | `bv_plantalias` | `ALS-0001` | 6 | Another name for a variety. Customers order by their own trade names — Summer Nights is Hawaiian, Snowy Morning is Marble Queen, Off to Oz is Neon — and breeders use codes like UF-Ea-0317. Without these, every order import is matched by hand and a near-miss like 'Njoy' against 'N'Joy' goes unnoticed. |
 
 ## Relationships
 
@@ -105,6 +106,7 @@
 | Order | `bv_portid` | Port | Remove link |
 | Order Item | `bv_orderid` | Order | Restrict |
 | Order Item | `bv_plantid` | Plant | Restrict |
+| Order Item | `bv_plantsizeid` | Plant Size | Remove link |
 | Packing | `bv_plantid` | Plant | Restrict |
 | Packing | `bv_plantsizeid` | Plant Size | Remove link |
 | Packing | `bv_bedid` | Bed | Remove link |
@@ -163,6 +165,8 @@
 | Plant Size | `bv_plantid` | Plant | Restrict |
 | Basket Density | `bv_plantid` | Plant | Restrict |
 | Basket Density | `bv_basketsizeid` | Basket Size | Restrict |
+| Plant Alias | `bv_plantid` | Plant | Restrict |
+| Plant Alias | `bv_customerid` | Customer | Remove link |
 
 ---
 
@@ -381,7 +385,7 @@ Plant species, varieties, and patent catalog
 
 </details>
 
-**Referenced by:** Planting (`bv_plantid`), Harvest (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Pruning (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`), Bed Count (`bv_plantid`), Plant Size (`bv_plantid`), Basket Density (`bv_plantid`)
+**Referenced by:** Planting (`bv_plantid`), Harvest (`bv_plantid`), Order Item (`bv_plantid`), Packing (`bv_plantid`), Plant Price (`bv_plantid`), Pruning (`bv_plantid`), Availability (`bv_plantid`), Demand Forecast (`bv_plantid`), Bed Count (`bv_plantid`), Plant Size (`bv_plantid`), Basket Density (`bv_plantid`), Plant Alias (`bv_plantid`)
 
 ## Season
 
@@ -785,7 +789,7 @@ Nursery customers for orders and invoicing
 
 </details>
 
-**Referenced by:** Order (`bv_customerid`), Invoice (`bv_customerid`), Plant Price (`bv_customerid`), Demand Forecast (`bv_customerid`), Shipment (`bv_customerid`)
+**Referenced by:** Order (`bv_customerid`), Invoice (`bv_customerid`), Plant Price (`bv_customerid`), Demand Forecast (`bv_customerid`), Shipment (`bv_customerid`), Plant Alias (`bv_customerid`)
 
 ## Order
 
@@ -828,7 +832,7 @@ Customer orders
 
 `bv_orderitem` · Organization-owned
 
-Line items within an order
+One line of an order: a variety, a week, and a quantity. Customers order week by week across a year or more — the 2027 book runs 66 weeks — so the week is part of the key and not a note on the side.
 
 **Record ID:** `bv_orderitemcode` — format `OIT-{SEQNUM:4}`, e.g. `OIT-0001`.
 
@@ -841,6 +845,22 @@ Line items within an order
 | `bv_quantity` | Quantity | Whole number | ✓ | Amount recorded for this entry. |
 | `bv_unitprice` | Unit Price | Currency(2) | ✓ | Unit price. |
 | `bv_linetotal` | Line Total | Currency(2) |  | Total amount. |
+| `bv_year` | Year | Whole number |  | ISO year of the delivery week. Separate from the week because an order book crosses new year. |
+| `bv_weeknumber` | Week | Whole number |  | ISO week the quantity is wanted in. |
+| `bv_plantsizeid` | Product | Lookup → [Plant Size](#plant-size) |  | Which product — variety, size, type and condition together. What the price and the box count are read from. |
+| `bv_linetype` | Line Type | Choice |  | Customers distinguish a standing order from an extra ask on top. One of: Current order, Additional request. |
+| `bv_customerreference` | Customer's name for it | Text(120) |  | What the customer called this line — 'Summer Nights™', '9cm H2O Bowls'. Kept as they wrote it so an order can be reconciled against their own paperwork. |
+
+<details><summary>Choice values</summary>
+
+**Line Type** (`bv_linetype`)
+
+| Value | Label |
+|---|---|
+| 187550000 | Current order |
+| 187550001 | Additional request |
+
+</details>
 
 ## Packing
 
@@ -2167,7 +2187,7 @@ What a box of one variety at one size holds. The catalogue counterpart to Packin
 
 </details>
 
-**Referenced by:** Packing (`bv_plantsizeid`), Plant Price (`bv_plantsizeid`)
+**Referenced by:** Order Item (`bv_plantsizeid`), Packing (`bv_plantsizeid`), Plant Price (`bv_plantsizeid`)
 
 ## Port
 
@@ -2233,3 +2253,32 @@ How densely one variety is planted in one size of basket. A row per variety and 
 | `bv_basketsizeid` | Basket Size | Lookup → [Basket Size](#basket-size) | ✓ | Which size of basket. |
 | `bv_plantspersqm` | Plants per m² | Decimal(2) | ✓ | Counted when planting, as on the ground — but for this size of basket. |
 | `bv_notes` | Notes | Text area(2000) |  |  |
+
+## Plant Alias
+
+`bv_plantalias` · User-owned
+
+Another name for a variety. Customers order by their own trade names — Summer Nights is Hawaiian, Snowy Morning is Marble Queen, Off to Oz is Neon — and breeders use codes like UF-Ea-0317. Without these, every order import is matched by hand and a near-miss like 'Njoy' against 'N'Joy' goes unnoticed.
+
+**Record ID:** `bv_plantaliascode` — format `ALS-{SEQNUM:4}`, e.g. `ALS-0001`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_plantaliascode` 🔑 | Alias ID | Autonumber | ✓ | Auto-generated identifier, format ALS-0001. |
+| `bv_plantid` | Plant | Lookup → [Plant](#plant) | ✓ | The variety this name refers to. |
+| `bv_alias` | Alias | Text(120) | ✓ | The other name — a trade name, a breeder code, or a customer's spelling. |
+| `bv_aliastype` | Kind | Choice |  | One of: Trade name, Breeder code, Customer spelling. |
+| `bv_customerid` | Customer | Lookup → [Customer](#customer) |  | Whose name this is, when only one customer uses it. Empty means anyone might. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Kind** (`bv_aliastype`)
+
+| Value | Label |
+|---|---|
+| 187560000 | Trade name |
+| 187560001 | Breeder code |
+| 187560002 | Customer spelling |
+
+</details>

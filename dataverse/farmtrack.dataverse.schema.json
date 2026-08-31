@@ -2072,7 +2072,7 @@
       "schemaName": "bv_OrderItem",
       "displayName": "Order Item",
       "displayCollectionName": "Order Items",
-      "description": "Line items within an order",
+      "description": "One line of an order: a variety, a week, and a quantity. Customers order week by week across a year or more \u2014 the 2027 book runs 66 weeks \u2014 so the week is part of the key and not a note on the side.",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -2129,6 +2129,57 @@
           "type": "currency",
           "required": false,
           "description": "Total amount."
+        },
+        {
+          "schemaName": "bv_Year",
+          "displayName": "Year",
+          "type": "integer",
+          "required": false,
+          "minValue": 2020,
+          "maxValue": 2100,
+          "description": "ISO year of the delivery week. Separate from the week because an order book crosses new year."
+        },
+        {
+          "schemaName": "bv_WeekNumber",
+          "displayName": "Week",
+          "type": "integer",
+          "required": false,
+          "minValue": 1,
+          "maxValue": 53,
+          "description": "ISO week the quantity is wanted in."
+        },
+        {
+          "schemaName": "bv_PlantSizeId",
+          "displayName": "Product",
+          "type": "lookup",
+          "relatedTable": "bv_PlantSize",
+          "required": false,
+          "description": "Which product \u2014 variety, size, type and condition together. What the price and the box count are read from."
+        },
+        {
+          "schemaName": "bv_LineType",
+          "displayName": "Line Type",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187550000,
+              "label": "Current order"
+            },
+            {
+              "value": 187550001,
+              "label": "Additional request"
+            }
+          ],
+          "description": "Customers distinguish a standing order from an extra ask on top. One of: Current order, Additional request."
+        },
+        {
+          "schemaName": "bv_CustomerReference",
+          "displayName": "Customer's name for it",
+          "type": "string",
+          "maxLength": 120,
+          "required": false,
+          "description": "What the customer called this line \u2014 'Summer Nights\u2122', '9cm H2O Bowls'. Kept as they wrote it so an order can be reconciled against their own paperwork."
         }
       ]
     },
@@ -6679,6 +6730,76 @@
           "minValue": 0,
           "maxValue": 10000,
           "description": "Counted when planting, as on the ground \u2014 but for this size of basket."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "bv_PlantAlias",
+      "displayName": "Plant Alias",
+      "displayCollectionName": "Plant Aliases",
+      "ownershipType": "UserOwned",
+      "description": "Another name for a variety. Customers order by their own trade names \u2014 Summer Nights is Hawaiian, Snowy Morning is Marble Queen, Off to Oz is Neon \u2014 and breeders use codes like UF-Ea-0317. Without these, every order import is matched by hand and a near-miss like 'Njoy' against 'N'Joy' goes unnoticed.",
+      "columns": [
+        {
+          "schemaName": "bv_PlantAliasCode",
+          "displayName": "Alias ID",
+          "type": "autonumber",
+          "autoNumberFormat": "ALS-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format ALS-0001."
+        },
+        {
+          "schemaName": "bv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "bv_Plant",
+          "required": true,
+          "description": "The variety this name refers to."
+        },
+        {
+          "schemaName": "bv_Alias",
+          "displayName": "Alias",
+          "type": "string",
+          "maxLength": 120,
+          "required": true,
+          "description": "The other name \u2014 a trade name, a breeder code, or a customer's spelling."
+        },
+        {
+          "schemaName": "bv_AliasType",
+          "displayName": "Kind",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187560000,
+              "label": "Trade name"
+            },
+            {
+              "value": 187560001,
+              "label": "Breeder code"
+            },
+            {
+              "value": 187560002,
+              "label": "Customer spelling"
+            }
+          ],
+          "description": "One of: Trade name, Breeder code, Customer spelling."
+        },
+        {
+          "schemaName": "bv_CustomerId",
+          "displayName": "Customer",
+          "type": "lookup",
+          "relatedTable": "bv_Customer",
+          "required": false,
+          "description": "Whose name this is, when only one customer uses it. Empty means anyone might."
         },
         {
           "schemaName": "bv_Notes",
