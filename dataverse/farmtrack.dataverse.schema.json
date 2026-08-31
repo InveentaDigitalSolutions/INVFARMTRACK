@@ -2818,142 +2818,6 @@
       ]
     },
     {
-      "schemaName": "bv_PlantPrice",
-      "displayName": "Plant Price",
-      "displayCollectionName": "Plant Prices",
-      "description": "Price history per variety, keyed on customer and destination port, and optionally narrowed to a size. Export and internal prices, with an effective date range.",
-      "ownershipType": "OrganizationOwned",
-      "columns": [
-        {
-          "schemaName": "bv_PlantPriceCode",
-          "displayName": "Plant Price ID",
-          "type": "autonumber",
-          "autoNumberFormat": "PRC-{SEQNUM:4}",
-          "maxLength": 40,
-          "required": true,
-          "isPrimaryName": true,
-          "description": "Auto-generated identifier, format PRC-0001."
-        },
-        {
-          "schemaName": "bv_PlantPriceName",
-          "displayName": "Plant Price Name",
-          "type": "string",
-          "maxLength": 200,
-          "required": true,
-          "description": "Auto-composed: {Plant} / {Customer or 'Base'} / {EffectiveFrom}"
-        },
-        {
-          "schemaName": "bv_PlantId",
-          "displayName": "Plant",
-          "type": "lookup",
-          "relatedTable": "bv_Plant",
-          "required": true,
-          "description": "Link to the related Plant record."
-        },
-        {
-          "schemaName": "bv_PortId",
-          "displayName": "Port",
-          "type": "lookup",
-          "relatedTable": "bv_Port",
-          "required": false,
-          "description": "Where this price ships to. Part of what a price is keyed on, alongside the variety and the customer."
-        },
-        {
-          "schemaName": "bv_Product",
-          "displayName": "Product",
-          "type": "choice",
-          "required": false,
-          "options": [
-            {
-              "value": 187540000,
-              "label": "L&E"
-            },
-            {
-              "value": 187540001,
-              "label": "E"
-            },
-            {
-              "value": 187540002,
-              "label": "Bulbs"
-            },
-            {
-              "value": 187540003,
-              "label": "Tips"
-            }
-          ],
-          "description": "What is being priced \u2014 L&E, E, Bulbs or Tips. Only L&E is sold today, but the others are coming and a price list that cannot tell them apart would have to be rebuilt when they do. Left empty the price applies to every product of that variety."
-        },
-        {
-          "schemaName": "bv_PlantSizeId",
-          "displayName": "Size",
-          "type": "lookup",
-          "relatedTable": "bv_PlantSize",
-          "required": false,
-          "description": "Narrows the price to one size. Left empty the price applies to every size of that variety, which is how it works today. Added now rather than later because retrofitting a key onto priced history is far worse than carrying an empty column."
-        },
-        {
-          "schemaName": "bv_SeasonId",
-          "displayName": "Season",
-          "type": "lookup",
-          "relatedTable": "bv_Season",
-          "required": false,
-          "description": "Link to the related Season record."
-        },
-        {
-          "schemaName": "bv_CustomerId",
-          "displayName": "Customer",
-          "type": "lookup",
-          "relatedTable": "bv_Customer",
-          "required": false,
-          "description": "If set, this price applies only to this customer. If null, it is the base/default price."
-        },
-        {
-          "schemaName": "bv_EffectiveFrom",
-          "displayName": "Effective From",
-          "type": "date",
-          "required": true,
-          "description": "Date value (date only, no time). Effective From for the Plant Price."
-        },
-        {
-          "schemaName": "bv_EffectiveTo",
-          "displayName": "Effective To",
-          "type": "date",
-          "required": false,
-          "description": "Date value (date only, no time). Effective To for the Plant Price."
-        },
-        {
-          "schemaName": "bv_PriceEXT",
-          "displayName": "Export Price (USD)",
-          "type": "currency",
-          "required": true,
-          "description": "Price per unit for export shipments"
-        },
-        {
-          "schemaName": "bv_PriceINT",
-          "displayName": "Internal Price (USD)",
-          "type": "currency",
-          "required": false,
-          "description": "Price per unit for internal/domestic sales (in USD \u2014 HNL conversion at invoice time via BCH exchange rate)"
-        },
-        {
-          "schemaName": "bv_IsActive",
-          "displayName": "Is Active",
-          "type": "boolean",
-          "required": false,
-          "defaultValue": true,
-          "description": "Whether the record is currently in use."
-        },
-        {
-          "schemaName": "bv_Notes",
-          "displayName": "Notes",
-          "type": "memo",
-          "maxLength": 2000,
-          "required": false,
-          "description": "Free-text notes."
-        }
-      ]
-    },
-    {
       "schemaName": "bv_CAINumber",
       "displayName": "CAI Number",
       "displayCollectionName": "CAI Numbers",
@@ -6384,10 +6248,10 @@
     },
     {
       "schemaName": "bv_PlantSize",
-      "displayName": "Plant Size",
-      "displayCollectionName": "Plant Sizes",
+      "displayName": "Product",
+      "displayCollectionName": "Products",
       "ownershipType": "UserOwned",
-      "description": "What a box of one variety at one size holds. The catalogue counterpart to Packing: packing records what WAS in a box, this records what a box SHOULD hold, which is what makes an order line checkable.",
+      "description": "A product the nursery sells: a variety at a size, as a type and a condition \u2014 and what it costs. Size and price were two tables, which meant two screens describing the same thing. The only reason to record a size at all is to price and pack it, so they are one row.\\n\\nCustomer, port and the dates may be left blank, meaning any. The most specific row that applies wins, so a general figure is set once and overridden only where something was negotiated \u2014 and the box count can live on the general row rather than being repeated.",
       "columns": [
         {
           "schemaName": "bv_PlantSizeCode",
@@ -6508,6 +6372,58 @@
           "displayName": "Notes",
           "type": "memo",
           "required": false
+        },
+        {
+          "schemaName": "bv_CustomerId",
+          "displayName": "Customer",
+          "type": "lookup",
+          "relatedTable": "bv_Customer",
+          "required": false,
+          "description": "If set, this price applies only to this customer. If null, it is the base/default price."
+        },
+        {
+          "schemaName": "bv_PortId",
+          "displayName": "Port",
+          "type": "lookup",
+          "relatedTable": "bv_Port",
+          "required": false,
+          "description": "Where this price ships to. Part of what a price is keyed on, alongside the variety and the customer."
+        },
+        {
+          "schemaName": "bv_SeasonId",
+          "displayName": "Season",
+          "type": "lookup",
+          "relatedTable": "bv_Season",
+          "required": false,
+          "description": "Link to the related Season record."
+        },
+        {
+          "schemaName": "bv_EffectiveFrom",
+          "displayName": "Effective From",
+          "type": "date",
+          "required": true,
+          "description": "Date value (date only, no time). Effective From for the Plant Price."
+        },
+        {
+          "schemaName": "bv_EffectiveTo",
+          "displayName": "Effective To",
+          "type": "date",
+          "required": false,
+          "description": "Date value (date only, no time). Effective To for the Plant Price."
+        },
+        {
+          "schemaName": "bv_PriceEXT",
+          "displayName": "Export Price (USD)",
+          "type": "currency",
+          "required": true,
+          "description": "Price per unit for export shipments"
+        },
+        {
+          "schemaName": "bv_PriceINT",
+          "displayName": "Internal Price (USD)",
+          "type": "currency",
+          "required": false,
+          "description": "Price per unit for internal/domestic sales (in USD \u2014 HNL conversion at invoice time via BCH exchange rate)"
         }
       ]
     },

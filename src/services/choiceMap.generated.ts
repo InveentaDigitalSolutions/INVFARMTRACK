@@ -432,9 +432,21 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     }
   },
   "bv_plantsizes": {
+    "_bv_customerid_value": {
+      "nav": "bv_CustomerId",
+      "targetSet": "bv_customers"
+    },
     "_bv_plantid_value": {
       "nav": "bv_PlantId",
       "targetSet": "bv_plants"
+    },
+    "_bv_portid_value": {
+      "nav": "bv_PortId",
+      "targetSet": "bv_ports"
+    },
+    "_bv_seasonid_value": {
+      "nav": "bv_SeasonId",
+      "targetSet": "bv_seasons"
     }
   },
   "bv_prunings": {

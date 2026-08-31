@@ -38,16 +38,6 @@ export interface BankAccountsRow {
   [key: string]: unknown;
 }
 
-export interface BasketDensitiesRow {
-  id: string;
-  code?: string;
-  plant?: string;
-  basketSize?: string;
-  plantsPerSqM?: number;
-  notes?: string;
-  [key: string]: unknown;
-}
-
 export interface BasketSizesRow {
   id: string;
   code?: string;
@@ -401,6 +391,20 @@ export interface PaymentsRow {
   [key: string]: unknown;
 }
 
+export interface PhenologyRow {
+  id: string;
+  code?: string;
+  plant?: string;
+  targetLeaves?: number;
+  growthWeeksMin?: number;
+  growthWeeksMax?: number;
+  harvestWeeks?: number;
+  pruneToLeaves?: number;
+  pruningWeeks?: number;
+  notes?: string;
+  [key: string]: unknown;
+}
+
 export interface PlantingsRow {
   id: string;
   basketSize?: string;
@@ -428,15 +432,8 @@ export interface PlantsRow {
   patentExpiry?: string;
   plantsPerSqM?: number;
   grownIn?: string;
-  shadeNeeded?: string;
-  growthWeeksMinMarAug?: string;
-  growthWeeksMaxMarAug?: string;
-  harvestWeeksMarAug?: string;
-  pruningWeeksMarAug?: string;
-  growthWeeksMinSepFeb?: string;
-  growthWeeksMaxSepFeb?: string;
-  harvestWeeksSepFeb?: string;
-  pruningWeeksSepFeb?: string;
+  shadeMin?: string;
+  shadeMax?: string;
   active?: boolean;
   [key: string]: unknown;
 }
@@ -473,11 +470,11 @@ export interface PricesRow {
   plant?: string;
   season?: string;
   customer?: string;
-  priceExt?: number;
-  priceInt?: number;
+  priceExt?: string;
+  priceInt?: string;
   from?: string;
   to?: string;
-  active?: boolean;
+  active?: string;
   primaryName?: string;
   [key: string]: unknown;
 }
@@ -679,6 +676,7 @@ export interface SuppliersRow {
 export interface TasksRow {
   id: string;
   title?: string;
+  bed?: string;
   type?: string;
   due?: string;
   assigned?: string;

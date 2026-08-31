@@ -26,7 +26,7 @@ import ExcelImport from "../components/ExcelImport";
 import { Upload } from "lucide-react";
 import { useInvoiceNumber } from "../hooks/useInvoiceNumber";
 import { toGrid, toRecords, weeksIn, type ForecastRecord, type ForecastRow } from "../services/demandForecast";
-import type { CustomersRow, OrdersRow, PackingRow, PricesRow, ShipmentsRow } from "../services/rowTypes.generated";
+import type { CustomersRow, OrdersRow, PackingRow, ShipmentsRow } from "../services/rowTypes.generated";
 import {
   assembleShipments, matchesShipment, nextStatus,
   SHIPMENT_FLOW, type Shipment,
@@ -37,7 +37,6 @@ const tabs = [
   { id: "forecast", label: "Demand Forecast" },
   { id: "orders", label: "Orders" },
   { id: "customers", label: "Customers" },
-  { id: "prices", label: "Price List" },
   // Ports sit here because price is keyed on them and this is where prices are
   // kept. They are also what an order ships to.
   { id: "ports", label: "Ports" },
@@ -97,7 +96,6 @@ const customerFields = [
 ];
 
 const initPorts: Record<string, unknown>[] = [];
-const initPrices: PricesRow[] = [];
 
 /** Customers that can actually be bound to: a nameless row is not a choice. */
 const customerOptions = (rows: { name?: string }[]) =>
@@ -106,9 +104,6 @@ const customerOptions = (rows: { name?: string }[]) =>
 /** No fallback list. These names come from the table the lookup points at;
  *  a hand-written stand-in offered workers and varieties that do not exist,
  *  and picking one saved the record with the lookup empty. */
-const plantNameOptionsFallback: { value: string; label: string }[] = [];
-const priceSeasonOptionsFallback: { value: string; label: string }[] = [];
-const priceCustomerOptionsFallback: { value: string; label: string }[] = [];
 
 /**
  * A price is keyed on more than the variety.
@@ -118,30 +113,6 @@ const priceCustomerOptionsFallback: { value: string; label: string }[] = [];
  * left blank, meaning "any", so a general figure can be set once and overridden
  * where something was actually negotiated. The most specific row wins.
  */
-const priceFields = [
-  { title: "What is being priced", columns: 2 as const, fields: [
-    { key: "plant", label: "Plant", type: "select" as const, options: plantNameOptionsFallback, optionsFrom: "plants", required: true },
-    { key: "product", label: "Product", type: "toggle" as const, options: [
-      { value: "L&E", label: "L&E" }, { value: "E", label: "E" },
-      { value: "Bulbs", label: "Bulbs" }, { value: "Tips", label: "Tips" },
-    ] },
-    { key: "size", label: "Size", type: "select" as const, options: [], optionsFrom: "plantSizes",
-      placeholder: "any size" },
-    { key: "season", label: "Season", type: "select" as const, options: priceSeasonOptionsFallback, optionsFrom: "seasons", required: true },
-  ]},
-  { title: "Who and where — leave blank for any", columns: 2 as const, fields: [
-    { key: "customer", label: "Customer", type: "select" as const, options: priceCustomerOptionsFallback, optionsFrom: "customers" },
-    { key: "port", label: "Port", type: "select" as const, options: [], optionsFrom: "ports" },
-  ]},
-  { title: "The price", columns: 2 as const, fields: [
-    { key: "priceExt", label: "Price (USD)", type: "text" as const, required: true },
-    { key: "priceInt", label: "Price (HNL)", type: "text" as const },
-    { key: "from", label: "Valid From", type: "date" as const, required: true },
-    { key: "to", label: "Valid To", type: "date" as const, required: true },
-    { key: "active", label: "Active", type: "boolean" as const },
-  ]},
-];
-
 const portFields = [
   { title: "Port", columns: 2 as const, fields: [
     { key: "code", label: "Port ID", type: "text" as const, readOnly: true, placeholder: "PRT-001 (auto)" },
@@ -176,12 +147,9 @@ export default function SalesPage() {
     [shipments, shipmentQuery, shipmentStatus]
   );
   const [showImport, setShowImport] = useState(false);
-  const [prices, setPrices] = useRecords("prices", initPrices);
-  const priceForm = useFormModal(initPrices[0]);
   const portForm = useFormModal(initPorts[0]);
   const portConfirm = useConfirmDialog();
   const [ports, setPorts] = useRecords("ports", initPorts);
-  const priceConfirm = useConfirmDialog();
 
   const [orders, setOrders] = useRecords("orders", initialOrders);
   const [customers, setCustomers] = useRecords("customers", initialCustomers);
@@ -230,22 +198,7 @@ export default function SalesPage() {
     portConfirm.close();
   };
 
-  const handlePriceSave = (values: Record<string, unknown>) => {
-    if (priceForm.isEdit && priceForm.editIndex !== null) {
-      const updated = [...prices];
-      updated[priceForm.editIndex] = values as any;
-      setPrices(updated);
-    } else {
-      setPrices([...prices, values as any]);
-    }
-    priceForm.close();
-  };
 
-  const handlePriceDelete = () => {
-    if (priceConfirm.pending) {
-      setPrices(prices.filter((_, i) => i !== priceConfirm.pending!.index));
-    }
-  };
 
   // Stored per variety, size and week — the grain everything else asks about.
   // The screen shows it as a grid, so it is converted on the way in and out.
@@ -828,58 +781,6 @@ export default function SalesPage() {
             <ConfirmDialog
               open={portConfirm.open} onClose={portConfirm.close} title="Delete Port"
               message="Delete this port?" onConfirm={handlePortDelete}
-            />
-          </>
-        );
-      case "prices":
-        return (
-          <>
-            <DataTable
-              columns={[
-                { key: "plant", label: "Plant" },
-                { key: "season", label: "Season" },
-                // Blank means "any", which is a real answer and reads better
-                // than an empty cell that looks like something went missing.
-                { key: "customer", label: "Customer", render: (r) => (
-                  <Badge variant={r.customer ? "blue" : "gray"}>{(r.customer as string) || "Any"}</Badge>
-                ) },
-                { key: "port", label: "Port", render: (r) => (
-                  <Badge variant={r.port ? "blue" : "gray"}>{(r.port as string) || "Any"}</Badge>
-                ) },
-                { key: "product", label: "Product", render: (r) => (
-                  <Badge variant={r.product ? "blue" : "gray"}>{(r.product as string) || "Any"}</Badge>
-                ) },
-                { key: "priceExt", label: "Export (USD)" },
-                { key: "priceInt", label: "Internal (USD)" },
-                { key: "from", label: "From" },
-                { key: "to", label: "To" },
-                { key: "active", label: "Active", render: (r) => (
-                  <Badge variant={r.active ? "green" : "gray"}>{r.active ? "Active" : "Expired"}</Badge>
-                )},
-              ]}
-              data={prices}
-              onAdd={priceForm.openCreate}
-              onEdit={(row, i) => priceForm.openEdit(row as any, i)}
-              onDelete={(row, i) => priceConfirm.requestDelete(row, i)}
-              addLabel="Set Price"
-              searchPlaceholder="Search prices..."
-            />
-            <FormModal
-              open={priceForm.open}
-              onClose={priceForm.close}
-              title={priceForm.isEdit ? "Edit Price" : "Set Price"}
-              groups={priceFields}
-              values={priceForm.values}
-              onChange={priceForm.onChange}
-              isEdit={priceForm.isEdit}
-              onSubmit={handlePriceSave}
-            />
-            <ConfirmDialog
-              open={priceConfirm.open}
-              onClose={priceConfirm.close}
-              title="Delete Price"
-              message="Delete this price entry?"
-              onConfirm={handlePriceDelete}
             />
           </>
         );

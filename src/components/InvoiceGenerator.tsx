@@ -4,7 +4,7 @@ import { downloadInvoicePDFs, type InvoiceData } from "../services/InvoicePDF";
 import { useExchangeRate } from "../hooks/useExchangeRate";
 import { useInvoiceNumber } from "../hooks/useInvoiceNumber";
 import { useRecords } from "../hooks/useRecords";
-import type { CustomersRow, FiscalRow, PricesRow } from "../services/rowTypes.generated";
+import type { CustomersRow, FiscalRow, PlantSizesRow } from "../services/rowTypes.generated";
 import {
   FileText,
   Check,
@@ -101,7 +101,10 @@ export default function InvoiceGenerator({
    * fiscal document with invented content on it.
    */
   const { next: nextNumber } = useInvoiceNumber();
-  const [priceRows] = useRecords<PricesRow>("prices", []);
+  // Price lives on the product row now — a variety at a size, as a type and a
+  // condition, with what it costs. Two tables meant two screens describing one
+  // thing.
+  const [priceRows] = useRecords<PlantSizesRow>("plantSizes", []);
   const [customerRows] = useRecords<CustomersRow>("customers", []);
   const [fiscalRows] = useRecords<FiscalRow>("fiscal", []);
 

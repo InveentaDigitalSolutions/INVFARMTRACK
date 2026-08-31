@@ -406,6 +406,9 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     primaryKey: "bv_taskid",
     fields: {
       title: "bv_tasktitle",
+      // The column was always there and never mapped, so a task could not be
+      // tied to the beds it is about.
+      bed: "_bv_bedid_value",
       type: "bv_tasktype",
       due: "bv_duedate",
       assigned: "bv_assignedto",
@@ -559,25 +562,6 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // `items` is a line count. Lines live in bv_OrderItem, which the app
       // does not read yet, so the number is app-only and does not persist.
     },
-  },
-  prices: {
-    dataSource: "bv_plantprices",
-    primaryKey: "bv_plantpriceid",
-    fields: {
-      port: "_bv_portid_value",
-      product: "bv_product",
-      size: "_bv_plantsizeid_value",
-      plant: "_bv_plantid_value",
-      season: "_bv_seasonid_value",
-      customer: "_bv_customerid_value",
-      priceExt: "bv_priceext",
-      priceInt: "bv_priceint",
-      from: "bv_effectivefrom",
-      to: "bv_effectiveto",
-      active: "bv_isactive",
-    },
-    primaryName: "bv_plantpricename",
-    nameFrom: ["plant", "customer", "from"],
   },
   invoices: {
     dataSource: "bv_invoices",
@@ -744,6 +728,17 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       bundleSize: "bv_bundlesize",
       productType: "bv_producttype",
       cuttingType: "bv_cuttingtype",
+      // Price lives on the same row. Size existed only to be priced and packed,
+      // so two tables meant two screens describing one thing. Customer, port
+      // and dates may be blank, meaning any — the most specific row wins, and
+      // the box count can sit on the general row instead of being repeated.
+      customer: "_bv_customerid_value",
+      port: "_bv_portid_value",
+      season: "_bv_seasonid_value",
+      from: "bv_effectivefrom",
+      to: "bv_effectiveto",
+      priceExt: "bv_priceext",
+      priceInt: "bv_priceint",
       active: "bv_isactive",
       notes: "bv_notes",
     },
@@ -880,7 +875,6 @@ export const ENABLED_TABLES = new Set<string>([
   "timesheets",
   // Batch 1 — commercial. Enabled 2026-08-28.
   "orders",
-  "prices",
   "invoices",
   "fiscal",
   "expenses",

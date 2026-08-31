@@ -80,7 +80,7 @@ const catalogViews = [
   // What a box of each variety and size should hold. Beside Plants because it
   // is reference data typed once and read constantly, the same reason Seasons
   // is here rather than under Accounting.
-  { id: "sizes", label: "Sizes & Packing" },
+  { id: "sizes", label: "Products & Pricing" },
   { id: "seasons", label: "Seasons" },
 ] as const;
 
@@ -197,6 +197,9 @@ const harvestFields = [
 const taskFormGroups = [
   { title: "Task Details", columns: 2 as const, fields: [
     { key: "title", label: "Title", type: "text" as const, required: true, span: 2 as const },
+    // A task is usually about a run of beds, not one. Every bed becomes its own
+    // task, so each can be finished on its own.
+    { key: "bed", label: "Beds", type: "bedselector" as const, span: 2 as const, multiSelect: true },
     { key: "type", label: "Type", type: "select" as const, options: [
       { value: "Watering", label: "Watering" }, { value: "Fertilizing", label: "Fertilizing" },
       { value: "Pruning", label: "Pruning" }, { value: "Pest Control", label: "Pest Control" },
@@ -254,6 +257,20 @@ const plantSizeFields = [
       { value: "Petit", label: "PET" },
     ] },
     { key: "active", label: "Offered", type: "boolean" as const },
+  ]},
+  { title: "Who and where — leave blank for any", columns: 2 as const, fields: [
+    // Blank means the row applies to anyone, anywhere. The most specific row
+    // that fits wins, so a general figure is set once and only overridden where
+    // something was actually negotiated.
+    { key: "customer", label: "Customer", type: "select" as const, options: [], optionsFrom: "customers" },
+    { key: "port", label: "Port", type: "select" as const, options: [], optionsFrom: "ports" },
+    { key: "season", label: "Season", type: "select" as const, options: [], optionsFrom: "seasons" },
+    { key: "from", label: "Priced from", type: "date" as const },
+    { key: "to", label: "Priced to", type: "date" as const },
+  ]},
+  { title: "Price", columns: 2 as const, fields: [
+    { key: "priceExt", label: "Export price (USD)", type: "text" as const },
+    { key: "priceInt", label: "Internal price (USD)", type: "text" as const },
   ]},
   { title: "What a box holds", columns: 2 as const, fields: [
     // The number an order line is checked against: 40 boxes of Regular
@@ -511,6 +528,19 @@ export default function ProductionPage() {
    * line is another variety going into the same bed on the same day, which is
    * a new planting record, not a change to this one.
    */
+  /** One task per bed, so each can be marked done as it is done. */
+  const saveTask = (values: Record<string, unknown>) => {
+    const records = expandBeds(values);
+    if (taskForm.isEdit && taskForm.editIndex !== null) {
+      const updated = [...tasks];
+      updated[taskForm.editIndex] = { ...updated[taskForm.editIndex], ...records[0] } as never;
+      setTasks([...updated, ...records.slice(1)] as never);
+    } else {
+      setTasks([...tasks, ...records] as never);
+    }
+    taskForm.close();
+  };
+
   const savePlanting = (values: Record<string, unknown>) => {
     // Ground or baskets, never both in one submission — a basket planting
     // carries a size that a ground one has no use for.
@@ -735,7 +765,7 @@ export default function ProductionPage() {
               addLabel="Add Task"
               searchPlaceholder="Search tasks..."
             />
-            <FormModal open={taskForm.open} onClose={taskForm.close} title={taskForm.isEdit ? "Edit Task" : "Add Task"} groups={taskFormGroups} values={taskForm.values} onChange={taskForm.onChange} isEdit={taskForm.isEdit} onSubmit={(v) => handleSave(tasks, setTasks, taskForm, v)} />
+            <FormModal open={taskForm.open} onClose={taskForm.close} title={taskForm.isEdit ? "Edit Task" : "Add Task"} groups={taskFormGroups} values={taskForm.values} onChange={taskForm.onChange} isEdit={taskForm.isEdit} onSubmit={saveTask} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Task" message="Delete this task?" onConfirm={() => handleDelete(tasks, setTasks)} />
           </>
         );
@@ -839,9 +869,12 @@ export default function ProductionPage() {
         return (
           <>
             <div className="mb-3 text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3.5 py-2.5">
-              What a box <em>should</em> hold, per variety and size. Packing records
-              what a box actually held; this is what an order is checked against —
-              40 boxes of Regular Hawaiian is 80,000 cuttings.
+              A product is a variety at a size, as a type and a condition — and
+              what it costs. Size and price were two screens describing the same
+              thing; the only reason to record a size is to price and pack it.
+              Leave customer, port or the dates blank and the row applies to any
+              of them, so a general figure is set once and the box count need not
+              be repeated on every price.
             </div>
             <DataTable
               columns={[
@@ -855,6 +888,17 @@ export default function ProductionPage() {
                 { key: "bundleSize", label: "Bundle" },
                 { key: "productType", label: "Type" },
                 { key: "cuttingType", label: "Product" },
+                { key: "customer", label: "Customer", render: (r) => (
+                  <Badge variant={r.customer ? "blue" : "gray"}>{(r.customer as string) || "Any"}</Badge>
+                ) },
+                { key: "port", label: "Port", render: (r) => (
+                  <Badge variant={r.port ? "blue" : "gray"}>{(r.port as string) || "Any"}</Badge>
+                ) },
+                { key: "priceExt", label: "Price (USD)", render: (r) => (
+                  <span className="font-mono tabular-nums text-navy-700">
+                    {r.priceExt ? String(r.priceExt) : "—"}
+                  </span>
+                ) },
                 { key: "active", label: "Offered", render: (r) => (
                   <Badge variant={r.active === false ? "gray" : "green"}>
                     {r.active === false ? "No" : "Yes"}
@@ -865,12 +909,12 @@ export default function ProductionPage() {
               onAdd={plantSizeForm.openCreate}
               onEdit={(row, i) => plantSizeForm.openEdit(row as any, i)}
               onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="Add Size"
-              searchPlaceholder="Search sizes..."
+              addLabel="Add Product"
+              searchPlaceholder="Search products..."
             />
             <FormModal
               open={plantSizeForm.open} onClose={plantSizeForm.close}
-              title={plantSizeForm.isEdit ? "Edit Size" : "Add Size"}
+              title={plantSizeForm.isEdit ? "Edit Product" : "Add Product"}
               groups={plantSizeFields} values={plantSizeForm.values}
               onChange={plantSizeForm.onChange} isEdit={plantSizeForm.isEdit}
               onSubmit={(v) => handleSave(plantSizes, setPlantSizes, plantSizeForm, v)}

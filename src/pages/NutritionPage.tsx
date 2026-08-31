@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { expandBeds } from "../services/expandBeds";
 import { motion } from "framer-motion";
 import { FlaskConical, Scale, Beaker, Microscope, Leaf } from "lucide-react";
 import PageShell from "../components/PageShell";
@@ -49,7 +50,7 @@ const weightFields = [
 const balanceFields = [
   { title: "Nutrient Balance Entry", columns: 2 as const, fields: [
     { key: "week", label: "Week", type: "number" as const, min: 1, max: 52, required: true },
-    { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
+    { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
     { key: "dryMatterPct", label: "Dry Matter %", type: "number" as const, suffix: "%", min: 0, max: 100 },
   ]},
   { title: "Applied (kg)", columns: 4 as const, fields: [
@@ -74,7 +75,7 @@ const soilFields = [
     { key: "labCode", label: "Lab Code", type: "text" as const },
     { key: "reportNumber", label: "Report Number", type: "text" as const },
     { key: "crop", label: "Crop", type: "text" as const },
-    { key: "bed", label: "Bed", type: "bedselector" as const, span: 2 as const, multiSelect: false },
+    { key: "bed", label: "Beds", type: "bedselector" as const, span: 2 as const, multiSelect: true },
   ]},
   { title: "Physical", columns: 3 as const, fields: [
     { key: "texture", label: "Texture", type: "text" as const },
@@ -129,7 +130,7 @@ const foliarFields = [
     { key: "lab", label: "Lab", type: "text" as const },
     { key: "labCode", label: "Lab Code", type: "text" as const },
     { key: "crop", label: "Crop", type: "text" as const },
-    { key: "bed", label: "Bed", type: "bedselector" as const, span: 2 as const, multiSelect: false },
+    { key: "bed", label: "Beds", type: "bedselector" as const, span: 2 as const, multiSelect: true },
   ]},
   { title: "Macronutrients (%)", columns: 3 as const, fields: [
     { key: "n", label: "N %", type: "number" as const },
@@ -168,6 +169,25 @@ export default function NutritionPage() {
     } else { setData([...data, values]); }
     form.close();
   };
+  /**
+   * One record per bed selected. A soil sample or a balance covers a run of
+   * beds, and entering them one at a time was the whole complaint.
+   */
+  const saveAcrossBeds = (
+    data: any[], setData: (d: any) => void,
+    form: ReturnType<typeof useFormModal>, values: Record<string, unknown>
+  ) => {
+    const records = expandBeds(values);
+    if (form.isEdit && form.editIndex !== null) {
+      const u = [...data];
+      u[form.editIndex] = { ...u[form.editIndex], ...records[0] };
+      setData([...u, ...records.slice(1)]);
+    } else {
+      setData([...data, ...records]);
+    }
+    form.close();
+  };
+
   const del = (data: any[], setData: (d: any) => void) => {
     if (confirm.pending) setData(data.filter((_, i) => i !== confirm.pending!.index));
   };
@@ -253,7 +273,7 @@ export default function NutritionPage() {
               addLabel="Add Balance Entry"
               searchPlaceholder="Search balance..."
             />
-            <FormModal open={balanceForm.open} onClose={balanceForm.close} title={balanceForm.isEdit ? "Edit Nutrient Balance" : "Add Nutrient Balance"} groups={balanceFields} values={balanceForm.values} onChange={balanceForm.onChange} isEdit={balanceForm.isEdit} onSubmit={(v) => save(balance, setBalance, balanceForm, v)} />
+            <FormModal open={balanceForm.open} onClose={balanceForm.close} title={balanceForm.isEdit ? "Edit Nutrient Balance" : "Add Nutrient Balance"} groups={balanceFields} values={balanceForm.values} onChange={balanceForm.onChange} isEdit={balanceForm.isEdit} onSubmit={(v) => saveAcrossBeds(balance, setBalance, balanceForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Entry" message="Delete this nutrient balance entry?" onConfirm={() => del(balance, setBalance)} />
           </>
         );
@@ -292,7 +312,7 @@ export default function NutritionPage() {
               addLabel="Add Soil Analysis"
               searchPlaceholder="Search soil analyses..."
             />
-            <FormModal open={soilForm.open} onClose={soilForm.close} title={soilForm.isEdit ? "Edit Soil Analysis" : "Add Soil Analysis"} subtitle="Zamorano lab report format" groups={soilFields} values={soilForm.values} onChange={soilForm.onChange} isEdit={soilForm.isEdit} onSubmit={(v) => save(soil, setSoil, soilForm, v)} />
+            <FormModal open={soilForm.open} onClose={soilForm.close} title={soilForm.isEdit ? "Edit Soil Analysis" : "Add Soil Analysis"} subtitle="Zamorano lab report format" groups={soilFields} values={soilForm.values} onChange={soilForm.onChange} isEdit={soilForm.isEdit} onSubmit={(v) => saveAcrossBeds(soil, setSoil, soilForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Analysis" message="Delete this soil analysis record?" onConfirm={() => del(soil, setSoil)} />
           </>
         );
@@ -326,7 +346,7 @@ export default function NutritionPage() {
               addLabel="Add Foliar Analysis"
               searchPlaceholder="Search foliar analyses..."
             />
-            <FormModal open={foliarForm.open} onClose={foliarForm.close} title={foliarForm.isEdit ? "Edit Foliar Analysis" : "Add Foliar Analysis"} groups={foliarFields} values={foliarForm.values} onChange={foliarForm.onChange} isEdit={foliarForm.isEdit} onSubmit={(v) => save(foliar, setFoliar, foliarForm, v)} />
+            <FormModal open={foliarForm.open} onClose={foliarForm.close} title={foliarForm.isEdit ? "Edit Foliar Analysis" : "Add Foliar Analysis"} groups={foliarFields} values={foliarForm.values} onChange={foliarForm.onChange} isEdit={foliarForm.isEdit} onSubmit={(v) => saveAcrossBeds(foliar, setFoliar, foliarForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Analysis" message="Delete this foliar analysis record?" onConfirm={() => del(foliar, setFoliar)} />
           </>
         );
