@@ -1,5 +1,5 @@
 /** Checks capacity from density. Run: npm run test:capacity */
-import { geometryOf, groundCapacity, cableCapacity, capacityByField } from '../../src/services/bedCapacity.ts'
+import { geometryOf, groundCapacity, cableCapacity, basketsPerCable, capacityByField } from '../../src/services/bedCapacity.ts'
 
 let failures = 0
 const eq = (label: string, got: unknown, want: unknown) => {
@@ -28,13 +28,11 @@ eq('a zero density is treated as unrecorded', groundCapacity({ plantsPerSqM: 0 }
 eq('a negative density too', groundCapacity({ plantsPerSqM: -3 }, 'E3'), null)
 eq('an unknown field gives null', groundCapacity(dense, 'Z9'), null)
 
-// A cable is a line: length only, and the width plays no part. So the same
-// density gives the same answer in E as in C, where the ground does not.
-const hanging = { plantsPerCableM: 4 }
-eq('a cable at 4/m holds 149', cableCapacity(hanging, 'E3'), 149)
-eq('and the same in a wider field', cableCapacity(hanging, 'C1'), 149)
-eq('ground density does not fill a cable', cableCapacity(dense, 'E3'), null)
-eq('cable density does not fill the ground', groundCapacity(hanging, 'E3'), null)
+// A cable is a series of small areas — the baskets — so the same density
+// applies inside them. Until the baskets are measured there is no area to
+// multiply by, and the honest answer is null rather than a guess.
+eq('an unmeasured basket gives no capacity', cableCapacity(dense, 'E3'), null)
+eq('nor a count of baskets on the cable', basketsPerCable('E3'), null)
 
 // The per-field table shown beside the density on the form.
 const table = capacityByField(dense)
@@ -44,8 +42,8 @@ eq('a whole E field is 33 rows of 536', table[0].perField, 536 * 33)
 eq('a whole C field is 27 rows of 804', table[1].perField, 804 * 27)
 eq('an unrecorded density leaves the field blank too',
   capacityByField({}).every((f) => f.perRow === null && f.perField === null), true)
-eq('asking for baskets uses the cable density',
-  capacityByField(hanging, 'basket')[0].perRow, 149)
+eq('and the per-field table says so too',
+  capacityByField(dense, 'basket').every((f) => f.perRow === null), true)
 
 console.log(failures ? `\n  ${failures} failed` : '\n  Capacity follows the bed it is in.')
 process.exit(failures ? 1 : 0)

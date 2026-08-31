@@ -17,6 +17,20 @@ export interface CapacityPreviewProps {
 export default function CapacityPreview({ plant, kind = "ground" }: CapacityPreviewProps) {
   const rows = capacityByField(plant, kind);
   const anything = rows.some((r) => r.perRow !== null);
+
+  // A density is entered but the baskets have not been measured, so nothing can
+  // be worked out. Say that, rather than showing nothing and letting it read as
+  // "no baskets".
+  if (!anything && kind === "basket" && Number(plant.plantsPerSqM) > 0) {
+    return (
+      <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200/70 px-3 py-2">
+        <p className="text-[11px] text-amber-900">
+          Basket capacity needs the basket measured — width across the top and
+          the spacing along the cable. Not recorded yet.
+        </p>
+      </div>
+    );
+  }
   if (!anything) return null;
 
   const total = rows.reduce((sum, r) => sum + (r.perField ?? 0), 0);

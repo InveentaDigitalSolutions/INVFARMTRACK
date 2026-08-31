@@ -6,25 +6,24 @@
  * C row is exactly one and a half times an E row and a single count was wrong
  * by fifty per cent for half the nursery.
  *
- * Density fixes that, and it has to be two different densities because the two
- * kinds of bed have different shapes:
+ * Density fixes that, and it is ONE density everywhere — plants per square
+ * metre, which the nursery counts when it plants. What differs is the area it
+ * is multiplied by:
  *
- * - A **ground bed** is an area. Plants per square metre times its area.
- * - A **basket** is a cable. Pots hang along it at a spacing, so it is plants
- *   per metre times its length — there is no width to multiply by.
+ * - A **ground row** is one rectangle: its width by its length.
+ * - A **cable** is a series of small ones: the area of a basket, times the
+ *   number of baskets hanging on it.
  *
- * Getting that wrong in the other direction, by putting baskets on a per-square
- * metre figure, would make a basket's capacity depend on a width it does not
- * have.
+ * An earlier version asked for a second density per metre of cable. That was
+ * wrong: it treated a cable as a line, when a basket has an area of its own and
+ * the same density applies inside it.
  */
 
-import { plotConfigs } from "./shadehouseLayout";
+import { plotConfigs, BASKET_GEOMETRY, type PotType } from "./shadehouseLayout";
 
 export interface PlantDensity {
-  /** Plants per square metre on the ground. */
+  /** Plants per square metre, counted when planting. The only density there is. */
   plantsPerSqM?: number;
-  /** Plants per metre of cable in a basket. */
-  plantsPerCableM?: number;
 }
 
 export interface BedGeometry {
@@ -57,15 +56,36 @@ export function groundCapacity(plant: PlantDensity | undefined, fieldId: string)
   return Math.round(density * geometry.widthM * geometry.lengthM);
 }
 
-/**
- * Capacity of one cable in a field. A cable runs the length of the row it hangs
- * over, so the length is the bed's length and the width plays no part.
- */
-export function cableCapacity(plant: PlantDensity | undefined, fieldId: string): number | null {
-  const density = positive(plant?.plantsPerCableM);
+/** How many baskets hang on one cable, or null until they are measured. */
+export function basketsPerCable(fieldId: string, potType: PotType = "round"): number | null {
+  const basket = BASKET_GEOMETRY[potType];
   const geometry = geometryOf(fieldId);
-  if (density === undefined || !geometry) return null;
-  return Math.round(density * geometry.lengthM);
+  if (!basket || !geometry || basket.pitchM <= 0) return null;
+  return Math.floor(geometry.lengthM / basket.pitchM);
+}
+
+/**
+ * Capacity of one cable: the same density, over the area of the baskets that
+ * hang on it.
+ *
+ * Null while the baskets are unmeasured. That is the honest answer — a guessed
+ * basket size would give every hanging variety a confident capacity with
+ * nothing on screen to say it was invented.
+ */
+export function cableCapacity(
+  plant: PlantDensity | undefined,
+  fieldId: string,
+  potType: PotType = "round"
+): number | null {
+  const density = positive(plant?.plantsPerSqM);
+  const basket = BASKET_GEOMETRY[potType];
+  const count = basketsPerCable(fieldId, potType);
+  if (density === undefined || !basket || count === null) return null;
+  // Square baskets use the full square; round ones only the circle inside it.
+  const area = potType === "round"
+    ? Math.PI * (basket.widthM / 2) ** 2
+    : basket.widthM ** 2;
+  return Math.round(density * area * count);
 }
 
 export interface FieldCapacity {

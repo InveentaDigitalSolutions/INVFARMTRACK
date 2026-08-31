@@ -609,16 +609,6 @@
           "description": "Planting density on the ground, in plants per square metre. Held as a density rather than a count per row because the rows are not the same size: an E row is 1.20 x 37.20 m and a C row 1.80 x 37.20, so one count is wrong by half for half the nursery."
         },
         {
-          "schemaName": "bv_PlantsPerCableM",
-          "displayName": "Plants per metre of cable",
-          "type": "decimal",
-          "required": false,
-          "precision": 2,
-          "minValue": 0,
-          "maxValue": 1000,
-          "description": "Density in a basket, in plants per metre of cable. Per metre and not per square metre because a cable is a line: pots hang along it at a spacing, and it has no width to multiply by."
-        },
-        {
           "schemaName": "bv_GrowthWeeksMinMarAug",
           "displayName": "Growth Weeks Min (Mar-Aug)",
           "type": "integer",

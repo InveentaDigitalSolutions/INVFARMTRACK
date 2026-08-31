@@ -57,10 +57,10 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       patentNum: "bv_patentnumber",
       patentHolder: "bv_patentholder",
       patentExpiry: "bv_patentexpiry",
-      // Densities, because the rows are not the same size. Ground is per
-      // square metre; a cable is a line, so it is per metre.
+      // One density, because it is what gets counted when planting. What it is
+      // multiplied by depends on the bed: width x length on the ground, the
+      // area of a basket times how many hang on the cable.
       plantsPerSqM: "bv_plantspersqm",
-      plantsPerCableM: "bv_plantspercablem",
       // Where it may be grown, and what it needs over it. The bed records what
       // it actually has; these two record what the variety asks for.
       grownIn: "bv_grownin",

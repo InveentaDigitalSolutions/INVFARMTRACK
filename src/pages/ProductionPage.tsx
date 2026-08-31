@@ -275,16 +275,21 @@ const plantFields = [
      * ground is an area, a cable is a line, so one is per square metre and the
      * other per metre.
      */
-    { key: "plantsPerSqM", label: "Plants per m² (ground)", type: "number" as const, min: 0, span: 2 as const,
+    // One density for everything, because it is what the nursery counts when
+    // it plants. A ground row multiplies it by width x length; a cable by the
+    // area of a basket times how many hang on it.
+    { key: "plantsPerSqM", label: "Plants per m²", type: "number" as const, min: 0, span: 2 as const,
       suffix: "per m²",
-      showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Ground"),
-      below: (v: Record<string, unknown>) =>
-        <CapacityPreview plant={{ plantsPerSqM: Number(v.plantsPerSqM) }} /> },
-    { key: "plantsPerCableM", label: "Plants per metre of cable (baskets)", type: "number" as const, min: 0,
-      span: 2 as const, suffix: "per m",
-      showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Basket"),
-      below: (v: Record<string, unknown>) =>
-        <CapacityPreview plant={{ plantsPerCableM: Number(v.plantsPerCableM) }} kind="basket" /> },
+      below: (v: Record<string, unknown>) => (
+        <>
+          {String(v.grownIn ?? "").includes("Ground") && (
+            <CapacityPreview plant={{ plantsPerSqM: Number(v.plantsPerSqM) }} />
+          )}
+          {String(v.grownIn ?? "").includes("Basket") && (
+            <CapacityPreview plant={{ plantsPerSqM: Number(v.plantsPerSqM) }} kind="basket" />
+          )}
+        </>
+      ) },
   ]},
   /**
    * Production knowledge, and it is genuinely per variety — the figures happen
@@ -736,7 +741,6 @@ export default function ProductionPage() {
                 { key: "variety", label: "Variety" },
                 { key: "grownIn", label: "Grown In" },
                 { key: "plantsPerSqM", label: "Per m²" },
-                { key: "plantsPerCableM", label: "Per cable m" },
                 // The seasonal pair replaced a single "weeks to first cut":
                 // the same cutting takes 8-10 weeks in the bright half of the
                 // year and 10-12 in the dark, so one number was always wrong
