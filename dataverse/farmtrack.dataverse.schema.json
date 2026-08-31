@@ -6742,7 +6742,7 @@
       "displayName": "Phenology",
       "displayCollectionName": "Phenology",
       "ownershipType": "UserOwned",
-      "description": "How long a variety takes, in one half of the year. A table rather than columns on the plant because the stage itself varies: most varieties are grown to eight leaves, some to three, and a column called 'weeks to 8 leaves' cannot hold that. One row per variety per season.",
+      "description": "How long a variety takes and to what stage. One row per variety \u2014 the season is not recorded because it is measured: the app knows the light each bed actually received, and a planting in the dark half reaches the same stage later on its own.",
       "columns": [
         {
           "schemaName": "bv_PhenologyCode",
@@ -6763,23 +6763,6 @@
           "description": "The variety these figures describe."
         },
         {
-          "schemaName": "bv_SeasonHalf",
-          "displayName": "Season",
-          "type": "choice",
-          "required": true,
-          "options": [
-            {
-              "value": 187570000,
-              "label": "Mar-Aug"
-            },
-            {
-              "value": 187570001,
-              "label": "Sep-Feb"
-            }
-          ],
-          "description": "Which half of the year. The same cutting takes longer in the dark half \u2014 measured daylight here is 45.3 mol/m2 a day from March to August against 34.7 from September to February. One of: Mar-Aug, Sep-Feb."
-        },
-        {
           "schemaName": "bv_TargetLeaves",
           "displayName": "Grown to (leaves)",
           "type": "integer",
@@ -6795,7 +6778,7 @@
           "required": false,
           "minValue": 0,
           "maxValue": 104,
-          "description": "Weeks from planting to that leaf count, fastest."
+          "description": "Weeks from planting to that leaf count in a normal year, fastest. The seasonal difference comes from measured light, not from a second row."
         },
         {
           "schemaName": "bv_GrowthWeeksMax",
@@ -6804,7 +6787,7 @@
           "required": false,
           "minValue": 0,
           "maxValue": 104,
-          "description": "Weeks from planting to that leaf count, slowest."
+          "description": "Weeks from planting to that leaf count in a normal year, slowest."
         },
         {
           "schemaName": "bv_HarvestWeeks",

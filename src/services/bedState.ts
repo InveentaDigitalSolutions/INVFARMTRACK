@@ -116,7 +116,7 @@ export function bedStatuses(input: {
     // The cycle depends on the month it went in, so it is looked up against
     // the planting date rather than read off the variety as one flat number.
     const cycle = planted
-      ? growthWeeks(input.phenology ?? [], varieties[0] ?? variety, planted)?.expected
+      ? growthWeeks(input.phenology ?? [], varieties[0] ?? variety)?.expected
       : undefined;
     const age = planted ? weeksBetween(planted, today) : 0;
 

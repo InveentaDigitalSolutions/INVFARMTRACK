@@ -11,8 +11,19 @@
  *
  * Then it lived as columns on the plant named "weeks to 8 leaves". Most
  * varieties are grown to eight; some are grown to three. A column with the
- * stage in its name cannot hold that, so the stage is now a field and the
- * figures live in their own table, one row per variety per season.
+ * stage in its name cannot hold that, so the stage is a field and the figures
+ * live in their own table.
+ *
+ * And now there is one row per variety rather than two. The season is not
+ * recorded because it is *measured*: 731 days of radiation say what light each
+ * bed actually received, so a planting in the dark half reaches its stage later
+ * on its own. Recording it twice as well would be two numbers that can
+ * disagree — and the typed pair would win over the measurement, which is
+ * exactly backwards.
+ *
+ * The weeks entered are read as "in a normal year"; `readyOn` in
+ * growthProgress.ts turns them into the light that implies, and then into a
+ * date from the light that actually fell.
  */
 
 /** The two halves of the year the nursery plans in. */
@@ -26,7 +37,6 @@ export function seasonOf(date: Date | string): Season {
 /** One row of the phenology table. */
 export interface PhenologyRow {
   plant?: string;
-  seasonHalf?: string;
   /** The leaf count this variety is grown to. Eight for most, three for some. */
   targetLeaves?: number;
   growthWeeksMin?: number;
@@ -41,7 +51,6 @@ export interface GrowthWeeks {
   max: number;
   /** The middle of the range, for anything that needs one number. */
   expected: number;
-  season: Season;
   /** What "grown" means for this variety, when it is recorded. */
   targetLeaves?: number;
 }
@@ -54,15 +63,10 @@ const num = (v: unknown): number | undefined => {
 const same = (a: unknown, b: unknown) =>
   String(a ?? "").trim().toLowerCase() === String(b ?? "").trim().toLowerCase();
 
-/** The row for a variety in the season a date falls in, or null. */
-export function rowFor(
-  rows: PhenologyRow[],
-  plant: string | undefined,
-  on: Date | string
-): PhenologyRow | null {
+/** The row for a variety, or null. */
+export function rowFor(rows: PhenologyRow[], plant: string | undefined): PhenologyRow | null {
   if (!plant) return null;
-  const season = seasonOf(on);
-  return rows.find((r) => same(r.plant, plant) && same(r.seasonHalf, season)) ?? null;
+  return rows.find((r) => same(r.plant, plant)) ?? null;
 }
 
 /**
@@ -74,10 +78,9 @@ export function rowFor(
  */
 export function growthWeeks(
   rows: PhenologyRow[],
-  plant: string | undefined,
-  plantedOn: Date | string
+  plant: string | undefined
 ): GrowthWeeks | null {
-  const row = rowFor(rows, plant, plantedOn);
+  const row = rowFor(rows, plant);
   if (!row) return null;
 
   const min = num(row.growthWeeksMin);
@@ -88,31 +91,17 @@ export function growthWeeks(
   const hi = max ?? min;
   if (lo === undefined || hi === undefined) return null;
 
-  return {
-    min: lo,
-    max: hi,
-    expected: (lo + hi) / 2,
-    season: seasonOf(plantedOn),
-    targetLeaves: num(row.targetLeaves),
-  };
+  return { min: lo, max: hi, expected: (lo + hi) / 2, targetLeaves: num(row.targetLeaves) };
 }
 
 /** Weeks between cuts once the plant is at its target stage. */
-export function harvestInterval(
-  rows: PhenologyRow[],
-  plant: string | undefined,
-  on: Date | string
-): number | null {
-  return num(rowFor(rows, plant, on)?.harvestWeeks) ?? null;
+export function harvestInterval(rows: PhenologyRow[], plant: string | undefined): number | null {
+  return num(rowFor(rows, plant)?.harvestWeeks) ?? null;
 }
 
 /** Weeks to grow back from the pruned stage to the target one. */
-export function pruningRecovery(
-  rows: PhenologyRow[],
-  plant: string | undefined,
-  on: Date | string
-): number | null {
-  return num(rowFor(rows, plant, on)?.pruningWeeks) ?? null;
+export function pruningRecovery(rows: PhenologyRow[], plant: string | undefined): number | null {
+  return num(rowFor(rows, plant)?.pruningWeeks) ?? null;
 }
 
 /**

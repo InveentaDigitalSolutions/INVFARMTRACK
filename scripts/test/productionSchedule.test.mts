@@ -19,11 +19,10 @@ const plantings = [
   { bed:'E3-09', plant:'Hawaiian', date:'2026-03-02', qty:380 },   // a later wave
   { bed:'C1-01', plant:'Jade',     date:'2026-01-05', qty:300 },   // different variety, same week
 ]
-// Phenology is its own table now: a row per variety per season, with the stage
-// it is grown to as a figure rather than a column heading.
+// Phenology is its own table now: one row per variety, with the stage it is
+// grown to as a figure rather than a column heading.
 const phenology = [
-  { plant:'Hawaiian', seasonHalf:'Mar-Aug', targetLeaves:8, growthWeeksMin:12, growthWeeksMax:14 },
-  { plant:'Hawaiian', seasonHalf:'Sep-Feb', targetLeaves:8, growthWeeksMin:14, growthWeeksMax:16 },
+  { plant:'Hawaiian', targetLeaves:8, growthWeeksMin:12, growthWeeksMax:14 },
 ]
 const list = cohorts(plantings, phenology)
 
@@ -36,11 +35,12 @@ eq('a later wave is its own cohort', list.filter(c => c.plant==='Hawaiian').map(
 
 // projection only where a cycle time exists
 const hawaiian = list.find(c => c.plant==='Hawaiian')!
-// Planted 5 January, so the dark half: 14-16 weeks, not the 12-14 of the bright
-// one. The window is the two ends of the growth range — "productive weeks" was
-// retired because these are cut and pruned in cycles, not finished after a span.
-eq('first cut is the near end of the range', hawaiian.harvestFrom, '2026-04-13')
-eq('and the window closes at the far end', hawaiian.harvestTo, '2026-04-27')
+// The window is the two ends of the growth range — "productive weeks" was
+// retired because these are cut and pruned in cycles, not finished after a
+// span. There is no season here either: the seasonal difference is measured
+// from light rather than entered twice, and growthProgress.ts applies it.
+eq('first cut is the near end of the range', hawaiian.harvestFrom, '2026-03-30')
+eq('and the window closes at the far end', hawaiian.harvestTo, '2026-04-13')
 eq('and it is scheduled', hawaiian.unscheduled, false)
 
 const jade = list.find(c => c.plant==='Jade')!

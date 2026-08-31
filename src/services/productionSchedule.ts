@@ -107,7 +107,7 @@ export function cohorts(
      * again — so the field was retired and the window is now the two ends of
      * the growth range, which is a thing the nursery actually recorded.
      */
-    const span = growthWeeks(phenology, p.plant, start);
+    const span = growthWeeks(phenology, p.plant);
     const weeks = span?.min;
     const latest = span?.max;
 

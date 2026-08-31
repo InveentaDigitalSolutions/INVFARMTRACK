@@ -152,6 +152,12 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   light model works in transmission underneath — 35%, 12.25%, 4.29% — and those
   are the same fact the other way round. Labelling them as transmission read as
   wrong to the nursery, and they were right.
+- **Phenology is one row per variety, with no season.** The stage varies — most
+  are grown to 8 leaves, some to 3 — so it is a field, not a column heading.
+  And the season is NOT recorded: `growthProgress.ts` turns the entered weeks
+  into the light they imply and then into a date from the light that actually
+  fell, so a dark-half planting takes longer on its own. Typing the two seasons
+  as well would let a typed pair overrule a measurement.
 - **The shade cloth is 65% netting, and layers multiply.** Single passes 35%,
   double 0.35² = 12.25%, triple 0.35³ = 4.29% — a factor of **eight** across the
   house, far larger than the seasonal swing (about 30%) or the terrain (1-4%).

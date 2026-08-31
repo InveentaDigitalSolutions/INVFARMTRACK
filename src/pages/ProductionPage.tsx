@@ -41,16 +41,9 @@ const tabs = [
 ];
 
 const phenologyFields = [
-  { title: "Which variety, which half of the year", columns: 2 as const, fields: [
+  { title: "Which variety", columns: 2 as const, fields: [
     { key: "code", label: "Phenology ID", type: "text" as const, readOnly: true, placeholder: "PH-0001 (auto)" },
     { key: "plant", label: "Plant", type: "select" as const, required: true, options: [], optionsFrom: "plants" },
-    // Measured daylight here is 45.3 mol/m² a day from March to August against
-    // 34.7 from September to February, which is why there are two rows and not
-    // one.
-    { key: "seasonHalf", label: "Season", type: "toggle" as const, required: true, span: 2 as const, options: [
-      { value: "Mar-Aug", label: "March – August (bright)" },
-      { value: "Sep-Feb", label: "September – February (dark)" },
-    ] },
   ]},
   { title: "Growing on", columns: 2 as const, fields: [
     // The stage is a figure, not a heading. Eight leaves for most, three for
@@ -601,16 +594,15 @@ export default function ProductionPage() {
         return (
           <>
             <div className="mb-3 text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3.5 py-2.5">
-              How long each variety takes, and to what stage. Two rows per
-              variety — the same cutting takes longer in the dark half of the
-              year, because there is about a quarter less daylight in it.
+              How long each variety takes, and to what stage — in a normal
+              year. One row per variety: the seasonal difference is not typed
+              here, it is measured. A planting in the dark half reaches its
+              stage later on its own, because the app knows the light that
+              actually fell on that bed.
             </div>
             <DataTable
               columns={[
                 { key: "plant", label: "Plant" },
-                { key: "seasonHalf", label: "Season", render: (r) => (
-                  <Badge variant={r.seasonHalf === "Mar-Aug" ? "amber" : "blue"}>{String(r.seasonHalf ?? "—")}</Badge>
-                ) },
                 { key: "targetLeaves", label: "Grown to", render: (r) => (
                   <span className="tabular-nums text-navy-700">
                     {r.targetLeaves ? `${r.targetLeaves} leaves` : "—"}
