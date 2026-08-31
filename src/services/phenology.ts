@@ -1,37 +1,49 @@
 /**
  * How long a variety takes, given when it was planted.
  *
- * `bv_WeeksToFirstHarvest` used to answer this with one number for the whole
- * year, which the nursery's own figures say is wrong: the same cutting reaches
- * eight leaves in 8-10 weeks between March and August and 10-12 between
- * September and February. Measured daylight here explains it — 45.3 mol/m2 a
- * day in the bright half against 34.7 in the dark — and the two seasons come
- * out to within 7% of the same accumulated light.
+ * Two things this has been wrong about, both corrected here.
  *
- * So the season is not a detail to average away. It is the difference between
- * promising stock in November and having it.
+ * It began as one number for the whole year, which the nursery's own figures
+ * contradict: the same cutting reaches its target in 8-10 weeks between March
+ * and August and 10-12 between September and February. Measured daylight
+ * explains it — 45.3 mol/m² a day in the bright half against 34.7 in the dark —
+ * and the two seasons come out within 7% of the same accumulated light.
+ *
+ * Then it lived as columns on the plant named "weeks to 8 leaves". Most
+ * varieties are grown to eight; some are grown to three. A column with the
+ * stage in its name cannot hold that, so the stage is now a field and the
+ * figures live in their own table, one row per variety per season.
  */
 
-import type { PhenologyPlant } from "./rowTypes.helpers";
-
-/** March to August is the bright half; September to February the dark one. */
+/** The two halves of the year the nursery plans in. */
 export type Season = "Mar-Aug" | "Sep-Feb";
 
 export function seasonOf(date: Date | string): Season {
-  const month =
-    typeof date === "string"
-      ? Number(date.slice(5, 7))
-      : date.getUTCMonth() + 1;
+  const month = typeof date === "string" ? Number(date.slice(5, 7)) : date.getUTCMonth() + 1;
   return month >= 3 && month <= 8 ? "Mar-Aug" : "Sep-Feb";
 }
 
+/** One row of the phenology table. */
+export interface PhenologyRow {
+  plant?: string;
+  seasonHalf?: string;
+  /** The leaf count this variety is grown to. Eight for most, three for some. */
+  targetLeaves?: number;
+  growthWeeksMin?: number;
+  growthWeeksMax?: number;
+  harvestWeeks?: number;
+  pruneToLeaves?: number;
+  pruningWeeks?: number;
+}
+
 export interface GrowthWeeks {
-  /** Fastest and slowest the variety reaches 8 leaves, in weeks. */
   min: number;
   max: number;
-  /** The middle of that range, for anything that needs one number. */
+  /** The middle of the range, for anything that needs one number. */
   expected: number;
   season: Season;
+  /** What "grown" means for this variety, when it is recorded. */
+  targetLeaves?: number;
 }
 
 const num = (v: unknown): number | undefined => {
@@ -39,48 +51,75 @@ const num = (v: unknown): number | undefined => {
   return Number.isFinite(n) && n > 0 ? n : undefined;
 };
 
+const same = (a: unknown, b: unknown) =>
+  String(a ?? "").trim().toLowerCase() === String(b ?? "").trim().toLowerCase();
+
+/** The row for a variety in the season a date falls in, or null. */
+export function rowFor(
+  rows: PhenologyRow[],
+  plant: string | undefined,
+  on: Date | string
+): PhenologyRow | null {
+  if (!plant) return null;
+  const season = seasonOf(on);
+  return rows.find((r) => same(r.plant, plant) && same(r.seasonHalf, season)) ?? null;
+}
+
 /**
- * Weeks from planting to first cut, for the season the planting falls in.
+ * Weeks from planting to the variety's own target stage, for the season the
+ * planting falls in.
  *
- * Returns null when the variety has no figures recorded. That is deliberate: a
- * bed whose cycle is unknown can only be called "growing", and inventing a
- * number would have the nursery going out to cut it.
+ * Null when nothing is recorded. A bed whose cycle is unknown can only be
+ * called growing; inventing a number would send someone out to cut it.
  */
 export function growthWeeks(
-  plant: PhenologyPlant | undefined,
+  rows: PhenologyRow[],
+  plant: string | undefined,
   plantedOn: Date | string
 ): GrowthWeeks | null {
-  if (!plant) return null;
-  const season = seasonOf(plantedOn);
+  const row = rowFor(rows, plant, plantedOn);
+  if (!row) return null;
 
-  const min = num(season === "Mar-Aug" ? plant.growthWeeksMinMarAug : plant.growthWeeksMinSepFeb);
-  const max = num(season === "Mar-Aug" ? plant.growthWeeksMaxMarAug : plant.growthWeeksMaxSepFeb);
-
-  // Either end alone is enough to work with; a range needs only one number to
-  // be usable, and half a figure is better than refusing to schedule at all.
+  const min = num(row.growthWeeksMin);
+  const max = num(row.growthWeeksMax);
+  // Either end alone is usable: half a range still schedules, and refusing on
+  // it helps nobody.
   const lo = min ?? max;
   const hi = max ?? min;
   if (lo === undefined || hi === undefined) return null;
 
-  return { min: lo, max: hi, expected: (lo + hi) / 2, season };
+  return {
+    min: lo,
+    max: hi,
+    expected: (lo + hi) / 2,
+    season: seasonOf(plantedOn),
+    targetLeaves: num(row.targetLeaves),
+  };
 }
 
-/** Weeks between harvests once the plant is at 8 leaves. */
+/** Weeks between cuts once the plant is at its target stage. */
 export function harvestInterval(
-  plant: PhenologyPlant | undefined,
+  rows: PhenologyRow[],
+  plant: string | undefined,
   on: Date | string
 ): number | null {
-  if (!plant) return null;
-  const season = seasonOf(on);
-  return num(season === "Mar-Aug" ? plant.harvestWeeksMarAug : plant.harvestWeeksSepFeb) ?? null;
+  return num(rowFor(rows, plant, on)?.harvestWeeks) ?? null;
 }
 
-/** Weeks to recover after pruning back to two leaves. */
+/** Weeks to grow back from the pruned stage to the target one. */
 export function pruningRecovery(
-  plant: PhenologyPlant | undefined,
+  rows: PhenologyRow[],
+  plant: string | undefined,
   on: Date | string
 ): number | null {
-  if (!plant) return null;
-  const season = seasonOf(on);
-  return num(season === "Mar-Aug" ? plant.pruningWeeksMarAug : plant.pruningWeeksSepFeb) ?? null;
+  return num(rowFor(rows, plant, on)?.pruningWeeks) ?? null;
+}
+
+/**
+ * "8 leaves", or "3 leaves", or nothing when it is not recorded — for a screen
+ * that wants to say what it is counting towards rather than assume.
+ */
+export function stageLabel(row: PhenologyRow | null): string | null {
+  const n = num(row?.targetLeaves);
+  return n === undefined ? null : `${n} ${n === 1 ? "leaf" : "leaves"}`;
 }

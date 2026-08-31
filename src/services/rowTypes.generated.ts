@@ -429,14 +429,14 @@ export interface PlantsRow {
   plantsPerSqM?: number;
   grownIn?: string;
   shadeNeeded?: string;
-  growthWeeksMinMarAug?: number;
-  growthWeeksMaxMarAug?: number;
-  harvestWeeksMarAug?: number;
-  pruningWeeksMarAug?: number;
-  growthWeeksMinSepFeb?: number;
-  growthWeeksMaxSepFeb?: number;
-  harvestWeeksSepFeb?: number;
-  pruningWeeksSepFeb?: number;
+  growthWeeksMinMarAug?: string;
+  growthWeeksMaxMarAug?: string;
+  harvestWeeksMarAug?: string;
+  pruningWeeksMarAug?: string;
+  growthWeeksMinSepFeb?: string;
+  growthWeeksMaxSepFeb?: string;
+  harvestWeeksSepFeb?: string;
+  pruningWeeksSepFeb?: string;
   active?: boolean;
   [key: string]: unknown;
 }

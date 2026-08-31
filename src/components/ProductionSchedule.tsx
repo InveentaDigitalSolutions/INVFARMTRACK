@@ -10,7 +10,8 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { useRecords } from "../hooks/useRecords";
-import { cohorts, missingCycles, type PlantCycle } from "../services/productionSchedule";
+import { cohorts, missingCycles } from "../services/productionSchedule";
+import type { PhenologyRow } from "../services/phenology";
 import Badge from "./Badge";
 
 interface PlantingRow {
@@ -21,38 +22,16 @@ interface PlantingRow {
   qty?: number;
   status?: string;
 }
-interface PlantRow {
-  id: string;
-  name?: string;
-  variety?: string;
-  growthWeeksMinMarAug?: number;
-  growthWeeksMaxMarAug?: number;
-  growthWeeksMinSepFeb?: number;
-  growthWeeksMaxSepFeb?: number;
-}
-
 const day = 86_400_000;
 const parse = (s: string) => new Date(`${s}T00:00:00Z`);
 
 export default function ProductionSchedule() {
   const [plantings] = useRecords<PlantingRow>("plantings", []);
-  const [plants] = useRecords<PlantRow>("plants", []);
+  // How long each variety takes, per season — its own table now, because the
+  // stage varies: most are grown to eight leaves, some to three.
+  const [phenology] = useRecords<PhenologyRow>("phenology", []);
 
-  // Plantings name a variety the way the lookup shows it — "Pothos /
-  // Hawaiian" — so the cycle times are keyed the same way.
-  const cycles = useMemo<PlantCycle[]>(
-    () =>
-      plants.map((p) => ({
-        plant: [p.name, p.variety].filter(Boolean).join(" / "),
-        growthWeeksMinMarAug: p.growthWeeksMinMarAug,
-        growthWeeksMaxMarAug: p.growthWeeksMaxMarAug,
-        growthWeeksMinSepFeb: p.growthWeeksMinSepFeb,
-        growthWeeksMaxSepFeb: p.growthWeeksMaxSepFeb,
-      })),
-    [plants]
-  );
-
-  const waves = useMemo(() => cohorts(plantings, cycles), [plantings, cycles]);
+  const waves = useMemo(() => cohorts(plantings, phenology), [plantings, phenology]);
   const missing = useMemo(() => missingCycles(waves), [waves]);
 
   // The window spans everything planted plus everything projected, so no bar

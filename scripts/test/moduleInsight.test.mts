@@ -174,8 +174,16 @@ const status = bedStatuses({
     { bed: 'E3-04', plant: 'Pothos / Jade', date: '2026-01-01', endDate: '2026-01-01' },
   ],
   plants: [
-    { name: 'Pothos', variety: 'Hawaiian', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:12, growthWeeksMinSepFeb:12, growthWeeksMaxSepFeb:12 },
-    { name: 'Pothos', variety: 'Jade', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:12, growthWeeksMinSepFeb:12, growthWeeksMaxSepFeb:12 },
+    { name: 'Pothos', variety: 'Hawaiian' },
+    { name: 'Pothos', variety: 'Jade' },
+  ],
+  // Phenology is a table of its own now, keyed on the variety as a planting
+  // names it, with the stage as a figure rather than a column heading.
+  // Keyed on the variety exactly as a planting names it — both resolve the
+  // same plant lookup, so both read "Pothos / Jade".
+  phenology: [
+    { plant: 'Pothos / Jade', seasonHalf: 'Mar-Aug', targetLeaves: 8, growthWeeksMin: 12, growthWeeksMax: 12 },
+    { plant: 'Pothos / Jade', seasonHalf: 'Sep-Feb', targetLeaves: 8, growthWeeksMin: 12, growthWeeksMax: 12 },
   ],
   treatments: [{ bed: 'E3-01', date: '2026-08-20', type: 'Pest control' }],
   today: TODAY,

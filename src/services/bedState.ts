@@ -10,13 +10,12 @@
  * somebody records a harvest and forgets to change a dropdown.
  */
 
-import { growthWeeks } from "./phenology";
-import type { PhenologyPlant } from "./rowTypes.helpers";
+import { growthWeeks, type PhenologyRow } from "./phenology";
 
 export type BedState = "empty" | "planted" | "growing" | "harvest-ready" | "issue";
 
 export interface PlantingLike { bed?: string; plant?: string; date?: string; qty?: number; endDate?: string }
-export interface PlantLike extends PhenologyPlant {
+export interface PlantLike {
   name?: string;
   variety?: string;
 }
@@ -60,6 +59,8 @@ export interface BedStatus {
 export function bedStatuses(input: {
   plantings: PlantingLike[];
   plants: PlantLike[];
+  /** One row per variety per season. Empty means no cycle is known. */
+  phenology?: PhenologyRow[];
   treatments?: DatedBedRecord[];
   today?: Date;
 }): Map<string, BedStatus> {
@@ -115,7 +116,7 @@ export function bedStatuses(input: {
     // The cycle depends on the month it went in, so it is looked up against
     // the planting date rather than read off the variety as one flat number.
     const cycle = planted
-      ? growthWeeks(plantOf.get(varieties[0] ?? variety), planted)?.expected
+      ? growthWeeks(input.phenology ?? [], varieties[0] ?? variety, planted)?.expected
       : undefined;
     const age = planted ? weeksBetween(planted, today) : 0;
 

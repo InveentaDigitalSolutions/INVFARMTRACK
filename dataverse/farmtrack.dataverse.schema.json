@@ -607,78 +607,6 @@
           "minValue": 0,
           "maxValue": 10000,
           "description": "Planting density on the ground, in plants per square metre. Held as a density rather than a count per row because the rows are not the same size: an E row is 1.20 x 37.20 m and a C row 1.80 x 37.20, so one count is wrong by half for half the nursery."
-        },
-        {
-          "schemaName": "bv_GrowthWeeksMinMarAug",
-          "displayName": "Growth Weeks Min (Mar-Aug)",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 104,
-          "description": "Weeks from planting to 8 leaves in the bright half of the year, low end of the range."
-        },
-        {
-          "schemaName": "bv_GrowthWeeksMaxMarAug",
-          "displayName": "Growth Weeks Max (Mar-Aug)",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 104,
-          "description": "Weeks from planting to 8 leaves in the bright half of the year, high end of the range."
-        },
-        {
-          "schemaName": "bv_HarvestWeeksMarAug",
-          "displayName": "Harvest Weeks (Mar-Aug)",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 104,
-          "description": "Weeks between harvests once the plant is at 8 leaves, bright half of the year."
-        },
-        {
-          "schemaName": "bv_PruningWeeksMarAug",
-          "displayName": "Pruning Weeks (Mar-Aug)",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 104,
-          "description": "Weeks to recover after pruning back to 2 leaves, bright half of the year."
-        },
-        {
-          "schemaName": "bv_GrowthWeeksMinSepFeb",
-          "displayName": "Growth Weeks Min (Sep-Feb)",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 104,
-          "description": "Weeks from planting to 8 leaves in the dark half of the year, low end of the range."
-        },
-        {
-          "schemaName": "bv_GrowthWeeksMaxSepFeb",
-          "displayName": "Growth Weeks Max (Sep-Feb)",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 104,
-          "description": "Weeks from planting to 8 leaves in the dark half of the year, high end of the range."
-        },
-        {
-          "schemaName": "bv_HarvestWeeksSepFeb",
-          "displayName": "Harvest Weeks (Sep-Feb)",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 104,
-          "description": "Weeks between harvests once the plant is at 8 leaves, dark half of the year."
-        },
-        {
-          "schemaName": "bv_PruningWeeksSepFeb",
-          "displayName": "Pruning Weeks (Sep-Feb)",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 104,
-          "description": "Weeks to recover after pruning back to 2 leaves, dark half of the year."
         }
       ]
     },
@@ -6800,6 +6728,110 @@
           "relatedTable": "bv_Customer",
           "required": false,
           "description": "Whose name this is, when only one customer uses it. Empty means anyone might."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "bv_Phenology",
+      "displayName": "Phenology",
+      "displayCollectionName": "Phenology",
+      "ownershipType": "UserOwned",
+      "description": "How long a variety takes, in one half of the year. A table rather than columns on the plant because the stage itself varies: most varieties are grown to eight leaves, some to three, and a column called 'weeks to 8 leaves' cannot hold that. One row per variety per season.",
+      "columns": [
+        {
+          "schemaName": "bv_PhenologyCode",
+          "displayName": "Phenology ID",
+          "type": "autonumber",
+          "autoNumberFormat": "PH-{SEQNUM:4}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format PH-0001."
+        },
+        {
+          "schemaName": "bv_PlantId",
+          "displayName": "Plant",
+          "type": "lookup",
+          "relatedTable": "bv_Plant",
+          "required": true,
+          "description": "The variety these figures describe."
+        },
+        {
+          "schemaName": "bv_SeasonHalf",
+          "displayName": "Season",
+          "type": "choice",
+          "required": true,
+          "options": [
+            {
+              "value": 187570000,
+              "label": "Mar-Aug"
+            },
+            {
+              "value": 187570001,
+              "label": "Sep-Feb"
+            }
+          ],
+          "description": "Which half of the year. The same cutting takes longer in the dark half \u2014 measured daylight here is 45.3 mol/m2 a day from March to August against 34.7 from September to February. One of: Mar-Aug, Sep-Feb."
+        },
+        {
+          "schemaName": "bv_TargetLeaves",
+          "displayName": "Grown to (leaves)",
+          "type": "integer",
+          "required": false,
+          "minValue": 1,
+          "maxValue": 60,
+          "description": "The leaf count this variety is grown to before it is cut. Eight for most, three for some \u2014 which is why it is a field and not a heading."
+        },
+        {
+          "schemaName": "bv_GrowthWeeksMin",
+          "displayName": "Growth weeks (from)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks from planting to that leaf count, fastest."
+        },
+        {
+          "schemaName": "bv_GrowthWeeksMax",
+          "displayName": "Growth weeks (to)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks from planting to that leaf count, slowest."
+        },
+        {
+          "schemaName": "bv_HarvestWeeks",
+          "displayName": "Harvest every (weeks)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks between cuts once the plant is at that stage."
+        },
+        {
+          "schemaName": "bv_PruneToLeaves",
+          "displayName": "Pruned back to (leaves)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 60,
+          "description": "The leaf count it is cut back to. Two on the current table, but no more fixed than the target."
+        },
+        {
+          "schemaName": "bv_PruningWeeks",
+          "displayName": "Recovery after pruning (weeks)",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 104,
+          "description": "Weeks to grow back from the pruned stage to the target one."
         },
         {
           "schemaName": "bv_Notes",

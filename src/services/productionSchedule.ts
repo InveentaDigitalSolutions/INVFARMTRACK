@@ -15,24 +15,15 @@
  * unknown, rather than drawing a plausible bar nobody entered.
  */
 
-import { growthWeeks } from "./phenology";
+import { growthWeeks, type PhenologyRow } from "./phenology";
 
 export interface PlantingLike {
   bed?: string;
   plant?: string;
   date?: string;
   qty?: number;
-  /** False once the planting has been cleared off the bed. */
-  current?: boolean;
-}
-
-export interface PlantCycle {
-  /** Variety name as it appears on a planting. */
-  plant: string;
-  growthWeeksMinMarAug?: number;
-  growthWeeksMaxMarAug?: number;
-  growthWeeksMinSepFeb?: number;
-  growthWeeksMaxSepFeb?: number;
+  /** The day it came off the bed. Empty means it is still standing. */
+  endDate?: string;
 }
 
 export interface Cohort {
@@ -84,14 +75,17 @@ const addWeeks = (dateISO: string, weeks: number) =>
  */
 export function cohorts(
   plantings: PlantingLike[],
-  cycles: PlantCycle[] = []
+  /** One row per variety per season — how long it takes and to what stage. */
+  phenology: PhenologyRow[] = []
 ): Cohort[] {
-  const cycleOf = new Map(cycles.map((c) => [c.plant, c]));
   const grouped = new Map<string, Cohort>();
 
   for (const p of plantings) {
     if (!p.plant || !p.date) continue;
-    if (p.current === false) continue;
+    // Standing until it is cleared. An end date in the future is still
+    // standing today, which the old yes/no could not express.
+    const cleared = String(p.endDate ?? "").slice(0, 10);
+    if (cleared && cleared <= new Date().toISOString().slice(0, 10)) continue;
 
     const start = weekStart(String(p.date));
     const key = `${p.plant}|${start}`;
@@ -102,7 +96,6 @@ export function cohorts(
       continue;
     }
 
-    const cycle = cycleOf.get(p.plant);
     /**
      * Seasonal, and a range rather than a point: a bed planted in October takes
      * longer to reach eight leaves than the same variety planted in April, and
@@ -114,7 +107,7 @@ export function cohorts(
      * again — so the field was retired and the window is now the two ends of
      * the growth range, which is a thing the nursery actually recorded.
      */
-    const span = growthWeeks(cycle, start);
+    const span = growthWeeks(phenology, p.plant, start);
     const weeks = span?.min;
     const latest = span?.max;
 

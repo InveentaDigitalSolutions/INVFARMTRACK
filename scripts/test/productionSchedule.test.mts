@@ -19,8 +19,13 @@ const plantings = [
   { bed:'E3-09', plant:'Hawaiian', date:'2026-03-02', qty:380 },   // a later wave
   { bed:'C1-01', plant:'Jade',     date:'2026-01-05', qty:300 },   // different variety, same week
 ]
-const cycles = [{ plant:'Hawaiian', growthWeeksMinMarAug:12, growthWeeksMaxMarAug:14, growthWeeksMinSepFeb:14, growthWeeksMaxSepFeb:16 }]
-const list = cohorts(plantings, cycles)
+// Phenology is its own table now: a row per variety per season, with the stage
+// it is grown to as a figure rather than a column heading.
+const phenology = [
+  { plant:'Hawaiian', seasonHalf:'Mar-Aug', targetLeaves:8, growthWeeksMin:12, growthWeeksMax:14 },
+  { plant:'Hawaiian', seasonHalf:'Sep-Feb', targetLeaves:8, growthWeeksMin:14, growthWeeksMax:16 },
+]
+const list = cohorts(plantings, phenology)
 
 eq('beds planted days apart are one wave', list.filter(c => c.plant==='Hawaiian').length, 2)
 eq('and their beds are collected', list[0].beds.length, 2)
@@ -44,7 +49,7 @@ eq('and says so rather than guessing', jade.unscheduled, true)
 eq('the screen can name what is missing', missingCycles(list), ['Jade'])
 
 eq('inactive plantings are excluded',
-  cohorts([...plantings, {bed:'C1-09',plant:'Neon',date:'2026-01-05',current:false}], cycles)
+  cohorts([...plantings, {bed:'C1-09',plant:'Neon',date:'2026-01-05',endDate:'2026-02-01'}], phenology)
     .some(c => c.plant==='Neon'), false)
 
 console.log(failures ? `\n  ${failures} failed` : '\n  all passed')

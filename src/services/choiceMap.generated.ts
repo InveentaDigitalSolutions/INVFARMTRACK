@@ -45,6 +45,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_orders",
   "bv_packings",
   "bv_payments",
+  "bv_phenologies",
   "bv_plantaliases",
   "bv_plantbasketdensities",
   "bv_plantings",
@@ -135,7 +136,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_workers": "bv_workername",
   "bv_basketsizes": "bv_basketsizename",
   "bv_plantbasketdensities": "bv_plantbasketdensitycode",
-  "bv_plantaliases": "bv_plantaliascode"
+  "bv_plantaliases": "bv_plantaliascode",
+  "bv_phenologies": "bv_phenologycode"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -518,6 +520,12 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
       "nav": "bv_CustomerId",
       "targetSet": "bv_customers"
     },
+    "_bv_plantid_value": {
+      "nav": "bv_PlantId",
+      "targetSet": "bv_plants"
+    }
+  },
+  "bv_phenologies": {
     "_bv_plantid_value": {
       "nav": "bv_PlantId",
       "targetSet": "bv_plants"
@@ -1077,6 +1085,12 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Trade name": 187560000,
       "Breeder code": 187560001,
       "Customer spelling": 187560002
+    }
+  },
+  "bv_phenologies": {
+    "bv_seasonhalf": {
+      "Mar-Aug": 187570000,
+      "Sep-Feb": 187570001
     }
   }
 };

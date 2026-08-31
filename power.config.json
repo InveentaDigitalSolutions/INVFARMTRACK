@@ -259,6 +259,11 @@
           "entitySetName": "bv_plantaliases",
           "logicalName": "bv_plantalias",
           "isHidden": false
+        },
+        "phenology": {
+          "entitySetName": "bv_phenologies",
+          "logicalName": "bv_phenology",
+          "isHidden": false
         }
       }
     }

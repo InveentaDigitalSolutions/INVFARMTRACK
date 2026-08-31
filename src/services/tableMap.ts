@@ -65,16 +65,9 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // it actually has; these two record what the variety asks for.
       grownIn: "bv_grownin",
       shadeNeeded: "bv_shadeneeded",
-      // Production knowledge, per season. Santiago's figures come as a range
-      // for growth ("8-10 weeks") and a single number for the other two.
-      growthWeeksMinMarAug: "bv_growthweeksminmaraug",
-      growthWeeksMaxMarAug: "bv_growthweeksmaxmaraug",
-      harvestWeeksMarAug: "bv_harvestweeksmaraug",
-      pruningWeeksMarAug: "bv_pruningweeksmaraug",
-      growthWeeksMinSepFeb: "bv_growthweeksminsepfeb",
-      growthWeeksMaxSepFeb: "bv_growthweeksmaxsepfeb",
-      harvestWeeksSepFeb: "bv_harvestweekssepfeb",
-      pruningWeeksSepFeb: "bv_pruningweekssepfeb",
+      // Production knowledge lives in its own table now: the stage varies —
+      // most varieties are grown to eight leaves, some to three — so it cannot
+      // be columns named after one of them.
       active: "bv_isactive",
     },
   },
@@ -779,6 +772,23 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     },
   },
   /** Destination ports. Price is keyed on them, because the freight is. */
+  /** How long a variety takes, per season, and to what stage. */
+  phenology: {
+    dataSource: "bv_phenologies",
+    primaryKey: "bv_phenologyid",
+    fields: {
+      code: "bv_phenologycode",
+      plant: "_bv_plantid_value",
+      seasonHalf: "bv_seasonhalf",
+      targetLeaves: "bv_targetleaves",
+      growthWeeksMin: "bv_growthweeksmin",
+      growthWeeksMax: "bv_growthweeksmax",
+      harvestWeeks: "bv_harvestweeks",
+      pruneToLeaves: "bv_prunetoleaves",
+      pruningWeeks: "bv_pruningweeks",
+      notes: "bv_notes",
+    },
+  },
   ports: {
     dataSource: "bv_ports",
     primaryKey: "bv_portid",
@@ -906,6 +916,7 @@ export const ENABLED_TABLES = new Set<string>([
   "caiNumbers",
   "exchangeRates",
   "ports",
+  "phenology",
   "basketSizes",
   "basketDensities",
   "plantSizes",

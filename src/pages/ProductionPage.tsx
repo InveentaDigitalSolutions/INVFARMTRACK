@@ -33,7 +33,39 @@ const tabs = [
   { id: "care", label: "Crop Care" },
   { id: "harvest", label: "Harvest" },
   { id: "tasks", label: "Tasks" },
+  // Its own tab, not a corner of the catalogue. How long a variety takes is
+  // production knowledge, it is two rows per variety rather than a field, and
+  // the stage varies — most are grown to eight leaves, some to three.
+  { id: "phenology", label: "Phenology" },
   { id: "catalog", label: "Catalog" },
+];
+
+const phenologyFields = [
+  { title: "Which variety, which half of the year", columns: 2 as const, fields: [
+    { key: "code", label: "Phenology ID", type: "text" as const, readOnly: true, placeholder: "PH-0001 (auto)" },
+    { key: "plant", label: "Plant", type: "select" as const, required: true, options: [], optionsFrom: "plants" },
+    // Measured daylight here is 45.3 mol/m² a day from March to August against
+    // 34.7 from September to February, which is why there are two rows and not
+    // one.
+    { key: "seasonHalf", label: "Season", type: "toggle" as const, required: true, span: 2 as const, options: [
+      { value: "Mar-Aug", label: "March – August (bright)" },
+      { value: "Sep-Feb", label: "September – February (dark)" },
+    ] },
+  ]},
+  { title: "Growing on", columns: 2 as const, fields: [
+    // The stage is a figure, not a heading. Eight leaves for most, three for
+    // some, and a column called "weeks to 8 leaves" could not hold that.
+    { key: "targetLeaves", label: "Grown to", type: "range" as const, min: 1, max: 20, suffix: "leaves",
+      hint: "the stage it is cut at" },
+    { key: "harvestWeeks", label: "Harvest every", type: "range" as const, min: 0, max: 20, suffix: "wks" },
+    { key: "growthWeeksMin", label: "Weeks to get there — from", type: "range" as const, min: 0, max: 40, suffix: "wks" },
+    { key: "growthWeeksMax", label: "…to", type: "range" as const, min: 0, max: 40, suffix: "wks" },
+  ]},
+  { title: "Pruning", columns: 2 as const, fields: [
+    { key: "pruneToLeaves", label: "Cut back to", type: "range" as const, min: 0, max: 20, suffix: "leaves" },
+    { key: "pruningWeeks", label: "Recovery", type: "range" as const, min: 0, max: 40, suffix: "wks" },
+    { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
+  ]},
 ];
 
 /** The activities inside Crop Care, in the order they recur. */
@@ -58,6 +90,7 @@ const catalogViews = [
 
 // Initial data
 const initPlantSizes: Record<string, unknown>[] = [];
+const initPhenology: Record<string, unknown>[] = [];
 const initBasketDensities: Record<string, unknown>[] = [];
 const initPlantings: PlantingsRow[] = [];
 const initTreatments: TreatmentsRow[] = [];
@@ -307,27 +340,6 @@ const plantFields = [
       below: (v: Record<string, unknown>) =>
         <CapacityPreview plant={{ plantsPerSqM: Number(v.plantsPerSqM) }} /> },
   ]},
-  /**
-   * Production knowledge, and it is genuinely per variety — the figures happen
-   * to fall into two groups today, but Santiago is clear that is not a rule
-   * about shade, so each variety carries its own.
-   *
-   * Two seasons because the same cutting takes longer in the dark half of the
-   * year: measured daylight here averages 45.3 mol/m2 a day from March to
-   * August and 34.7 from September to February.
-   */
-  { title: "Production — March to August", columns: 2 as const, fields: [
-    { key: "growthWeeksMinMarAug", label: "Growth to 8 leaves — from", type: "range" as const, min: 0, max: 30, suffix: "wks", hint: "weeks" },
-    { key: "growthWeeksMaxMarAug", label: "…to", type: "range" as const, min: 0, max: 30, suffix: "wks" },
-    { key: "harvestWeeksMarAug", label: "Harvest every", type: "range" as const, min: 0, max: 20, suffix: "wks" },
-    { key: "pruningWeeksMarAug", label: "Back to 2 leaves after", type: "range" as const, min: 0, max: 20, suffix: "wks" },
-  ]},
-  { title: "Production — September to February", columns: 2 as const, fields: [
-    { key: "growthWeeksMinSepFeb", label: "Growth to 8 leaves — from", type: "range" as const, min: 0, max: 30, suffix: "wks", hint: "weeks" },
-    { key: "growthWeeksMaxSepFeb", label: "…to", type: "range" as const, min: 0, max: 30, suffix: "wks" },
-    { key: "harvestWeeksSepFeb", label: "Harvest every", type: "range" as const, min: 0, max: 20, suffix: "wks" },
-    { key: "pruningWeeksSepFeb", label: "Back to 2 leaves after", type: "range" as const, min: 0, max: 20, suffix: "wks" },
-  ]},
   { title: "Patent & Status", columns: 2 as const, fields: [
     // bv_IsPatented is a boolean; the form used to offer "Yes"/"No" strings,
     // which is why the column was never bound and the table showed nothing.
@@ -437,6 +449,7 @@ export default function ProductionPage() {
   const { elementsFor, hasCompositions } = useInputNutrients();
   const [plants, setPlants] = useRecords("plants", initPlants);
   const [plantSizes, setPlantSizes] = useRecords("plantSizes", initPlantSizes);
+  const [phenology, setPhenology] = useRecords("phenology", initPhenology);
   const [basketDensities, setBasketDensities] = useRecords("basketDensities", initBasketDensities);
 
   /** Names a new season from its start date; an existing one keeps its name. */
@@ -460,6 +473,7 @@ export default function ProductionPage() {
   const fertilizationForm = useFormModal(initFertilization[0]);
   const plantForm = useFormModal(initPlants[0]);
   const plantSizeForm = useFormModal(initPlantSizes[0]);
+  const phenologyForm = useFormModal(initPhenology[0]);
   const basketDensityForm = useFormModal(initBasketDensities[0]);
   const seasonForm = useFormModal(initSeasons[0]);
   const confirm = useConfirmDialog();
@@ -582,6 +596,57 @@ export default function ProductionPage() {
             <ViewSwitch views={careViews} value={careView} onChange={setCareView} label="Crop care activity" />
             {renderTab(careView)}
           </div>
+        );
+      case "phenology":
+        return (
+          <>
+            <div className="mb-3 text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3.5 py-2.5">
+              How long each variety takes, and to what stage. Two rows per
+              variety — the same cutting takes longer in the dark half of the
+              year, because there is about a quarter less daylight in it.
+            </div>
+            <DataTable
+              columns={[
+                { key: "plant", label: "Plant" },
+                { key: "seasonHalf", label: "Season", render: (r) => (
+                  <Badge variant={r.seasonHalf === "Mar-Aug" ? "amber" : "blue"}>{String(r.seasonHalf ?? "—")}</Badge>
+                ) },
+                { key: "targetLeaves", label: "Grown to", render: (r) => (
+                  <span className="tabular-nums text-navy-700">
+                    {r.targetLeaves ? `${r.targetLeaves} leaves` : "—"}
+                  </span>
+                ) },
+                { key: "growthWeeksMin", label: "Weeks", render: (r) => (
+                  <span className="font-mono tabular-nums text-navy-700">
+                    {r.growthWeeksMin && r.growthWeeksMax
+                      ? `${r.growthWeeksMin}–${r.growthWeeksMax}`
+                      : String(r.growthWeeksMin ?? r.growthWeeksMax ?? "—")}
+                  </span>
+                ) },
+                { key: "harvestWeeks", label: "Harvest every" },
+                { key: "pruneToLeaves", label: "Back to" },
+                { key: "pruningWeeks", label: "Recovery" },
+              ]}
+              data={phenology}
+              onAdd={phenologyForm.openCreate}
+              onEdit={(row, i) => phenologyForm.openEdit(row as any, i)}
+              onDelete={(row, i) => confirm.requestDelete(row, i)}
+              addLabel="Add Phenology"
+              searchPlaceholder="Search phenology..."
+            />
+            <FormModal
+              open={phenologyForm.open} onClose={phenologyForm.close}
+              title={phenologyForm.isEdit ? "Edit Phenology" : "Add Phenology"}
+              groups={phenologyFields} values={phenologyForm.values}
+              onChange={phenologyForm.onChange} isEdit={phenologyForm.isEdit}
+              onSubmit={(v) => handleSave(phenology, setPhenology, phenologyForm, v)}
+            />
+            <ConfirmDialog
+              open={confirm.open} onClose={confirm.close} title="Delete Phenology"
+              message="Remove these figures?"
+              onConfirm={() => handleDelete(phenology, setPhenology)}
+            />
+          </>
         );
       case "catalog":
         return (
@@ -759,12 +824,6 @@ export default function ProductionPage() {
                 { key: "variety", label: "Variety" },
                 { key: "grownIn", label: "Grown In" },
                 { key: "plantsPerSqM", label: "Per m²" },
-                // The seasonal pair replaced a single "weeks to first cut":
-                // the same cutting takes 8-10 weeks in the bright half of the
-                // year and 10-12 in the dark, so one number was always wrong
-                // for half the year.
-                { key: "growthWeeksMinMarAug", label: "Mar–Aug wks" },
-                { key: "growthWeeksMinSepFeb", label: "Sep–Feb wks" },
                 { key: "patent", label: "Patented", render: (r) => (
                   <Badge variant={r.patent ? "amber" : "gray"}>{r.patent ? "Yes" : "No"}</Badge>
                 ) },
