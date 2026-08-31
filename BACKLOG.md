@@ -7,7 +7,7 @@ is parked for want of analysis.
 A shareable version of this document lives at
 <https://claude.ai/code/artifact/7e8688fe-22df-41e0-9658-f3838177f593>.
 
-**Counts:** 1 critical · 6 blocked on Santiago · 8 decisions · 5 builds · 3 watching.
+**Counts:** 1 critical · 6 blocked on Santiago · 7 decisions · 5 builds · 3 watching.
 
 ---
 
@@ -225,7 +225,13 @@ both are fixed. Two more columns exist on the same table — product type (`URC`
 and cutting type (`L/E`) — and the packing form does not offer them, so the
 invoice prints them as fixed text.
 
-**Decide:** do these vary per box? If so they belong on the packing form.
+Both now live on `bv_PlantSize` with the full vocabulary — Product takes L&E, E,
+Bulbs and Tips; Type takes URC and RC — so a product is defined once and the
+packing line points at it.
+
+**Decide:** can a single box ever differ from its product's definition — a box
+of Tips packed against an L&E product row? If never, packing inherits them and
+the free-hand fields come off the form entirely.
 
 ### PRK-5 · A measurements layer for the 3D view — **build**
 
@@ -236,21 +242,11 @@ The two things next to it are done: the **Terrain** layer paints the survey's
 contours flat on the floor (`services/terrain.ts` + `terrainTexture.ts`), and
 the dashboard's rate chip opens its **history** over 3M / 6M / 1Y.
 
-### PRK-8 · A variety that can only be grown in a basket — **decision**
+### PRK-8 · A variety that can only be grown in a basket — **closed 2026-08-31**
 
-Santiago's reason for the rename: some varieties in the catalogue are only ever
-grown hanging, never in the ground. Nothing records that, so the app will
-happily offer a basket-only variety for a ground bed and a seeding form will
-accept it.
-
-**Decide:** is it a property of the variety — grown in the ground, in a basket,
-or either — or does it vary by season and customer? If it is a property of the
-variety it belongs on `bv_Plant` as a choice, and then seeding can refuse the
-combination rather than let it through.
-
-Worth pairing with the light model: a basket sits at 1.15 m or 1.75 m under the
-same cloth, so its light is the bed's light. What differs is that a basket
-*shades the ground bed beneath it* — see PRK-7.
+`bv_Plant.bv_GrownIn` records it: Ground, Basket, or both. The planting picker
+filters by kind, so a basket-only variety is no longer offered a ground bed by
+an interface that could not tell the difference.
 
 ### PRK-7 · Light per bed is clear-sky only — **build**
 
