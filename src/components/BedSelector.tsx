@@ -52,12 +52,31 @@ export default function BedSelector({ selected, onChange, multiSelect = true, la
       .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
   }, [shadehouse, nurseryData, countByField]);
 
+  /**
+   * Ground or basket. A planting goes into one or the other and they are
+   * different records — E3-07 is the bed, E3-07-1 is the cable above it — so
+   * without this the picker was a wall of names with no way to say which kind
+   * you meant.
+   */
+  const [kind, setKind] = useState<"" | "Ground" | "Basket">("");
+
+  const inShadehouse = useMemo(
+    () => nurseryData.filter((b) => b.shadehouseId === shadehouse),
+    [shadehouse, nurseryData]
+  );
+  /** How many of each kind exist, so the filter can say when there are none. */
+  const kindCounts = useMemo(() => ({
+    Ground: inShadehouse.filter((b) => b.type === "Ground").length,
+    Basket: inShadehouse.filter((b) => b.type === "Basket").length,
+  }), [inShadehouse]);
+
   const availableBeds = useMemo(() => {
     if (!shadehouse) return [];
-    let beds = nurseryData.filter((b) => b.shadehouseId === shadehouse);
+    let beds = inShadehouse;
     if (field) beds = beds.filter((b) => b.fieldId === field);
+    if (kind) beds = beds.filter((b) => b.type === kind);
     return beds;
-  }, [shadehouse, field, nurseryData]);
+  }, [shadehouse, field, kind, inShadehouse]);
 
   useEffect(() => { setField(""); }, [shadehouse]);
 
@@ -105,6 +124,39 @@ export default function BedSelector({ selected, onChange, multiSelect = true, la
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-navy-300 pointer-events-none" />
         </div>
       </div>
+      {shadehouse && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {([["", "All"], ["Ground", "Ground beds"], ["Basket", "Baskets"]] as const).map(([id, label]) => {
+            const count = id === "" ? inShadehouse.length : kindCounts[id];
+            return (
+              <button
+                key={id || "all"}
+                type="button"
+                onClick={() => setKind(id)}
+                aria-pressed={kind === id}
+                disabled={count === 0}
+                className={`px-3 py-1.5 text-[11px] font-medium rounded-lg border transition-colors ${
+                  count === 0
+                    ? "bg-sand-50 text-navy-300 border-sand-200 cursor-not-allowed"
+                    : kind === id
+                      ? "chip-selected cursor-pointer"
+                      : "bg-white text-navy-600 border-sand-200 hover:border-lime-300 cursor-pointer"
+                }`}
+              >
+                {label} ({count})
+              </button>
+            );
+          })}
+          {/* Say why the option is dead rather than leaving a greyed button
+              with no explanation. */}
+          {kindCounts.Basket === 0 && (
+            <span className="text-[11px] text-navy-400">
+              No baskets recorded yet — add them under Infrastructure.
+            </span>
+          )}
+        </div>
+      )}
+
       {shadehouse && multiSelect && (
         <div className="flex flex-wrap gap-1.5">
           {fields.map((f) => {
@@ -131,12 +183,22 @@ export default function BedSelector({ selected, onChange, multiSelect = true, la
               const hasPlant = !!bed.plant;
               return (
                 <motion.button type="button" key={bed.id} whileTap={{ scale: 0.95 }} onClick={() => toggleBed(bed.id)}
-                  title={`${bed.id} (${bed.type})${bed.plant ? ` — ${bed.plant}` : " — Empty"}`}
+                  title={`${bed.id} (${bed.type ?? "type not recorded"})${bed.plant ? ` — ${bed.plant}` : " — Empty"}`}
                   className={`relative p-1.5 rounded-md text-[9px] font-mono font-medium border transition-all cursor-pointer ${
                     isSelected ? "chip-selected shadow-sm"
                     : hasPlant ? "bg-white text-navy-700 border-sand-200 hover:border-lime-400"
                     : "bg-sand-100 text-navy-400 border-sand-200 hover:border-navy-300"}`}>
                   {bed.id}
+                  {/* A basket needs to read as one on the tile. The name says so
+                      — E3-07-1 is the cable above E3-07 — but a trailing digit
+                      is easy to miss in a grid of a hundred. */}
+                  {bed.type === "Basket" && (
+                    <span
+                      aria-hidden="true"
+                      className={`absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full ${
+                        isSelected ? "bg-navy-900/40" : "bg-sky-400"}`}
+                    />
+                  )}
                 </motion.button>
               );
             })}

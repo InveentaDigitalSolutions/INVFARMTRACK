@@ -1,13 +1,13 @@
 # Backlog
 
-What is open, as of **2026-08-30**. Items are grouped by whether they need a
+What is open, as of **2026-08-31**. Items are grouped by whether they need a
 decision, a build, or something entered. Anything here is understood — nothing
 is parked for want of analysis.
 
 A shareable version of this document lives at
 <https://claude.ai/code/artifact/7e8688fe-22df-41e0-9658-f3838177f593>.
 
-**Counts:** 6 blocked on Santiago · 7 decisions · 5 builds · 3 watching.
+**Counts:** 1 critical · 6 blocked on Santiago · 8 decisions · 5 builds · 3 watching.
 
 ---
 
@@ -16,6 +16,33 @@ A shareable version of this document lives at
 The screens exist and every table writes, but the chain from
 *shipment → invoice → receivable → payment* is not joined up. Three of the joins
 need a decision before they can be built.
+
+### SLS-3 · A product is not one thing — **critical · decision**
+
+Santiago's question: how do you choose a packing type when building a packing
+list? You cannot, and the reason is structural.
+
+Three tables describe the same product and none of them are joined:
+
+- **`bv_PlantSize`** says what a box of a variety at a size holds — the
+  catalogue row.
+- **`bv_Packing`** types its own size, type and product free-hand on every box,
+  pointing at nothing. So a packed box is not connected to the catalogue row
+  that says what that product *is*, and there is nothing to pick from.
+- **`bv_PlantPrice`** is per plant, season and customer and carries **no size
+  at all**. A Large and a Petit cutting of the same variety can only hold one
+  price, and their boxes differ by two and a half times in count alone.
+
+**Proposed:** make `bv_PlantSize` the product definition — variety × size ×
+type × product — and have Packing and Price both point at it. Packing then picks
+a product and inherits its box count and bundle; a price is always a price for a
+specific thing. SLS-1 disappears with it: an unpriced product cannot be
+invoiced at two cents by accident, because there is a row that either has a
+price or does not.
+
+**Decide first:** does price vary by **size**? And by **product** — L&E against
+Tips against Bulbs? If yes to both, price belongs on the `bv_PlantSize` row and
+this is one change rather than three.
 
 ### ACC-1 · Generating an invoice produces a PDF and no record — **decision**
 
