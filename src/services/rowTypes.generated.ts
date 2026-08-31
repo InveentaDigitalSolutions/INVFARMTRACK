@@ -38,6 +38,28 @@ export interface BankAccountsRow {
   [key: string]: unknown;
 }
 
+export interface BasketDensitiesRow {
+  id: string;
+  code?: string;
+  plant?: string;
+  basketSize?: string;
+  plantsPerSqM?: number;
+  notes?: string;
+  [key: string]: unknown;
+}
+
+export interface BasketSizesRow {
+  id: string;
+  code?: string;
+  name?: string;
+  widthCm?: number;
+  shape?: string;
+  basketsPerCable?: number;
+  active?: boolean;
+  notes?: string;
+  [key: string]: unknown;
+}
+
 export interface BedCompositionsRow {
   id: string;
   bed?: string;
@@ -381,6 +403,7 @@ export interface PaymentsRow {
 
 export interface PlantingsRow {
   id: string;
+  basketSize?: string;
   date?: string;
   qty?: number;
   plant?: string;

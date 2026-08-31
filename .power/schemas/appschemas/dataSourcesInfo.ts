@@ -264,6 +264,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_ports": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_portid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_pruningcurves": {
     "tableId": "",
     "version": "",

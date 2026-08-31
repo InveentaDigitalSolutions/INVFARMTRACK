@@ -882,6 +882,14 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Propagation": 121320001
     }
   },
+  "bv_plantprices": {
+    "bv_product": {
+      "L&E": 187540000,
+      "E": 187540001,
+      "Bulbs": 187540002,
+      "Tips": 187540003
+    }
+  },
   "bv_plantsizes": {
     "bv_cuttingtype": {
       "L&E": 187520000,

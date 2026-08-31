@@ -38,6 +38,9 @@ const tabs = [
   { id: "orders", label: "Orders" },
   { id: "customers", label: "Customers" },
   { id: "prices", label: "Price List" },
+  // Ports sit here because price is keyed on them and this is where prices are
+  // kept. They are also what an order ships to.
+  { id: "ports", label: "Ports" },
 ];
 
 const initialShipments: ShipmentsRow[] = [];
@@ -93,6 +96,7 @@ const customerFields = [
   ]},
 ];
 
+const initPorts: Record<string, unknown>[] = [];
 const initPrices: PricesRow[] = [];
 
 /** Customers that can actually be bound to: a nameless row is not a choice. */
@@ -106,16 +110,45 @@ const plantNameOptionsFallback: { value: string; label: string }[] = [];
 const priceSeasonOptionsFallback: { value: string; label: string }[] = [];
 const priceCustomerOptionsFallback: { value: string; label: string }[] = [];
 
+/**
+ * A price is keyed on more than the variety.
+ *
+ * Customer, port and product all move it — the freight differs by port, and
+ * only L&E is sold today but E, Bulbs and Tips are coming. Any of them may be
+ * left blank, meaning "any", so a general figure can be set once and overridden
+ * where something was actually negotiated. The most specific row wins.
+ */
 const priceFields = [
-  { title: "Price Details", columns: 2 as const, fields: [
+  { title: "What is being priced", columns: 2 as const, fields: [
     { key: "plant", label: "Plant", type: "select" as const, options: plantNameOptionsFallback, optionsFrom: "plants", required: true },
+    { key: "product", label: "Product", type: "toggle" as const, options: [
+      { value: "L&E", label: "L&E" }, { value: "E", label: "E" },
+      { value: "Bulbs", label: "Bulbs" }, { value: "Tips", label: "Tips" },
+    ] },
+    { key: "size", label: "Size", type: "select" as const, options: [], optionsFrom: "plantSizes",
+      placeholder: "any size" },
     { key: "season", label: "Season", type: "select" as const, options: priceSeasonOptionsFallback, optionsFrom: "seasons", required: true },
+  ]},
+  { title: "Who and where — leave blank for any", columns: 2 as const, fields: [
     { key: "customer", label: "Customer", type: "select" as const, options: priceCustomerOptionsFallback, optionsFrom: "customers" },
+    { key: "port", label: "Port", type: "select" as const, options: [], optionsFrom: "ports" },
+  ]},
+  { title: "The price", columns: 2 as const, fields: [
     { key: "priceExt", label: "Price (USD)", type: "text" as const, required: true },
     { key: "priceInt", label: "Price (HNL)", type: "text" as const },
     { key: "from", label: "Valid From", type: "date" as const, required: true },
     { key: "to", label: "Valid To", type: "date" as const, required: true },
     { key: "active", label: "Active", type: "boolean" as const },
+  ]},
+];
+
+const portFields = [
+  { title: "Port", columns: 2 as const, fields: [
+    { key: "code", label: "Port ID", type: "text" as const, readOnly: true, placeholder: "PRT-001 (auto)" },
+    { key: "name", label: "Name", type: "text" as const, required: true, placeholder: "Miami, Rotterdam" },
+    { key: "country", label: "Country", type: "text" as const },
+    { key: "active", label: "Shipping there", type: "boolean" as const },
+    { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
   ]},
 ];
 
@@ -145,6 +178,9 @@ export default function SalesPage() {
   const [showImport, setShowImport] = useState(false);
   const [prices, setPrices] = useRecords("prices", initPrices);
   const priceForm = useFormModal(initPrices[0]);
+  const portForm = useFormModal(initPorts[0]);
+  const portConfirm = useConfirmDialog();
+  const [ports, setPorts] = useRecords("ports", initPorts);
   const priceConfirm = useConfirmDialog();
 
   const [orders, setOrders] = useRecords("orders", initialOrders);
@@ -174,6 +210,24 @@ export default function SalesPage() {
   const handleCustomerSave = (values: Record<string, unknown>) => {
     setCustomers((prev) => [values as typeof initialCustomers[0], ...prev]);
     customerForm.close();
+  };
+
+  const handlePortSave = (values: Record<string, unknown>) => {
+    if (portForm.isEdit && portForm.editIndex !== null) {
+      const updated = [...ports];
+      updated[portForm.editIndex] = values as never;
+      setPorts(updated);
+    } else {
+      setPorts([...ports, values as never]);
+    }
+    portForm.close();
+  };
+
+  const handlePortDelete = () => {
+    if (portConfirm.pending) {
+      setPorts(ports.filter((_, i) => i !== portConfirm.pending!.index));
+    }
+    portConfirm.close();
   };
 
   const handlePriceSave = (values: Record<string, unknown>) => {
@@ -738,6 +792,45 @@ export default function SalesPage() {
           </>
         );
 
+      case "ports":
+        return (
+          <>
+            <div className="mb-3 text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3.5 py-2.5">
+              Where stock ships to. Price is keyed on the port as well as the
+              customer, because the freight is — the same cutting costs a
+              different amount into Miami than into Rotterdam.
+            </div>
+            <DataTable
+              columns={[
+                { key: "name", label: "Name" },
+                { key: "country", label: "Country" },
+                { key: "active", label: "Shipping there", render: (r) => (
+                  <Badge variant={r.active === false ? "gray" : "green"}>
+                    {r.active === false ? "No" : "Yes"}
+                  </Badge>
+                ) },
+                { key: "notes", label: "Notes" },
+              ]}
+              data={ports}
+              onAdd={portForm.openCreate}
+              onEdit={(row, i) => portForm.openEdit(row as never, i)}
+              onDelete={(row, i) => portConfirm.requestDelete(row, i)}
+              addLabel="Add Port"
+              searchPlaceholder="Search ports..."
+            />
+            <FormModal
+              open={portForm.open} onClose={portForm.close}
+              title={portForm.isEdit ? "Edit Port" : "Add Port"}
+              groups={portFields} values={portForm.values}
+              onChange={portForm.onChange} isEdit={portForm.isEdit}
+              onSubmit={handlePortSave}
+            />
+            <ConfirmDialog
+              open={portConfirm.open} onClose={portConfirm.close} title="Delete Port"
+              message="Delete this port?" onConfirm={handlePortDelete}
+            />
+          </>
+        );
       case "prices":
         return (
           <>
@@ -745,7 +838,17 @@ export default function SalesPage() {
               columns={[
                 { key: "plant", label: "Plant" },
                 { key: "season", label: "Season" },
-                { key: "customer", label: "Customer", render: (r) => <Badge variant={r.customer === "Base" ? "gray" : "blue"}>{r.customer as string}</Badge> },
+                // Blank means "any", which is a real answer and reads better
+                // than an empty cell that looks like something went missing.
+                { key: "customer", label: "Customer", render: (r) => (
+                  <Badge variant={r.customer ? "blue" : "gray"}>{(r.customer as string) || "Any"}</Badge>
+                ) },
+                { key: "port", label: "Port", render: (r) => (
+                  <Badge variant={r.port ? "blue" : "gray"}>{(r.port as string) || "Any"}</Badge>
+                ) },
+                { key: "product", label: "Product", render: (r) => (
+                  <Badge variant={r.product ? "blue" : "gray"}>{(r.product as string) || "Any"}</Badge>
+                ) },
                 { key: "priceExt", label: "Export (USD)" },
                 { key: "priceInt", label: "Internal (USD)" },
                 { key: "from", label: "From" },

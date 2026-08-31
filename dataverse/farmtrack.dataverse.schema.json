@@ -2863,6 +2863,31 @@
           "description": "Where this price ships to. Part of what a price is keyed on, alongside the variety and the customer."
         },
         {
+          "schemaName": "bv_Product",
+          "displayName": "Product",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187540000,
+              "label": "L&E"
+            },
+            {
+              "value": 187540001,
+              "label": "E"
+            },
+            {
+              "value": 187540002,
+              "label": "Bulbs"
+            },
+            {
+              "value": 187540003,
+              "label": "Tips"
+            }
+          ],
+          "description": "What is being priced \u2014 L&E, E, Bulbs or Tips. Only L&E is sold today, but the others are coming and a price list that cannot tell them apart would have to be rebuilt when they do. Left empty the price applies to every product of that variety."
+        },
+        {
           "schemaName": "bv_PlantSizeId",
           "displayName": "Size",
           "type": "lookup",

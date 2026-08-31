@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 52 |
-| Columns | 622 |
+| Columns | 623 |
 | Relationships | 75 |
 
 ## Conventions
@@ -49,7 +49,7 @@
 | [Packing](#packing) | `bv_packing` | `PCK-0001` | 25 | Per-box packing records — each record is one box with full traceability |
 | [Fiscal Authorization](#fiscal-authorization) | `bv_fiscalauthorization` | `FIS-0001` | 11 | Honduras SAR CAI authorizations — invoice number ranges and expiration dates |
 | [Invoice](#invoice) | `bv_invoice` | `INV-0001` | 34 | Export invoices with shipping, fiscal, and payment tracking |
-| [Plant Price](#plant-price) | `bv_plantprice` | `PRC-0001` | 13 | Price history per variety, keyed on customer and destination port, and optionally narrowed to a size. Export and internal prices, with an effective date range. |
+| [Plant Price](#plant-price) | `bv_plantprice` | `PRC-0001` | 14 | Price history per variety, keyed on customer and destination port, and optionally narrowed to a size. Export and internal prices, with an effective date range. |
 | [CAI Number](#cai-number) | `bv_cainumber` | `CAI-0001` | 9 | Individual invoice numbers within a CAI authorization range — tracks used/available status |
 | [Expense](#expense) | `bv_expense` | `EXP-0001` | 12 | Operational expenses with optional receipt photo and AI extraction |
 | [Supplier](#supplier) | `bv_supplier` | `SUP-0001` | 11 | Vendors and suppliers for inputs, materials, and services |
@@ -1037,6 +1037,7 @@ Price history per variety, keyed on customer and destination port, and optionall
 | `bv_plantpricename` | Plant Price Name | Text(200) | ✓ | Auto-composed: {Plant} / {Customer or 'Base'} / {EffectiveFrom} |
 | `bv_plantid` | Plant | Lookup → [Plant](#plant) | ✓ | Link to the related Plant record. |
 | `bv_portid` | Port | Lookup → [Port](#port) |  | Where this price ships to. Part of what a price is keyed on, alongside the variety and the customer. |
+| `bv_product` | Product | Choice |  | What is being priced — L&E, E, Bulbs or Tips. Only L&E is sold today, but the others are coming and a price list that cannot tell them apart would have to be rebuilt when they do. Left empty the price applies to every product of that variety. |
 | `bv_plantsizeid` | Size | Lookup → [Plant Size](#plant-size) |  | Narrows the price to one size. Left empty the price applies to every size of that variety, which is how it works today. Added now rather than later because retrofitting a key onto priced history is far worse than carrying an empty column. |
 | `bv_seasonid` | Season | Lookup → [Season](#season) |  | Link to the related Season record. |
 | `bv_customerid` | Customer | Lookup → [Customer](#customer) |  | If set, this price applies only to this customer. If null, it is the base/default price. |
@@ -1046,6 +1047,19 @@ Price history per variety, keyed on customer and destination port, and optionall
 | `bv_priceint` | Internal Price (USD) | Currency(2) |  | Price per unit for internal/domestic sales (in USD — HNL conversion at invoice time via BCH exchange rate) |
 | `bv_isactive` | Is Active | Yes/No |  | Whether the record is currently in use. |
 | `bv_notes` | Notes | Text area(2000) |  | Free-text notes. |
+
+<details><summary>Choice values</summary>
+
+**Product** (`bv_product`)
+
+| Value | Label |
+|---|---|
+| 187540000 | L&E |
+| 187540001 | E |
+| 187540002 | Bulbs |
+| 187540003 | Tips |
+
+</details>
 
 ## CAI Number
 

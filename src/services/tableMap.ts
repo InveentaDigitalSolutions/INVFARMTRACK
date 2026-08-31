@@ -568,6 +568,9 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     dataSource: "bv_plantprices",
     primaryKey: "bv_plantpriceid",
     fields: {
+      port: "_bv_portid_value",
+      product: "bv_product",
+      size: "_bv_plantsizeid_value",
       plant: "_bv_plantid_value",
       season: "_bv_seasonid_value",
       customer: "_bv_customerid_value",
@@ -775,6 +778,18 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       notes: "bv_notes",
     },
   },
+  /** Destination ports. Price is keyed on them, because the freight is. */
+  ports: {
+    dataSource: "bv_ports",
+    primaryKey: "bv_portid",
+    fields: {
+      code: "bv_portcode",
+      name: "bv_portname",
+      country: "bv_country",
+      active: "bv_isactive",
+      notes: "bv_notes",
+    },
+  },
   caiNumbers: {
     dataSource: "bv_cainumbers",
     primaryKey: "bv_cainumberid",
@@ -890,6 +905,7 @@ export const ENABLED_TABLES = new Set<string>([
   "bedCompositions",
   "caiNumbers",
   "exchangeRates",
+  "ports",
   "basketSizes",
   "basketDensities",
   "plantSizes",

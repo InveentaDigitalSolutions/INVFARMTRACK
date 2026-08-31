@@ -249,6 +249,11 @@
           "entitySetName": "bv_plantbasketdensities",
           "logicalName": "bv_plantbasketdensity",
           "isHidden": false
+        },
+        "ports": {
+          "entitySetName": "bv_ports",
+          "logicalName": "bv_port",
+          "isHidden": false
         }
       }
     }

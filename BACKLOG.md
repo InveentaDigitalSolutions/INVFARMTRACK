@@ -7,7 +7,7 @@ is parked for want of analysis.
 A shareable version of this document lives at
 <https://claude.ai/code/artifact/7e8688fe-22df-41e0-9658-f3838177f593>.
 
-**Counts:** 1 critical · 6 blocked on Santiago · 7 decisions · 5 builds · 3 watching.
+**Counts:** 6 blocked on Santiago · 1 decision · 8 builds · 3 watching.
 
 ---
 
@@ -17,7 +17,7 @@ The screens exist and every table writes, but the chain from
 *shipment → invoice → receivable → payment* is not joined up. Three of the joins
 need a decision before they can be built.
 
-### SLS-3 · A product is not one thing — **critical · decision**
+### SLS-3 · A product is not one thing — **decided, partly built**
 
 Santiago's question: how do you choose a packing type when building a packing
 list? You cannot, and the reason is structural.
@@ -40,11 +40,13 @@ specific thing. SLS-1 disappears with it: an unpriced product cannot be
 invoiced at two cents by accident, because there is a row that either has a
 price or does not.
 
-**Decide first:** does price vary by **size**? And by **product** — L&E against
-Tips against Bulbs? If yes to both, price belongs on the `bv_PlantSize` row and
-this is one change rather than three.
+Answered: price is keyed on variety, customer, port and product, and on size in
+future. Built — `services/priceResolver.ts` picks the most specific row that
+applies and **returns null rather than a number it is not sure of**. Only L&E is
+sold today; the other products exist in the model so the list does not have to
+be rebuilt when they arrive.
 
-### ACC-1 · Generating an invoice produces a PDF and no record — **decision**
+### ACC-1 · Generating an invoice produces a PDF and no record — **decided, to build**
 
 The invoice screen builds the document correctly — real CAI, real prices, real
 customer — and then `onGenerate` writes it to the browser console. No
@@ -58,7 +60,7 @@ unless the steps are deliberately separate.
 Files: `src/components/InvoiceGenerator.tsx`, `src/components/ShipmentDetail.tsx`,
 `src/hooks/useInvoiceNumber.ts`.
 
-### ACC-2 · Payments do not settle invoices — **decision**
+### ACC-2 · Payments do not settle invoices — **decided, to build**
 
 An invoice's balance is whatever was typed on it. Recording a payment does not
 reduce it. The arithmetic exists — `paidAgainst()` in `services/invoiceMath.ts`,
@@ -67,7 +69,7 @@ already used by the dashboard — and the Accounting screen does not apply it.
 **Decide:** are payments allocated to specific invoices (allows partial payments
 and a trustworthy ageing), or are balances adjusted by hand?
 
-### ACC-3 · Orders have no lines — **decision**
+### ACC-3 · Orders have no lines — **decided, awaiting the order spreadsheet**
 
 `bv_OrderItem` exists in Dataverse — order, plant, quantity, unit price, line
 total — and nothing in the app reads or writes it. It is deliberately absent from
@@ -91,7 +93,7 @@ under *Accounting → Fiscal*.
 Once entered, the app issues numbers strictly in order and refuses to invoice
 against an exhausted or expired range (`services/fiscalNumbering.ts`).
 
-### ACC-5 · Export sales and ISV — **decision**
+### ACC-5 · Export sales and ISV — **decided: none exonerated**
 
 The invoice was applying 18% ISV; Honduras is 15% and that is corrected
 (`ISV_RATE`). Exports are normally zero-rated, and the invoice layout already has
@@ -100,7 +102,7 @@ a line for an exonerated subtotal that nothing fills.
 **Decide:** which customers or lines are exonerated, and does the printed invoice
 need to show the exonerated subtotal separately?
 
-### ACC-6 · Which exchange rate an invoice locks to — **decision**
+### ACC-6 · Which exchange rate an invoice locks to — **decided, to build**
 
 Invoices are priced in dollars, costs are in lempira, and the central-bank rate is
 live with 400 days of history behind it. Conversion currently always uses the
@@ -164,13 +166,15 @@ prefix) and the browser client is gone, but the key is unchanged, so anyone who
 took a copy still has a working one. Deferred once already; the only outstanding
 security item.
 
-### OPS-2 · The app is not in a solution — **decision**
+### OPS-2 · ALM: DEV, INT, PROD — **decided, later**
 
 It lives unmanaged in the DEV environment. There is no packaged way to move it to
 production, and no way to restore it if lost.
 
-**Decide:** does this stay in Enterprise DEV, or does Broton Verde get its own
-production environment? The answer changes how tables and app are packaged.
+Santiago is setting up DEV / INT / PROD, but deliberately after a working
+prototype with real data in DEV. So: stay unmanaged in DEV for now, and package
+when the prototype holds. Until then there is no way to restore the app if it is
+lost, which is the cost of that order and worth knowing.
 
 ### OPS-3 · Stale personal flow — **watching**
 
