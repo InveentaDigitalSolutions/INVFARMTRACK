@@ -71,6 +71,7 @@ const fieldFormGroups = [
   { title: "Field Details", columns: 2 as const, fields: [
     { key: "code", label: "Field ID", type: "text" as const, readOnly: true, placeholder: "FLD-0001 (auto)" },
     { key: "name", label: "Field Name", type: "text" as const, required: true, placeholder: "E3" },
+    { key: "postLines", label: "Post lines (basket rows per level)", type: "number" as const, min: 0 },
     { key: "shadehouse", label: "Shadehouse", type: "select" as const,
       options: shOptions, optionsFrom: "shadehouses", required: true },
     // What bounds bed numbering: rows run 01 to this, and the field is full at it.
@@ -182,13 +183,18 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
     // Level first: a field's rows are its ground beds, and baskets hang on
     // cables above some of them. Type follows from this, not the other way.
     { key: "level", label: "Level", type: "select" as const, required: true, options: [
-      { value: "0", label: "0 — ground bed" },
-      { value: "1", label: "1 — basket" },
-      { value: "2", label: "2 — basket" },
+      { value: "0", label: "Ground bed" },
+      { value: "1", label: "Basket · level 1" },
+      { value: "2", label: "Basket · level 2" },
     ] },
     // Free rows at this level. A ground bed in row 7 does not stop a basket
     // hanging above it, so each level is counted separately.
+    // "Row" meant two things. On a ground bed it is the bed row; on a basket
+    // it is the post line the cable hangs from, and those are different grids
+    // — post line 5 of an E field sits above bed row 16, not bed row 5.
     { key: "row", label: "Row", type: "select" as const, required: true, options: [],
+      labelWhen: (v: Record<string, unknown>) =>
+        String(v.level ?? "") === "0" ? "Bed row" : "Post line",
       emptyHint: "Choose a field and a level first",
       optionsWhen: (values: Record<string, unknown>) => {
         // A level that has not been chosen is NOT level 0. Coercing it there
@@ -211,7 +217,7 @@ const bedFormGroups = (fields: FieldRow[], beds: BedRow[]) => [
           .map((row) => ({ value: String(row), label: String(row).padStart(2, "0") }));
       } },
     { key: "name", label: "Bed Name", type: "text" as const, readOnly: true,
-      placeholder: "E3-01, or E3-01-2 for a basket" },
+      placeholder: "E3-01 for a bed, E3-01-01 for a basket row" },
     { key: "shade", label: "Shade", type: "select" as const, options: [
       { value: "Single", label: "Single" }, { value: "Double", label: "Double" },
       { value: "Triple", label: "Triple" },

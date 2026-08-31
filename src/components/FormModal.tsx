@@ -15,6 +15,12 @@ interface BaseField {
    */
   showWhen?: (values: Record<string, unknown>) => boolean;
   /**
+   * A label that depends on the rest of the form. "Row" means the bed row on a
+   * ground bed and the post line on a basket, and calling both "Row" is how the
+   * two grids got confused in the first place.
+   */
+  labelWhen?: (values: Record<string, unknown>) => string;
+  /**
    * Rendered under the control. For a figure whose meaning is not obvious from
    * the number — a density, a rate — this is where it gets spelled out.
    */
@@ -558,7 +564,7 @@ export default function FormModal({
                       {shown.map((field) => (
                         <div key={field.key} className={spanClass[field.span ?? 1]}>
                           <label className="block text-[12px] font-medium text-navy-600 mb-1.5">
-                            {field.label}
+                            {field.labelWhen?.(values) ?? field.label}
                             {field.required && <span className="text-red-500 ml-0.5">*</span>}
                           </label>
                           {renderField(field, values[field.key], onChange, liveOptions, values)}

@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 52 |
-| Columns | 624 |
+| Columns | 625 |
 | Relationships | 75 |
 
 ## Conventions
@@ -32,10 +32,10 @@
 | Table | Logical name | ID format | Columns | Purpose |
 |---|---|---|---|---|
 | [Shadehouse](#shadehouse) | `bv_shadehouse` | `SH-0001` | 9 | Physical growing structures in the nursery |
-| [Bed](#bed) | `bv_bed` | `BED-0001` | 12 | Growing beds within batches (Shadehouse > Batch > Bed) |
+| [Bed](#bed) | `bv_bed` | `BED-0001` | 12 | A ground bed or a basket row. A ground bed is a field and a bed row — E1-05. A basket row is a field, a POST line and a level — E1-05-01 — because cables hang on the posts, not above any particular bed. The two numbers count different grids, which is why a field records both a bed count and a post-line count. |
 | [Plant](#plant) | `bv_plant` | `PLT-0001` | 24 | Plant species, varieties, and patent catalog |
 | [Season](#season) | `bv_season` | `SSN-0001` | 6 | Growing seasons for tracking performance over time |
-| [Field](#field) | `bv_field` | `FLD-0001` | 5 | Production fields of plants within a shadehouse |
+| [Field](#field) | `bv_field` | `FLD-0001` | 6 | Production fields of plants within a shadehouse |
 | [Planting](#planting) | `bv_planting` | `PLG-0001` | 12 | Records of plants placed in beds — central activity hub |
 | [Input](#input) | `bv_input` | `INP-0001` | 14 | Catalog of fertilizers, pesticides, and other inputs |
 | [Treatment](#treatment) | `bv_treatment` | `TRT-0001` | 14 | Treatment/fumigation applications to plantings |
@@ -192,7 +192,7 @@ Physical growing structures in the nursery
 
 `bv_bed` · Organization-owned
 
-Growing beds within batches (Shadehouse > Batch > Bed)
+A ground bed or a basket row. A ground bed is a field and a bed row — E1-05. A basket row is a field, a POST line and a level — E1-05-01 — because cables hang on the posts, not above any particular bed. The two numbers count different grids, which is why a field records both a bed count and a post-line count.
 
 **Record ID:** `bv_bedcode` — format `BED-{SEQNUM:4}`, e.g. `BED-0001`.
 
@@ -417,6 +417,7 @@ Production fields of plants within a shadehouse
 | `bv_shadehouseid` | Shadehouse | Lookup → [Shadehouse](#shadehouse) | ✓ | Link to the related Shadehouse record. |
 | `bv_notes` | Notes | Text area(2000) |  | Free-text notes. |
 | `bv_rowcount` | Rows | Whole number |  | How many bed rows this field physically has. Bed numbering runs 01 to this value, so it is what decides which row numbers can be chosen and when the field is full. |
+| `bv_postlines` | Post Lines | Whole number |  | How many lines of posts run north-south through this field. A cable hangs on each, so this is how many basket rows the field can have per level — nine in an E field, ten in a C. Nothing to do with the bed count: the posts are 5 m apart and the beds 1.2 or 1.8, so one cable spans three or four beds and lines up with none of them. |
 
 **Referenced by:** Bed (`bv_fieldid`)
 

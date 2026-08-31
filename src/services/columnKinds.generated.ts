@@ -201,6 +201,7 @@ export const COLUMN_KIND: Record<string, Record<string, ColumnKind>> = {
     "bv_shadehouseid": "lookup",
     "bv_notes": "text",
     "bv_rowcount": "number",
+    "bv_postlines": "number",
   },
   "bv_fiscalauthorizations": {
     "bv_fiscalauthorizationcode": "text",

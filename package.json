@@ -23,7 +23,7 @@
     "dataverse:seed-fix": "node scripts/dataverse/fix-autonumber-seeds.mjs",
     "test:math": "tsx scripts/test/invoiceMath.test.mts",
     "test:rules": "tsx scripts/test/infrastructureRules.test.mts",
-    "test": "npm run test:math && npm run test:rules && npm run test:rotation && npm run test:schedule && npm run test:forecast && npm run test:insight && npm run test:availability && npm run test:beds && npm run test:stock && npm run test:variety && npm run test:modules && npm run test:sync && npm run test:payload && npm run test:terrain && npm run test:rate && npm run test:solar && npm run test:light && npm run test:moon && npm run test:mooninsight && npm run test:phenology && npm run test:capacity && npm run test:price && npm run test:growth",
+    "test": "npm run test:math && npm run test:rules && npm run test:rotation && npm run test:schedule && npm run test:forecast && npm run test:insight && npm run test:availability && npm run test:beds && npm run test:stock && npm run test:variety && npm run test:modules && npm run test:sync && npm run test:payload && npm run test:terrain && npm run test:rate && npm run test:solar && npm run test:light && npm run test:moon && npm run test:mooninsight && npm run test:phenology && npm run test:capacity && npm run test:price && npm run test:growth && npm run test:postlines",
     "dataverse:photos": "node scripts/dataverse/sync-user-photos.mjs",
     "test:rotation": "tsx scripts/test/bedRotation.test.mts",
     "test:schedule": "tsx scripts/test/productionSchedule.test.mts",
@@ -57,7 +57,8 @@
     "dataverse:check-reads": "node scripts/dataverse/check-reads.mjs",
     "test:capacity": "tsx scripts/test/bedCapacity.test.mts",
     "test:price": "tsx scripts/test/priceResolver.test.mts",
-    "test:growth": "tsx scripts/test/growthProgress.test.mts"
+    "test:growth": "tsx scripts/test/growthProgress.test.mts",
+    "test:postlines": "tsx scripts/test/postLines.test.mts"
   },
   "dependencies": {
     "@fontsource-variable/playfair-display": "^5.3.0",

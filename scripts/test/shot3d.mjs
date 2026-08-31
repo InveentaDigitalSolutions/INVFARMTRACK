@@ -46,13 +46,31 @@ await page.evaluate(() => {
                   // runs, C fields uniform — which is one panel spanning 49 m.
                   shade: f.startsWith('C') ? 'Single'
                     : ([1,2,3,4,9,10,11,12,17,18,19,20,21,26,27,28,29].includes(r) ? 'Double' : 'Single') })
+  // Basket rows are a different grid: one per post line per level, numbered by
+  // the post line, so E1-05-01 is the fifth cable of E1 and sits nowhere near
+  // bed E1-05. Seeded here because a cable that is never drawn is never checked.
+  const postLines = { E3: 9, C3: 10, E1: 9, C1: 10 }
+  for (const [f] of fields)
+    for (let line = 1; line <= postLines[f]; line++)
+      for (const level of [1, 2])
+        beds.push({ id: `${f}-${String(line).padStart(2, '0')}-${String(level).padStart(2, '0')}`,
+                    name: `${f}-${String(line).padStart(2, '0')}-${String(level).padStart(2, '0')}`,
+                    field: f, fieldName: f, row: line, level, type: 'Basket', status: 'Active',
+                    shade: 'Single' })
   localStorage.setItem('dni_beds', JSON.stringify(beds))
   localStorage.setItem('dni_fields', JSON.stringify(
-    fields.map(([n, rows]) => ({ id: n, name: n, fieldName: n, rows, shadehouse: 'SH-0001' }))))
+    fields.map(([n, rows]) => ({ id: n, name: n, fieldName: n, rows, postLines: postLines[n], shadehouse: 'SH-0001' }))))
 })
 await page.goto('http://localhost:4179/', { waitUntil: 'networkidle' })
 await page.getByRole('button', { name: 'Infrastructure' }).first().click()
 await page.waitForTimeout(800)
+if (process.env.PLAN) {
+  await page.getByRole('button', { name: 'Plan', exact: true }).click()
+  await page.waitForTimeout(1200)
+  await page.locator('svg.shadehouse-svg').first().screenshot({ path: process.argv[2] })
+  console.log('errors:', errs.length ? errs.slice(0, 5) : 'none')
+  await browser.close(); server.kill('SIGTERM'); process.exit(0)
+}
 await page.getByRole('button', { name: '3D', exact: true }).click()
 await page.waitForTimeout(2500)
 if (process.env.NOSHADE) {

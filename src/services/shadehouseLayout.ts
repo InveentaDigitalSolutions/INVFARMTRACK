@@ -29,7 +29,26 @@ export const IRRIGATION_LEVEL: BedLevel = 3;
  * length, nineteen perpendicular to the beds.
  */
 export const POSTS_ALONG_BED = 12;
+/** Nine lines over each E field and ten over each C — see postLineXs. */
 export const POSTS_ACROSS_BEDS = 19;
+
+/** Pot spacing along a cable, measured off the photos. */
+export const POT_PITCH_M = 0.45;
+
+/**
+ * How many pots hang on one cable.
+ *
+ * Nobody records this per row — the hooks are simply there, the length of the
+ * house — so it comes from the geometry. The end of a cable is taken up by the
+ * tie-off at each post, hence the 1.2 m.
+ */
+export function potsPerCable(lengthM: number): number {
+  return Math.max(0, Math.floor((lengthM - 1.2) / POT_PITCH_M));
+}
+
+/** Gap between the two field columns — the logistics road in the layout. */
+export const ROAD_M = 3.5;
+export const PLOT_GAP_M = 3.5;
 
 /** Nursery uses both round and square hanging pots; the shape is per planting. */
 export type PotType = "round" | "square";
@@ -93,6 +112,15 @@ export interface PlotConfig {
   bedCount: number;
   bedWidth: number;
   bedLength: number;
+  /**
+   * Lines of posts running north-south through the field, one cable each.
+   *
+   * A different grid from the beds and a much coarser one: 19 lines across the
+   * whole house against 120 bed rows, so a cable spans three or four beds. Nine
+   * over an E field and ten over a C, the north-south road falling between
+   * lines 9 and 10 of the nineteen.
+   */
+  postLines: number;
   label: string;
 }
 
@@ -107,10 +135,10 @@ export const stateColors: Record<string, { fill: string; label: string }> = {
 
 // Real shadehouse config — 1 shadehouse with 4 fields
 export const plotConfigs: PlotConfig[] = [
-  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "E3" },
-  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "C3" },
-  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, label: "E1" },
-  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, label: "C1" },
+  { id: "E3", position: "NW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, postLines: 9, label: "E3" },
+  { id: "C3", position: "NE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, postLines: 10, label: "C3" },
+  { id: "E1", position: "SW", bedCount: 33, bedWidth: 1.20, bedLength: 37.20, postLines: 9, label: "E1" },
+  { id: "C1", position: "SE", bedCount: 27, bedWidth: 1.80, bedLength: 37.20, postLines: 10, label: "C1" },
 ];
 
 /** Posts stand roughly every 3.6 m, whatever the bed pitch. */
@@ -143,4 +171,47 @@ export function airLevelsFor(bed: ShadehouseBed, all: ShadehouseBed[]): BedLevel
     .filter((b) => b.fieldId === bed.fieldId && b.bedNumber === bed.bedNumber && b.level > 0)
     .map((b) => b.level)
     .sort((a, z) => a - z);
+}
+
+/**
+ * Where the lines of posts stand, west field first.
+ *
+ * This is the house's second grid and the coarse one: nineteen lines across
+ * the whole width, nine over an E field and ten over a C, with the north-south
+ * road falling between line 9 and line 10. The beds are a finer grid entirely
+ * — 120 rows to these 19 lines — so a cable spans three or four beds and a
+ * basket row cannot be placed at a bed row's x.
+ *
+ * Both the posts and the baskets they carry are placed from here, so a basket
+ * hangs on a post rather than near one.
+ */
+export function postLineXs(): { x: number; fieldId: string; line: number }[] {
+  const widthOf = (fieldId: string) => {
+    const field = plotConfigs.find((p) => p.id === fieldId);
+    return field ? field.bedCount * field.bedWidth : 0;
+  };
+  const linesOf = (fieldId: string) =>
+    plotConfigs.find((p) => p.id === fieldId)?.postLines ?? 0;
+
+  const westWidth = Math.max(widthOf("E3"), widthOf("E1"));
+  const eastWidth = Math.max(widthOf("C3"), widthOf("C1"));
+  const totalWidth = westWidth + ROAD_M + eastWidth;
+
+  // Posts stand at the field's edge as well as through it, so n lines make
+  // n - 1 bays — 4.95 m across an E field, which is what a cable spans.
+  const spread = (n: number, start: number, width: number) =>
+    Array.from({ length: n }, (_, i) => (n === 1 ? start + width / 2 : start + (i * width) / (n - 1)));
+
+  return [
+    ...spread(linesOf("E3"), -totalWidth / 2, westWidth).map((x, i) => ({
+      x,
+      fieldId: "E",
+      line: i + 1,
+    })),
+    ...spread(linesOf("C3"), -totalWidth / 2 + westWidth + ROAD_M, eastWidth).map((x, i) => ({
+      x,
+      fieldId: "C",
+      line: i + 1,
+    })),
+  ];
 }

@@ -14,7 +14,10 @@ import {
   stateColors,
   plotConfigs,
   POSTS_ALONG_BED,
-  POSTS_ACROSS_BEDS,
+  POT_PITCH_M,
+  ROAD_M,
+  PLOT_GAP_M,
+  postLineXs,
   SHADE_COLOR,
   SHADE_HEIGHT_M,
   SHADE_OPACITY,
@@ -52,9 +55,6 @@ export const PLAN_COLORS = {
   roadLabel: "#9ca3af",
 };
 
-/** Gap between the two field columns — the logistics road in the layout. */
-const ROAD_M = 3.5;
-const PLOT_GAP_M = 3.5;
 /** Height of the shade cloth, and so of the posts that hold it up. */
 const ROOF_HEIGHT_M = 3.1;
 /**
@@ -213,6 +213,9 @@ function fieldLayout(fieldId: string, beds: ShadehouseBed[]) {
     // top of a field that is already there.
     position: "SOUTH" as const,
     bedCount: beds.filter((b) => b.fieldId === fieldId).length || 1,
+    // Unknown field, so no measured post grid: baskets fall back to bed
+    // positions rather than being spread across a count nobody recorded.
+    postLines: 0,
     bedWidth: sample?.widthM || 1.2,
     bedLength: sample?.lengthM || 37.2,
     label: fieldId,
@@ -239,6 +242,7 @@ export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
   // Where the south band for unfamiliar fields starts, and how they stack.
   const NEW_FIELD_BAND = plotConfigs[0]?.bedLength ?? 37.2;
   const extra = unknownFields(beds);
+  const postLines = postLineXs();
 
   return beds.map((bed) => {
     const field = fieldLayout(bed.fieldId, beds);
@@ -265,8 +269,23 @@ export function placeBeds(beds: ShadehouseBed[]): BedPlacement[] {
       ? -totalWidth / 2 + westWidth + ROAD_M
       : -totalWidth / 2;
 
-    // Beds run along Z; consecutive beds step along X.
-    const x = columnStart + (bed.bedNumber - 0.5) * field.bedWidth;
+    /**
+     * Where the row sits across the field.
+     *
+     * A ground bed is one of the field's bed rows, so it steps along X by the
+     * bed width. A basket row is not: it hangs on a line of posts, and the
+     * posts are about 5 m apart where the beds are 1.2 or 1.8. Placing a
+     * basket at its bed-row position drew a cable above every bed — up to 120
+     * of them, where the house has nine or ten lines per field.
+     *
+     * So a basket is placed by spreading its post lines evenly across the
+     * field's width, which is where the posts already stand.
+     */
+    const line =
+      bed.level > 0
+        ? postLines.find((l) => l.fieldId === field.id[0] && l.line === bed.bedNumber)
+        : undefined;
+    const x = line ? line.x : columnStart + (bed.bedNumber - 0.5) * field.bedWidth;
     const z = isNorth
       ? -(field.bedLength / 2 + PLOT_GAP_M / 2)
       : field.bedLength / 2 + PLOT_GAP_M / 2;
@@ -475,8 +494,6 @@ const leafColors: Record<ShadehouseBed["state"], string> = {
   issue: "#9aa35a",
 };
 
-/** Pot spacing along the cable, from the photos. */
-const POT_PITCH_M = 0.45;
 const POT_DROP_M = 0.22;
 
 /**
@@ -862,7 +879,8 @@ function Structure({
       if (Math.abs(v - centre) > half) return v;
       return v < centre ? centre - half : centre + half;
     };
-    return at(POSTS_ACROSS_BEDS, span)
+    return postLineXs()
+      .map((line) => line.x)
       .map((x) => clearOf(x, roads.vertical.x, roads.vertical.width))
       .flatMap((x) =>
         at(POSTS_ALONG_BED, depth)

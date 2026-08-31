@@ -20,6 +20,8 @@ export interface FieldLike {
   shadehouse?: string;
   /** How many bed rows the field physically has. */
   rows?: number;
+  /** How many lines of posts run through it — one cable, and so one basket row, each. */
+  postLines?: number;
 }
 
 export interface BedLike {
@@ -106,16 +108,29 @@ export function fieldCapacityProblem(
  * row has air above it — the cables cover part of a field, not all of it — so
  * which rows do is recorded, never derived.
  */
+/**
+ * The name of a bed or a basket row.
+ *
+ * E1-05 is a ground bed — field and bed row. E1-05-01 is a basket row — field,
+ * POST line and level. Same shape, and the middle number counts a different
+ * grid in each, which is why the screens label it "Bed row" or "Post line"
+ * rather than just "Row".
+ */
 export function bedName(fieldName: string, row: number, level: number = 0): string {
   if (!fieldName || !Number.isFinite(row) || row < 1) return "";
   const ground = `${fieldName}-${String(row).padStart(2, "0")}`;
-  return level > 0 ? `${ground}-${level}` : ground;
+  return level > 0 ? `${ground}-${String(level).padStart(2, "0")}` : ground;
 }
 
 export interface ParsedBed {
   field: string;
+  /**
+   * The bed row on a ground bed, the POST line on a basket row. They count
+   * different grids: E1-05 is the fifth bed of 33, E1-05-01 is the fifth post
+   * line of 9 — which sits above bed row 16, not bed row 5.
+   */
   row: number;
-  /** 0 for a ground bed, 1 or 2 for a basket above it. */
+  /** 0 for a ground bed, 1 or 2 for a basket row. */
   level: number;
 }
 
@@ -128,9 +143,21 @@ export function parseBedName(name: string): ParsedBed | null {
   // Two digits or more: row numbers are padded to two, but a field with a
   // hundred rows would produce "E3-100" and a fixed \d{2} would refuse to
   // parse it — silently dropping every bed past 99 from position counts.
-  const match = /^(.+?)-(\d{2,})(?:-([1-2]))?$/.exec(String(name ?? "").trim());
+  // The level is written with a leading zero — E1-05-01 — so it reads like the
+  // rest of the name; the unpadded form still parses.
+  //
+  // The level is matched loosely here and checked below rather than pinned in
+  // the pattern. Restricting it to [1-2] let the engine backtrack on a bad
+  // level: "E3-12-03" failed the last group, retried with the field as
+  // "E3-12", and came back as row 3 of a field that does not exist.
+  const match = /^(.+?)-(\d{2,})(?:-(\d{1,2}))?$/.exec(String(name ?? "").trim());
   if (!match) return null;
-  return { field: match[1], row: Number(match[2]), level: match[3] ? Number(match[3]) : 0 };
+
+  const level = match[3] ? Number(match[3]) : 0;
+  // Level 3 carries the irrigation line, so it is not a bed at anything above 2.
+  if (level < 0 || level > 2) return null;
+
+  return { field: match[1], row: Number(match[2]), level };
 }
 
 /** The row number of a bed name, ground or air. */
@@ -151,12 +178,30 @@ export function levelOf(name: string): number | null {
  * does not stop a basket hanging above it, and a basket on level 1 does
  * not block level 2.
  */
+/**
+ * How many rows a field has at a given level — and they are not the same count.
+ *
+ * A ground bed is one of the field's bed rows: 33 in an E field, 27 in a C.
+ * A basket row hangs on a line of posts, and there are 9 lines in an E field
+ * and 10 in a C. The posts sit about 5 m apart and the beds 1.2 or 1.8, so one
+ * cable spans three or four beds and lines up with none of them.
+ *
+ * Offering 33 post lines because a field has 33 beds was the bug this whole
+ * change exists to remove.
+ */
+export function rowsAtLevel(field: FieldLike | undefined, level: number): number {
+  if (!field) return 0;
+  const count = level === 0 ? field.rows : field.postLines;
+  return Number.isFinite(Number(count)) && Number(count) > 0 ? Number(count) : 0;
+}
+
 export function availableRows(
   field: FieldLike | undefined,
   beds: BedLike[],
   level: number = 0
 ): number[] {
-  if (!field?.rows || field.rows < 1) return [];
+  const total = rowsAtLevel(field, level);
+  if (!field || total < 1) return [];
   const taken = new Set(
     beds
       .map((b) => parseBedName(String(b.name ?? "")))
@@ -164,7 +209,7 @@ export function availableRows(
       .map((p) => p.row)
   );
   const free: number[] = [];
-  for (let row = 1; row <= field.rows; row++) if (!taken.has(row)) free.push(row);
+  for (let row = 1; row <= total; row++) if (!taken.has(row)) free.push(row);
   return free;
 }
 

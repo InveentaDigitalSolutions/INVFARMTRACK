@@ -221,6 +221,7 @@ export interface FieldsRow {
   name?: string;
   notes?: string;
   rows?: number;
+  postLines?: number;
   shadehouse?: string;
   [key: string]: unknown;
 }
@@ -447,6 +448,13 @@ export interface PlantSizesRow {
   bundleSize?: number;
   productType?: string;
   cuttingType?: string;
+  customer?: string;
+  port?: string;
+  season?: string;
+  from?: string;
+  to?: string;
+  priceExt?: number;
+  priceInt?: number;
   active?: boolean;
   notes?: string;
   [key: string]: unknown;
@@ -459,23 +467,6 @@ export interface PortsRow {
   country?: string;
   active?: boolean;
   notes?: string;
-  [key: string]: unknown;
-}
-
-export interface PricesRow {
-  id: string;
-  port?: string;
-  product?: string;
-  size?: string;
-  plant?: string;
-  season?: string;
-  customer?: string;
-  priceExt?: string;
-  priceInt?: string;
-  from?: string;
-  to?: string;
-  active?: string;
-  primaryName?: string;
   [key: string]: unknown;
 }
 

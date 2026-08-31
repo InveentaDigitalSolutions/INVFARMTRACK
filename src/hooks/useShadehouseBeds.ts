@@ -13,7 +13,7 @@
 
 import { useMemo } from "react";
 import { useRecords } from "./useRecords";
-import { plotConfigs, type ShadehouseBed, type BedLevel } from "../services/shadehouseLayout";
+import { plotConfigs, potsPerCable, type ShadehouseBed, type BedLevel } from "../services/shadehouseLayout";
 import { bedStatuses, bedHistory, type BedActivity } from "../services/bedState";
 import { parseBedName } from "../services/infrastructureRules";
 import type {
@@ -58,6 +58,10 @@ export function useShadehouseBeds(): {
           bedNumber: parsed?.row ?? 0,
           level,
           type: level === 0 ? ("ground" as const) : ("basket" as const),
+          // A cable row's pots are not counted anywhere: the hooks run the
+          // length of the house whether or not anything hangs on them, so the
+          // count comes from the cable. Without it the 3D view drew bare wire.
+          potCount: level === 0 ? undefined : potsPerCable(geometry?.bedLength ?? 37.2),
           // A field with no geometry on file falls back to the common bed size
           // rather than to zero, which would draw the map as a hairline.
           widthM: geometry?.bedWidth ?? 1.2,

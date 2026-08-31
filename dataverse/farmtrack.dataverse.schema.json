@@ -88,7 +88,7 @@
       "schemaName": "bv_Bed",
       "displayName": "Bed",
       "displayCollectionName": "Beds",
-      "description": "Growing beds within batches (Shadehouse > Batch > Bed)",
+      "description": "A ground bed or a basket row. A ground bed is a field and a bed row \u2014 E1-05. A basket row is a field, a POST line and a level \u2014 E1-05-01 \u2014 because cables hang on the posts, not above any particular bed. The two numbers count different grids, which is why a field records both a bed count and a post-line count.",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -733,6 +733,15 @@
           "minValue": 0,
           "maxValue": 1000,
           "description": "How many bed rows this field physically has. Bed numbering runs 01 to this value, so it is what decides which row numbers can be chosen and when the field is full."
+        },
+        {
+          "schemaName": "bv_PostLines",
+          "displayName": "Post Lines",
+          "type": "integer",
+          "required": false,
+          "minValue": 0,
+          "maxValue": 200,
+          "description": "How many lines of posts run north-south through this field. A cable hangs on each, so this is how many basket rows the field can have per level \u2014 nine in an E field, ten in a C. Nothing to do with the bed count: the posts are 5 m apart and the beds 1.2 or 1.8, so one cable spans three or four beds and lines up with none of them."
         }
       ]
     },

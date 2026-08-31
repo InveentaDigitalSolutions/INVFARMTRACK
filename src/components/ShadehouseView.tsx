@@ -206,9 +206,17 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
           {/* Fields and beds */}
           {plotConfigs.map((field) => {
             const area = plotAreas[field.position];
-            const plotBeds = beds.filter((b) => b.fieldId === field.id);
+            // Two grids share this field. The rectangles are the ground beds —
+            // one per bed row — and the cable lines above them hang on the
+            // posts, a much coarser grid. Drawing every record as a rectangle
+            // squeezed 51 columns into a 33-bed field.
+            const plotBeds = beds.filter((b) => b.fieldId === field.id && b.type === "ground");
+            const cableBeds = beds.filter((b) => b.fieldId === field.id && b.type === "basket");
             const bedW = (area.w - plotGap * 2) / field.bedCount;
             const bedH = area.h - plotGap * 2 - 12;
+            const cableX = (line: number) =>
+              area.x + plotGap +
+              (field.postLines > 1 ? ((line - 1) / (field.postLines - 1)) * (area.w - plotGap * 2) : (area.w - plotGap * 2) / 2);
 
             return (
               <g key={field.id}>
@@ -227,12 +235,16 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
                   fontSize="9"
                   fontWeight="600"
                 >
-                  {field.label} ({field.bedCount} beds · {field.bedWidth}m wide)
+                  {field.label} ({field.bedCount} beds · {field.postLines} cable lines)
                 </text>
 
                 {/* Individual beds */}
                 {plotBeds.map((bed, i) => {
-                  const bx = area.x + plotGap + i * bedW;
+                  // Positioned by its row number, not by where it happens to
+                  // fall in the array: a missing or inactive row would
+                  // otherwise shift every bed after it one place across.
+                  const slot = bed.bedNumber > 0 ? bed.bedNumber - 1 : i;
+                  const bx = area.x + plotGap + slot * bedW;
                   const by = area.y + plotGap + 14;
                   const bw = Math.max(bedW - 0.8, 1);
                   const filtered = isFiltered(bed);
@@ -306,6 +318,43 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
                     </g>
                   );
                 })}
+
+                {/* Cable lines: one per post line per level, north-south over
+                    the beds. Levels are drawn a hair apart so each can still be
+                    picked; they are physically one above the other. */}
+                {cableBeds.map((bed) => {
+                  const x = cableX(bed.bedNumber) + (bed.level === 1 ? -1.1 : 1.1);
+                  const filtered = isFiltered(bed);
+                  const isHovered = hoveredBed === bed.bedId;
+                  const isSelected = selectedBeds.has(bed.bedId);
+                  return (
+                    <line
+                      key={bed.bedId}
+                      data-bed-id={bed.bedId}
+                      // Run a little past the beds at both ends: a cable is a
+                      // layer above them, not one of them, and at bed width it
+                      // vanished into the block of empty beds behind it.
+                      x1={x}
+                      y1={area.y + plotGap + 9}
+                      x2={x}
+                      y2={area.y + plotGap + 19 + bedH}
+                      stroke={
+                        isSelected ? "#c4d93e"
+                          : bed.state === "empty" ? "#64748b"
+                          : stateColors[bed.state]?.fill || "#94a3b8"
+                      }
+                      strokeWidth={isSelected || isHovered ? 2.4 : 1.2}
+                      opacity={filtered ? 0.95 : 0.2}
+                      strokeLinecap="round"
+                      onClick={(e) => toggleBedSelection(bed.bedId, e)}
+                      onMouseEnter={() => setHoveredBed(bed.bedId)}
+                      onMouseLeave={() => setHoveredBed(null)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <title>{`${bed.bedId} — ${stateColors[bed.state].label}`}</title>
+                    </line>
+                  );
+                })}
               </g>
             );
           })}
@@ -350,7 +399,9 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
                       {selectedBed.bedId}
                     </h4>
                     <p className="text-[11px] text-navy-400">
-                      Field {selectedBed.fieldId} · Bed #{selectedBed.bedNumber} · {selectedBed.widthM}m × {selectedBed.lengthM}m
+                      {selectedBed.type === "basket"
+                        ? `Field ${selectedBed.fieldId} · Cable line ${selectedBed.bedNumber} · level ${selectedBed.level} · ${selectedBed.lengthM}m`
+                        : `Field ${selectedBed.fieldId} · Bed row ${selectedBed.bedNumber} · ${selectedBed.widthM}m × ${selectedBed.lengthM}m`}
                     </p>
                   </div>
                   <button

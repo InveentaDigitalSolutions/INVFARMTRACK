@@ -97,6 +97,10 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       name: "bv_fieldname",
       notes: "bv_notes",
       rows: "bv_rowcount",
+      // Lines of posts running north-south. A cable hangs on each, so this is
+      // how many basket rows the field can carry per level — a different count
+      // from the beds, and on a different grid.
+      postLines: "bv_postlines",
       shadehouse: "_bv_shadehouseid_value",
     },
   },
