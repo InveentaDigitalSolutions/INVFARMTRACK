@@ -545,15 +545,6 @@
           "description": "Whether the record is currently in use."
         },
         {
-          "schemaName": "bv_PlantsPerBed",
-          "displayName": "Plants per Bed Row",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 1000000,
-          "description": "How many of this variety fit in one ground bed row. Every bed row is the same size, so this is a property of the variety."
-        },
-        {
           "schemaName": "bv_GrownIn",
           "displayName": "Grown In",
           "type": "choice",
@@ -606,6 +597,26 @@
             }
           ],
           "description": "Layers of 65% cloth this variety needs, and the combinations where more than one will do. Distinct from the shade a bed actually has: this is the requirement, that is the fact."
+        },
+        {
+          "schemaName": "bv_PlantsPerSqM",
+          "displayName": "Plants per m\u00b2",
+          "type": "decimal",
+          "required": false,
+          "precision": 2,
+          "minValue": 0,
+          "maxValue": 10000,
+          "description": "Planting density on the ground, in plants per square metre. Held as a density rather than a count per row because the rows are not the same size: an E row is 1.20 x 37.20 m and a C row 1.80 x 37.20, so one count is wrong by half for half the nursery."
+        },
+        {
+          "schemaName": "bv_PlantsPerCableM",
+          "displayName": "Plants per metre of cable",
+          "type": "decimal",
+          "required": false,
+          "precision": 2,
+          "minValue": 0,
+          "maxValue": 1000,
+          "description": "Density in a basket, in plants per metre of cable. Per metre and not per square metre because a cable is a line: pots hang along it at a spacing, and it has no width to multiply by."
         },
         {
           "schemaName": "bv_GrowthWeeksMinMarAug",
@@ -678,15 +689,6 @@
           "minValue": 0,
           "maxValue": 104,
           "description": "Weeks to recover after pruning back to 2 leaves, dark half of the year."
-        },
-        {
-          "schemaName": "bv_PlantsPerBasketRow",
-          "displayName": "Plants per Cable",
-          "type": "integer",
-          "required": false,
-          "minValue": 0,
-          "maxValue": 100000,
-          "description": "How many of this variety hang on one cable. A basket bed is a cable strung between the posts with pots hooked along it, so the cable is the unit, and it holds a different number from a ground bed row."
         }
       ]
     },

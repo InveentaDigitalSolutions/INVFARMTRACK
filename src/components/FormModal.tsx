@@ -14,6 +14,11 @@ interface BaseField {
    * unable to see it at all.
    */
   showWhen?: (values: Record<string, unknown>) => boolean;
+  /**
+   * Rendered under the control. For a figure whose meaning is not obvious from
+   * the number — a density, a rate — this is where it gets spelled out.
+   */
+  below?: (values: Record<string, unknown>) => React.ReactNode;
   key: string;
   label: string;
   required?: boolean;
@@ -540,6 +545,7 @@ export default function FormModal({
                             {field.required && <span className="text-red-500 ml-0.5">*</span>}
                           </label>
                           {renderField(field, values[field.key], onChange, liveOptions, values)}
+                          {field.below?.(values)}
                         </div>
                       ))}
                     </div>

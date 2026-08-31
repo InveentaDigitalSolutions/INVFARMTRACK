@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Sprout, Leaf, Bug, Droplets, Scissors} from "lucide-react";
 import PageShell from "../components/PageShell";
+import CapacityPreview from "../components/CapacityPreview";
 import TabBar from "../components/TabBar";
 import DataTable from "../components/DataTable";
 import Badge from "../components/Badge";
@@ -265,13 +266,25 @@ const plantFields = [
       { value: "Double", label: "Double · 87.75%" },
       { value: "Triple", label: "Triple · 95.71%" },
     ] },
-    // Capacity depends on which of the two it is: a basket row holds a
-    // different number from a ground bed row. A variety grown both ways carries
-    // both figures, and each only appears when it applies.
-    { key: "plantsPerBed", label: "Plants per Bed Row", type: "number" as const, min: 0,
-      showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Ground") },
-    { key: "plantsPerBasketRow", label: "Plants per Cable", type: "number" as const, min: 0,
-      showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Basket") },
+    /**
+     * Density, not a count per row.
+     *
+     * The rows are not the same size — an E row is 1.20 x 37.20 m and a C row
+     * 1.80 x 37.20 — so a single "plants per bed" figure was wrong by half for
+     * half the nursery. And the two kinds of bed have different shapes: the
+     * ground is an area, a cable is a line, so one is per square metre and the
+     * other per metre.
+     */
+    { key: "plantsPerSqM", label: "Plants per m² (ground)", type: "number" as const, min: 0, span: 2 as const,
+      suffix: "per m²",
+      showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Ground"),
+      below: (v: Record<string, unknown>) =>
+        <CapacityPreview plant={{ plantsPerSqM: Number(v.plantsPerSqM) }} /> },
+    { key: "plantsPerCableM", label: "Plants per metre of cable (baskets)", type: "number" as const, min: 0,
+      span: 2 as const, suffix: "per m",
+      showWhen: (v: Record<string, unknown>) => String(v.grownIn ?? "").includes("Basket"),
+      below: (v: Record<string, unknown>) =>
+        <CapacityPreview plant={{ plantsPerCableM: Number(v.plantsPerCableM) }} kind="basket" /> },
   ]},
   /**
    * Production knowledge, and it is genuinely per variety — the figures happen
@@ -722,8 +735,8 @@ export default function ProductionPage() {
                 { key: "latin", label: "Latin Name" },
                 { key: "variety", label: "Variety" },
                 { key: "grownIn", label: "Grown In" },
-                { key: "plantsPerBed", label: "Per Bed Row" },
-                { key: "plantsPerBasketRow", label: "Per Cable" },
+                { key: "plantsPerSqM", label: "Per m²" },
+                { key: "plantsPerCableM", label: "Per cable m" },
                 // The seasonal pair replaced a single "weeks to first cut":
                 // the same cutting takes 8-10 weeks in the bright half of the
                 // year and 10-12 in the dark, so one number was always wrong

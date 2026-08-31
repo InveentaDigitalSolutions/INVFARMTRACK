@@ -28,6 +28,14 @@ for (const label of (process.env.CLICKS ?? '').split(',').filter(Boolean)) {
   await page.getByRole('button', { name: label, exact: true }).first().click()
   await page.waitForTimeout(350)
 }
+if (process.env.TYPE_INTO) {
+  const [label, value] = process.env.TYPE_INTO.split('=')
+  await page.getByLabel(label, { exact: false }).first().fill(value).catch(async () => {
+    const idx = Number(process.env.TYPE_IDX ?? 0)
+    await page.locator('input[type=number]').nth(idx).fill(value)
+  })
+  await page.waitForTimeout(500)
+}
 const dlg = page.locator('[role=dialog]').first()
 await (await dlg.count() ? dlg : page).screenshot({ path: process.argv[2] })
 console.log('errors:', errs.length ? errs.slice(0,3) : 'none')
