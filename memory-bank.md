@@ -107,6 +107,17 @@ npm run dataverse:verify-writes     # create/patch/delete live, per table
   layer, drawn by default. Turn Shade off before judging any lighting change —
   `NOSHADE=1 node scripts/test/shot3d.mjs` does it. Shadows work for anything
   bed-sized; 15 cm posts are below what one 4096 map resolves over 115 m.
+- **A read that fails looks exactly like an empty table.** `useRecords` only
+  logged to the console, so a broken read and "no records yet" were
+  indistinguishable on screen. Reads now report to the same banner writes do.
+- **A stale lookup index leaves raw GUIDs on screen.** `labelFor` keeps the id
+  when it cannot resolve it, so a row referencing something created after the
+  page loaded showed a GUID. It now refreshes the index once on a miss, with a
+  10 s cooldown.
+- **`npm run dataverse:check-reads` is the sweep for "nothing is showing".** It
+  checks every table the app reads is mapped, enabled AND registered with the
+  code app, and that `.env.local` has the URL — miss any one and the screen is
+  silently empty.
 - **A lookup list is cached for the life of the page load.** `LookupResolver`
   indexes each table once and nothing called `invalidate()`, so a season created
   in the app could not be picked in the planting form until a full reload —

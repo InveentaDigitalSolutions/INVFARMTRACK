@@ -13,7 +13,12 @@
 export interface WriteError {
   id: number;
   table: string;
-  action: "create" | "update" | "delete";
+  /**
+   * "read" included on purpose: a read that fails leaves a screen looking like
+   * the nursery has no records, which is the one failure a person cannot tell
+   * from the truth. It used to go to the console and nowhere else.
+   */
+  action: "create" | "update" | "delete" | "read";
   message: string;
 }
 

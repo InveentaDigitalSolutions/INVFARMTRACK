@@ -27,7 +27,14 @@ export default function WriteErrorBanner() {
           <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
           <div className="min-w-0 flex-1">
             <p className="text-[12px] font-semibold text-red-800">
-              {e.action === "delete" ? "Could not delete" : "Not saved"} — {e.table}
+              {/* A failed read needs its own words: "not saved" would be a lie,
+                  and the person is looking at an empty screen wondering whether
+                  that is the truth. */}
+              {e.action === "read"
+                ? "Could not load"
+                : e.action === "delete"
+                  ? "Could not delete"
+                  : "Not saved"} — {e.table}
             </p>
             <p className="text-[11px] text-red-700/90 mt-0.5 break-words">{e.message}</p>
           </div>

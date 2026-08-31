@@ -53,7 +53,8 @@
     "dataverse:backfill-radiation": "node scripts/dataverse/backfill-radiation.mjs",
     "test:moon": "tsx scripts/test/moon.test.mts",
     "test:mooninsight": "tsx scripts/test/moonInsight.test.mts",
-    "test:phenology": "tsx scripts/test/phenology.test.mts"
+    "test:phenology": "tsx scripts/test/phenology.test.mts",
+    "dataverse:check-reads": "node scripts/dataverse/check-reads.mjs"
   },
   "dependencies": {
     "@fontsource-variable/playfair-display": "^5.3.0",

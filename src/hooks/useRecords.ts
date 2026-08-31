@@ -72,8 +72,10 @@ export function useRecords<T>(
       setRowsState(all as unknown as T[]);
     } catch (err) {
       // A silent empty table is the worst failure mode here: it looks like
-      // "no records" rather than "the read failed". Say so loudly.
+      // "no records" rather than "the read failed". Say so where it can be
+      // seen — the console is not somewhere anyone is looking.
       console.error(`[data] failed to load "${table}"`, err);
+      reportWriteError(table, "read", err);
       setRowsState([]);
     }
   }, [store, table]);

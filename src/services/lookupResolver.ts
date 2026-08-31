@@ -82,10 +82,30 @@ export class LookupResolver {
     return pending;
   }
 
-  /** The name to show for a row id. Returns undefined when it cannot be resolved. */
+  /**
+   * The name to show for a row id, or undefined when it cannot be resolved.
+   *
+   * A miss usually means the index was built before the row existed — someone
+   * added a bed in another tab, or straight into Dataverse. Left alone, the
+   * column keeps the raw GUID and the screen looks broken, so a miss refreshes
+   * the index once and asks again. The cooldown stops a page full of genuinely
+   * unresolvable ids from refetching per row.
+   */
+  private readonly refreshedAt = new Map<string, number>();
+
   async labelFor(entitySet: string, id: unknown): Promise<string | undefined> {
     if (!isGuid(id)) return undefined;
-    return (await this.index(entitySet)).byId.get(id.toLowerCase());
+    const key = id.toLowerCase();
+
+    const found = (await this.index(entitySet)).byId.get(key);
+    if (found !== undefined) return found;
+
+    const last = this.refreshedAt.get(entitySet) ?? 0;
+    if (Date.now() - last < 10_000) return undefined;
+    this.refreshedAt.set(entitySet, Date.now());
+
+    this.indexes.delete(entitySet);
+    return (await this.index(entitySet)).byId.get(key);
   }
 
   /**
