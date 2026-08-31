@@ -9,9 +9,9 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 49 |
-| Columns | 601 |
-| Relationships | 68 |
+| Tables | 50 |
+| Columns | 610 |
+| Relationships | 72 |
 
 ## Conventions
 
@@ -44,12 +44,12 @@
 | [Calendar](#calendar) | `bv_calendar` | `CAL-0001` | 17 | Date dimension table for scheduling and reporting |
 | [Task](#task) | `bv_task` | `TSK-0001` | 11 | Scheduled and assigned nursery tasks |
 | [Customer](#customer) | `bv_customer` | `CUS-0001` | 13 | Nursery customers for orders and invoicing |
-| [Order](#order) | `bv_order` | `ORD-0001` | 7 | Customer orders |
+| [Order](#order) | `bv_order` | `ORD-0001` | 8 | Customer orders |
 | [Order Item](#order-item) | `bv_orderitem` | `OIT-0001` | 7 | Line items within an order |
-| [Packing](#packing) | `bv_packing` | `PCK-0001` | 24 | Per-box packing records — each record is one box with full traceability |
+| [Packing](#packing) | `bv_packing` | `PCK-0001` | 25 | Per-box packing records — each record is one box with full traceability |
 | [Fiscal Authorization](#fiscal-authorization) | `bv_fiscalauthorization` | `FIS-0001` | 11 | Honduras SAR CAI authorizations — invoice number ranges and expiration dates |
 | [Invoice](#invoice) | `bv_invoice` | `INV-0001` | 34 | Export invoices with shipping, fiscal, and payment tracking |
-| [Plant Price](#plant-price) | `bv_plantprice` | `PRC-0001` | 11 | Price history per plant — export and internal prices, with optional customer-specific overrides |
+| [Plant Price](#plant-price) | `bv_plantprice` | `PRC-0001` | 13 | Price history per variety, keyed on customer and destination port, and optionally narrowed to a size. Export and internal prices, with an effective date range. |
 | [CAI Number](#cai-number) | `bv_cainumber` | `CAI-0001` | 9 | Individual invoice numbers within a CAI authorization range — tracks used/available status |
 | [Expense](#expense) | `bv_expense` | `EXP-0001` | 12 | Operational expenses with optional receipt photo and AI extraction |
 | [Supplier](#supplier) | `bv_supplier` | `SUP-0001` | 11 | Vendors and suppliers for inputs, materials, and services |
@@ -80,6 +80,7 @@
 | [Shipment](#shipment) | `bv_shipment` | `SHP-0001` | 11 | One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed — so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went. |
 | [Solar Radiation](#solar-radiation) | `bv_solarradiation` | `SR-{SEQNUM:5}` | 5 | Measured shortwave radiation for one day at the nursery. Kept as history for the same reason the exchange rate is: the light a planting actually received is a fact about the past, and the weather service only offers a 92-day window. Without this, a crop older than that accumulates on clear-sky assumptions. |
 | [Plant Size](#plant-size) | `bv_plantsize` | `PS-0001` | 9 | What a box of one variety at one size holds. The catalogue counterpart to Packing: packing records what WAS in a box, this records what a box SHOULD hold, which is what makes an order line checkable. |
+| [Port](#port) | `bv_port` | `PRT-{SEQNUM:3}` | 5 | A destination port. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does. Kept as a table rather than a fixed list so a new one can be added without a schema change. |
 
 ## Relationships
 
@@ -98,9 +99,11 @@
 | Task | `bv_plantingid` | Planting | Remove link |
 | Task | `bv_bedid` | Bed | Remove link |
 | Order | `bv_customerid` | Customer | Restrict |
+| Order | `bv_portid` | Port | Remove link |
 | Order Item | `bv_orderid` | Order | Restrict |
 | Order Item | `bv_plantid` | Plant | Restrict |
 | Packing | `bv_plantid` | Plant | Restrict |
+| Packing | `bv_plantsizeid` | Plant Size | Remove link |
 | Packing | `bv_bedid` | Bed | Remove link |
 | Packing | `bv_shadehouseid` | Shadehouse | Remove link |
 | Packing | `bv_orderid` | Order | Remove link |
@@ -109,6 +112,8 @@
 | Invoice | `bv_fiscalauthid` | Fiscal Authorization | Remove link |
 | Invoice | `bv_customerid` | Customer | Restrict |
 | Plant Price | `bv_plantid` | Plant | Restrict |
+| Plant Price | `bv_portid` | Port | Remove link |
+| Plant Price | `bv_plantsizeid` | Plant Size | Remove link |
 | Plant Price | `bv_seasonid` | Season | Remove link |
 | Plant Price | `bv_customerid` | Customer | Remove link |
 | CAI Number | `bv_fiscalauthid` | Fiscal Authorization | Restrict |
@@ -789,6 +794,7 @@ Customer orders
 |---|---|---|:--:|---|
 | `bv_ordernumber` 🔑 | Order Number | Autonumber | ✓ | Auto-generated identifier, format ORD-0001. |
 | `bv_customerid` | Customer | Lookup → [Customer](#customer) | ✓ | Link to the related Customer record. |
+| `bv_portid` | Port | Lookup → [Port](#port) |  | Where this order ships to. Together with the customer and variety it decides the price. |
 | `bv_orderdate` | Order Date | Date only | ✓ | Date the event took place. |
 | `bv_requesteddeliverydate` | Requested Delivery Date | Date only |  | Date the event took place. |
 | `bv_status` | Status | Choice | ✓ | Current state of the record. One of: Draft, Confirmed, In Packing, Ready for Pickup, Delivered, Cancelled. |
@@ -845,6 +851,7 @@ Per-box packing records — each record is one box with full traceability
 | `bv_barcode` | Barcode | Text(100) |  | Short text value. Barcode for the Packing. |
 | `bv_boxnumber` | Box Number | Whole number |  | Whole number. Box Number for the Packing. |
 | `bv_plantid` | Product (Plant) | Lookup → [Plant](#plant) | ✓ | Link to the related Plant record. |
+| `bv_plantsizeid` | Product | Lookup → [Plant Size](#plant-size) |  | The catalogue row this box is of — variety, size, type and product together. Packing used to type each of those free-hand and point at nothing, so a packed box could not be checked against what a box of that product is supposed to hold. |
 | `bv_bedid` | Bed (source) | Lookup → [Bed](#bed) |  | Link to the related Bed record. |
 | `bv_shadehouseid` | Shadehouse | Lookup → [Shadehouse](#shadehouse) |  | Link to the related Shadehouse record. |
 | `bv_orderid` | Order | Lookup → [Order](#order) |  | Link to the related Order record. |
@@ -1015,7 +1022,7 @@ Export invoices with shipping, fiscal, and payment tracking
 
 `bv_plantprice` · Organization-owned
 
-Price history per plant — export and internal prices, with optional customer-specific overrides
+Price history per variety, keyed on customer and destination port, and optionally narrowed to a size. Export and internal prices, with an effective date range.
 
 **Record ID:** `bv_plantpricecode` — format `PRC-{SEQNUM:4}`, e.g. `PRC-0001`.
 
@@ -1024,6 +1031,8 @@ Price history per plant — export and internal prices, with optional customer-s
 | `bv_plantpricecode` 🔑 | Plant Price ID | Autonumber | ✓ | Auto-generated identifier, format PRC-0001. |
 | `bv_plantpricename` | Plant Price Name | Text(200) | ✓ | Auto-composed: {Plant} / {Customer or 'Base'} / {EffectiveFrom} |
 | `bv_plantid` | Plant | Lookup → [Plant](#plant) | ✓ | Link to the related Plant record. |
+| `bv_portid` | Port | Lookup → [Port](#port) |  | Where this price ships to. Part of what a price is keyed on, alongside the variety and the customer. |
+| `bv_plantsizeid` | Size | Lookup → [Plant Size](#plant-size) |  | Narrows the price to one size. Left empty the price applies to every size of that variety, which is how it works today. Added now rather than later because retrofitting a key onto priced history is far worse than carrying an empty column. |
 | `bv_seasonid` | Season | Lookup → [Season](#season) |  | Link to the related Season record. |
 | `bv_customerid` | Customer | Lookup → [Customer](#customer) |  | If set, this price applies only to this customer. If null, it is the base/default price. |
 | `bv_effectivefrom` | Effective From | Date only | ✓ | Date value (date only, no time). Effective From for the Plant Price. |
@@ -2138,3 +2147,23 @@ What a box of one variety at one size holds. The catalogue counterpart to Packin
 | 187520003 | Tips |
 
 </details>
+
+**Referenced by:** Packing (`bv_plantsizeid`), Plant Price (`bv_plantsizeid`)
+
+## Port
+
+`bv_port` · User-owned
+
+A destination port. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does. Kept as a table rather than a fixed list so a new one can be added without a schema change.
+
+**Record ID:** `bv_portcode` — format `PRT-{SEQNUM:3}`, e.g. `PRT-{SEQNUM:3}`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_portcode` 🔑 | Port ID | Autonumber | ✓ | Auto-generated identifier, format PRT-001. |
+| `bv_portname` | Name | Text(100) | ✓ | What the port is called — Miami, Rotterdam, Amsterdam. |
+| `bv_country` | Country | Text(100) |  |  |
+| `bv_isactive` | Active | Yes/No |  | Whether the nursery currently ships there. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+**Referenced by:** Order (`bv_portid`), Plant Price (`bv_portid`)

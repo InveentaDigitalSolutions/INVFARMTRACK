@@ -48,6 +48,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_plantprices",
   "bv_plants",
   "bv_plantsizes",
+  "bv_ports",
   "bv_pruningcurves",
   "bv_prunings",
   "bv_purchaseorders",
@@ -127,7 +128,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_stockmovements": "bv_stockmovementname",
   "bv_shipments": "bv_shipmentcode",
   "bv_solarradiations": "bv_solarradiationcode",
-  "bv_plantsizes": "bv_plantsizecode"
+  "bv_plantsizes": "bv_plantsizecode",
+  "bv_ports": "bv_portname"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {
@@ -289,6 +291,10 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_customerid_value": {
       "nav": "bv_CustomerId",
       "targetSet": "bv_customers"
+    },
+    "_bv_portid_value": {
+      "nav": "bv_PortId",
+      "targetSet": "bv_ports"
     }
   },
   "bv_orderitems": {
@@ -317,6 +323,10 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_plantid_value": {
       "nav": "bv_PlantId",
       "targetSet": "bv_plants"
+    },
+    "_bv_plantsizeid_value": {
+      "nav": "bv_PlantSizeId",
+      "targetSet": "bv_plantsizes"
     },
     "_bv_shadehouseid_value": {
       "nav": "bv_ShadehouseId",
@@ -359,6 +369,14 @@ export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet:
     "_bv_plantid_value": {
       "nav": "bv_PlantId",
       "targetSet": "bv_plants"
+    },
+    "_bv_plantsizeid_value": {
+      "nav": "bv_PlantSizeId",
+      "targetSet": "bv_plantsizes"
+    },
+    "_bv_portid_value": {
+      "nav": "bv_PortId",
+      "targetSet": "bv_ports"
     },
     "_bv_seasonid_value": {
       "nav": "bv_SeasonId",

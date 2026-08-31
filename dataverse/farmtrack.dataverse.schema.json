@@ -1993,6 +1993,14 @@
           "description": "Link to the related Customer record."
         },
         {
+          "schemaName": "bv_PortId",
+          "displayName": "Port",
+          "type": "lookup",
+          "relatedTable": "bv_Port",
+          "required": false,
+          "description": "Where this order ships to. Together with the customer and variety it decides the price."
+        },
+        {
           "schemaName": "bv_OrderDate",
           "displayName": "Order Date",
           "type": "date",
@@ -2163,6 +2171,14 @@
           "relatedTable": "bv_Plant",
           "required": true,
           "description": "Link to the related Plant record."
+        },
+        {
+          "schemaName": "bv_PlantSizeId",
+          "displayName": "Product",
+          "type": "lookup",
+          "relatedTable": "bv_PlantSize",
+          "required": false,
+          "description": "The catalogue row this box is of \u2014 variety, size, type and product together. Packing used to type each of those free-hand and point at nothing, so a packed box could not be checked against what a box of that product is supposed to hold."
         },
         {
           "schemaName": "bv_BedId",
@@ -2809,7 +2825,7 @@
       "schemaName": "bv_PlantPrice",
       "displayName": "Plant Price",
       "displayCollectionName": "Plant Prices",
-      "description": "Price history per plant \u2014 export and internal prices, with optional customer-specific overrides",
+      "description": "Price history per variety, keyed on customer and destination port, and optionally narrowed to a size. Export and internal prices, with an effective date range.",
       "ownershipType": "OrganizationOwned",
       "columns": [
         {
@@ -2837,6 +2853,22 @@
           "relatedTable": "bv_Plant",
           "required": true,
           "description": "Link to the related Plant record."
+        },
+        {
+          "schemaName": "bv_PortId",
+          "displayName": "Port",
+          "type": "lookup",
+          "relatedTable": "bv_Port",
+          "required": false,
+          "description": "Where this price ships to. Part of what a price is keyed on, alongside the variety and the customer."
+        },
+        {
+          "schemaName": "bv_PlantSizeId",
+          "displayName": "Size",
+          "type": "lookup",
+          "relatedTable": "bv_PlantSize",
+          "required": false,
+          "description": "Narrows the price to one size. Left empty the price applies to every size of that variety, which is how it works today. Added now rather than later because retrofitting a key onto priced history is far worse than carrying an empty column."
         },
         {
           "schemaName": "bv_SeasonId",
@@ -6449,6 +6481,53 @@
           "type": "boolean",
           "required": false,
           "description": "Whether this size is currently offered."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ]
+    },
+    {
+      "schemaName": "bv_Port",
+      "displayName": "Port",
+      "displayCollectionName": "Ports",
+      "ownershipType": "UserOwned",
+      "description": "A destination port. Price depends on it \u2014 the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does. Kept as a table rather than a fixed list so a new one can be added without a schema change.",
+      "columns": [
+        {
+          "schemaName": "bv_PortCode",
+          "displayName": "Port ID",
+          "type": "autonumber",
+          "autoNumberFormat": "PRT-{SEQNUM:3}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format PRT-001."
+        },
+        {
+          "schemaName": "bv_PortName",
+          "displayName": "Name",
+          "type": "string",
+          "maxLength": 100,
+          "required": true,
+          "description": "What the port is called \u2014 Miami, Rotterdam, Amsterdam."
+        },
+        {
+          "schemaName": "bv_Country",
+          "displayName": "Country",
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "schemaName": "bv_IsActive",
+          "displayName": "Active",
+          "type": "boolean",
+          "required": false,
+          "description": "Whether the nursery currently ships there."
         },
         {
           "schemaName": "bv_Notes",
