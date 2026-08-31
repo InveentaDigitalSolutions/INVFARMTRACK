@@ -956,6 +956,10 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Bulbs": 187520002,
       "Tips": 187520003
     },
+    "bv_freightmode": {
+      "Air": 187500100,
+      "Sea": 187500101
+    },
     "bv_producttype": {
       "URC": 187510000,
       "RC": 187510001

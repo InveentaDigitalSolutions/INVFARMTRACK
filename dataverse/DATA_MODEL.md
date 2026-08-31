@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 52 |
-| Columns | 625 |
+| Columns | 626 |
 | Relationships | 75 |
 
 ## Conventions
@@ -78,7 +78,7 @@
 | [Stock Movement](#stock-movement) | `bv_stockmovement` | `STK-0001` | 12 | One receipt, issue or correction. Stock on hand is the sum of these rather than a number somebody edits: a stored total drifts silently, and nothing afterwards can say why it changed. Points at a Material or an Input — a sack of fertilizer is stock in the same way a box of fittings is. |
 | [Shipment](#shipment) | `bv_shipment` | `SHP-0001` | 11 | One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed — so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went. |
 | [Solar Radiation](#solar-radiation) | `bv_solarradiation` | `SR-{SEQNUM:5}` | 5 | Measured shortwave radiation for one day at the nursery. Kept as history for the same reason the exchange rate is: the light a planting actually received is a fact about the past, and the weather service only offers a 92-day window. Without this, a crop older than that accumulates on clear-sky assumptions. |
-| [Product](#product) | `bv_plantsize` | `PS-0001` | 16 | A product the nursery sells: a variety at a size, as a type and a condition — and what it costs. Size and price were two tables, which meant two screens describing the same thing. The only reason to record a size at all is to price and pack it, so they are one row.\n\nCustomer, port and the dates may be left blank, meaning any. The most specific row that applies wins, so a general figure is set once and overridden only where something was negotiated — and the box count can live on the general row rather than being repeated. |
+| [Product](#product) | `bv_plantsize` | `PS-0001` | 17 | A product the nursery sells: a variety at a size, as a type and a condition — and what it costs. Size and price were two tables, which meant two screens describing the same thing. The only reason to record a size at all is to price and pack it, so they are one row.\n\nCustomer, port and the dates may be left blank, meaning any. The most specific row that applies wins, so a general figure is set once and overridden only where something was negotiated — and the box count can live on the general row rather than being repeated. |
 | [Port](#port) | `bv_port` | `PRT-{SEQNUM:3}` | 5 | A destination port. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does. Kept as a table rather than a fixed list so a new one can be added without a schema change. |
 | [Basket Size](#basket-size) | `bv_basketsize` | `BSK-{SEQNUM:3}` | 7 | A size of hanging basket the nursery uses. Kept as a table because the sizes change, and because how many fit on a cable is a fact about the basket rather than about any variety. |
 | [Plant Alias](#plant-alias) | `bv_plantalias` | `ALS-0001` | 6 | Another name for a variety. Customers order by their own trade names — Summer Nights is Hawaiian, Snowy Morning is Marble Queen, Off to Oz is Neon — and breeders use codes like UF-Ea-0317. Without these, every order import is matched by hand and a near-miss like 'Njoy' against 'N'Joy' goes unnoticed. |
@@ -2117,6 +2117,7 @@ A product the nursery sells: a variety at a size, as a type and a condition — 
 | `bv_notes` | Notes | Text area(2000) |  |  |
 | `bv_customerid` | Customer | Lookup → [Customer](#customer) |  | If set, this price applies only to this customer. If null, it is the base/default price. |
 | `bv_portid` | Port | Lookup → [Port](#port) |  | Where this price ships to. Part of what a price is keyed on, alongside the variety and the customer. |
+| `bv_freightmode` | Freight | Choice |  | How the goods travel. Freight is most of what separates one destination's price from another's, and air and sea to the same city are not the same cost — everything ships by air today, but the price list has to be able to say so. Blank means the row applies to either. |
 | `bv_seasonid` | Season | Lookup → [Season](#season) |  | Link to the related Season record. |
 | `bv_effectivefrom` | Effective From | Date only | ✓ | Date value (date only, no time). Effective From for the Plant Price. |
 | `bv_effectiveto` | Effective To | Date only |  | Date value (date only, no time). Effective To for the Plant Price. |
@@ -2150,6 +2151,13 @@ A product the nursery sells: a variety at a size, as a type and a condition — 
 | 187520001 | E |
 | 187520002 | Bulbs |
 | 187520003 | Tips |
+
+**Freight** (`bv_freightmode`)
+
+| Value | Label |
+|---|---|
+| 187500100 | Air |
+| 187500101 | Sea |
 
 </details>
 

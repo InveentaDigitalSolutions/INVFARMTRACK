@@ -3,7 +3,9 @@
  *
  * Price is keyed on more than the variety: the same cutting costs a different
  * amount to a different customer, and a different amount again into Rotterdam
- * than into Miami, because the freight does. Product matters too — only L&E is
+ * than into Miami, because the freight does — and by air into a city is not the
+ * same cost as by sea into the same one, which is why the mode is priced
+ * separately from the destination. Product matters too — only L&E is
  * sold today, but E, Bulbs and Tips are coming, and a price list that cannot
  * tell them apart would have to be rebuilt when they arrive.
  *
@@ -21,6 +23,8 @@ export interface PriceRow {
   plant?: string;
   customer?: string;
   port?: string;
+  /** "Air" or "Sea". Blank means the row applies to either. */
+  freightMode?: string;
   product?: string;
   size?: string;
   effectiveFrom?: string;
@@ -34,6 +38,7 @@ export interface PriceQuery {
   plant: string;
   customer?: string;
   port?: string;
+  freightMode?: string;
   product?: string;
   size?: string;
   /** ISO date the sale is priced on. Defaults to today. */
@@ -63,7 +68,7 @@ export interface PriceMatch {
   row: PriceRow;
   /** Export price, which is what an invoice carries. */
   price: number;
-  /** How many of customer, port, product and size the row pinned down. */
+  /** How many of customer, port, freight, product and size the row pinned down. */
   specificity: number;
 }
 
@@ -87,6 +92,7 @@ export function resolvePrice(rows: PriceRow[], query: PriceQuery): PriceMatch | 
     const parts = [
       score(row.customer, query.customer),
       score(row.port, query.port),
+      score(row.freightMode, query.freightMode),
       score(row.product, query.product),
       score(row.size, query.size),
     ];

@@ -264,6 +264,13 @@ const plantSizeFields = [
     // something was actually negotiated.
     { key: "customer", label: "Customer", type: "select" as const, options: [], optionsFrom: "customers" },
     { key: "port", label: "Port", type: "select" as const, options: [], optionsFrom: "ports" },
+    // Freight is most of the difference between one destination's price and
+    // another's, and air and sea into the same city are not the same cost.
+    // Everything goes by air today; blank means the row covers either.
+    { key: "freightMode", label: "Freight", type: "toggle" as const, options: [
+      { value: "Air", label: "By air" },
+      { value: "Sea", label: "By sea" },
+    ] },
     { key: "season", label: "Season", type: "select" as const, options: [], optionsFrom: "seasons" },
     { key: "from", label: "Priced from", type: "date" as const },
     { key: "to", label: "Priced to", type: "date" as const },
@@ -893,6 +900,9 @@ export default function ProductionPage() {
                 ) },
                 { key: "port", label: "Port", render: (r) => (
                   <Badge variant={r.port ? "blue" : "gray"}>{(r.port as string) || "Any"}</Badge>
+                ) },
+                { key: "freightMode", label: "Freight", render: (r) => (
+                  <Badge variant={r.freightMode ? "blue" : "gray"}>{(r.freightMode as string) || "Any"}</Badge>
                 ) },
                 { key: "priceExt", label: "Price (USD)", render: (r) => (
                   <span className="font-mono tabular-nums text-navy-700">

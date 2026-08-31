@@ -449,6 +449,7 @@ export const COLUMN_KIND: Record<string, Record<string, ColumnKind>> = {
     "bv_notes": "text",
     "bv_customerid": "lookup",
     "bv_portid": "lookup",
+    "bv_freightmode": "choice",
     "bv_seasonid": "lookup",
     "bv_effectivefrom": "date",
     "bv_effectiveto": "date",

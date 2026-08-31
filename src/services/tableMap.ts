@@ -738,6 +738,10 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // the box count can sit on the general row instead of being repeated.
       customer: "_bv_customerid_value",
       port: "_bv_portid_value",
+      // Air or sea. Freight is most of what separates one destination's price
+      // from another's, and the two modes into the same city are not the same
+      // cost — everything goes by air today, but the list has to say so.
+      freightMode: "bv_freightmode",
       season: "_bv_seasonid_value",
       from: "bv_effectivefrom",
       to: "bv_effectiveto",

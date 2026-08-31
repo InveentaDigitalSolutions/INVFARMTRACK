@@ -82,5 +82,24 @@ eq('and they are named', missing.map((m) => m.label),
   ['Marble Queen · Regular · L&E', 'Neon · L&E'])
 eq('nothing to price is not a failure', unpriced(rows, []), [])
 
+// Freight mode. Everything goes by air today, but air and sea into the same
+// port are different money, and the list has to be able to hold both.
+const freight = [
+  { plant: 'Hawaiian', port: 'Miami', priceEXT: 0.30 },
+  { plant: 'Hawaiian', port: 'Miami', freightMode: 'Sea', priceEXT: 0.22 },
+] as never
+eq('by air takes the row that does not name a mode',
+  resolvePrice(freight, { plant: 'Hawaiian', port: 'Miami', freightMode: 'Air' })?.price, 0.30)
+eq('by sea takes the mode-specific row',
+  resolvePrice(freight, { plant: 'Hawaiian', port: 'Miami', freightMode: 'Sea' })?.price, 0.22)
+eq('a mode-specific row is not used when no mode was asked',
+  resolvePrice([{ plant: 'Hawaiian', freightMode: 'Sea', priceEXT: 0.22 }] as never,
+    { plant: 'Hawaiian' }), null)
+eq('freight beats nothing but loses to nothing either — port still counts',
+  resolvePrice([
+    { plant: 'Hawaiian', freightMode: 'Air', priceEXT: 0.31 },
+    { plant: 'Hawaiian', port: 'Miami', freightMode: 'Air', priceEXT: 0.28 },
+  ] as never, { plant: 'Hawaiian', port: 'Miami', freightMode: 'Air' })?.price, 0.28)
+
 console.log(failures ? `\n  ${failures} failed` : '\n  A price is chosen, or refused.')
 process.exit(failures ? 1 : 0)

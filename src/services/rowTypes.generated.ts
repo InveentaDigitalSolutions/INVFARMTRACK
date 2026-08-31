@@ -450,6 +450,7 @@ export interface PlantSizesRow {
   cuttingType?: string;
   customer?: string;
   port?: string;
+  freightMode?: string;
   season?: string;
   from?: string;
   to?: string;

@@ -6399,6 +6399,23 @@
           "description": "Where this price ships to. Part of what a price is keyed on, alongside the variety and the customer."
         },
         {
+          "schemaName": "bv_FreightMode",
+          "displayName": "Freight",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187500100,
+              "label": "Air"
+            },
+            {
+              "value": 187500101,
+              "label": "Sea"
+            }
+          ],
+          "description": "How the goods travel. Freight is most of what separates one destination's price from another's, and air and sea to the same city are not the same cost \u2014 everything ships by air today, but the price list has to be able to say so. Blank means the row applies to either."
+        },
+        {
           "schemaName": "bv_SeasonId",
           "displayName": "Season",
           "type": "lookup",
