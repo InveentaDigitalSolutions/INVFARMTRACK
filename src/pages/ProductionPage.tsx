@@ -45,18 +45,23 @@ const phenologyFields = [
     { key: "code", label: "Phenology ID", type: "text" as const, readOnly: true, placeholder: "PH-0001 (auto)" },
     { key: "plant", label: "Plant", type: "select" as const, required: true, options: [], optionsFrom: "plants" },
   ]},
-  { title: "Growing on", columns: 2 as const, fields: [
-    // The stage is a figure, not a heading. Eight leaves for most, three for
-    // some, and a column called "weeks to 8 leaves" could not hold that.
-    { key: "targetLeaves", label: "Grown to", type: "range" as const, min: 1, max: 20, suffix: "leaves",
-      hint: "the stage it is cut at" },
-    { key: "harvestWeeks", label: "Harvest every", type: "range" as const, min: 0, max: 20, suffix: "wks" },
-    { key: "growthWeeksMin", label: "Weeks to get there — from", type: "range" as const, min: 0, max: 40, suffix: "wks" },
+  /**
+   * The stage is a figure, not a heading — eight leaves for most varieties,
+   * three for some. It was labelled "Grown to" beside an empty slider, which
+   * does not read as "how many leaves", so the label now says so outright.
+   */
+  { title: "Grown to which stage", columns: 2 as const, fields: [
+    { key: "targetLeaves", label: "Number of leaves it is grown to", type: "range" as const,
+      min: 1, max: 20, step: 1, suffix: "leaves", span: 2 as const },
+    { key: "growthWeeksMin", label: "Weeks to reach it — from", type: "range" as const, min: 0, max: 40, suffix: "wks" },
     { key: "growthWeeksMax", label: "…to", type: "range" as const, min: 0, max: 40, suffix: "wks" },
   ]},
-  { title: "Pruning", columns: 2 as const, fields: [
-    { key: "pruneToLeaves", label: "Cut back to", type: "range" as const, min: 0, max: 20, suffix: "leaves" },
-    { key: "pruningWeeks", label: "Recovery", type: "range" as const, min: 0, max: 40, suffix: "wks" },
+  { title: "Cutting and pruning", columns: 2 as const, fields: [
+    { key: "harvestWeeks", label: "Cut every", type: "range" as const, min: 0, max: 20, suffix: "wks" },
+    { key: "pruneToLeaves", label: "Number of leaves it is cut back to", type: "range" as const,
+      min: 0, max: 20, step: 1, suffix: "leaves" },
+    { key: "pruningWeeks", label: "Weeks to grow back after pruning", type: "range" as const,
+      min: 0, max: 40, suffix: "wks", span: 2 as const },
     { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
   ]},
 ];

@@ -18,7 +18,7 @@ page.on('console', m => { if (m.type() === 'error') errs.push(m.text()) })
 await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' })
 await page.getByRole('button', { name: 'Production' }).first().click()
 await page.waitForTimeout(700)
-await page.getByRole('button', { name: 'Catalog', exact: true }).first().click()
+await page.getByRole('button', { name: process.env.TAB ?? 'Catalog', exact: true }).first().click()
 await page.waitForTimeout(700)
 if (process.env.SUB) { await page.getByRole('button', { name: process.env.SUB, exact: true }).first().click(); await page.waitForTimeout(600) }
 await page.getByRole('button', { name: process.env.ADD ?? 'Add Plant' }).first().click()
