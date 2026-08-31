@@ -5,7 +5,7 @@ import {
   nextSeasonName, fieldNameProblem, fieldCapacityProblem,
   bedName, rowOf, levelOf, parseBedName, availableRows, levelsFor, defaultLevel,
   levelProblem, bedCapacityProblem, typeForLevel, planBulkBeds,
-  planBedUpdate, positionCount,
+  planBedUpdate, positionCount, mixedBedKindProblem, allBaskets,
 } from '../../src/services/infrastructureRules.ts'
 
 let failures = 0
@@ -165,6 +165,27 @@ eq('the run reads in row order, not string order',
    planBedUpdate({ field: { name: "E3", rows: 12 }, fromRow: 1, toRow: 11,
      existing: [{ name: "E3-11" }, { name: "E3-02" }, { name: "E3-01" }] }).match,
    ["E3-01", "E3-02", "E3-11"])
+
+// --- one submission, many beds ----------------------------------------------
+// A wave is planted across many beds at once, so the form takes a selection.
+// Ground and baskets cannot be mixed: a basket planting carries a size that a
+// ground one has no use for, and one submission cannot carry both answers.
+eq('one bed is never mixed', mixedBedKindProblem(['E3-01']), null)
+eq('all ground is fine', mixedBedKindProblem(['E3-01', 'E3-02', 'C1-05']), null)
+eq('all baskets is fine', mixedBedKindProblem(['E3-01-1', 'E3-02-2']), null)
+eq('nothing selected is fine', mixedBedKindProblem([]), null)
+eq('not a list is fine', mixedBedKindProblem(undefined), null)
+eq('a mix is refused', !!mixedBedKindProblem(['E3-01', 'E3-02-1']), true)
+eq('and the message names both sides',
+  /ground/.test(mixedBedKindProblem(['E3-01', 'E3-02-1'])!) &&
+  /basket/.test(mixedBedKindProblem(['E3-01', 'E3-02-1'])!), true)
+
+// Which fields the form shows depends on this.
+eq('a basket selection is all baskets', allBaskets(['E3-01-1', 'C1-04-2']), true)
+eq('a ground selection is not', allBaskets(['E3-01', 'E3-02']), false)
+eq('a mixed one is not either', allBaskets(['E3-01', 'E3-02-1']), false)
+eq('an empty selection is not', allBaskets([]), false)
+eq('nonsense names do not count as baskets', allBaskets(['nonsense']), false)
 
 console.log(failures ? `\n  ${failures} failed` : '\n  all passed')
 process.exit(failures ? 1 : 0)

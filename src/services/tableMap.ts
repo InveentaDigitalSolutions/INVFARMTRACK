@@ -762,19 +762,6 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       notes: "bv_notes",
     },
   },
-  /** How densely one variety is planted in one size of basket. */
-  basketDensities: {
-    dataSource: "bv_plantbasketdensities",
-    primaryKey: "bv_plantbasketdensityid",
-    fields: {
-      code: "bv_plantbasketdensitycode",
-      plant: "_bv_plantid_value",
-      basketSize: "_bv_basketsizeid_value",
-      plantsPerSqM: "bv_plantspersqm",
-      notes: "bv_notes",
-    },
-  },
-  /** Destination ports. Price is keyed on them, because the freight is. */
   /** How long a variety takes, per season, and to what stage. */
   phenology: {
     dataSource: "bv_phenologies",
@@ -782,7 +769,6 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     fields: {
       code: "bv_phenologycode",
       plant: "_bv_plantid_value",
-      seasonHalf: "bv_seasonhalf",
       targetLeaves: "bv_targetleaves",
       growthWeeksMin: "bv_growthweeksmin",
       growthWeeksMax: "bv_growthweeksmax",
@@ -792,6 +778,7 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       notes: "bv_notes",
     },
   },
+  /** Destination ports. Price is keyed on them, because the freight is. */
   ports: {
     dataSource: "bv_ports",
     primaryKey: "bv_portid",
@@ -921,7 +908,6 @@ export const ENABLED_TABLES = new Set<string>([
   "ports",
   "phenology",
   "basketSizes",
-  "basketDensities",
   "plantSizes",
   "solarRadiation",
   "bedCounts",

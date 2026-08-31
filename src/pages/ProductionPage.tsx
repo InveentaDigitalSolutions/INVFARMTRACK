@@ -12,7 +12,7 @@ import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
-import { nextSeasonName } from "../services/infrastructureRules";
+import { nextSeasonName, mixedBedKindProblem, allBaskets } from "../services/infrastructureRules";
 import ProductionOverview from "../components/ProductionOverview";
 import { useInputNutrients } from "../hooks/useInputNutrients";
 import { expandBeds, expandPlantLines } from "../services/expandBeds";
@@ -81,16 +81,12 @@ const catalogViews = [
   // is reference data typed once and read constantly, the same reason Seasons
   // is here rather than under Accounting.
   { id: "sizes", label: "Sizes & Packing" },
-  // Density in a basket is per variety AND per size — a small basket does not
-  // fill at the same rate as a large one — so it cannot live on the plant.
-  { id: "basketDensity", label: "Basket Density" },
   { id: "seasons", label: "Seasons" },
 ] as const;
 
 // Initial data
 const initPlantSizes: Record<string, unknown>[] = [];
 const initPhenology: Record<string, unknown>[] = [];
-const initBasketDensities: Record<string, unknown>[] = [];
 const initPlantings: PlantingsRow[] = [];
 const initTreatments: TreatmentsRow[] = [];
 const initIrrigation: IrrigationRow[] = [];
@@ -120,22 +116,28 @@ const workerOptionsFallback: { value: string; label: string }[] = [];
 // Form definitions
 const plantingFields = [
   { title: "Planting Details", columns: 2 as const, fields: [
-    { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
+    // Many beds at once when they carry the same variety, which is how a wave
+    // is actually planted. Every bed becomes its own record.
+    { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
     // A bed carries several varieties at once, each with its own quantity.
     // Every line becomes its own planting record.
     { key: "lines", label: "Plants and quantities", type: "plantlines" as const,
       options: plantOptionsFallback, optionsFrom: "plants", required: true, span: 2 as const },
-    // Which size went in. It is what decides the density, and so how many
-    // plants that cable holds — so it is asked at planting, not inferred.
-    { key: "basketSize", label: "Basket Size", type: "select" as const,
-      options: [], optionsFrom: "basketSizes",
-      placeholder: "only for a basket bed" },
+    // Only when the selection is baskets. A basket size names its shape and
+    // width together, so one choice settles both and an impossible pair — a
+    // round size marked square — cannot be made.
+    { key: "basketSize", label: "Basket size and shape", type: "select" as const,
+      options: [], optionsFrom: "basketSizes", span: 2 as const,
+      showWhen: (v: Record<string, unknown>) => allBaskets(v.bed) },
     { key: "season", label: "Season", type: "select" as const, options: seasonOptionsFallback, optionsFrom: "seasons", required: true },
     { key: "date", label: "Planting Date", type: "date" as const, required: true },
-    // Baskets carry hanging pots in two shapes; the 3D view renders each.
-    { key: "potType", label: "Pot Type", type: "toggle" as const, options: [
-      { value: "round", label: "Round" }, { value: "square", label: "Square" },
-    ] },
+    // The 3D view draws round and square pots differently. Only asked for
+    // baskets, since a ground bed has no pots at all.
+    { key: "potType", label: "Pot Type", type: "toggle" as const,
+      showWhen: (v: Record<string, unknown>) => allBaskets(v.bed),
+      options: [
+        { value: "round", label: "Round" }, { value: "square", label: "Square" },
+      ] },
     /**
      * The day it came off the bed. Left empty while it is still standing.
      *
@@ -237,20 +239,6 @@ const pruningFields = [
  * than the variety name: "Neon" is both a Pothos and a Philodendron, and a form
  * that matched on the name would quietly merge the two.
  */
-const basketDensityFields = [
-  { title: "Which variety, in which basket", columns: 2 as const, fields: [
-    { key: "code", label: "Density ID", type: "text" as const, readOnly: true, placeholder: "BD-0001 (auto)" },
-    { key: "plant", label: "Plant", type: "select" as const, required: true, options: [], optionsFrom: "plants" },
-    { key: "basketSize", label: "Basket Size", type: "select" as const, required: true,
-      options: [], optionsFrom: "basketSizes" },
-    // The same figure the ground uses, counted the same way — but for this
-    // size of basket, because they do not fill at the same rate.
-    { key: "plantsPerSqM", label: "Plants per m²", type: "number" as const, min: 0, required: true,
-      suffix: "per m²" },
-    { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
-  ]},
-];
-
 const plantSizeFields = [
   { title: "Which product", columns: 2 as const, fields: [
     { key: "code", label: "Size ID", type: "text" as const, readOnly: true, placeholder: "PS-0001 (auto)" },
@@ -371,7 +359,9 @@ const seasonFormGroups = [
 const fertilizationFields = [
   { title: "Fertilization Event", columns: 2 as const, fields: [
     { key: "date", label: "Date", type: "date" as const, required: true },
-    { key: "bed", label: "Bed", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: false },
+    // Many beds at once when they carry the same variety, which is how a wave
+    // is actually planted. Every bed becomes its own record.
+    { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
     { key: "input", label: "Fertilizer", type: "select" as const, options: fertilizerInputOptionsFallback, optionsFrom: "inputs", required: true },
     { key: "qtyKg", label: "Qty (kg)", type: "number" as const, min: 0, required: true },
     // Labels must match bv_fertilizations.bv_method exactly — Dataverse takes
@@ -454,7 +444,6 @@ export default function ProductionPage() {
   const [plants, setPlants] = useRecords("plants", initPlants);
   const [plantSizes, setPlantSizes] = useRecords("plantSizes", initPlantSizes);
   const [phenology, setPhenology] = useRecords("phenology", initPhenology);
-  const [basketDensities, setBasketDensities] = useRecords("basketDensities", initBasketDensities);
 
   /** Names a new season from its start date; an existing one keeps its name. */
   const saveSeason = (values: Record<string, unknown>) => {
@@ -478,7 +467,6 @@ export default function ProductionPage() {
   const plantForm = useFormModal(initPlants[0]);
   const plantSizeForm = useFormModal(initPlantSizes[0]);
   const phenologyForm = useFormModal(initPhenology[0]);
-  const basketDensityForm = useFormModal(initBasketDensities[0]);
   const seasonForm = useFormModal(initSeasons[0]);
   const confirm = useConfirmDialog();
 
@@ -524,6 +512,11 @@ export default function ProductionPage() {
    * a new planting record, not a change to this one.
    */
   const savePlanting = (values: Record<string, unknown>) => {
+    // Ground or baskets, never both in one submission — a basket planting
+    // carries a size that a ground one has no use for.
+    const mixed = mixedBedKindProblem(values.bed);
+    if (mixed) { alert(mixed); return; }
+
     const records = expandBeds(values).flatMap(expandPlantLines);
     if (records.length === 0 || !records[0].plant) {
       alert("Choose at least one plant.");
@@ -886,45 +879,6 @@ export default function ProductionPage() {
               open={confirm.open} onClose={confirm.close} title="Delete Size"
               message="Remove this size from the catalogue?"
               onConfirm={() => handleDelete(plantSizes, setPlantSizes)}
-            />
-          </>
-        );
-      case "basketDensity":
-        return (
-          <>
-            <div className="mb-3 text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3.5 py-2.5">
-              How densely each variety is planted in each size of basket. The
-              basket's own measurements — width and how many fit on a cable —
-              live under <b>Infrastructure → Basket Sizes</b>; together they give
-              the capacity of a cable.
-            </div>
-            <DataTable
-              columns={[
-                { key: "plant", label: "Plant" },
-                { key: "basketSize", label: "Basket Size" },
-                { key: "plantsPerSqM", label: "Per m²", render: (r) => (
-                  <span className="font-mono tabular-nums text-navy-700">{String(r.plantsPerSqM ?? "—")}</span>
-                ) },
-                { key: "notes", label: "Notes" },
-              ]}
-              data={basketDensities}
-              onAdd={basketDensityForm.openCreate}
-              onEdit={(row, i) => basketDensityForm.openEdit(row as any, i)}
-              onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="Add Density"
-              searchPlaceholder="Search densities..."
-            />
-            <FormModal
-              open={basketDensityForm.open} onClose={basketDensityForm.close}
-              title={basketDensityForm.isEdit ? "Edit Basket Density" : "Add Basket Density"}
-              groups={basketDensityFields} values={basketDensityForm.values}
-              onChange={basketDensityForm.onChange} isEdit={basketDensityForm.isEdit}
-              onSubmit={(v) => handleSave(basketDensities, setBasketDensities, basketDensityForm, v)}
-            />
-            <ConfirmDialog
-              open={confirm.open} onClose={confirm.close} title="Delete Density"
-              message="Remove this basket density?"
-              onConfirm={() => handleDelete(basketDensities, setBasketDensities)}
             />
           </>
         );

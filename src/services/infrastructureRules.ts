@@ -203,6 +203,43 @@ export function levelProblem(type: string | undefined, level: string | number | 
   return null;
 }
 
+/**
+ * A planting goes into ground beds or into baskets, never a mix.
+ *
+ * They are different records — E3-07 is the bed, E3-07-1 is the cable above it
+ * — and a basket planting carries a basket size that a ground one has no use
+ * for. Letting one submission cover both would either lose that size or write
+ * it onto rows where it means nothing.
+ *
+ * Returns null when the selection is fine, or a sentence naming the problem.
+ */
+export function mixedBedKindProblem(bedNames: unknown): string | null {
+  if (!Array.isArray(bedNames) || bedNames.length < 2) return null;
+
+  const ground: string[] = [];
+  const baskets: string[] = [];
+  for (const name of bedNames) {
+    const parsed = parseBedName(String(name ?? ""));
+    if (!parsed) continue;
+    (parsed.level === 0 ? ground : baskets).push(String(name));
+  }
+  if (ground.length === 0 || baskets.length === 0) return null;
+
+  return (
+    `Choose ground beds or baskets, not both — ${ground.length} ground ` +
+    `(${ground.slice(0, 3).join(", ")}${ground.length > 3 ? "…" : ""}) and ` +
+    `${baskets.length} basket (${baskets.slice(0, 3).join(", ")}${baskets.length > 3 ? "…" : ""}) ` +
+    `are selected. A basket planting carries a basket size that a ground one does not.`
+  );
+}
+
+/** True when every bed in the selection is a basket. */
+export function allBaskets(bedNames: unknown): boolean {
+  if (!Array.isArray(bedNames) || bedNames.length === 0) return false;
+  const parsed = bedNames.map((n) => parseBedName(String(n ?? ""))).filter(Boolean);
+  return parsed.length > 0 && parsed.every((p) => p!.level !== 0);
+}
+
 export interface BulkBedRequest {
   field: FieldLike | undefined;
   level: number;

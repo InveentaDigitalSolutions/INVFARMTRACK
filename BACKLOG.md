@@ -176,6 +176,13 @@ prototype with real data in DEV. So: stay unmanaged in DEV for now, and package
 when the prototype holds. Until then there is no way to restore the app if it is
 lost, which is the cost of that order and worth knowing.
 
+### OPS-6 · `bv_PlantBasketDensity` is orphaned — **watching**
+
+Built for a per-variety, per-basket-size density and dropped the same day when
+Santiago decided it was not needed. Removed from the app and the schema file;
+the table itself refused to delete because something still references it, and it
+is empty, so it is left for the next tidy rather than forced.
+
 ### OPS-3 · Stale personal flow — **watching**
 
 `e206cf2a-c439-49c0-9b1b-1333df4ead4e`, superseded by the solution copy
