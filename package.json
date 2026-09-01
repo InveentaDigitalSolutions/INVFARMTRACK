@@ -67,7 +67,8 @@
     "test:days": "tsx scripts/test/workingDays.test.mts",
     "dataverse:holidays": "node scripts/dataverse/import-holidays.mjs",
     "dataverse:ports": "node scripts/dataverse/import-ports.mjs",
-    "dataverse:plant-names": "node scripts/dataverse/check-plant-names.mjs"
+    "dataverse:plant-names": "node scripts/dataverse/check-plant-names.mjs",
+    "dataverse:orders": "node scripts/dataverse/import-orders.mjs"
   },
   "dependencies": {
     "@fontsource-variable/playfair-display": "^5.3.0",

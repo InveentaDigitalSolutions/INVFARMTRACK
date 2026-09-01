@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain, Mountain, Sun } from "lucide-react";
+import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain, Mountain, Sun, Maximize2, Minimize2 } from "lucide-react";
 import { terrainFall } from "../services/terrain";
 import { atLocal, sunPosition, dayArc } from "../services/solar";
 import SceneCompass from "./SceneCompass";
@@ -122,6 +122,22 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   }, [webgl]);
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
+  /**
+   * The scene filled a fixed 460 px whatever the screen was, which on a laptop
+   * is a letterbox: the house is 110 m wide and 80 deep, so a wide, shallow
+   * frame either shows it tiny or crops the far fields. It now takes what the
+   * window can spare, and expands to the whole of it on request.
+   */
+  const [expanded, setExpanded] = useState(false);
+
+  // Escape leaves the expanded view. Without it the only way out is the
+  // button, which is somewhere the eye is not while orbiting.
+  useEffect(() => {
+    if (!expanded) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setExpanded(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [expanded]);
 
   const placements = useMemo(() => placeBeds(beds), [beds]);
   const baseZones = useMemo(() => buildZones(beds), [beds]);
@@ -179,7 +195,13 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const totalFlow = running.reduce((sum, r) => sum + r.flowLpm, 0);
 
   return (
-    <div className={`card-surface bg-white rounded-xl border border-sand-200/80 overflow-hidden ${className}`}>
+    <div
+      className={`card-surface bg-white border border-sand-200/80 overflow-hidden ${
+        expanded
+          ? "fixed inset-3 z-50 rounded-xl shadow-2xl overflow-y-auto"
+          : `rounded-xl ${className}`
+      }`}
+    >
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-5 pb-3">
         <div>
@@ -202,6 +224,16 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           >
             <Droplets className="w-3.5 h-3.5" />
             Irrigation
+          </button>
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            title={expanded ? "Back to the page (Esc)" : "Fill the window"}
+            aria-label={expanded ? "Shrink the scene" : "Expand the scene"}
+            className="p-2 rounded-lg bg-sand-100 text-navy-500 hover:bg-sand-200 cursor-pointer transition-colors"
+          >
+            {expanded
+              ? <Minimize2 className="w-3.5 h-3.5" />
+              : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
           <button
             onClick={() => setResetKey((k) => k + 1)}
@@ -433,7 +465,14 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
       )}
 
       {/* Scene */}
-      <div className="relative h-[460px] bg-gradient-to-b from-sand-50 to-sand-100">
+      <div
+        className="relative bg-gradient-to-b from-sand-50 to-sand-100"
+        style={{
+          // Enough to see the house in, never taller than the window: clamp
+          // keeps a short laptop screen usable and lets a large one breathe.
+          height: expanded ? "calc(100vh - 210px)" : "clamp(460px, 68vh, 860px)",
+        }}
+      >
         {loading ? (
           /* The house is drawn to fit the beds, so with none read yet it is
              built at a default size and then rebuilt — a different model
