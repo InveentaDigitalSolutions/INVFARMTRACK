@@ -180,10 +180,15 @@ async function main() {
   const file = JSON.parse(readFileSync(FILE, 'utf8'))
   const h = { ...(await headers()), 'Content-Type': 'application/json' }
 
+  // $top and paging are mutually exclusive in Dataverse: asking for the first
+  // 5,000 rows returns exactly that and no next link, which reads as "the
+  // whole table" and would have re-created 1,591 ports it already held. The
+  // page size goes in a header instead, and the link is followed to the end.
   const existing = new Set()
-  let url = `${BASE}/bv_ports?$select=bv_portname&$top=5000`
+  let url = `${BASE}/bv_ports?$select=bv_portname`
+  const paged = { ...h, Prefer: 'odata.maxpagesize=5000' }
   while (url) {
-    const page = await (await fetch(url, { headers: h })).json()
+    const page = await (await fetch(url, { headers: paged })).json()
     for (const row of page.value ?? []) existing.add(row.bv_portname)
     url = page['@odata.nextLink']
   }

@@ -36,6 +36,16 @@ interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
   onAdd?: () => void;
+  /**
+   * Both are handed the row's index in `data` — not in what is on screen.
+   *
+   * Pages act on that index: delete filters it out of the source array, edit
+   * writes back over it. The table hands out the position within the rows it
+   * is showing, which is the same number only when nothing is searched,
+   * filtered, sorted or limited. Search "E1-05-01", press delete, and the
+   * first bed in the table was the one that went — while the row in front of
+   * you stayed exactly where it was, which reads as nothing happening.
+   */
   onEdit?: (row: T, index: number) => void;
   onDelete?: (row: T, index: number) => void;
   addLabel?: string;
@@ -159,6 +169,14 @@ export default function DataTable<T extends Record<string, unknown>>({
     if (limit === "bot5") return sorted.slice(-5);
     return sorted.slice(0, limit === "top5" ? 5 : 10);
   }, [sorted, limit]);
+
+  /**
+   * Where a visible row sits in the data the page holds.
+   *
+   * Filtering, sorting and slicing all preserve object identity, so the row
+   * on screen is the same object the page passed in and can be found by it.
+   */
+  const sourceIndex = (row: T) => data.indexOf(row);
 
   /** Min/max per heatmap column, computed over the rows actually on screen. */
   const heatRanges = useMemo(() => {
@@ -435,7 +453,7 @@ export default function DataTable<T extends Record<string, unknown>>({
                   className={`transition-colors ${
                     onEdit ? "hover:bg-lime-50/30 cursor-pointer" : "hover:bg-sand-50/50"
                   }`}
-                  onClick={() => onEdit?.(row, i)}
+                  onClick={() => { const at = sourceIndex(row); if (at >= 0) onEdit?.(row, at); }}
                 >
                   {visibleColumns.map((col) => (
                     <td
@@ -455,7 +473,7 @@ export default function DataTable<T extends Record<string, unknown>>({
                       <div className="flex items-center justify-end gap-1">
                         {onEdit && (
                           <button
-                            onClick={(e) => { e.stopPropagation(); onEdit(row, i); }}
+                            onClick={(e) => { e.stopPropagation(); const at = sourceIndex(row); if (at >= 0) onEdit(row, at); }}
                             className="p-1.5 rounded-md text-navy-400 hover:text-navy-700 hover:bg-sand-100 cursor-pointer transition-colors"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -463,7 +481,7 @@ export default function DataTable<T extends Record<string, unknown>>({
                         )}
                         {onDelete && (
                           <button
-                            onClick={(e) => { e.stopPropagation(); onDelete(row, i); }}
+                            onClick={(e) => { e.stopPropagation(); const at = sourceIndex(row); if (at >= 0) onDelete(row, at); }}
                             className="p-1.5 rounded-md text-navy-400 hover:text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
