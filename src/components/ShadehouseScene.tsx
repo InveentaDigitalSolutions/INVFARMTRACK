@@ -765,8 +765,17 @@ function Sun({
   /** The whole day's path, not just this instant. */
   showArc: boolean;
 }) {
-  // Far enough out to read as a direction rather than a lamp in the room.
-  const radius = Math.max(span, depth) * 0.95;
+  /**
+   * How far out the sun and its path are drawn.
+   *
+   * Far enough to read as a direction rather than a lamp in the room, close
+   * enough that the whole arc is in frame without zooming out: at 0.95 the
+   * path left the view entirely at the default camera, which for a layer whose
+   * whole point is watching the sun move is the same as not drawing it.
+   *
+   * Only the drawing moves — the light's direction is the real one.
+   */
+  const radius = Math.max(span, depth) * 0.6;
   const modelNorth = BED_AXIS_BEARING_DEG;
 
   const dir = useMemo(() => sunVector(at, modelNorth), [at, modelNorth]);
@@ -806,11 +815,41 @@ function Sun({
     return points;
   }, [at, showArc, radius, modelNorth]);
 
-  const arcGeometry = useMemo(
-    () => (arc.length ? new THREE.BufferGeometry().setFromPoints(arc) : null),
-    [arc]
-  );
+  /**
+   * The path as a tube, not a line.
+   *
+   * WebGL ignores line width on every platform that matters, so a THREE.Line
+   * is one pixel wide however it is styled — against a bright sky at this
+   * distance it was a thread nobody could see. A tube is real geometry and
+   * can be as thick as it needs to be.
+   */
+  const arcGeometry = useMemo(() => {
+    if (arc.length < 2) return null;
+    const curve = new THREE.CatmullRomCurve3(arc);
+    return new THREE.TubeGeometry(curve, Math.min(240, arc.length * 2), radius * 0.006, 8, false);
+  }, [arc, radius]);
   useEffect(() => () => arcGeometry?.dispose(), [arcGeometry]);
+
+  /**
+   * Where the sun stands at each whole hour, so the arc can be read as a clock
+   * rather than as a shape. Every second hour, which is as dense as the marks
+   * can be before they touch near noon.
+   */
+  const hourMarks = useMemo(() => {
+    if (!showArc) return [] as { key: string; at: [number, number, number]; label: string }[];
+    const iso = at.toISOString().slice(0, 10);
+    const marks: { key: string; at: [number, number, number]; label: string }[] = [];
+    for (let hour = 0; hour <= 24; hour += 2) {
+      const v = sunVector(atLocal(iso, hour), modelNorth);
+      if (!v) continue;
+      marks.push({
+        key: `h${hour}`,
+        at: [v[0] * radius, v[1] * radius, v[2] * radius],
+        label: `${String(hour).padStart(2, "0")}:00`,
+      });
+    }
+    return marks;
+  }, [at, showArc, radius, modelNorth]);
 
   // Below the horizon there is no direct sun. Lighting the beds anyway — the
   // obvious shortcut — would put a sun under the ground and shadows upward.
@@ -850,18 +889,52 @@ function Sun({
       />
 
       {!night && (
-        <mesh position={position}>
-          <sphereGeometry args={[radius * 0.035, 20, 16]} />
-          <meshBasicMaterial color={colour} toneMapped={false} />
-        </mesh>
+        <group position={position}>
+          {/* The disc itself, and a halo around it. Both unlit and exempt from
+              tone mapping, so the sun is the brightest thing on screen — which
+              is the one property everybody already knows it has. */}
+          <mesh>
+            <sphereGeometry args={[radius * 0.055, 24, 18]} />
+            <meshBasicMaterial color={colour} toneMapped={false} />
+          </mesh>
+          <mesh>
+            <sphereGeometry args={[radius * 0.11, 20, 14]} />
+            <meshBasicMaterial
+              color={colour}
+              toneMapped={false}
+              transparent
+              opacity={0.22}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        </group>
       )}
 
       {arcGeometry && (
-        <line>
-          <primitive object={arcGeometry} attach="geometry" />
-          <lineBasicMaterial color="#e0b64a" transparent opacity={0.5} />
-        </line>
+        <mesh geometry={arcGeometry} renderOrder={5}>
+          <meshBasicMaterial color="#f0a92c" toneMapped={false} transparent opacity={0.9} />
+        </mesh>
       )}
+
+      {hourMarks.map((mark) => (
+        <group key={mark.key} position={mark.at}>
+          <mesh>
+            <sphereGeometry args={[radius * 0.012, 10, 8]} />
+            <meshBasicMaterial color="#f7d488" toneMapped={false} />
+          </mesh>
+          <Billboard position={[0, radius * 0.028, 0]}>
+            <SceneText
+              fontSize={radius * 0.02}
+              color="#7a5c14"
+              outlineWidth={0.09}
+              outlineColor="#ffffff"
+            >
+              {mark.label}
+            </SceneText>
+          </Billboard>
+        </group>
+      ))}
     </group>
   );
 }
@@ -894,8 +967,17 @@ function Valley({ span, depth }: { span: number; depth: number }) {
     // Flat over the block itself, then out to the real ground quickly: ease it
     // over too long a distance and everything within sight of the house is
     // levelled, which is the flat plane this was meant to replace.
-    const flatTo = Math.hypot(span, depth) / 2;
-    const easeOver = 70;
+    // Flat well past the house, then out to the real ground slowly.
+    //
+    // The ground rises 180 m to the west, and easing over 70 m from the
+    // block's own corner radius put the first climbing vertices about 20 m
+    // beyond the westernmost beds — several metres up, in front of E1 rows 1
+    // to 7. That is the "ground on top of the beds": not a sorting fault, the
+    // hillside genuinely standing where the beds are.
+    const flatTo = Math.hypot(span, depth) * 1.4;
+    const easeOver = 400;
+    /** Nothing within this radius may rise above the floor the house sits on. */
+    const KEEP_CLEAR_M = 320;
 
     // Land reads as land by its shading. Seen from above, a slope with one
     // flat colour is indistinguishable from a void, so height is painted on.
@@ -918,7 +1000,10 @@ function Valley({ span, depth }: { span: number; depth: number }) {
       const blend = distance <= flatTo
         ? 0
         : Math.min(1, (distance - flatTo) / easeOver);
-      position.setZ(i, (metres - SITE_ELEV_M) * blend);
+      // Belt and braces: near the house the land may fall away but never
+      // climb above it, whatever the tiles say.
+      const raised = (metres - SITE_ELEV_M) * blend;
+      position.setZ(i, distance < KEEP_CLEAR_M ? Math.min(raised, 0) : raised);
 
       // Valley floor green through to a dry, pale ridge.
       const t = high > low ? Math.min(1, Math.max(0, (metres - low) / (high - low))) : 0;
