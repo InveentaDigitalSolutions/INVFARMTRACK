@@ -924,8 +924,16 @@ function Valley({ span, depth }: { span: number; depth: number }) {
     <mesh
       geometry={geometry}
       rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, -0.05, 0]}
-      receiveShadow
+      // Well below the house's own floor plate. Two centimetres apart, the two
+      // surfaces fought for every pixel and the whole scene shimmered as the
+      // camera moved; at 40 cm the plate simply sits on the land.
+      position={[0, -0.4, 0]}
+      // And it does not take shadows. The shadow camera is fitted to the
+      // house — about 120 m — while this mesh runs 2.4 km, so every pixel
+      // beyond the frustum sampled an undefined depth and came back blotched.
+      receiveShadow={false}
+      // Nothing in the distance should ever be drawn over the nursery.
+      renderOrder={-10}
     >
       {/* Matte and unsaturated: it is context, and must not compete with the
           beds for attention. */}

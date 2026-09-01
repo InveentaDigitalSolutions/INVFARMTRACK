@@ -98,11 +98,33 @@ if (process.env.TERRAIN) {
 }
 const out = process.argv[2]
 const canvas = page.locator('canvas').first()
+// The scene sits well down the page. Mouse coordinates are window
+// coordinates, so with the canvas below the fold every drag and wheel landed
+// outside the window and did nothing — three "different" camera angles came
+// back byte-identical before this.
+await canvas.scrollIntoViewIfNeeded()
+await page.waitForTimeout(300)
 if (process.env.ORBIT) {
   const box = await canvas.boundingBox()
   const cx = box.x + box.width / 2, cy = box.y + box.height / 2
   await page.mouse.move(cx, cy); await page.mouse.down()
   await page.mouse.move(cx + Number(process.env.ORBIT), cy, { steps: 20 })
+  await page.mouse.up(); await page.waitForTimeout(1200)
+}
+// Straight down is where coplanar surfaces fight worst, so it has to be
+// reachable from the harness.
+if (process.env.TILT) {
+  const box = await canvas.boundingBox()
+  const cx = box.x + box.width / 2, cy = box.y + box.height / 2
+  await page.mouse.move(cx, cy)
+  await page.mouse.down()
+  // OrbitControls only starts turning after it has seen movement while the
+  // button is held; one jump from A to B is not movement it can integrate.
+  const tilt = Number(process.env.TILT)
+  for (let i = 1; i <= 20; i++) {
+    await page.mouse.move(cx, cy - (tilt * i) / 20)
+    await page.waitForTimeout(20)
+  }
   await page.mouse.up(); await page.waitForTimeout(1200)
 }
 if (process.env.ZOOMOUT) {
