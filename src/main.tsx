@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { BUILD_TARGET } from "./services/tableMap";
 import { configureTextBuilder } from "troika-three-text";
 
 // The Power Apps player sets worker-src 'none', so troika's default of
@@ -15,3 +16,7 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </StrictMode>
 );
+
+// Says which store this bundle talks to, so an empty nursery can be told
+// apart from a nursery with no records in it.
+console.info(`[build] ${BUILD_TARGET}`);

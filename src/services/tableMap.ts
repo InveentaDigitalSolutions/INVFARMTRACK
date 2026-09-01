@@ -974,8 +974,25 @@ export const ENABLED_TABLES = new Set<string>([
  */
 export type HostingMode = "player" | "demo";
 
+/**
+ * Which store this bundle was built to talk to, as a string that survives into
+ * the bundle.
+ *
+ * `import.meta.env.VITE_DATAVERSE_URL` is only ever tested for truth here, so
+ * the compiler folds the whole expression away and the URL never appears in
+ * the output — which meant a deploy could not be checked by looking at it. One
+ * demo-mode build reached the nursery that way: every screen rendered and
+ * every table was empty, because it was reading a browser's local storage.
+ *
+ * This literal is what scripts/test/check-build-target.mjs looks for, and what
+ * the console line at startup prints.
+ */
+export const BUILD_TARGET = import.meta.env.VITE_DATAVERSE_URL
+  ? "BUILD_TARGET:dataverse"
+  : "BUILD_TARGET:localstore";
+
 export function hostingMode(): HostingMode {
-  return import.meta.env.VITE_DATAVERSE_URL ? "player" : "demo";
+  return BUILD_TARGET === "BUILD_TARGET:dataverse" ? "player" : "demo";
 }
 
 /** Dataverse is only usable when the app has a session of some kind. */
