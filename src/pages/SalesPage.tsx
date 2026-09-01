@@ -19,7 +19,7 @@ import RankedBars from "../components/RankedBars";
 import ShipmentDetail from "../components/ShipmentDetail";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useFormModal, useConfirmDialog, withEdited } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withEdited, withoutPending } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { salesSummary } from "../services/salesInsight";
 import ExcelImport from "../components/ExcelImport";
@@ -163,6 +163,8 @@ export default function SalesPage() {
   const [showImport, setShowImport] = useState(false);
   const portForm = useFormModal(initPorts[0]);
   const portConfirm = useConfirmDialog();
+  const customerConfirm = useConfirmDialog();
+  const orderConfirm = useConfirmDialog();
   const [ports, setPorts] = useRecords("ports", initPorts);
 
   const [orders, setOrders] = useRecords("orders", initialOrders);
@@ -215,13 +217,29 @@ export default function SalesPage() {
     terms: "CIF",
   });
 
+  /**
+   * Both of these could only ever add.
+   *
+   * A customer's country, terms and invoicing address are the sort of thing
+   * that is filled in later — and three of these customers were created by the
+   * order import with almost nothing on them — so a directory that can only be
+   * added to is a directory that stays wrong.
+   */
   const handleOrderSave = (values: Record<string, unknown>) => {
-    setOrders((prev) => [values as typeof initialOrders[0], ...prev]);
+    if (orderForm.isEdit) {
+      setOrders(withEdited(orders, orderForm, values) as typeof initialOrders);
+    } else {
+      setOrders((prev) => [values as typeof initialOrders[0], ...prev]);
+    }
     orderForm.close();
   };
 
   const handleCustomerSave = (values: Record<string, unknown>) => {
-    setCustomers((prev) => [values as typeof initialCustomers[0], ...prev]);
+    if (customerForm.isEdit) {
+      setCustomers(withEdited(customers, customerForm, values) as typeof initialCustomers);
+    } else {
+      setCustomers((prev) => [values as typeof initialCustomers[0], ...prev]);
+    }
     customerForm.close();
   };
 
@@ -734,14 +752,17 @@ export default function SalesPage() {
               ]}
               data={orders}
               onAdd={orderForm.openCreate}
+              onEdit={(row, i) => orderForm.openEdit(row as never, i)}
+              onDelete={(row, i) => orderConfirm.requestDelete(row, i)}
               addLabel="New Order"
               searchPlaceholder="Search orders..."
             />
             <FormModal
               open={orderForm.open}
               onClose={orderForm.close}
-              title="New Order"
-              subtitle="Create a customer order"
+              title={orderForm.isEdit ? "Edit Order" : "New Order"}
+              subtitle={orderForm.isEdit ? "Change what was agreed" : "Create a customer order"}
+              isEdit={orderForm.isEdit}
               groups={[{
                 ...orderFields[0],
                 fields: orderFields[0].fields.map((f) => {
@@ -758,8 +779,18 @@ export default function SalesPage() {
               }]}
               values={orderForm.values}
               onChange={orderForm.onChange}
-              submitLabel="Create Order"
+              submitLabel={orderForm.isEdit ? "Save" : "Create Order"}
               onSubmit={handleOrderSave}
+            />
+            <ConfirmDialog
+              open={orderConfirm.open}
+              onClose={orderConfirm.close}
+              title="Delete Order"
+              message="Delete this order?"
+              onConfirm={() => {
+                setOrders(withoutPending(orders, orderConfirm.pending) as typeof initialOrders);
+                orderConfirm.close();
+              }}
             />
           </>
         );
@@ -777,19 +808,34 @@ export default function SalesPage() {
               ]}
               data={customers}
               onAdd={customerForm.openCreate}
+              onEdit={(row, i) => customerForm.openEdit(row as never, i)}
+              onDelete={(row, i) => customerConfirm.requestDelete(row, i)}
               addLabel="Add Customer"
               searchPlaceholder="Search customers..."
             />
             <FormModal
               open={customerForm.open}
               onClose={customerForm.close}
-              title="New Customer"
-              subtitle="Add a new customer to the directory"
+              title={customerForm.isEdit ? "Edit Customer" : "New Customer"}
+              subtitle={customerForm.isEdit
+                ? "Correct the directory — country decides their currency and holidays"
+                : "Add a new customer to the directory"}
               groups={customerFields}
               values={customerForm.values}
               onChange={customerForm.onChange}
-              submitLabel="Create Customer"
+              isEdit={customerForm.isEdit}
+              submitLabel={customerForm.isEdit ? "Save" : "Create Customer"}
               onSubmit={handleCustomerSave}
+            />
+            <ConfirmDialog
+              open={customerConfirm.open}
+              onClose={customerConfirm.close}
+              title="Delete Customer"
+              message="Remove this customer from the directory?"
+              onConfirm={() => {
+                setCustomers(withoutPending(customers, customerConfirm.pending) as typeof initialCustomers);
+                customerConfirm.close();
+              }}
             />
           </>
         );

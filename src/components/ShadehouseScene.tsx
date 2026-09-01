@@ -474,8 +474,13 @@ function Bed({
           color={base}
           emissive={base}
           transparent
-          opacity={dimmed ? 0.12 : faded ? 0.34 : 1}
-          depthWrite={!faded && !dimmed}
+          // Turning the terrain on used to drop the beds to a third opacity
+          // AND stop them writing depth, which put them behind the ground they
+          // stand on: whole rows vanished under the pale plate. They stay
+          // solid enough to see and keep their place in the depth buffer; the
+          // contours read through them rather than over them.
+          opacity={dimmed ? 0.12 : faded ? 0.72 : 1}
+          depthWrite={!dimmed}
           roughness={0.62}
           metalness={0.02}
         />
@@ -584,7 +589,7 @@ function BasketLine({
   });
 
   if (!matrices.length) return null;
-  const opacity = dimmed ? 0.1 : faded ? 0.32 : 1;
+  const opacity = dimmed ? 0.1 : faded ? 0.7 : 1;
 
   return (
     <group
@@ -652,7 +657,7 @@ function BasketLine({
           emissive={foliage}
           emissiveIntensity={selected ? 0.45 : 0}
           transparent
-          opacity={dimmed ? 0.1 : faded ? 0.3 : 0.95}
+          opacity={dimmed ? 0.1 : faded ? 0.68 : 0.95}
           roughness={0.9}
         />
       </instancedMesh>
