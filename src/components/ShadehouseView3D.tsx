@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain, Mountain, Sun, Maximize2, Minimize2 } from "lucide-react";
 import { terrainFall } from "../services/terrain";
-import { atLocal, sunPosition, dayArc } from "../services/solar";
+import { atLocal, sunPosition, dayArc, localHours, nurseryToday } from "../services/solar";
 import SceneCompass from "./SceneCompass";
 import { useRadiation } from "../hooks/useRadiation";
 import { measuredDayLight, clothTransmission, SHADE_LAYERS } from "../services/bedLight";
@@ -100,9 +100,32 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
    * so the shadows are the real ones.
    */
   const [showSun, setShowSun] = useState(false);
-  const [sunHour, setSunHour] = useState(12);
-  const [sunDate, setSunDate] = useState(() => new Date().toISOString().slice(0, 10));
+  /**
+   * The layer opens where the sun actually is.
+   *
+   * It used to open at noon on today's date, which is a fair guess and never
+   * the answer to the question being asked — "is that bed in shade right now".
+   * Honduras keeps UTC-6 all year, so the nursery's clock is a fixed offset
+   * from this machine's, whatever timezone the machine is in.
+   */
+  const [sunHour, setSunHour] = useState(() => localHours(new Date()));
+  const [sunDate, setSunDate] = useState(() => nurseryToday());
   const [showSunPath, setShowSunPath] = useState(true);
+  /** True while the sun is following the clock rather than the slider. */
+  const [followNow, setFollowNow] = useState(true);
+
+  // Keep it there. A view of "now" that stops being now within the minute is
+  // worse than one that never claimed to be.
+  useEffect(() => {
+    if (!showSun || !followNow) return;
+    const tick = () => {
+      setSunHour(localHours(new Date()));
+      setSunDate(nurseryToday());
+    };
+    tick();
+    const timer = setInterval(tick, 60_000);
+    return () => clearInterval(timer);
+  }, [showSun, followNow]);
 
   const sunAt = useMemo(
     () => (showSun ? atLocal(sunDate, sunHour) : null),
@@ -419,7 +442,11 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
               <input
                 type="date"
                 value={sunDate}
-                onChange={(e) => e.target.value && setSunDate(e.target.value)}
+                onChange={(e) => {
+                  if (!e.target.value) return;
+                  setSunDate(e.target.value);
+                  setFollowNow(false);
+                }}
                 className="bg-white/10 text-white rounded px-2 py-1 text-[11px]
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/50"
               />
@@ -427,6 +454,12 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
             <div className="flex items-baseline gap-2 tabular-nums">
               <span className="text-[17px] font-bold text-white">{fmtHour(sunHour)}</span>
+              {followNow && (
+                <span className="px-1.5 py-0.5 rounded bg-lime-400/15 text-[9px] font-semibold
+                                 uppercase tracking-[0.1em] text-lime-300">
+                  Now
+                </span>
+              )}
               <span className="text-[11px] text-white/50">
                 {sunNow.altitude > 0
                   ? `sun ${sunNow.altitude.toFixed(0)}° up, bearing ${sunNow.azimuth.toFixed(0)}°`
@@ -434,11 +467,28 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
               </span>
             </div>
 
+            {/* Back to the clock, after a look at some other hour. */}
+            <button
+              type="button"
+              onClick={() => {
+                setSunDate(nurseryToday());
+                setSunHour(localHours(new Date()));
+                setFollowNow(true);
+              }}
+              disabled={followNow}
+              className="ml-auto px-2 py-1 rounded text-[10px] font-semibold cursor-pointer
+                bg-white/10 text-white/70 hover:text-white disabled:opacity-30
+                disabled:cursor-not-allowed transition-colors
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/50"
+            >
+              Now
+            </button>
+
             <button
               type="button"
               onClick={() => setShowSunPath((v) => !v)}
               aria-pressed={showSunPath}
-              className={`ml-auto px-2 py-1 rounded text-[10px] font-semibold cursor-pointer transition-colors
+              className={`px-2 py-1 rounded text-[10px] font-semibold cursor-pointer transition-colors
                 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/50 ${
                 showSunPath ? "bg-lime-400 text-navy-900" : "bg-white/10 text-white/55 hover:text-white/85"
               }`}
@@ -453,7 +503,10 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             max={24}
             step={0.25}
             value={sunHour}
-            onChange={(e) => setSunHour(Number(e.target.value))}
+            onChange={(e) => {
+              setSunHour(Number(e.target.value));
+              setFollowNow(false);
+            }}
             aria-label="Time of day"
             className="w-full mt-2.5 accent-lime-400 cursor-pointer"
           />

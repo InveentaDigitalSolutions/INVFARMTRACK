@@ -1,5 +1,5 @@
 /** Checks the solar geometry over the nursery. Run: npm run test:solar */
-import { sunPosition, sunVector, dayArc, atLocal, localHours } from '../../src/services/solar.ts'
+import { sunPosition, sunVector, dayArc, atLocal, localHours, localHours, nurseryToday } from '../../src/services/solar.ts'
 import { SITE_LAT, SITE_LON, BED_AXIS_BEARING_DEG, bearingToModel } from '../../src/services/site.ts'
 
 let failures = 0
@@ -93,4 +93,23 @@ eq('and reads back as noon', localHours(atLocal('2026-03-21', 12)), 12)
 eq('an hour before midnight reads 23', localHours(atLocal('2026-03-21', 23)), 23)
 
 console.log(failures ? `\n  ${failures} failed` : '\n  The sun is where the almanac puts it.')
+
+
+// The sun layer opens on the nursery's date, not the browser's. Honduras is
+// UTC-6, so between midnight and 06:00 UTC it is still yesterday there.
+{
+  const eq2 = (label: string, got: unknown, want: unknown) => {
+    const pass = JSON.stringify(got) === JSON.stringify(want)
+    if (!pass) failures++
+    console.log(`  ${pass ? 'ok  ' : 'FAIL'} ${label.padEnd(52)} ${JSON.stringify(got)}${pass ? '' : ` want ${JSON.stringify(want)}`}`)
+  }
+  eq2('03:00 UTC is still the previous day at the nursery',
+    nurseryToday(new Date('2026-09-02T03:00:00Z')), '2026-09-01')
+  eq2('and 07:00 UTC is the new one',
+    nurseryToday(new Date('2026-09-02T07:00:00Z')), '2026-09-02')
+  eq2('local hours run six behind UTC',
+    Number(localHours(new Date('2026-09-01T18:00:00Z')).toFixed(2)), 12)
+}
+
+console.log(failures ? `\n  ${failures} failed` : '\n  The sun is where it is.')
 process.exit(failures ? 1 : 0)

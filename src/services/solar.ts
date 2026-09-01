@@ -109,6 +109,18 @@ export function localHours(at: Date): number {
 }
 
 /**
+ * Today's date at the nursery, which is not always today on this machine.
+ *
+ * Honduras keeps UTC-6 all year. Between midnight and 06:00 UTC it is still
+ * yesterday there, and a European browser calling toISOString would open the
+ * sun layer on tomorrow's arc.
+ */
+export function nurseryToday(at: Date = new Date()): string {
+  const local = new Date(at.getTime() + SITE_UTC_OFFSET_H * 3_600_000);
+  return local.toISOString().slice(0, 10);
+}
+
+/**
  * The instant of a given local clock time on a given local date.
  * Written this way rather than with a Date constructor because the machine
  * running this is not in Honduras — the browser's own zone must not leak in.
