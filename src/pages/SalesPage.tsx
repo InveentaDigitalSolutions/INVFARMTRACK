@@ -292,12 +292,29 @@ export default function SalesPage() {
     shipmentForm.close();
   };
 
-  const handleDeleteShipment = (s: Shipment) => {
+  /**
+   * Deleting a shipment takes its boxes with it.
+   *
+   * It used to refuse, through a browser alert, and tell you to remove ten
+   * boxes first — with no way offered to do that. A packed box has no meaning
+   * without the shipment it was packed for, so the honest options are "delete
+   * both" or "don't", and the dialog says how many are going.
+   *
+   * The boxes must be gone from Dataverse, not merely from React state,
+   * before the shipment is attempted: the relationship is cascade-restrict, so
+   * a shipment deleted in the same breath is refused and quietly comes back.
+   */
+  const [shipmentToDelete, setShipmentToDelete] = useState<Shipment | null>(null);
+
+  const handleDeleteShipment = (s: Shipment) => setShipmentToDelete(s);
+
+  const deleteShipmentAndBoxes = async (s: Shipment) => {
+    setShipmentToDelete(null);
     if (s.boxes.length > 0) {
-      alert(`${s.code ?? "This shipment"} still has ${s.boxes.length} boxes packed against it. Remove them first.`);
-      return;
+      const doomed = new Set(s.boxes.map((b) => b.id));
+      await setPackingRows((prev) => prev.filter((r) => !doomed.has(r.id)));
     }
-    setShipmentRows((prev) => prev.filter((r) => r.id !== s.id));
+    await setShipmentRows((prev) => prev.filter((r) => r.id !== s.id));
     if (activeShipment === s.id) setActiveShipment(null);
   };
 
@@ -949,6 +966,20 @@ export default function SalesPage() {
       >
         {renderTab()}
       </motion.div>
+
+      <ConfirmDialog
+        open={shipmentToDelete !== null}
+        onClose={() => setShipmentToDelete(null)}
+        title="Delete shipment"
+        message={
+          shipmentToDelete
+            ? shipmentToDelete.boxes.length > 0
+              ? `${shipmentToDelete.code ?? "This shipment"} and the ${shipmentToDelete.boxes.length} boxes packed against it will be deleted. A packed box has no meaning without its shipment.`
+              : `Delete ${shipmentToDelete.code ?? "this shipment"}?`
+            : ""
+        }
+        onConfirm={() => { if (shipmentToDelete) void deleteShipmentAndBoxes(shipmentToDelete); }}
+      />
     </PageShell>
   );
 }

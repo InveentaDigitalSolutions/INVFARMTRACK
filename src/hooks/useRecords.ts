@@ -57,6 +57,15 @@ function storeFor(table: string, seed: Record<string, unknown>[]): DataStore<Ide
 type Updater<T> = T[] | ((prev: T[]) => T[]);
 
 /**
+ * setRows resolves when the writes are done and the table has been re-read.
+ *
+ * Most callers ignore it, as they always have. It matters when one delete has
+ * to happen before another is even allowed: Dataverse refuses to delete a
+ * shipment while its boxes still point at it, so the boxes have to be gone —
+ * really gone, not just gone from React state — before the shipment is tried.
+ */
+
+/**
  * The third element is whether the first read is still in flight.
  *
  * An empty array means two very different things — "nothing recorded" and
@@ -68,7 +77,7 @@ type Updater<T> = T[] | ((prev: T[]) => T[]);
 export function useRecords<T>(
   table: string,
   seed: T[]
-): [T[], (next: Updater<T>) => void, boolean] {
+): [T[], (next: Updater<T>) => Promise<void>, boolean] {
   const store = useMemo(
     () => storeFor(table, seed as unknown as Record<string, unknown>[]),
     [table, seed]
@@ -99,7 +108,7 @@ export function useRecords<T>(
   }, [load]);
 
   const setRows = useCallback(
-    (update: Updater<T>) => {
+    (update: Updater<T>): Promise<void> => {
       // Accepts an array or an updater, matching useState so pages that do
       // setRows(prev => ...) keep working.
       let next: T[] = [];
@@ -108,7 +117,7 @@ export function useRecords<T>(
         return next;
       });
 
-      void (async () => {
+      return (async () => {
         // Declared out here so the check after the reload can see it.
         const removed: string[] = [];
         try {

@@ -81,6 +81,14 @@ await page.evaluate(() => {
     fields.map(([n, rows]) => ({ id: n, name: n, fieldName: n, rows, postLines: postLines[n], shadehouse: 'SH-0001' }))))
 })
 await page.goto('http://localhost:4179/', { waitUntil: 'networkidle' })
+if (process.env.DARK) {
+  // The app keeps the choice in localStorage and paints a class on <html>.
+  await page.evaluate(() => {
+    localStorage.setItem('dni_theme', 'dark')
+    document.documentElement.classList.add('dark')
+  })
+  await page.waitForTimeout(300)
+}
 await page.getByRole('button', { name: 'Infrastructure' }).first().click()
 await page.waitForTimeout(800)
 if (process.env.PLAN) {

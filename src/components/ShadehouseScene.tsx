@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Billboard, RoundedBox } from "@react-three/drei";
+import { Billboard } from "@react-three/drei";
 // Not drei's <Text>: troika fetches a font index from a CDN, which the player
 // blocks, and the failure takes the whole scene down. See SceneText.
 import SceneText from "./SceneText";
 import { drawTerrainOverlay } from "../services/terrainTexture";
+import { useDarkMode } from "../hooks/useDarkMode";
 import { BED_AXIS_BEARING_DEG, SITE_ELEV_M } from "../services/site";
 import {
   SURROUND_M, SURROUND_SAMPLES, SURROUND_HALF_SPAN_M,
@@ -58,6 +59,23 @@ export const PLAN_COLORS = {
   roadLabel: "#9ca3af",
 };
 
+/**
+ * The same surfaces after dark.
+ *
+ * Not the light palette dimmed: a night scene needs its own relationships or
+ * everything collapses into one grey. The ground goes blue-black so the beds —
+ * which keep their own colours, because those are data — read against it.
+ */
+export const NIGHT_COLORS = {
+  ground: "#141c28",
+  road: "#1d2735",
+  roadLine: "#2c3a4c",
+  roadLabel: "#5d6b7e",
+  land: "#161d24",
+  zenith: "#070c16",
+  horizon: "#1b2740",
+};
+
 /** Height of the shade cloth, and so of the posts that hold it up. */
 const ROOF_HEIGHT_M = 3.1;
 /**
@@ -95,9 +113,11 @@ function RoadDashes({
   along,
   fixed,
   length,
+  dark,
 }: {
   along: "x" | "z";
   fixed: number;
+  dark: boolean;
   length: number;
 }) {
   const dashes = useMemo(() => {
@@ -116,7 +136,7 @@ function RoadDashes({
           rotation={[-Math.PI / 2, 0, 0]}
         >
           <planeGeometry args={along === "z" ? [0.12, 1.2] : [1.2, 0.12]} />
-          <meshBasicMaterial color={PLAN_COLORS.roadLine} />
+          <meshBasicMaterial color={dark ? NIGHT_COLORS.roadLine : PLAN_COLORS.roadLine} />
         </mesh>
       ))}
     </group>
@@ -152,29 +172,30 @@ function PlotOutline({
   );
 }
 
-function Roads() {
+function Roads({ dark }: { dark: boolean }) {
   const roads = useMemo(() => computeRoads(), []);
+  const paint = dark ? NIGHT_COLORS : PLAN_COLORS;
   return (
     <group>
       {/* Logistics road, running the length of the house */}
       <mesh position={[roads.vertical.x, 0.006, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <shapeGeometry args={[roundedRectShape(roads.vertical.width, roads.vertical.length, 0.9)]} />
-        <meshStandardMaterial color={PLAN_COLORS.road} roughness={1} />
+        <meshStandardMaterial color={paint.road} roughness={1} />
       </mesh>
-      <RoadDashes along="z" fixed={roads.vertical.x} length={roads.vertical.length} />
+      <RoadDashes along="z" fixed={roads.vertical.x} length={roads.vertical.length} dark={dark} />
 
       {/* Cross aisle */}
       <mesh position={[0, 0.007, roads.horizontal.z]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <shapeGeometry args={[roundedRectShape(roads.horizontal.length, roads.horizontal.width, 0.9)]} />
-        <meshStandardMaterial color={PLAN_COLORS.road} roughness={1} />
+        <meshStandardMaterial color={paint.road} roughness={1} />
       </mesh>
-      <RoadDashes along="x" fixed={roads.horizontal.z} length={roads.horizontal.length} />
+      <RoadDashes along="x" fixed={roads.horizontal.z} length={roads.horizontal.length} dark={dark} />
 
       <SceneText
         position={[roads.vertical.x, 0.05, roads.vertical.length / 2 + 1.8]}
         rotation={[-Math.PI / 2, 0, 0]}
         fontSize={1.05}
-        color={PLAN_COLORS.roadLabel}
+        color={paint.roadLabel}
       >
         Logistics Road
       </SceneText>
@@ -428,7 +449,8 @@ function Bed({
   onSelect: (bedId: string) => void;
 }) {
   const mat = useRef<THREE.MeshStandardMaterial>(null);
-  const height = 0.35;
+  const dark = useDarkMode();
+  const height = 0.3;
   const base = useMemo(
     () => colorFor(placement, reading, showIrrigation, lens, nowMs),
     [placement, reading, showIrrigation, lens, nowMs]
@@ -461,15 +483,24 @@ function Bed({
         document.body.style.cursor = "";
       }}
     >
-      <RoundedBox
-        args={[placement.width, height, placement.length]}
-        radius={Math.min(0.085, placement.width / 2.6, height / 2.2)}
-        smoothness={4}
-        creaseAngle={0.5}
+      <mesh
+        geometry={MOUND_GEOMETRY}
+        scale={[placement.width, height, placement.length]}
         castShadow={!dimmed}
         receiveShadow={!dimmed}
       >
+        {/* Side: the ground cover over the mound. */}
         <meshStandardMaterial
+          attach="material-0"
+          color={dark ? MULCH_COLOR_DARK : MULCH_COLOR}
+          roughness={0.95}
+          transparent
+          opacity={dimmed ? 0.12 : 1}
+          depthWrite={!dimmed}
+        />
+        {/* Top: what is growing, which is what all the colour rules mean. */}
+        <meshStandardMaterial
+          attach="material-1"
           ref={mat}
           color={base}
           emissive={base}
@@ -484,7 +515,12 @@ function Bed({
           roughness={0.62}
           metalness={0.02}
         />
-      </RoundedBox>
+        <meshStandardMaterial
+          attach="material-2"
+          color={dark ? MULCH_COLOR_DARK : MULCH_COLOR}
+          roughness={1}
+        />
+      </mesh>
     </group>
   );
 }
@@ -952,7 +988,7 @@ function Sun({
  * held flat at the house's own floor, and over the next 200 m it eases out to
  * the real ground. Without that the survey ends in a cliff.
  */
-function Valley({ span, depth }: { span: number; depth: number }) {
+function Valley({ span, depth, dark }: { span: number; depth: number; dark: boolean }) {
   const geometry = useMemo(() => {
     const size = SURROUND_HALF_SPAN_M * 2;
     const segments = SURROUND_SAMPLES - 1;
@@ -1009,9 +1045,16 @@ function Valley({ span, depth }: { span: number; depth: number }) {
       const t = high > low ? Math.min(1, Math.max(0, (metres - low) / (high - low))) : 0;
       // Valley floor green through to a dry, pale ridge — muted, because the
       // land is context and must not compete with the beds.
-      colour[i * 3] = 0.38 + 0.30 * t;
-      colour[i * 3 + 1] = 0.46 + 0.22 * t;
-      colour[i * 3 + 2] = 0.30 + 0.26 * t;
+      if (dark) {
+        // Land at night is not black — it is the sky's colour, darker.
+        colour[i * 3] = 0.07 + 0.05 * t;
+        colour[i * 3 + 1] = 0.09 + 0.06 * t;
+        colour[i * 3 + 2] = 0.12 + 0.07 * t;
+      } else {
+        colour[i * 3] = 0.38 + 0.30 * t;
+        colour[i * 3 + 1] = 0.46 + 0.22 * t;
+        colour[i * 3 + 2] = 0.30 + 0.26 * t;
+      }
 
       // Turn the sample grid into the model's frame.
       position.setX(i, x * cos - y * sin);
@@ -1020,7 +1063,7 @@ function Valley({ span, depth }: { span: number; depth: number }) {
     geo.setAttribute("color", new THREE.BufferAttribute(colour, 3));
     geo.computeVertexNormals();
     return geo;
-  }, [span, depth]);
+  }, [span, depth, dark]);
 
   return (
     <mesh
@@ -1045,6 +1088,33 @@ function Valley({ span, depth }: { span: number; depth: number }) {
 }
 
 /**
+ * A bed, as the nursery actually builds one.
+ *
+ * Not a slab: soil mounded up between sunken paths and wrapped in black ground
+ * cover pinned with wire staples, so the planted top is narrower than the base
+ * and the sides are dark. A four-sided cylinder is exactly that shape — the
+ * rotation turns its diamond cross-section into a rectangle, and the unit size
+ * lets every bed scale one shared geometry.
+ *
+ * Its three groups are side, top, bottom, which is what lets the mulch and the
+ * crop be different materials on one mesh.
+ */
+const MOUND_GEOMETRY = (() => {
+  const r = 1 / Math.SQRT2;
+  // Barely tapered: a nursery bed is a low mound, not a pyramid.
+  const geo = new THREE.CylinderGeometry(r * 0.88, r, 1, 4, 1, false);
+  geo.rotateY(Math.PI / 4);
+  return geo;
+})();
+
+/**
+ * Woven ground cover. Black when new; in the photographs it is weathered and
+ * mossy, and a true black flank on every bed turns the house into a barcode.
+ */
+const MULCH_COLOR = "#4a4f42";
+const MULCH_COLOR_DARK = "#22261f";
+
+/**
  * A sky for the model to sit under.
  *
  * Drawn rather than borrowed: three's own scattering sky is built for a
@@ -1055,15 +1125,19 @@ function Valley({ span, depth }: { span: number; depth: number }) {
  * `toneMapped={false}` keeps the chosen colours the colours that appear, and
  * BackSide draws the inside of the dome. It is not lit, so it costs nothing.
  */
-function SkyDome({ sunUp }: { sunUp: number }) {
+function SkyDome({ sunUp, dark }: { sunUp: number; dark: boolean }) {
   const geometry = useMemo(() => new THREE.SphereGeometry(6000, 24, 16), []);
 
   const material = useMemo(() => {
     // Below the horizon the whole dome cools and darkens: dusk, not midnight,
     // because the light layer still has to be readable at either end of a day.
     const dusk = Math.max(0, Math.min(1, (0.18 - sunUp) / 0.36));
-    const zenith = new THREE.Color("#5b9bd5").lerp(new THREE.Color("#2c3f63"), dusk);
-    const horizon = new THREE.Color("#dfeaf3").lerp(new THREE.Color("#e8b98a"), dusk);
+    const zenith = dark
+      ? new THREE.Color(NIGHT_COLORS.zenith)
+      : new THREE.Color("#5b9bd5").lerp(new THREE.Color("#2c3f63"), dusk);
+    const horizon = dark
+      ? new THREE.Color(NIGHT_COLORS.horizon)
+      : new THREE.Color("#dfeaf3").lerp(new THREE.Color("#e8b98a"), dusk);
 
     return new THREE.ShaderMaterial({
       side: THREE.BackSide,
@@ -1102,10 +1176,12 @@ function Structure({
   depth,
   showRoof,
   postLines,
+  dark,
 }: {
   span: number;
   depth: number;
   showRoof: boolean;
+  dark: boolean;
   /** x position, z extent and cable levels of each post line. */
   postLines: { x: number; z: number; length: number; levels: BedLevel[] }[];
 }) {
@@ -1187,7 +1263,7 @@ function Structure({
       )}
       <mesh position={[0, -0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[span + 8, depth + 8]} />
-        <meshStandardMaterial color={PLAN_COLORS.ground} roughness={1} />
+        <meshStandardMaterial color={dark ? NIGHT_COLORS.ground : PLAN_COLORS.ground} roughness={1} />
       </mesh>
     </group>
   );
@@ -1595,6 +1671,8 @@ export default function ShadehouseScene({
    * shadows and the arc all agree; a fixed high sun otherwise, because a
    * layout view should not look like it is 6pm.
    */
+  const dark = useDarkMode();
+
   const sunPosition3D = useMemo<[number, number, number]>(() => {
     const v = sunAt ? sunVector(sunAt, BED_AXIS_BEARING_DEG) : null;
     // Null below the horizon — at night the dome is lit from just under it,
@@ -1608,9 +1686,13 @@ export default function ShadehouseScene({
       {/* Sky light stays whatever the sun is doing: even under cloud, and even
           at dusk, the beds are not lit only by the beam. It dims with the sun
           rather than going out. */}
-      <SkyDome sunUp={sunPosition3D[1]} />
-      <hemisphereLight args={["#eaf4ff", "#c9c3b4", sunAt ? 0.55 : 1.0]} />
-      <ambientLight intensity={sunAt ? 0.26 : 0.42} />
+      <SkyDome sunUp={sunPosition3D[1]} dark={dark} />
+      {/* Dark mode is a night, not a filter: the fill light drops and cools,
+          and the beds keep their own colours so the data still reads. */}
+      <hemisphereLight
+        args={dark ? ["#22354d", "#0d131c", sunAt ? 0.35 : 0.55] : ["#eaf4ff", "#c9c3b4", sunAt ? 0.55 : 1.0]}
+      />
+      <ambientLight intensity={sunAt ? (dark ? 0.16 : 0.26) : dark ? 0.24 : 0.42} />
 
       {sunAt ? (
         <Sun at={sunAt} span={span} depth={depth} showArc={showSunPath} />
@@ -1619,8 +1701,8 @@ export default function ShadehouseScene({
           {/* The studio lamp, for reading the layout rather than the light. */}
           <directionalLight
             position={[34, 42, 22]}
-            intensity={1.05}
-            color="#fff8ec"
+            intensity={dark ? 0.55 : 1.05}
+            color={dark ? "#bcd0ea" : "#fff8ec"}
             castShadow
             shadow-mapSize={[2048, 2048]}
             shadow-radius={4}
@@ -1634,10 +1716,10 @@ export default function ShadehouseScene({
         </>
       )}
 
-      <Valley span={span} depth={depth} />
-      <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} />
+      <Valley span={span} depth={depth} dark={dark} />
+      <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} dark={dark} />
       {showShade && <ShadeCloth placements={placements} />}
-      <Roads />
+      <Roads dark={dark} />
       <WeatherLayer conditions={weather} span={span} depth={depth} />
 
       {placements.map((placement) =>

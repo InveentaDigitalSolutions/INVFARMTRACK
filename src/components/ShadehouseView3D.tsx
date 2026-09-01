@@ -515,7 +515,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
       {/* Scene */}
       <div
-        className="relative bg-gradient-to-b from-sand-50 to-sand-100"
+        className="relative bg-gradient-to-b from-sand-50 to-sand-100
+                   dark:from-[#0b1119] dark:to-[#131c28]"
         style={{
           // Enough to see the house in, never taller than the window: clamp
           // keeps a short laptop screen usable and lets a large one breathe.
