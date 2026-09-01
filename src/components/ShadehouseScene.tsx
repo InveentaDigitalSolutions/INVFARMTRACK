@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Billboard } from "@react-three/drei";
+import { Billboard, RoundedBox } from "@react-three/drei";
 // Not drei's <Text>: troika fetches a font index from a CDN, which the player
 // blocks, and the failure takes the whole scene down. See SceneText.
 import SceneText from "./SceneText";
@@ -449,8 +449,7 @@ function Bed({
   onSelect: (bedId: string) => void;
 }) {
   const mat = useRef<THREE.MeshStandardMaterial>(null);
-  const dark = useDarkMode();
-  const height = 0.3;
+  const height = 0.35;
   const base = useMemo(
     () => colorFor(placement, reading, showIrrigation, lens, nowMs),
     [placement, reading, showIrrigation, lens, nowMs]
@@ -483,24 +482,15 @@ function Bed({
         document.body.style.cursor = "";
       }}
     >
-      <mesh
-        geometry={MOUND_GEOMETRY}
-        scale={[placement.width, height, placement.length]}
+      <RoundedBox
+        args={[placement.width, height, placement.length]}
+        radius={Math.min(0.085, placement.width / 2.6, height / 2.2)}
+        smoothness={4}
+        creaseAngle={0.5}
         castShadow={!dimmed}
         receiveShadow={!dimmed}
       >
-        {/* Side: the ground cover over the mound. */}
         <meshStandardMaterial
-          attach="material-0"
-          color={dark ? MULCH_COLOR_DARK : MULCH_COLOR}
-          roughness={0.95}
-          transparent
-          opacity={dimmed ? 0.12 : 1}
-          depthWrite={!dimmed}
-        />
-        {/* Top: what is growing, which is what all the colour rules mean. */}
-        <meshStandardMaterial
-          attach="material-1"
           ref={mat}
           color={base}
           emissive={base}
@@ -515,12 +505,7 @@ function Bed({
           roughness={0.62}
           metalness={0.02}
         />
-        <meshStandardMaterial
-          attach="material-2"
-          color={dark ? MULCH_COLOR_DARK : MULCH_COLOR}
-          roughness={1}
-        />
-      </mesh>
+      </RoundedBox>
     </group>
   );
 }
@@ -1086,33 +1071,6 @@ function Valley({ span, depth, dark }: { span: number; depth: number; dark: bool
     </mesh>
   );
 }
-
-/**
- * A bed, as the nursery actually builds one.
- *
- * Not a slab: soil mounded up between sunken paths and wrapped in black ground
- * cover pinned with wire staples, so the planted top is narrower than the base
- * and the sides are dark. A four-sided cylinder is exactly that shape — the
- * rotation turns its diamond cross-section into a rectangle, and the unit size
- * lets every bed scale one shared geometry.
- *
- * Its three groups are side, top, bottom, which is what lets the mulch and the
- * crop be different materials on one mesh.
- */
-const MOUND_GEOMETRY = (() => {
-  const r = 1 / Math.SQRT2;
-  // Barely tapered: a nursery bed is a low mound, not a pyramid.
-  const geo = new THREE.CylinderGeometry(r * 0.88, r, 1, 4, 1, false);
-  geo.rotateY(Math.PI / 4);
-  return geo;
-})();
-
-/**
- * Woven ground cover. Black when new; in the photographs it is weathered and
- * mossy, and a true black flank on every bed turns the house into a barcode.
- */
-const MULCH_COLOR = "#4a4f42";
-const MULCH_COLOR_DARK = "#22261f";
 
 /**
  * A sky for the model to sit under.
