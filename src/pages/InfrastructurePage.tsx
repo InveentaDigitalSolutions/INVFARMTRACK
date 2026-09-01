@@ -11,7 +11,7 @@ import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import ShadehouseView from "../components/ShadehouseView";
 import ShadehouseView3D from "../components/ShadehouseView3D";
-import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withoutPending, withEdited } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { infrastructureSummary } from "../services/infrastructureInsight";
 import { availableRows, bedName, parseBedName, typeForLevel, planBulkBeds, planBedUpdate, bedCapacityProblem, fieldNameProblem, fieldCapacityProblem } from "../services/infrastructureRules";
@@ -453,12 +453,12 @@ export default function InfrastructurePage() {
 
   const save = (data: any[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
     if (form.isEdit && form.editIndex !== null) {
-      const u = [...data]; u[form.editIndex] = values; setData(u);
+      setData(withEdited(data, form, values));
     } else { setData([...data, values]); }
     form.close();
   };
   const del = (data: any[], setData: (d: any) => void) => {
-    if (confirm.pending) setData(data.filter((_, i) => i !== confirm.pending!.index));
+    if (confirm.pending) setData(withoutPending(data, confirm.pending));
   };
 
   /**

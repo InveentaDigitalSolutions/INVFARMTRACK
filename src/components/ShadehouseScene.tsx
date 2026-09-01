@@ -5,7 +5,10 @@ import { Billboard, RoundedBox } from "@react-three/drei";
 // blocks, and the failure takes the whole scene down. See SceneText.
 import SceneText from "./SceneText";
 import { drawTerrainOverlay } from "../services/terrainTexture";
-import { BED_AXIS_BEARING_DEG } from "../services/site";
+import { BED_AXIS_BEARING_DEG, SITE_ELEV_M } from "../services/site";
+import {
+  SURROUND_M, SURROUND_SAMPLES, SURROUND_HALF_SPAN_M,
+} from "../services/terrainSurround.generated";
 import { sunVector, atLocal } from "../services/solar";
 import { relativeLight } from "../services/bedLight";
 import * as THREE from "three";
@@ -846,6 +849,91 @@ function Sun({
   );
 }
 
+/**
+ * The valley the nursery sits in.
+ *
+ * The block used to stand on an infinite flat plane, which is not El Olvido:
+ * the ground rises 180 m to the west and falls 90 m towards the north. Read
+ * from public elevation tiles at about 19 m a pixel — far too coarse for the
+ * block itself, where the survey is two orders of magnitude better and keeps
+ * that job, and plenty for the hillside a kilometre out.
+ *
+ * The two are joined rather than butted together: inside the block the mesh is
+ * held flat at the house's own floor, and over the next 200 m it eases out to
+ * the real ground. Without that the survey ends in a cliff.
+ */
+function Valley({ span, depth }: { span: number; depth: number }) {
+  const geometry = useMemo(() => {
+    const size = SURROUND_HALF_SPAN_M * 2;
+    const segments = SURROUND_SAMPLES - 1;
+    const geo = new THREE.PlaneGeometry(size, size, segments, segments);
+    const position = geo.attributes.position as THREE.BufferAttribute;
+
+    // The tiles are in true north; the model's Z runs along the beds, 17.75°
+    // west of it. Turning the mesh puts the real hillside in the real place.
+    const turn = (BED_AXIS_BEARING_DEG - 360) * (Math.PI / 180);
+    const cos = Math.cos(turn), sin = Math.sin(turn);
+
+    // Flat over the block itself, then out to the real ground quickly: ease it
+    // over too long a distance and everything within sight of the house is
+    // levelled, which is the flat plane this was meant to replace.
+    const flatTo = Math.hypot(span, depth) / 2;
+    const easeOver = 70;
+
+    // Land reads as land by its shading. Seen from above, a slope with one
+    // flat colour is indistinguishable from a void, so height is painted on.
+    const colour = new Float32Array(position.count * 3);
+    // Ramped over the ground near the nursery, not over the whole 313 m the
+    // tiles cover: stretched that far, everything within sight of the house
+    // lands on one indistinguishable middle colour.
+    const low = SITE_ELEV_M - 40, high = SITE_ELEV_M + 40;
+
+    for (let i = 0; i < position.count; i++) {
+      const x = position.getX(i);
+      // PlaneGeometry lies in XY before it is laid down, so its Y is the
+      // model's Z once rotated: row 0 (north) is -Z.
+      const y = position.getY(i);
+      const row = Math.round((SURROUND_HALF_SPAN_M - y) / size * segments);
+      const col = Math.round((x + SURROUND_HALF_SPAN_M) / size * segments);
+      const metres = SURROUND_M[Math.min(segments, Math.max(0, row))][Math.min(segments, Math.max(0, col))];
+
+      const distance = Math.hypot(x, y);
+      const blend = distance <= flatTo
+        ? 0
+        : Math.min(1, (distance - flatTo) / easeOver);
+      position.setZ(i, (metres - SITE_ELEV_M) * blend);
+
+      // Valley floor green through to a dry, pale ridge.
+      const t = high > low ? Math.min(1, Math.max(0, (metres - low) / (high - low))) : 0;
+      // Valley floor green through to a dry, pale ridge — muted, because the
+      // land is context and must not compete with the beds.
+      colour[i * 3] = 0.38 + 0.30 * t;
+      colour[i * 3 + 1] = 0.46 + 0.22 * t;
+      colour[i * 3 + 2] = 0.30 + 0.26 * t;
+
+      // Turn the sample grid into the model's frame.
+      position.setX(i, x * cos - y * sin);
+      position.setY(i, x * sin + y * cos);
+    }
+    geo.setAttribute("color", new THREE.BufferAttribute(colour, 3));
+    geo.computeVertexNormals();
+    return geo;
+  }, [span, depth]);
+
+  return (
+    <mesh
+      geometry={geometry}
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, -0.05, 0]}
+      receiveShadow
+    >
+      {/* Matte and unsaturated: it is context, and must not compete with the
+          beds for attention. */}
+      <meshStandardMaterial vertexColors roughness={1} metalness={0} flatShading />
+    </mesh>
+  );
+}
+
 /** Structural context: posts and the shade-cloth roof from the photos. */
 function Structure({
   span,
@@ -1298,6 +1386,7 @@ export default function ShadehouseScene({
         </>
       )}
 
+      <Valley span={span} depth={depth} />
       <Structure span={span} depth={depth} showRoof={showRoof} postLines={postLines} />
       {showShade && <ShadeCloth placements={placements} />}
       <Roads />

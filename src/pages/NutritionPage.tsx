@@ -8,7 +8,7 @@ import DataTable from "../components/DataTable";
 import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withoutPending, withEdited } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import MetricTile from "../components/MetricTile";
 import { nutritionSummary } from "../services/nutritionInsight";
@@ -165,7 +165,7 @@ export default function NutritionPage() {
 
   const save = (data: any[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
     if (form.isEdit && form.editIndex !== null) {
-      const u = [...data]; u[form.editIndex] = values; setData(u);
+      setData(withEdited(data, form, values));
     } else { setData([...data, values]); }
     form.close();
   };
@@ -189,7 +189,7 @@ export default function NutritionPage() {
   };
 
   const del = (data: any[], setData: (d: any) => void) => {
-    if (confirm.pending) setData(data.filter((_, i) => i !== confirm.pending!.index));
+    if (confirm.pending) setData(withoutPending(data, confirm.pending));
   };
 
   /**

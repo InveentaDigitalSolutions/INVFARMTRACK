@@ -42,11 +42,15 @@ const ok = (label, pass, detail = '') => {
 // Ground beds and cable rows, so the row deleted is neither first nor last.
 await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' })
 await page.evaluate(() => {
+  // Two fields, because the bug that reached the nursery deleted a basket row
+  // in E3 when one in C1 was asked for.
   const beds = [
     { id: 'b1', name: 'E1-01', field: 'E1', type: 'Ground', level: 0, active: true },
     { id: 'b2', name: 'E1-02', field: 'E1', type: 'Ground', level: 0, active: true },
     { id: 'b3', name: 'E1-05-01', field: 'E1', type: 'Basket', level: 1, active: true },
     { id: 'b4', name: 'E1-05-02', field: 'E1', type: 'Basket', level: 2, active: true },
+    { id: 'b5', name: 'C1-03-01', field: 'C1', type: 'Basket', level: 1, active: true },
+    { id: 'b6', name: 'C1-03-02', field: 'C1', type: 'Basket', level: 2, active: true },
   ]
   localStorage.setItem('dni_beds', JSON.stringify(beds))
 })
@@ -72,7 +76,21 @@ await page.waitForTimeout(500)
 const names = await page.locator('tbody tr td:first-child').allInnerTexts()
 ok('the row asked for is gone', !names.includes('E1-05-02'), names.join(', '))
 ok('and the first row is untouched', names.includes('E1-01'), names.join(', '))
-ok('nothing else was taken with it', names.length === 3, `${names.length} left`)
+ok('nothing else was taken with it', names.length === 5, `${names.length} left`)
+
+// The reported failure: a cable row in C1 was asked for and one in E3 went.
+await page.getByPlaceholder('Search beds...').fill('C1-03-01')
+await page.waitForTimeout(400)
+await page.locator('tbody tr').first().locator('button').last().click()
+await page.waitForTimeout(300)
+await page.getByRole('button', { name: /delete|confirm|yes/i }).last().click()
+await page.waitForTimeout(800)
+await page.getByPlaceholder('Search beds...').fill('')
+await page.waitForTimeout(500)
+const after = await page.locator('tbody tr td:first-child').allInnerTexts()
+ok('the C row asked for is gone', !after.includes('C1-03-01'), after.join(', '))
+ok('and no E row went with it',
+  ['E1-01', 'E1-02', 'E1-05-01'].every((n) => after.includes(n)), after.join(', '))
 
 console.log(failures ? `\n  ${failures} failed` : '\n  The row deleted is the row asked for.')
 await browser.close(); stop()

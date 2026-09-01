@@ -524,7 +524,10 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             makeDefault
             enablePan
             minDistance={12}
-            maxDistance={140}
+            // Far enough out to see the nursery in its valley: the ground
+            // model runs 1.2 km each way, and a limit of 140 m meant nobody
+            // could ever pull back far enough to look at it.
+            maxDistance={900}
             maxPolarAngle={Math.PI / 2.15}
             target={[0, 0.8, 0]}
           />

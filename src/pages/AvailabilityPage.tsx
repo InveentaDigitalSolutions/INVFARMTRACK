@@ -8,7 +8,7 @@ import Badge from "../components/Badge";
 import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withoutPending, withEdited } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { isoWeek, sum } from "../services/period";
 import { PLANT_SIZE_OPTIONS } from "../services/plantSizes";
@@ -171,7 +171,7 @@ export default function AvailabilityPage() {
 
   const save = (data: any[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
     if (form.isEdit && form.editIndex !== null) {
-      const u = [...data]; u[form.editIndex] = values; setData(u);
+      setData(withEdited(data, form, values));
     } else {
       // One record per bed, as in Production — an array cannot bind to a
       // single bed lookup.
@@ -180,7 +180,7 @@ export default function AvailabilityPage() {
     form.close();
   };
   const del = (data: any[], setData: (d: any) => void) => {
-    if (confirm.pending) setData(data.filter((_: any, i: number) => i !== confirm.pending!.index));
+    if (confirm.pending) setData(withoutPending(data, confirm.pending));
   };
 
   // "This week" was pinned to 2026-W15, a demo week that would have read zero

@@ -19,7 +19,7 @@ import RankedBars from "../components/RankedBars";
 import ShipmentDetail from "../components/ShipmentDetail";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withEdited } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { salesSummary } from "../services/salesInsight";
 import ExcelImport from "../components/ExcelImport";
@@ -226,10 +226,8 @@ export default function SalesPage() {
   };
 
   const handlePortSave = (values: Record<string, unknown>) => {
-    if (portForm.isEdit && portForm.editIndex !== null) {
-      const updated = [...ports];
-      updated[portForm.editIndex] = values as never;
-      setPorts(updated);
+    if (portForm.isEdit) {
+      setPorts(withEdited(ports, portForm, values) as never[]);
     } else {
       setPorts([...ports, values as never]);
     }

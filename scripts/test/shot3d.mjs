@@ -105,6 +105,14 @@ if (process.env.ORBIT) {
   await page.mouse.move(cx + Number(process.env.ORBIT), cy, { steps: 20 })
   await page.mouse.up(); await page.waitForTimeout(1200)
 }
+if (process.env.ZOOMOUT) {
+  const box = await canvas.boundingBox()
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  for (let i = 0; i < Number(process.env.ZOOMOUT); i++) {
+    await page.mouse.wheel(0, 240); await page.waitForTimeout(120)
+  }
+  await page.waitForTimeout(1200)
+}
 if (process.env.ZOOM) {
   const box = await canvas.boundingBox()
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)

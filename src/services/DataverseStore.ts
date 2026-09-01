@@ -272,6 +272,12 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
       : await retrieveAll(this.client, this.dataSourceName, query);
 
     let rows = data.map((r) => this.toApp(r));
+    // Dataverse does not promise the same order twice when nothing asked for
+    // one, and a table that reshuffles between two reads is how a delete lands
+    // on the wrong row. Ordering by the key is arbitrary but stable.
+    if (!options?.orderBy) {
+      rows.sort((a, b) => String((a as Row).id ?? "").localeCompare(String((b as Row).id ?? "")));
+    }
     await this.resolveLookupLabels(rows);
 
     if (options?.search) {

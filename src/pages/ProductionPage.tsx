@@ -10,7 +10,7 @@ import Badge from "../components/Badge";
 import StatCard from "../components/StatCard";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withoutPending, withEdited } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { nextSeasonName, mixedBedKindProblem, allBaskets } from "../services/infrastructureRules";
 import ProductionOverview from "../components/ProductionOverview";
@@ -553,10 +553,8 @@ export default function ProductionPage() {
   const confirm = useConfirmDialog();
 
   const handleSave = (data: Record<string, unknown>[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
-    if (form.isEdit && form.editIndex !== null) {
-      const updated = [...data];
-      updated[form.editIndex] = values as any;
-      setData(updated);
+    if (form.isEdit) {
+      setData(withEdited(data, form, values));
     } else {
       // One record per bed, then one per variety planted into it. A bed is a
       // single lookup, so an array saved as one record resolved to nothing and
@@ -631,10 +629,7 @@ export default function ProductionPage() {
   };
 
   const handleDelete = (data: Record<string, unknown>[], setData: (d: any) => void) => {
-    if (confirm.pending) {
-      const updated = data.filter((_, i) => i !== confirm.pending!.index);
-      setData(updated);
-    }
+    if (confirm.pending) setData(withoutPending(data, confirm.pending));
   };
 
   const renderTab = (which: string = tab) => {

@@ -9,7 +9,7 @@ import MetricTile from "../components/MetricTile";
 import RankedBars from "../components/RankedBars";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withoutPending, withEdited } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { supplierSummary } from "../services/supplierInsight";
 import type { PurchaseOrdersRow, SuppliersRow } from "../services/rowTypes.generated";
@@ -92,12 +92,12 @@ export default function SuppliersPage() {
 
   const save = (data: any[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
     if (form.isEdit && form.editIndex !== null) {
-      const u = [...data]; u[form.editIndex] = values; setData(u);
+      setData(withEdited(data, form, values));
     } else { setData([...data, values]); }
     form.close();
   };
   const del = (data: any[], setData: (d: any) => void) => {
-    if (confirm.pending) setData(data.filter((_: any, i: number) => i !== confirm.pending!.index));
+    if (confirm.pending) setData(withoutPending(data, confirm.pending));
   };
 
   const renderTab = () => {

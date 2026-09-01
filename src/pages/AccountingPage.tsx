@@ -10,7 +10,7 @@ import DataTable from "../components/DataTable";
 import Badge from "../components/Badge";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withoutPending, withEdited } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { invoiceAmounts, invoiceStatus } from "../services/invoiceMath";
 import { useExchangeRate } from "../hooks/useExchangeRate";
@@ -428,13 +428,13 @@ export default function AccountingPage() {
 
   const save = <T,>(data: T[], setData: (d: T[]) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
     const row = withDerivedAmounts(values);
-    if (form.isEdit && form.editIndex !== null) {
-      const u = [...data]; u[form.editIndex] = row as T; setData(u);
+    if (form.isEdit) {
+      setData(withEdited(data, form, row) as T[]);
     } else { setData([...data, row as T]); }
     form.close();
   };
   const del = <T,>(data: T[], setData: (d: T[]) => void) => {
-    if (confirm.pending) setData(data.filter((_, i) => i !== confirm.pending!.index));
+    if (confirm.pending) setData(withoutPending(data, confirm.pending));
   };
 
   /* -----------------------------------------------------------------

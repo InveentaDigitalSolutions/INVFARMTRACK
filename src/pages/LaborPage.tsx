@@ -9,7 +9,7 @@ import MetricTile from "../components/MetricTile";
 import RankedBars from "../components/RankedBars";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withoutPending, withEdited } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import type { TimesheetsRow, WorkersRow } from "../services/rowTypes.generated";
 import { laborSummary, workerPerformance, weeklyHours } from "../services/laborInsight";
@@ -91,12 +91,12 @@ export default function LaborPage() {
 
   const save = (data: any[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
     if (form.isEdit && form.editIndex !== null) {
-      const u = [...data]; u[form.editIndex] = values; setData(u);
+      setData(withEdited(data, form, values));
     } else { setData([...data, values]); }
     form.close();
   };
   const del = (data: any[], setData: (d: any) => void) => {
-    if (confirm.pending) setData(data.filter((_: any, i: number) => i !== confirm.pending!.index));
+    if (confirm.pending) setData(withoutPending(data, confirm.pending));
   };
 
   // Everything measured, in one place. The page had "Hours Today" pinned to

@@ -7,6 +7,7 @@ export const COUNTRIES = [
   {
     "code": "AF",
     "code3": "AFG",
+    "numeric": 4,
     "name": "Afghanistan",
     "aliases": [
       "Afghanistan"
@@ -16,6 +17,7 @@ export const COUNTRIES = [
   {
     "code": "AX",
     "code3": "ALA",
+    "numeric": 248,
     "name": "Åland Islands",
     "aliases": [
       "Åland Islands"
@@ -25,6 +27,7 @@ export const COUNTRIES = [
   {
     "code": "AL",
     "code3": "ALB",
+    "numeric": 8,
     "name": "Albania",
     "aliases": [
       "Albania"
@@ -34,6 +37,7 @@ export const COUNTRIES = [
   {
     "code": "DZ",
     "code3": "DZA",
+    "numeric": 12,
     "name": "Algeria",
     "aliases": [
       "Algeria"
@@ -43,6 +47,7 @@ export const COUNTRIES = [
   {
     "code": "AS",
     "code3": "ASM",
+    "numeric": 16,
     "name": "American Samoa",
     "aliases": [
       "American Samoa"
@@ -52,6 +57,7 @@ export const COUNTRIES = [
   {
     "code": "AD",
     "code3": "AND",
+    "numeric": 20,
     "name": "Andorra",
     "aliases": [
       "Andorra"
@@ -61,6 +67,7 @@ export const COUNTRIES = [
   {
     "code": "AO",
     "code3": "AGO",
+    "numeric": 24,
     "name": "Angola",
     "aliases": [
       "Angola"
@@ -70,6 +77,7 @@ export const COUNTRIES = [
   {
     "code": "AI",
     "code3": "AIA",
+    "numeric": 660,
     "name": "Anguilla",
     "aliases": [
       "Anguilla"
@@ -79,6 +87,7 @@ export const COUNTRIES = [
   {
     "code": "AQ",
     "code3": "ATA",
+    "numeric": 10,
     "name": "Antarctica",
     "aliases": [
       "Antarctica"
@@ -88,6 +97,7 @@ export const COUNTRIES = [
   {
     "code": "AG",
     "code3": "ATG",
+    "numeric": 28,
     "name": "Antigua & Barbuda",
     "aliases": [
       "Antigua & Barbuda",
@@ -98,6 +108,7 @@ export const COUNTRIES = [
   {
     "code": "AR",
     "code3": "ARG",
+    "numeric": 32,
     "name": "Argentina",
     "aliases": [
       "Argentina"
@@ -107,6 +118,7 @@ export const COUNTRIES = [
   {
     "code": "AM",
     "code3": "ARM",
+    "numeric": 51,
     "name": "Armenia",
     "aliases": [
       "Armenia"
@@ -116,6 +128,7 @@ export const COUNTRIES = [
   {
     "code": "AW",
     "code3": "ABW",
+    "numeric": 533,
     "name": "Aruba",
     "aliases": [
       "Aruba"
@@ -125,6 +138,7 @@ export const COUNTRIES = [
   {
     "code": "AU",
     "code3": "AUS",
+    "numeric": 36,
     "name": "Australia",
     "aliases": [
       "Australia"
@@ -134,6 +148,7 @@ export const COUNTRIES = [
   {
     "code": "AT",
     "code3": "AUT",
+    "numeric": 40,
     "name": "Austria",
     "aliases": [
       "Austria"
@@ -143,6 +158,7 @@ export const COUNTRIES = [
   {
     "code": "AZ",
     "code3": "AZE",
+    "numeric": 31,
     "name": "Azerbaijan",
     "aliases": [
       "Azerbaijan"
@@ -152,6 +168,7 @@ export const COUNTRIES = [
   {
     "code": "BS",
     "code3": "BHS",
+    "numeric": 44,
     "name": "Bahamas",
     "aliases": [
       "Bahamas",
@@ -162,6 +179,7 @@ export const COUNTRIES = [
   {
     "code": "BH",
     "code3": "BHR",
+    "numeric": 48,
     "name": "Bahrain",
     "aliases": [
       "Bahrain"
@@ -171,6 +189,7 @@ export const COUNTRIES = [
   {
     "code": "BD",
     "code3": "BGD",
+    "numeric": 50,
     "name": "Bangladesh",
     "aliases": [
       "Bangladesh"
@@ -180,6 +199,7 @@ export const COUNTRIES = [
   {
     "code": "BB",
     "code3": "BRB",
+    "numeric": 52,
     "name": "Barbados",
     "aliases": [
       "Barbados"
@@ -189,6 +209,7 @@ export const COUNTRIES = [
   {
     "code": "BY",
     "code3": "BLR",
+    "numeric": 112,
     "name": "Belarus",
     "aliases": [
       "Belarus"
@@ -198,6 +219,7 @@ export const COUNTRIES = [
   {
     "code": "BE",
     "code3": "BEL",
+    "numeric": 56,
     "name": "Belgium",
     "aliases": [
       "Belgium"
@@ -207,6 +229,7 @@ export const COUNTRIES = [
   {
     "code": "BZ",
     "code3": "BLZ",
+    "numeric": 84,
     "name": "Belize",
     "aliases": [
       "Belize"
@@ -216,6 +239,7 @@ export const COUNTRIES = [
   {
     "code": "BJ",
     "code3": "BEN",
+    "numeric": 204,
     "name": "Benin",
     "aliases": [
       "Benin"
@@ -225,6 +249,7 @@ export const COUNTRIES = [
   {
     "code": "BM",
     "code3": "BMU",
+    "numeric": 60,
     "name": "Bermuda",
     "aliases": [
       "Bermuda"
@@ -234,6 +259,7 @@ export const COUNTRIES = [
   {
     "code": "BT",
     "code3": "BTN",
+    "numeric": 64,
     "name": "Bhutan",
     "aliases": [
       "Bhutan"
@@ -243,6 +269,7 @@ export const COUNTRIES = [
   {
     "code": "BO",
     "code3": "BOL",
+    "numeric": 68,
     "name": "Bolivia",
     "aliases": [
       "Bolivia",
@@ -253,6 +280,7 @@ export const COUNTRIES = [
   {
     "code": "BA",
     "code3": "BIH",
+    "numeric": 70,
     "name": "Bosnia",
     "aliases": [
       "Bosnia",
@@ -263,6 +291,7 @@ export const COUNTRIES = [
   {
     "code": "BW",
     "code3": "BWA",
+    "numeric": 72,
     "name": "Botswana",
     "aliases": [
       "Botswana"
@@ -272,6 +301,7 @@ export const COUNTRIES = [
   {
     "code": "BV",
     "code3": "BVT",
+    "numeric": 74,
     "name": "Bouvet Island",
     "aliases": [
       "Bouvet Island"
@@ -281,6 +311,7 @@ export const COUNTRIES = [
   {
     "code": "BR",
     "code3": "BRA",
+    "numeric": 76,
     "name": "Brazil",
     "aliases": [
       "Brazil"
@@ -290,6 +321,7 @@ export const COUNTRIES = [
   {
     "code": "IO",
     "code3": "IOT",
+    "numeric": 86,
     "name": "British Indian Ocean Territory",
     "aliases": [
       "British Indian Ocean Territory"
@@ -299,6 +331,7 @@ export const COUNTRIES = [
   {
     "code": "VG",
     "code3": "VGB",
+    "numeric": 92,
     "name": "British Virgin Islands",
     "aliases": [
       "British Virgin Islands"
@@ -308,6 +341,7 @@ export const COUNTRIES = [
   {
     "code": "BN",
     "code3": "BRN",
+    "numeric": 96,
     "name": "Brunei",
     "aliases": [
       "Brunei",
@@ -318,6 +352,7 @@ export const COUNTRIES = [
   {
     "code": "BG",
     "code3": "BGR",
+    "numeric": 100,
     "name": "Bulgaria",
     "aliases": [
       "Bulgaria"
@@ -327,6 +362,7 @@ export const COUNTRIES = [
   {
     "code": "BF",
     "code3": "BFA",
+    "numeric": 854,
     "name": "Burkina Faso",
     "aliases": [
       "Burkina Faso"
@@ -336,6 +372,7 @@ export const COUNTRIES = [
   {
     "code": "BI",
     "code3": "BDI",
+    "numeric": 108,
     "name": "Burundi",
     "aliases": [
       "Burundi"
@@ -345,6 +382,7 @@ export const COUNTRIES = [
   {
     "code": "KH",
     "code3": "KHM",
+    "numeric": 116,
     "name": "Cambodia",
     "aliases": [
       "Cambodia"
@@ -354,6 +392,7 @@ export const COUNTRIES = [
   {
     "code": "CM",
     "code3": "CMR",
+    "numeric": 120,
     "name": "Cameroon",
     "aliases": [
       "Cameroon"
@@ -363,6 +402,7 @@ export const COUNTRIES = [
   {
     "code": "CA",
     "code3": "CAN",
+    "numeric": 124,
     "name": "Canada",
     "aliases": [
       "Canada"
@@ -372,6 +412,7 @@ export const COUNTRIES = [
   {
     "code": "CV",
     "code3": "CPV",
+    "numeric": 132,
     "name": "Cape Verde",
     "aliases": [
       "Cape Verde",
@@ -382,6 +423,7 @@ export const COUNTRIES = [
   {
     "code": "BQ",
     "code3": "BES",
+    "numeric": 535,
     "name": "Caribbean Netherlands",
     "aliases": [
       "Caribbean Netherlands",
@@ -392,6 +434,7 @@ export const COUNTRIES = [
   {
     "code": "KY",
     "code3": "CYM",
+    "numeric": 136,
     "name": "Cayman Islands",
     "aliases": [
       "Cayman Islands"
@@ -401,6 +444,7 @@ export const COUNTRIES = [
   {
     "code": "CF",
     "code3": "CAF",
+    "numeric": 140,
     "name": "Central African Republic",
     "aliases": [
       "Central African Republic",
@@ -411,6 +455,7 @@ export const COUNTRIES = [
   {
     "code": "TD",
     "code3": "TCD",
+    "numeric": 148,
     "name": "Chad",
     "aliases": [
       "Chad"
@@ -420,6 +465,7 @@ export const COUNTRIES = [
   {
     "code": "CL",
     "code3": "CHL",
+    "numeric": 152,
     "name": "Chile",
     "aliases": [
       "Chile"
@@ -429,6 +475,7 @@ export const COUNTRIES = [
   {
     "code": "CN",
     "code3": "CHN",
+    "numeric": 156,
     "name": "China",
     "aliases": [
       "China"
@@ -438,6 +485,7 @@ export const COUNTRIES = [
   {
     "code": "CX",
     "code3": "CXR",
+    "numeric": 162,
     "name": "Christmas Island",
     "aliases": [
       "Christmas Island"
@@ -447,6 +495,7 @@ export const COUNTRIES = [
   {
     "code": "CC",
     "code3": "CCK",
+    "numeric": 166,
     "name": "Cocos Islands",
     "aliases": [
       "Cocos Islands",
@@ -457,6 +506,7 @@ export const COUNTRIES = [
   {
     "code": "CO",
     "code3": "COL",
+    "numeric": 170,
     "name": "Colombia",
     "aliases": [
       "Colombia"
@@ -466,6 +516,7 @@ export const COUNTRIES = [
   {
     "code": "KM",
     "code3": "COM",
+    "numeric": 174,
     "name": "Comoros",
     "aliases": [
       "Comoros",
@@ -476,6 +527,7 @@ export const COUNTRIES = [
   {
     "code": "CG",
     "code3": "COG",
+    "numeric": 178,
     "name": "Congo - Brazzaville",
     "aliases": [
       "Congo - Brazzaville",
@@ -487,6 +539,7 @@ export const COUNTRIES = [
   {
     "code": "CD",
     "code3": "COD",
+    "numeric": 180,
     "name": "Congo - Kinshasa",
     "aliases": [
       "Congo - Kinshasa",
@@ -498,6 +551,7 @@ export const COUNTRIES = [
   {
     "code": "CK",
     "code3": "COK",
+    "numeric": 184,
     "name": "Cook Islands",
     "aliases": [
       "Cook Islands",
@@ -508,6 +562,7 @@ export const COUNTRIES = [
   {
     "code": "CR",
     "code3": "CRI",
+    "numeric": 188,
     "name": "Costa Rica",
     "aliases": [
       "Costa Rica"
@@ -517,6 +572,7 @@ export const COUNTRIES = [
   {
     "code": "CI",
     "code3": "CIV",
+    "numeric": 384,
     "name": "Côte d’Ivoire",
     "aliases": [
       "Côte d’Ivoire",
@@ -527,6 +583,7 @@ export const COUNTRIES = [
   {
     "code": "HR",
     "code3": "HRV",
+    "numeric": 191,
     "name": "Croatia",
     "aliases": [
       "Croatia"
@@ -536,6 +593,7 @@ export const COUNTRIES = [
   {
     "code": "CU",
     "code3": "CUB",
+    "numeric": 192,
     "name": "Cuba",
     "aliases": [
       "Cuba"
@@ -545,6 +603,7 @@ export const COUNTRIES = [
   {
     "code": "CW",
     "code3": "CUW",
+    "numeric": 531,
     "name": "Curaçao",
     "aliases": [
       "Curaçao"
@@ -554,6 +613,7 @@ export const COUNTRIES = [
   {
     "code": "CY",
     "code3": "CYP",
+    "numeric": 196,
     "name": "Cyprus",
     "aliases": [
       "Cyprus"
@@ -563,6 +623,7 @@ export const COUNTRIES = [
   {
     "code": "CZ",
     "code3": "CZE",
+    "numeric": 203,
     "name": "Czechia",
     "aliases": [
       "Czechia"
@@ -572,6 +633,7 @@ export const COUNTRIES = [
   {
     "code": "DK",
     "code3": "DNK",
+    "numeric": 208,
     "name": "Denmark",
     "aliases": [
       "Denmark"
@@ -581,6 +643,7 @@ export const COUNTRIES = [
   {
     "code": "DJ",
     "code3": "DJI",
+    "numeric": 262,
     "name": "Djibouti",
     "aliases": [
       "Djibouti"
@@ -590,6 +653,7 @@ export const COUNTRIES = [
   {
     "code": "DM",
     "code3": "DMA",
+    "numeric": 212,
     "name": "Dominica",
     "aliases": [
       "Dominica"
@@ -599,6 +663,7 @@ export const COUNTRIES = [
   {
     "code": "DO",
     "code3": "DOM",
+    "numeric": 214,
     "name": "Dominican Republic",
     "aliases": [
       "Dominican Republic",
@@ -609,6 +674,7 @@ export const COUNTRIES = [
   {
     "code": "EC",
     "code3": "ECU",
+    "numeric": 218,
     "name": "Ecuador",
     "aliases": [
       "Ecuador"
@@ -618,6 +684,7 @@ export const COUNTRIES = [
   {
     "code": "EG",
     "code3": "EGY",
+    "numeric": 818,
     "name": "Egypt",
     "aliases": [
       "Egypt"
@@ -627,6 +694,7 @@ export const COUNTRIES = [
   {
     "code": "SV",
     "code3": "SLV",
+    "numeric": 222,
     "name": "El Salvador",
     "aliases": [
       "El Salvador"
@@ -636,6 +704,7 @@ export const COUNTRIES = [
   {
     "code": "GQ",
     "code3": "GNQ",
+    "numeric": 226,
     "name": "Equatorial Guinea",
     "aliases": [
       "Equatorial Guinea"
@@ -645,6 +714,7 @@ export const COUNTRIES = [
   {
     "code": "ER",
     "code3": "ERI",
+    "numeric": 232,
     "name": "Eritrea",
     "aliases": [
       "Eritrea"
@@ -654,6 +724,7 @@ export const COUNTRIES = [
   {
     "code": "EE",
     "code3": "EST",
+    "numeric": 233,
     "name": "Estonia",
     "aliases": [
       "Estonia"
@@ -663,6 +734,7 @@ export const COUNTRIES = [
   {
     "code": "SZ",
     "code3": "SWZ",
+    "numeric": 748,
     "name": "Eswatini",
     "aliases": [
       "Eswatini"
@@ -672,6 +744,7 @@ export const COUNTRIES = [
   {
     "code": "ET",
     "code3": "ETH",
+    "numeric": 231,
     "name": "Ethiopia",
     "aliases": [
       "Ethiopia"
@@ -681,6 +754,7 @@ export const COUNTRIES = [
   {
     "code": "FK",
     "code3": "FLK",
+    "numeric": 238,
     "name": "Falkland Islands",
     "aliases": [
       "Falkland Islands"
@@ -690,6 +764,7 @@ export const COUNTRIES = [
   {
     "code": "FO",
     "code3": "FRO",
+    "numeric": 234,
     "name": "Faroe Islands",
     "aliases": [
       "Faroe Islands"
@@ -699,6 +774,7 @@ export const COUNTRIES = [
   {
     "code": "FJ",
     "code3": "FJI",
+    "numeric": 242,
     "name": "Fiji",
     "aliases": [
       "Fiji"
@@ -708,6 +784,7 @@ export const COUNTRIES = [
   {
     "code": "FI",
     "code3": "FIN",
+    "numeric": 246,
     "name": "Finland",
     "aliases": [
       "Finland"
@@ -717,6 +794,7 @@ export const COUNTRIES = [
   {
     "code": "FR",
     "code3": "FRA",
+    "numeric": 250,
     "name": "France",
     "aliases": [
       "France"
@@ -726,6 +804,7 @@ export const COUNTRIES = [
   {
     "code": "GF",
     "code3": "GUF",
+    "numeric": 254,
     "name": "French Guiana",
     "aliases": [
       "French Guiana"
@@ -735,6 +814,7 @@ export const COUNTRIES = [
   {
     "code": "PF",
     "code3": "PYF",
+    "numeric": 258,
     "name": "French Polynesia",
     "aliases": [
       "French Polynesia"
@@ -744,6 +824,7 @@ export const COUNTRIES = [
   {
     "code": "TF",
     "code3": "ATF",
+    "numeric": 260,
     "name": "French Southern Territories",
     "aliases": [
       "French Southern Territories"
@@ -753,6 +834,7 @@ export const COUNTRIES = [
   {
     "code": "GA",
     "code3": "GAB",
+    "numeric": 266,
     "name": "Gabon",
     "aliases": [
       "Gabon"
@@ -762,6 +844,7 @@ export const COUNTRIES = [
   {
     "code": "GM",
     "code3": "GMB",
+    "numeric": 270,
     "name": "Gambia",
     "aliases": [
       "Gambia",
@@ -772,6 +855,7 @@ export const COUNTRIES = [
   {
     "code": "GE",
     "code3": "GEO",
+    "numeric": 268,
     "name": "Georgia",
     "aliases": [
       "Georgia"
@@ -781,6 +865,7 @@ export const COUNTRIES = [
   {
     "code": "DE",
     "code3": "DEU",
+    "numeric": 276,
     "name": "Germany",
     "aliases": [
       "Germany"
@@ -790,6 +875,7 @@ export const COUNTRIES = [
   {
     "code": "GH",
     "code3": "GHA",
+    "numeric": 288,
     "name": "Ghana",
     "aliases": [
       "Ghana"
@@ -799,6 +885,7 @@ export const COUNTRIES = [
   {
     "code": "GI",
     "code3": "GIB",
+    "numeric": 292,
     "name": "Gibraltar",
     "aliases": [
       "Gibraltar"
@@ -808,6 +895,7 @@ export const COUNTRIES = [
   {
     "code": "GR",
     "code3": "GRC",
+    "numeric": 300,
     "name": "Greece",
     "aliases": [
       "Greece"
@@ -817,6 +905,7 @@ export const COUNTRIES = [
   {
     "code": "GL",
     "code3": "GRL",
+    "numeric": 304,
     "name": "Greenland",
     "aliases": [
       "Greenland"
@@ -826,6 +915,7 @@ export const COUNTRIES = [
   {
     "code": "GD",
     "code3": "GRD",
+    "numeric": 308,
     "name": "Grenada",
     "aliases": [
       "Grenada"
@@ -835,6 +925,7 @@ export const COUNTRIES = [
   {
     "code": "GP",
     "code3": "GLP",
+    "numeric": 312,
     "name": "Guadeloupe",
     "aliases": [
       "Guadeloupe"
@@ -844,6 +935,7 @@ export const COUNTRIES = [
   {
     "code": "GU",
     "code3": "GUM",
+    "numeric": 316,
     "name": "Guam",
     "aliases": [
       "Guam"
@@ -853,6 +945,7 @@ export const COUNTRIES = [
   {
     "code": "GT",
     "code3": "GTM",
+    "numeric": 320,
     "name": "Guatemala",
     "aliases": [
       "Guatemala"
@@ -862,6 +955,7 @@ export const COUNTRIES = [
   {
     "code": "GG",
     "code3": "GGY",
+    "numeric": 831,
     "name": "Guernsey",
     "aliases": [
       "Guernsey"
@@ -871,6 +965,7 @@ export const COUNTRIES = [
   {
     "code": "GN",
     "code3": "GIN",
+    "numeric": 324,
     "name": "Guinea",
     "aliases": [
       "Guinea"
@@ -880,6 +975,7 @@ export const COUNTRIES = [
   {
     "code": "GW",
     "code3": "GNB",
+    "numeric": 624,
     "name": "Guinea-Bissau",
     "aliases": [
       "Guinea-Bissau"
@@ -889,6 +985,7 @@ export const COUNTRIES = [
   {
     "code": "GY",
     "code3": "GUY",
+    "numeric": 328,
     "name": "Guyana",
     "aliases": [
       "Guyana"
@@ -898,6 +995,7 @@ export const COUNTRIES = [
   {
     "code": "HT",
     "code3": "HTI",
+    "numeric": 332,
     "name": "Haiti",
     "aliases": [
       "Haiti"
@@ -907,6 +1005,7 @@ export const COUNTRIES = [
   {
     "code": "HM",
     "code3": "HMD",
+    "numeric": 334,
     "name": "Heard & McDonald Islands",
     "aliases": [
       "Heard & McDonald Islands",
@@ -917,6 +1016,7 @@ export const COUNTRIES = [
   {
     "code": "HN",
     "code3": "HND",
+    "numeric": 340,
     "name": "Honduras",
     "aliases": [
       "Honduras"
@@ -926,6 +1026,7 @@ export const COUNTRIES = [
   {
     "code": "HK",
     "code3": "HKG",
+    "numeric": 344,
     "name": "Hong Kong",
     "aliases": [
       "Hong Kong",
@@ -936,6 +1037,7 @@ export const COUNTRIES = [
   {
     "code": "HU",
     "code3": "HUN",
+    "numeric": 348,
     "name": "Hungary",
     "aliases": [
       "Hungary"
@@ -945,6 +1047,7 @@ export const COUNTRIES = [
   {
     "code": "IS",
     "code3": "ISL",
+    "numeric": 352,
     "name": "Iceland",
     "aliases": [
       "Iceland"
@@ -954,6 +1057,7 @@ export const COUNTRIES = [
   {
     "code": "IN",
     "code3": "IND",
+    "numeric": 356,
     "name": "India",
     "aliases": [
       "India"
@@ -963,6 +1067,7 @@ export const COUNTRIES = [
   {
     "code": "ID",
     "code3": "IDN",
+    "numeric": 360,
     "name": "Indonesia",
     "aliases": [
       "Indonesia"
@@ -972,6 +1077,7 @@ export const COUNTRIES = [
   {
     "code": "IR",
     "code3": "IRN",
+    "numeric": 364,
     "name": "Iran",
     "aliases": [
       "Iran",
@@ -982,6 +1088,7 @@ export const COUNTRIES = [
   {
     "code": "IQ",
     "code3": "IRQ",
+    "numeric": 368,
     "name": "Iraq",
     "aliases": [
       "Iraq"
@@ -991,6 +1098,7 @@ export const COUNTRIES = [
   {
     "code": "IE",
     "code3": "IRL",
+    "numeric": 372,
     "name": "Ireland",
     "aliases": [
       "Ireland"
@@ -1000,6 +1108,7 @@ export const COUNTRIES = [
   {
     "code": "IM",
     "code3": "IMN",
+    "numeric": 833,
     "name": "Isle of Man",
     "aliases": [
       "Isle of Man"
@@ -1009,6 +1118,7 @@ export const COUNTRIES = [
   {
     "code": "IL",
     "code3": "ISR",
+    "numeric": 376,
     "name": "Israel",
     "aliases": [
       "Israel"
@@ -1018,6 +1128,7 @@ export const COUNTRIES = [
   {
     "code": "IT",
     "code3": "ITA",
+    "numeric": 380,
     "name": "Italy",
     "aliases": [
       "Italy"
@@ -1027,6 +1138,7 @@ export const COUNTRIES = [
   {
     "code": "JM",
     "code3": "JAM",
+    "numeric": 388,
     "name": "Jamaica",
     "aliases": [
       "Jamaica"
@@ -1036,6 +1148,7 @@ export const COUNTRIES = [
   {
     "code": "JP",
     "code3": "JPN",
+    "numeric": 392,
     "name": "Japan",
     "aliases": [
       "Japan"
@@ -1045,6 +1158,7 @@ export const COUNTRIES = [
   {
     "code": "JE",
     "code3": "JEY",
+    "numeric": 832,
     "name": "Jersey",
     "aliases": [
       "Jersey"
@@ -1054,6 +1168,7 @@ export const COUNTRIES = [
   {
     "code": "JO",
     "code3": "JOR",
+    "numeric": 400,
     "name": "Jordan",
     "aliases": [
       "Jordan"
@@ -1063,6 +1178,7 @@ export const COUNTRIES = [
   {
     "code": "KZ",
     "code3": "KAZ",
+    "numeric": 398,
     "name": "Kazakhstan",
     "aliases": [
       "Kazakhstan"
@@ -1072,6 +1188,7 @@ export const COUNTRIES = [
   {
     "code": "KE",
     "code3": "KEN",
+    "numeric": 404,
     "name": "Kenya",
     "aliases": [
       "Kenya"
@@ -1081,6 +1198,7 @@ export const COUNTRIES = [
   {
     "code": "KI",
     "code3": "KIR",
+    "numeric": 296,
     "name": "Kiribati",
     "aliases": [
       "Kiribati"
@@ -1090,6 +1208,7 @@ export const COUNTRIES = [
   {
     "code": "KW",
     "code3": "KWT",
+    "numeric": 414,
     "name": "Kuwait",
     "aliases": [
       "Kuwait"
@@ -1099,6 +1218,7 @@ export const COUNTRIES = [
   {
     "code": "KG",
     "code3": "KGZ",
+    "numeric": 417,
     "name": "Kyrgyzstan",
     "aliases": [
       "Kyrgyzstan"
@@ -1108,6 +1228,7 @@ export const COUNTRIES = [
   {
     "code": "LA",
     "code3": "LAO",
+    "numeric": 418,
     "name": "Laos",
     "aliases": [
       "Laos",
@@ -1119,6 +1240,7 @@ export const COUNTRIES = [
   {
     "code": "LV",
     "code3": "LVA",
+    "numeric": 428,
     "name": "Latvia",
     "aliases": [
       "Latvia"
@@ -1128,6 +1250,7 @@ export const COUNTRIES = [
   {
     "code": "LB",
     "code3": "LBN",
+    "numeric": 422,
     "name": "Lebanon",
     "aliases": [
       "Lebanon"
@@ -1137,6 +1260,7 @@ export const COUNTRIES = [
   {
     "code": "LS",
     "code3": "LSO",
+    "numeric": 426,
     "name": "Lesotho",
     "aliases": [
       "Lesotho"
@@ -1146,6 +1270,7 @@ export const COUNTRIES = [
   {
     "code": "LR",
     "code3": "LBR",
+    "numeric": 430,
     "name": "Liberia",
     "aliases": [
       "Liberia"
@@ -1155,6 +1280,7 @@ export const COUNTRIES = [
   {
     "code": "LY",
     "code3": "LBY",
+    "numeric": 434,
     "name": "Libya",
     "aliases": [
       "Libya"
@@ -1164,6 +1290,7 @@ export const COUNTRIES = [
   {
     "code": "LI",
     "code3": "LIE",
+    "numeric": 438,
     "name": "Liechtenstein",
     "aliases": [
       "Liechtenstein"
@@ -1173,6 +1300,7 @@ export const COUNTRIES = [
   {
     "code": "LT",
     "code3": "LTU",
+    "numeric": 440,
     "name": "Lithuania",
     "aliases": [
       "Lithuania"
@@ -1182,6 +1310,7 @@ export const COUNTRIES = [
   {
     "code": "LU",
     "code3": "LUX",
+    "numeric": 442,
     "name": "Luxembourg",
     "aliases": [
       "Luxembourg"
@@ -1191,6 +1320,7 @@ export const COUNTRIES = [
   {
     "code": "MO",
     "code3": "MAC",
+    "numeric": 446,
     "name": "Macao",
     "aliases": [
       "Macao",
@@ -1201,6 +1331,7 @@ export const COUNTRIES = [
   {
     "code": "MG",
     "code3": "MDG",
+    "numeric": 450,
     "name": "Madagascar",
     "aliases": [
       "Madagascar"
@@ -1210,6 +1341,7 @@ export const COUNTRIES = [
   {
     "code": "MW",
     "code3": "MWI",
+    "numeric": 454,
     "name": "Malawi",
     "aliases": [
       "Malawi"
@@ -1219,6 +1351,7 @@ export const COUNTRIES = [
   {
     "code": "MY",
     "code3": "MYS",
+    "numeric": 458,
     "name": "Malaysia",
     "aliases": [
       "Malaysia"
@@ -1228,6 +1361,7 @@ export const COUNTRIES = [
   {
     "code": "MV",
     "code3": "MDV",
+    "numeric": 462,
     "name": "Maldives",
     "aliases": [
       "Maldives"
@@ -1237,6 +1371,7 @@ export const COUNTRIES = [
   {
     "code": "ML",
     "code3": "MLI",
+    "numeric": 466,
     "name": "Mali",
     "aliases": [
       "Mali"
@@ -1246,6 +1381,7 @@ export const COUNTRIES = [
   {
     "code": "MT",
     "code3": "MLT",
+    "numeric": 470,
     "name": "Malta",
     "aliases": [
       "Malta"
@@ -1255,6 +1391,7 @@ export const COUNTRIES = [
   {
     "code": "MH",
     "code3": "MHL",
+    "numeric": 584,
     "name": "Marshall Islands",
     "aliases": [
       "Marshall Islands",
@@ -1265,6 +1402,7 @@ export const COUNTRIES = [
   {
     "code": "MQ",
     "code3": "MTQ",
+    "numeric": 474,
     "name": "Martinique",
     "aliases": [
       "Martinique"
@@ -1274,6 +1412,7 @@ export const COUNTRIES = [
   {
     "code": "MR",
     "code3": "MRT",
+    "numeric": 478,
     "name": "Mauritania",
     "aliases": [
       "Mauritania"
@@ -1283,6 +1422,7 @@ export const COUNTRIES = [
   {
     "code": "MU",
     "code3": "MUS",
+    "numeric": 480,
     "name": "Mauritius",
     "aliases": [
       "Mauritius"
@@ -1292,6 +1432,7 @@ export const COUNTRIES = [
   {
     "code": "YT",
     "code3": "MYT",
+    "numeric": 175,
     "name": "Mayotte",
     "aliases": [
       "Mayotte"
@@ -1301,6 +1442,7 @@ export const COUNTRIES = [
   {
     "code": "MX",
     "code3": "MEX",
+    "numeric": 484,
     "name": "Mexico",
     "aliases": [
       "Mexico"
@@ -1310,6 +1452,7 @@ export const COUNTRIES = [
   {
     "code": "FM",
     "code3": "FSM",
+    "numeric": 583,
     "name": "Micronesia",
     "aliases": [
       "Micronesia",
@@ -1320,6 +1463,7 @@ export const COUNTRIES = [
   {
     "code": "MD",
     "code3": "MDA",
+    "numeric": 498,
     "name": "Moldova",
     "aliases": [
       "Moldova",
@@ -1331,6 +1475,7 @@ export const COUNTRIES = [
   {
     "code": "MC",
     "code3": "MCO",
+    "numeric": 492,
     "name": "Monaco",
     "aliases": [
       "Monaco"
@@ -1340,6 +1485,7 @@ export const COUNTRIES = [
   {
     "code": "MN",
     "code3": "MNG",
+    "numeric": 496,
     "name": "Mongolia",
     "aliases": [
       "Mongolia"
@@ -1349,6 +1495,7 @@ export const COUNTRIES = [
   {
     "code": "ME",
     "code3": "MNE",
+    "numeric": 499,
     "name": "Montenegro",
     "aliases": [
       "Montenegro"
@@ -1358,6 +1505,7 @@ export const COUNTRIES = [
   {
     "code": "MS",
     "code3": "MSR",
+    "numeric": 500,
     "name": "Montserrat",
     "aliases": [
       "Montserrat"
@@ -1367,6 +1515,7 @@ export const COUNTRIES = [
   {
     "code": "MA",
     "code3": "MAR",
+    "numeric": 504,
     "name": "Morocco",
     "aliases": [
       "Morocco"
@@ -1376,6 +1525,7 @@ export const COUNTRIES = [
   {
     "code": "MZ",
     "code3": "MOZ",
+    "numeric": 508,
     "name": "Mozambique",
     "aliases": [
       "Mozambique"
@@ -1385,6 +1535,7 @@ export const COUNTRIES = [
   {
     "code": "MM",
     "code3": "MMR",
+    "numeric": 104,
     "name": "Myanmar",
     "aliases": [
       "Myanmar"
@@ -1394,6 +1545,7 @@ export const COUNTRIES = [
   {
     "code": "NA",
     "code3": "NAM",
+    "numeric": 516,
     "name": "Namibia",
     "aliases": [
       "Namibia"
@@ -1403,6 +1555,7 @@ export const COUNTRIES = [
   {
     "code": "NR",
     "code3": "NRU",
+    "numeric": 520,
     "name": "Nauru",
     "aliases": [
       "Nauru"
@@ -1412,6 +1565,7 @@ export const COUNTRIES = [
   {
     "code": "NP",
     "code3": "NPL",
+    "numeric": 524,
     "name": "Nepal",
     "aliases": [
       "Nepal"
@@ -1421,6 +1575,7 @@ export const COUNTRIES = [
   {
     "code": "NL",
     "code3": "NLD",
+    "numeric": 528,
     "name": "Netherlands",
     "aliases": [
       "Netherlands",
@@ -1431,6 +1586,7 @@ export const COUNTRIES = [
   {
     "code": "NC",
     "code3": "NCL",
+    "numeric": 540,
     "name": "New Caledonia",
     "aliases": [
       "New Caledonia"
@@ -1440,6 +1596,7 @@ export const COUNTRIES = [
   {
     "code": "NZ",
     "code3": "NZL",
+    "numeric": 554,
     "name": "New Zealand",
     "aliases": [
       "New Zealand"
@@ -1449,6 +1606,7 @@ export const COUNTRIES = [
   {
     "code": "NI",
     "code3": "NIC",
+    "numeric": 558,
     "name": "Nicaragua",
     "aliases": [
       "Nicaragua"
@@ -1458,6 +1616,7 @@ export const COUNTRIES = [
   {
     "code": "NE",
     "code3": "NER",
+    "numeric": 562,
     "name": "Niger",
     "aliases": [
       "Niger",
@@ -1468,6 +1627,7 @@ export const COUNTRIES = [
   {
     "code": "NG",
     "code3": "NGA",
+    "numeric": 566,
     "name": "Nigeria",
     "aliases": [
       "Nigeria"
@@ -1477,6 +1637,7 @@ export const COUNTRIES = [
   {
     "code": "NU",
     "code3": "NIU",
+    "numeric": 570,
     "name": "Niue",
     "aliases": [
       "Niue",
@@ -1487,6 +1648,7 @@ export const COUNTRIES = [
   {
     "code": "NF",
     "code3": "NFK",
+    "numeric": 574,
     "name": "Norfolk Island",
     "aliases": [
       "Norfolk Island"
@@ -1496,6 +1658,7 @@ export const COUNTRIES = [
   {
     "code": "KP",
     "code3": "PRK",
+    "numeric": 408,
     "name": "North Korea",
     "aliases": [
       "North Korea",
@@ -1507,6 +1670,7 @@ export const COUNTRIES = [
   {
     "code": "MK",
     "code3": "MKD",
+    "numeric": 807,
     "name": "North Macedonia",
     "aliases": [
       "North Macedonia"
@@ -1516,6 +1680,7 @@ export const COUNTRIES = [
   {
     "code": "MP",
     "code3": "MNP",
+    "numeric": 580,
     "name": "Northern Mariana Islands",
     "aliases": [
       "Northern Mariana Islands"
@@ -1525,6 +1690,7 @@ export const COUNTRIES = [
   {
     "code": "NO",
     "code3": "NOR",
+    "numeric": 578,
     "name": "Norway",
     "aliases": [
       "Norway"
@@ -1534,6 +1700,7 @@ export const COUNTRIES = [
   {
     "code": "OM",
     "code3": "OMN",
+    "numeric": 512,
     "name": "Oman",
     "aliases": [
       "Oman"
@@ -1543,6 +1710,7 @@ export const COUNTRIES = [
   {
     "code": "PK",
     "code3": "PAK",
+    "numeric": 586,
     "name": "Pakistan",
     "aliases": [
       "Pakistan"
@@ -1552,6 +1720,7 @@ export const COUNTRIES = [
   {
     "code": "PW",
     "code3": "PLW",
+    "numeric": 585,
     "name": "Palau",
     "aliases": [
       "Palau"
@@ -1561,6 +1730,7 @@ export const COUNTRIES = [
   {
     "code": "PS",
     "code3": "PSE",
+    "numeric": 275,
     "name": "Palestine",
     "aliases": [
       "Palestine",
@@ -1572,6 +1742,7 @@ export const COUNTRIES = [
   {
     "code": "PA",
     "code3": "PAN",
+    "numeric": 591,
     "name": "Panama",
     "aliases": [
       "Panama"
@@ -1581,6 +1752,7 @@ export const COUNTRIES = [
   {
     "code": "PG",
     "code3": "PNG",
+    "numeric": 598,
     "name": "Papua New Guinea",
     "aliases": [
       "Papua New Guinea"
@@ -1590,6 +1762,7 @@ export const COUNTRIES = [
   {
     "code": "PY",
     "code3": "PRY",
+    "numeric": 600,
     "name": "Paraguay",
     "aliases": [
       "Paraguay"
@@ -1599,6 +1772,7 @@ export const COUNTRIES = [
   {
     "code": "PE",
     "code3": "PER",
+    "numeric": 604,
     "name": "Peru",
     "aliases": [
       "Peru"
@@ -1608,6 +1782,7 @@ export const COUNTRIES = [
   {
     "code": "PH",
     "code3": "PHL",
+    "numeric": 608,
     "name": "Philippines",
     "aliases": [
       "Philippines",
@@ -1618,6 +1793,7 @@ export const COUNTRIES = [
   {
     "code": "PN",
     "code3": "PCN",
+    "numeric": 612,
     "name": "Pitcairn",
     "aliases": [
       "Pitcairn"
@@ -1627,6 +1803,7 @@ export const COUNTRIES = [
   {
     "code": "PL",
     "code3": "POL",
+    "numeric": 616,
     "name": "Poland",
     "aliases": [
       "Poland"
@@ -1636,6 +1813,7 @@ export const COUNTRIES = [
   {
     "code": "PT",
     "code3": "PRT",
+    "numeric": 620,
     "name": "Portugal",
     "aliases": [
       "Portugal"
@@ -1645,6 +1823,7 @@ export const COUNTRIES = [
   {
     "code": "PR",
     "code3": "PRI",
+    "numeric": 630,
     "name": "Puerto Rico",
     "aliases": [
       "Puerto Rico"
@@ -1654,6 +1833,7 @@ export const COUNTRIES = [
   {
     "code": "QA",
     "code3": "QAT",
+    "numeric": 634,
     "name": "Qatar",
     "aliases": [
       "Qatar"
@@ -1663,6 +1843,7 @@ export const COUNTRIES = [
   {
     "code": "RE",
     "code3": "REU",
+    "numeric": 638,
     "name": "Réunion",
     "aliases": [
       "Réunion"
@@ -1672,6 +1853,7 @@ export const COUNTRIES = [
   {
     "code": "RO",
     "code3": "ROU",
+    "numeric": 642,
     "name": "Romania",
     "aliases": [
       "Romania"
@@ -1681,6 +1863,7 @@ export const COUNTRIES = [
   {
     "code": "RU",
     "code3": "RUS",
+    "numeric": 643,
     "name": "Russia",
     "aliases": [
       "Russia",
@@ -1692,6 +1875,7 @@ export const COUNTRIES = [
   {
     "code": "RW",
     "code3": "RWA",
+    "numeric": 646,
     "name": "Rwanda",
     "aliases": [
       "Rwanda"
@@ -1701,6 +1885,7 @@ export const COUNTRIES = [
   {
     "code": "WS",
     "code3": "WSM",
+    "numeric": 882,
     "name": "Samoa",
     "aliases": [
       "Samoa"
@@ -1710,6 +1895,7 @@ export const COUNTRIES = [
   {
     "code": "SM",
     "code3": "SMR",
+    "numeric": 674,
     "name": "San Marino",
     "aliases": [
       "San Marino"
@@ -1719,6 +1905,7 @@ export const COUNTRIES = [
   {
     "code": "ST",
     "code3": "STP",
+    "numeric": 678,
     "name": "São Tomé & Príncipe",
     "aliases": [
       "São Tomé & Príncipe",
@@ -1729,6 +1916,7 @@ export const COUNTRIES = [
   {
     "code": "SA",
     "code3": "SAU",
+    "numeric": 682,
     "name": "Saudi Arabia",
     "aliases": [
       "Saudi Arabia"
@@ -1738,6 +1926,7 @@ export const COUNTRIES = [
   {
     "code": "SN",
     "code3": "SEN",
+    "numeric": 686,
     "name": "Senegal",
     "aliases": [
       "Senegal"
@@ -1747,6 +1936,7 @@ export const COUNTRIES = [
   {
     "code": "RS",
     "code3": "SRB",
+    "numeric": 688,
     "name": "Serbia",
     "aliases": [
       "Serbia"
@@ -1756,6 +1946,7 @@ export const COUNTRIES = [
   {
     "code": "SC",
     "code3": "SYC",
+    "numeric": 690,
     "name": "Seychelles",
     "aliases": [
       "Seychelles"
@@ -1765,6 +1956,7 @@ export const COUNTRIES = [
   {
     "code": "SL",
     "code3": "SLE",
+    "numeric": 694,
     "name": "Sierra Leone",
     "aliases": [
       "Sierra Leone"
@@ -1774,6 +1966,7 @@ export const COUNTRIES = [
   {
     "code": "SG",
     "code3": "SGP",
+    "numeric": 702,
     "name": "Singapore",
     "aliases": [
       "Singapore"
@@ -1783,6 +1976,7 @@ export const COUNTRIES = [
   {
     "code": "SX",
     "code3": "SXM",
+    "numeric": 534,
     "name": "Sint Maarten",
     "aliases": [
       "Sint Maarten",
@@ -1793,6 +1987,7 @@ export const COUNTRIES = [
   {
     "code": "SK",
     "code3": "SVK",
+    "numeric": 703,
     "name": "Slovakia",
     "aliases": [
       "Slovakia"
@@ -1802,6 +1997,7 @@ export const COUNTRIES = [
   {
     "code": "SI",
     "code3": "SVN",
+    "numeric": 705,
     "name": "Slovenia",
     "aliases": [
       "Slovenia"
@@ -1811,6 +2007,7 @@ export const COUNTRIES = [
   {
     "code": "SB",
     "code3": "SLB",
+    "numeric": 90,
     "name": "Solomon Islands",
     "aliases": [
       "Solomon Islands"
@@ -1820,6 +2017,7 @@ export const COUNTRIES = [
   {
     "code": "SO",
     "code3": "SOM",
+    "numeric": 706,
     "name": "Somalia",
     "aliases": [
       "Somalia"
@@ -1829,6 +2027,7 @@ export const COUNTRIES = [
   {
     "code": "ZA",
     "code3": "ZAF",
+    "numeric": 710,
     "name": "South Africa",
     "aliases": [
       "South Africa"
@@ -1838,6 +2037,7 @@ export const COUNTRIES = [
   {
     "code": "GS",
     "code3": "SGS",
+    "numeric": 239,
     "name": "South Georgia & South Sandwich Islands",
     "aliases": [
       "South Georgia & South Sandwich Islands",
@@ -1848,6 +2048,7 @@ export const COUNTRIES = [
   {
     "code": "KR",
     "code3": "KOR",
+    "numeric": 410,
     "name": "South Korea",
     "aliases": [
       "South Korea",
@@ -1859,6 +2060,7 @@ export const COUNTRIES = [
   {
     "code": "SS",
     "code3": "SSD",
+    "numeric": 728,
     "name": "South Sudan",
     "aliases": [
       "South Sudan"
@@ -1868,6 +2070,7 @@ export const COUNTRIES = [
   {
     "code": "ES",
     "code3": "ESP",
+    "numeric": 724,
     "name": "Spain",
     "aliases": [
       "Spain"
@@ -1877,6 +2080,7 @@ export const COUNTRIES = [
   {
     "code": "LK",
     "code3": "LKA",
+    "numeric": 144,
     "name": "Sri Lanka",
     "aliases": [
       "Sri Lanka"
@@ -1886,6 +2090,7 @@ export const COUNTRIES = [
   {
     "code": "BL",
     "code3": "BLM",
+    "numeric": 652,
     "name": "St. Barthélemy",
     "aliases": [
       "St. Barthélemy",
@@ -1896,6 +2101,7 @@ export const COUNTRIES = [
   {
     "code": "SH",
     "code3": "SHN",
+    "numeric": 654,
     "name": "St. Helena",
     "aliases": [
       "St. Helena",
@@ -1906,6 +2112,7 @@ export const COUNTRIES = [
   {
     "code": "KN",
     "code3": "KNA",
+    "numeric": 659,
     "name": "St. Kitts & Nevis",
     "aliases": [
       "St. Kitts & Nevis",
@@ -1916,6 +2123,7 @@ export const COUNTRIES = [
   {
     "code": "LC",
     "code3": "LCA",
+    "numeric": 662,
     "name": "St. Lucia",
     "aliases": [
       "St. Lucia",
@@ -1926,6 +2134,7 @@ export const COUNTRIES = [
   {
     "code": "MF",
     "code3": "MAF",
+    "numeric": 663,
     "name": "St. Martin",
     "aliases": [
       "St. Martin",
@@ -1936,6 +2145,7 @@ export const COUNTRIES = [
   {
     "code": "PM",
     "code3": "SPM",
+    "numeric": 666,
     "name": "St. Pierre & Miquelon",
     "aliases": [
       "St. Pierre & Miquelon",
@@ -1946,6 +2156,7 @@ export const COUNTRIES = [
   {
     "code": "VC",
     "code3": "VCT",
+    "numeric": 670,
     "name": "St. Vincent & Grenadines",
     "aliases": [
       "St. Vincent & Grenadines",
@@ -1956,6 +2167,7 @@ export const COUNTRIES = [
   {
     "code": "SD",
     "code3": "SDN",
+    "numeric": 729,
     "name": "Sudan",
     "aliases": [
       "Sudan",
@@ -1966,6 +2178,7 @@ export const COUNTRIES = [
   {
     "code": "SR",
     "code3": "SUR",
+    "numeric": 740,
     "name": "Suriname",
     "aliases": [
       "Suriname"
@@ -1975,6 +2188,7 @@ export const COUNTRIES = [
   {
     "code": "SJ",
     "code3": "SJM",
+    "numeric": 744,
     "name": "Svalbard & Jan Mayen",
     "aliases": [
       "Svalbard & Jan Mayen",
@@ -1985,6 +2199,7 @@ export const COUNTRIES = [
   {
     "code": "SE",
     "code3": "SWE",
+    "numeric": 752,
     "name": "Sweden",
     "aliases": [
       "Sweden"
@@ -1994,6 +2209,7 @@ export const COUNTRIES = [
   {
     "code": "CH",
     "code3": "CHE",
+    "numeric": 756,
     "name": "Switzerland",
     "aliases": [
       "Switzerland"
@@ -2003,6 +2219,7 @@ export const COUNTRIES = [
   {
     "code": "SY",
     "code3": "SYR",
+    "numeric": 760,
     "name": "Syria",
     "aliases": [
       "Syria",
@@ -2014,6 +2231,7 @@ export const COUNTRIES = [
   {
     "code": "TW",
     "code3": "TWN",
+    "numeric": 158,
     "name": "Taiwan",
     "aliases": [
       "Taiwan"
@@ -2023,6 +2241,7 @@ export const COUNTRIES = [
   {
     "code": "TJ",
     "code3": "TJK",
+    "numeric": 762,
     "name": "Tajikistan",
     "aliases": [
       "Tajikistan"
@@ -2032,6 +2251,7 @@ export const COUNTRIES = [
   {
     "code": "TZ",
     "code3": "TZA",
+    "numeric": 834,
     "name": "Tanzania",
     "aliases": [
       "Tanzania",
@@ -2043,6 +2263,7 @@ export const COUNTRIES = [
   {
     "code": "TH",
     "code3": "THA",
+    "numeric": 764,
     "name": "Thailand",
     "aliases": [
       "Thailand"
@@ -2052,6 +2273,7 @@ export const COUNTRIES = [
   {
     "code": "TL",
     "code3": "TLS",
+    "numeric": 626,
     "name": "Timor-Leste",
     "aliases": [
       "Timor-Leste"
@@ -2061,6 +2283,7 @@ export const COUNTRIES = [
   {
     "code": "TG",
     "code3": "TGO",
+    "numeric": 768,
     "name": "Togo",
     "aliases": [
       "Togo"
@@ -2070,6 +2293,7 @@ export const COUNTRIES = [
   {
     "code": "TK",
     "code3": "TKL",
+    "numeric": 772,
     "name": "Tokelau",
     "aliases": [
       "Tokelau"
@@ -2079,6 +2303,7 @@ export const COUNTRIES = [
   {
     "code": "TO",
     "code3": "TON",
+    "numeric": 776,
     "name": "Tonga",
     "aliases": [
       "Tonga"
@@ -2088,6 +2313,7 @@ export const COUNTRIES = [
   {
     "code": "TT",
     "code3": "TTO",
+    "numeric": 780,
     "name": "Trinidad & Tobago",
     "aliases": [
       "Trinidad & Tobago",
@@ -2098,6 +2324,7 @@ export const COUNTRIES = [
   {
     "code": "TN",
     "code3": "TUN",
+    "numeric": 788,
     "name": "Tunisia",
     "aliases": [
       "Tunisia"
@@ -2107,6 +2334,7 @@ export const COUNTRIES = [
   {
     "code": "TR",
     "code3": "TUR",
+    "numeric": 792,
     "name": "Türkiye",
     "aliases": [
       "Türkiye"
@@ -2116,6 +2344,7 @@ export const COUNTRIES = [
   {
     "code": "TM",
     "code3": "TKM",
+    "numeric": 795,
     "name": "Turkmenistan",
     "aliases": [
       "Turkmenistan"
@@ -2125,6 +2354,7 @@ export const COUNTRIES = [
   {
     "code": "TC",
     "code3": "TCA",
+    "numeric": 796,
     "name": "Turks & Caicos Islands",
     "aliases": [
       "Turks & Caicos Islands",
@@ -2135,6 +2365,7 @@ export const COUNTRIES = [
   {
     "code": "TV",
     "code3": "TUV",
+    "numeric": 798,
     "name": "Tuvalu",
     "aliases": [
       "Tuvalu"
@@ -2144,6 +2375,7 @@ export const COUNTRIES = [
   {
     "code": "UM",
     "code3": "UMI",
+    "numeric": 581,
     "name": "U.S. Outlying Islands",
     "aliases": [
       "U.S. Outlying Islands",
@@ -2154,6 +2386,7 @@ export const COUNTRIES = [
   {
     "code": "VI",
     "code3": "VIR",
+    "numeric": 850,
     "name": "U.S. Virgin Islands",
     "aliases": [
       "U.S. Virgin Islands",
@@ -2164,6 +2397,7 @@ export const COUNTRIES = [
   {
     "code": "UG",
     "code3": "UGA",
+    "numeric": 800,
     "name": "Uganda",
     "aliases": [
       "Uganda"
@@ -2173,6 +2407,7 @@ export const COUNTRIES = [
   {
     "code": "UA",
     "code3": "UKR",
+    "numeric": 804,
     "name": "Ukraine",
     "aliases": [
       "Ukraine"
@@ -2182,6 +2417,7 @@ export const COUNTRIES = [
   {
     "code": "AE",
     "code3": "ARE",
+    "numeric": 784,
     "name": "United Arab Emirates",
     "aliases": [
       "United Arab Emirates",
@@ -2192,6 +2428,7 @@ export const COUNTRIES = [
   {
     "code": "GB",
     "code3": "GBR",
+    "numeric": 826,
     "name": "United Kingdom of Great Britain and Northern Ireland",
     "aliases": [
       "UK",
@@ -2203,6 +2440,7 @@ export const COUNTRIES = [
   {
     "code": "US",
     "code3": "USA",
+    "numeric": 840,
     "name": "United States of America",
     "aliases": [
       "US",
@@ -2215,6 +2453,7 @@ export const COUNTRIES = [
   {
     "code": "UY",
     "code3": "URY",
+    "numeric": 858,
     "name": "Uruguay",
     "aliases": [
       "Uruguay"
@@ -2224,6 +2463,7 @@ export const COUNTRIES = [
   {
     "code": "UZ",
     "code3": "UZB",
+    "numeric": 860,
     "name": "Uzbekistan",
     "aliases": [
       "Uzbekistan"
@@ -2233,6 +2473,7 @@ export const COUNTRIES = [
   {
     "code": "VU",
     "code3": "VUT",
+    "numeric": 548,
     "name": "Vanuatu",
     "aliases": [
       "Vanuatu"
@@ -2242,6 +2483,7 @@ export const COUNTRIES = [
   {
     "code": "VA",
     "code3": "VAT",
+    "numeric": 336,
     "name": "Vatican City",
     "aliases": [
       "Vatican City",
@@ -2253,6 +2495,7 @@ export const COUNTRIES = [
   {
     "code": "VE",
     "code3": "VEN",
+    "numeric": 862,
     "name": "Venezuela",
     "aliases": [
       "Venezuela",
@@ -2263,6 +2506,7 @@ export const COUNTRIES = [
   {
     "code": "VN",
     "code3": "VNM",
+    "numeric": 704,
     "name": "Vietnam",
     "aliases": [
       "Vietnam",
@@ -2273,6 +2517,7 @@ export const COUNTRIES = [
   {
     "code": "WF",
     "code3": "WLF",
+    "numeric": 876,
     "name": "Wallis & Futuna",
     "aliases": [
       "Wallis & Futuna",
@@ -2283,6 +2528,7 @@ export const COUNTRIES = [
   {
     "code": "EH",
     "code3": "ESH",
+    "numeric": 732,
     "name": "Western Sahara",
     "aliases": [
       "Western Sahara"
@@ -2292,6 +2538,7 @@ export const COUNTRIES = [
   {
     "code": "YE",
     "code3": "YEM",
+    "numeric": 887,
     "name": "Yemen",
     "aliases": [
       "Yemen"
@@ -2301,6 +2548,7 @@ export const COUNTRIES = [
   {
     "code": "ZM",
     "code3": "ZMB",
+    "numeric": 894,
     "name": "Zambia",
     "aliases": [
       "Zambia"
@@ -2310,6 +2558,7 @@ export const COUNTRIES = [
   {
     "code": "ZW",
     "code3": "ZWE",
+    "numeric": 716,
     "name": "Zimbabwe",
     "aliases": [
       "Zimbabwe"

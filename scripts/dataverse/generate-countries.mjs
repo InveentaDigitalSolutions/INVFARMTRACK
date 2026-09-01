@@ -49,6 +49,9 @@ const countries = parseCsv(await res.text())
   .map((c) => ({
     code: c['ISO3166-1-Alpha-2'],
     code3: c['ISO3166-1-Alpha-3'],
+    // M49, which is what UN trade data speaks: its rows name partners as 340,
+    // not HN.
+    numeric: Number(c['ISO3166-1-numeric']) || 0,
     // CLDR is what a person would say — except where it abbreviates to the
     // point of uselessness on paperwork: the United States is listed as "US".
     name: (c['CLDR display name'] || '').length > 3
@@ -85,6 +88,8 @@ export interface Country {
   /** ISO 3166-1 alpha-2, which is what an airway bill carries. */
   code: string;
   code3: string;
+  /** UN M49 numeric code, as used by Comtrade. */
+  numeric: number;
   name: string;
   /** Other spellings the app's own data uses for it. */
   aliases: string[];

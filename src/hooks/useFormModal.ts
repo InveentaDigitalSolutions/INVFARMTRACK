@@ -86,3 +86,59 @@ export function useConfirmDialog() {
 
   return { open, pending, requestDelete, close };
 }
+
+/**
+ * The rows that survive a confirmed delete.
+ *
+ * By identity, not by position. A position is captured when the delete button
+ * is pressed and used when the dialog is confirmed a second or two later, and
+ * in between the table can reload: `useRecords` re-reads after any write, and
+ * Dataverse does not promise the same order twice. The row at index 7 is then
+ * a different row, and a basket in C1 deletes one in E3.
+ *
+ * Falling back to the index keeps LocalStore rows working, where a record that
+ * has never been saved has no id yet.
+ */
+export function withoutPending<T>(
+  data: T[],
+  pending: { row: unknown; index: number } | null
+): T[] {
+  if (!pending) return data;
+  const id = (pending.row as { id?: unknown } | null)?.id;
+  if (id !== undefined && id !== null && id !== "") {
+    const next = data.filter((row) => (row as { id?: unknown }).id !== id);
+    // A delete that removes nothing looks exactly like a button that does not
+    // work, which is how the last one went unnoticed for a week.
+    if (next.length === data.length) {
+      console.error("[data] nothing to delete: no row with id", id);
+    }
+    return next;
+  }
+  return data.filter((_, i) => i !== pending.index);
+}
+
+/**
+ * The rows after an edit is saved, with the edited one replaced.
+ *
+ * Same hazard as deleting, same answer: the record being edited is found by
+ * its id, and only falls back to the position when it has none.
+ */
+export function withEdited<T>(
+  data: T[],
+  form: { editIndex: number | null; values: Record<string, unknown> },
+  values: Record<string, unknown>
+): T[] {
+  const id = form.values?.id;
+  if (id !== undefined && id !== null && id !== "") {
+    const at = data.findIndex((row) => (row as { id?: unknown }).id === id);
+    if (at >= 0) {
+      const next = [...data];
+      next[at] = values as T;
+      return next;
+    }
+  }
+  if (form.editIndex === null) return [...data, values as T];
+  const next = [...data];
+  next[form.editIndex] = values as T;
+  return next;
+}

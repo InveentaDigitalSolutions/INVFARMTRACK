@@ -9,7 +9,7 @@ import StatCard from "../components/StatCard";
 import RankedBars from "../components/RankedBars";
 import FormModal from "../components/FormModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useFormModal, useConfirmDialog } from "../hooks/useFormModal";
+import { useFormModal, useConfirmDialog, withoutPending, withEdited } from "../hooks/useFormModal";
 import { useRecords } from "../hooks/useRecords";
 import { stockLevels, lowStock, direction, type Movement } from "../services/stock";
 import type { InputsRow } from "../services/rowTypes.generated";
@@ -163,10 +163,8 @@ export default function InventoryPage() {
   const confirm = useConfirmDialog();
 
   const handleSave = (data: Record<string, unknown>[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
-    if (form.isEdit && form.editIndex !== null) {
-      const updated = [...data];
-      updated[form.editIndex] = values as any;
-      setData(updated);
+    if (form.isEdit) {
+      setData(withEdited(data, form, values));
     } else {
       setData([...data, values]);
     }
@@ -174,10 +172,7 @@ export default function InventoryPage() {
   };
 
   const handleDelete = (data: Record<string, unknown>[], setData: (d: any) => void) => {
-    if (confirm.pending) {
-      const updated = data.filter((_, i) => i !== confirm.pending!.index);
-      setData(updated);
-    }
+    if (confirm.pending) setData(withoutPending(data, confirm.pending));
   };
 
   const renderTab = () => {
