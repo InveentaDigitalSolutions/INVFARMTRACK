@@ -337,7 +337,12 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
   }
 
   async delete(id: string): Promise<void> {
-    await this.client.deleteRecordAsync(this.dataSourceName, id);
+    // The result was thrown away, so a refused delete looked like a successful
+    // one: the row left the screen, the request failed, and the next load put
+    // it back with nothing anywhere saying why. Dataverse refuses to delete a
+    // customer that forecast lines still point at, which is exactly the case
+    // that reached the nursery.
+    this.unwrap(await this.client.deleteRecordAsync(this.dataSourceName, id));
   }
 
   async count(): Promise<number> {

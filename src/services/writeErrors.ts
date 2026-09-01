@@ -38,6 +38,15 @@ export function describeError(err: unknown): string {
   const text = String(raw || "The write was rejected and gave no reason.");
   // Dataverse wraps the real cause several layers deep; the tail is the part
   // that says which column it objected to.
+  // Dataverse's own words for "something still points at this" run to a
+  // paragraph of object type codes and GUIDs. What a person needs is the name
+  // of the thing in the way.
+  const restricted = /Restricting entity bv_(\w+)/.exec(text);
+  if (/cascade restrict|0x80040227/i.test(text) && restricted) {
+    const what = restricted[1].replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+    return `Still in use: ${what} records point at this one. Delete or re-point those first.`;
+  }
+
   const inner = /InnerException\s*:\s*([\s\S]+)$/.exec(text);
   return (inner ? inner[1] : text).replace(/\s+/g, " ").slice(0, 300);
 }

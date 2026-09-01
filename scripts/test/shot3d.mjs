@@ -143,6 +143,13 @@ if (process.env.ZOOM) {
   }
   await page.waitForTimeout(1200)
 }
+// Click a bed, so the camera fly-to can be looked at.
+if (process.env.PICK) {
+  const box = await canvas.boundingBox()
+  await page.mouse.click(box.x + box.width * Number(process.env.PICKX ?? 0.5),
+                         box.y + box.height * Number(process.env.PICKY ?? 0.55))
+  await page.waitForTimeout(1600)
+}
 const target = process.env.FULL ? page
   : process.env.CLIP ? page.locator('canvas').first().locator('xpath=..')
   : canvas

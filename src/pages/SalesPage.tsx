@@ -28,6 +28,8 @@ import { useInvoiceNumber } from "../hooks/useInvoiceNumber";
 import { COUNTRIES } from "../services/countries.generated";
 import { countryFor } from "../services/tariff";
 import { closuresOn, nextWorkingDay, type HolidayRow } from "../services/workingDays";
+import { portDistanceKm, type PortRow } from "../services/portPicker";
+import { formatKm } from "../services/geo";
 import { toGrid, toRecords, weeksIn, type ForecastRecord, type ForecastRow } from "../services/demandForecast";
 import type { CustomersRow, OrdersRow, PackingRow, ShipmentsRow } from "../services/rowTypes.generated";
 import {
@@ -40,9 +42,12 @@ const tabs = [
   { id: "forecast", label: "Demand Forecast" },
   { id: "orders", label: "Orders" },
   { id: "customers", label: "Customers" },
-  // Ports sit here because price is keyed on them and this is where prices are
-  // kept. They are also what an order ships to.
-  { id: "ports", label: "Ports" },
+  // Both sit here because price is keyed on the destination and this is where
+  // prices are kept. They are one table — a place goods can be delivered to —
+  // but nobody thinks about them together: everything flies today, and a list
+  // that mixes 3,348 harbours into the airport you are looking for is no list.
+  { id: "ports", label: "Seaports" },
+  { id: "airports", label: "Airports" },
 ];
 
 const initialShipments: ShipmentsRow[] = [];
@@ -130,8 +135,18 @@ const customerOptions = (rows: { name?: string }[]) =>
 const portFields = [
   { title: "Port", columns: 2 as const, fields: [
     { key: "code", label: "Port ID", type: "text" as const, readOnly: true, placeholder: "PRT-001 (auto)" },
-    { key: "name", label: "Name", type: "text" as const, required: true, placeholder: "Miami, Rotterdam" },
-    { key: "country", label: "Country", type: "text" as const },
+    { key: "kind", label: "Kind", type: "toggle" as const, options: [
+      { value: "Airport", label: "Airport" },
+      { value: "Seaport", label: "Seaport" },
+    ] },
+    { key: "name", label: "Name", type: "text" as const, required: true,
+      placeholder: "MIA · Miami International Airport, United States" },
+    // What the airway bill carries, and what people search by.
+    { key: "locator", label: "IATA / LOCODE", type: "text" as const, placeholder: "MIA, NLRTM" },
+    { key: "country", label: "Country", type: "select" as const, searchable: true,
+      options: COUNTRIES.map((c) => ({ value: c.name, label: `${c.name} (${c.code})` })) },
+    { key: "latitude", label: "Latitude", type: "text" as const, placeholder: "25.7932" },
+    { key: "longitude", label: "Longitude", type: "text" as const, placeholder: "-80.2906" },
     { key: "active", label: "Shipping there", type: "boolean" as const },
     { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
   ]},
@@ -841,30 +856,44 @@ export default function SalesPage() {
         );
 
       case "ports":
+      case "airports": {
+        const wantAirports = tab === "airports";
+        const kind = wantAirports ? "Airport" : "Seaport";
+        const shown = (ports as PortRow[]).filter(
+          (p) => String((p as Record<string, unknown>).kind ?? "") === kind
+        );
         return (
           <>
             <div className="mb-3 text-[12px] text-navy-500 bg-sand-50 border border-sand-200 rounded-lg px-3.5 py-2.5">
-              Where stock ships to. Price is keyed on the port as well as the
-              customer, because the freight is — the same cutting costs a
-              different amount into Miami than into Rotterdam.
+              {wantAirports
+                ? `Every airport with an IATA code and scheduled service — ${shown.length.toLocaleString()} of them, from OurAirports. Everything ships by air today, so this is the list that matters. Search by code: SAP, XPL, MIA.`
+                : `Every seaport the UN issues a code for — ${shown.length.toLocaleString()} of them, from the World Port Index. Kept for the day something goes by sea; the price list can already tell the two apart.`}
             </div>
             <DataTable
               columns={[
+                { key: "locator", label: wantAirports ? "IATA" : "LOCODE", render: (r) => (
+                  <span className="font-mono text-navy-700">{String(r.locator ?? "—")}</span>
+                ) },
                 { key: "name", label: "Name" },
                 { key: "country", label: "Country" },
+                { key: "distance", label: "From the nursery", render: (r) => {
+                  const km = portDistanceKm(ports as PortRow[], r.name);
+                  return km === null
+                    ? <span className="text-navy-300">—</span>
+                    : <span className="font-mono tabular-nums text-navy-600">{formatKm(km)}</span>;
+                } },
                 { key: "active", label: "Shipping there", render: (r) => (
                   <Badge variant={r.active === false ? "gray" : "green"}>
                     {r.active === false ? "No" : "Yes"}
                   </Badge>
                 ) },
-                { key: "notes", label: "Notes" },
               ]}
-              data={ports}
-              onAdd={portForm.openCreate}
+              data={shown as Record<string, unknown>[]}
+              onAdd={() => portForm.openCreateWith({ kind })}
               onEdit={(row, i) => portForm.openEdit(row as never, i)}
               onDelete={(row, i) => portConfirm.requestDelete(row, i)}
-              addLabel="Add Port"
-              searchPlaceholder="Search ports..."
+              addLabel={wantAirports ? "Add Airport" : "Add Seaport"}
+              searchPlaceholder={wantAirports ? "Search airports…" : "Search seaports…"}
             />
             <FormModal
               open={portForm.open} onClose={portForm.close}
@@ -879,6 +908,7 @@ export default function SalesPage() {
             />
           </>
         );
+      }
     }
   };
 

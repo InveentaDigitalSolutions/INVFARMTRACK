@@ -1157,6 +1157,76 @@ function CameraHeading({ onChange }: { onChange: (deg: number) => void }) {
   return null;
 }
 
+/**
+ * Fly the camera to what was just selected.
+ *
+ * A bed is 1.2 m across in a house 110 m wide. Picking one from a table and
+ * then hunting for it by dragging is the difference between a model somebody
+ * uses and a model somebody looks at once — and the far corner of C3 is a
+ * long way from wherever the camera happens to be.
+ *
+ * Eased rather than cut, and only when the selection changes: a cut leaves you
+ * with no idea where you have been put, and re-framing every frame would fight
+ * the hands on the mouse.
+ */
+function FocusOnSelection({
+  placements,
+  selectedBedId,
+}: {
+  placements: BedPlacement[];
+  selectedBedId: string | null;
+}) {
+  const flight = useRef<{
+    from: THREE.Vector3;
+    to: THREE.Vector3;
+    fromTarget: THREE.Vector3;
+    toTarget: THREE.Vector3;
+    start: number;
+  } | null>(null);
+  const lastId = useRef<string | null>(null);
+
+  useFrame(({ camera, controls, clock }) => {
+    const orbit = controls as unknown as {
+      target?: THREE.Vector3;
+      update?: () => void;
+    } | null;
+
+    if (selectedBedId !== lastId.current) {
+      lastId.current = selectedBedId;
+      const found = placements.find((p) => p.bed.bedId === selectedBedId);
+      if (found && orbit?.target) {
+        const target = new THREE.Vector3(found.x, found.y + 0.5, found.z);
+        // Close enough to read the bed, far enough to keep its neighbours in
+        // frame — a plant is not judged in isolation.
+        const back = new THREE.Vector3(15, 12, 18);
+        flight.current = {
+          from: camera.position.clone(),
+          to: target.clone().add(back),
+          fromTarget: orbit.target.clone(),
+          toTarget: target,
+          start: clock.elapsedTime,
+        };
+      } else {
+        flight.current = null;
+      }
+    }
+
+    const run = flight.current;
+    if (!run || !orbit?.target) return;
+
+    const t = Math.min(1, (clock.elapsedTime - run.start) / 0.7);
+    // Ease out: quick away from where you were, gentle into where you are
+    // going, which is what makes it read as travel rather than a jump.
+    const e = 1 - Math.pow(1 - t, 3);
+    camera.position.lerpVectors(run.from, run.to, e);
+    orbit.target.lerpVectors(run.fromTarget, run.toTarget, e);
+    orbit.update?.();
+    if (t >= 1) flight.current = null;
+  });
+
+  return null;
+}
+
 function ShadeCloth({ placements }: { placements: BedPlacement[] }) {
   const panels = useMemo(() => {
     // Ground beds carry the run's identity; a basket above one sits under
@@ -1452,6 +1522,7 @@ export default function ShadehouseScene({
 
       {showTopography && <Topography span={span} depth={depth} />}
       {onCameraHeading && <CameraHeading onChange={onCameraHeading} />}
+      <FocusOnSelection placements={placements} selectedBedId={selectedBedId} />
 
       {showPlotLabels &&
         plotAnchors.map((a) => (

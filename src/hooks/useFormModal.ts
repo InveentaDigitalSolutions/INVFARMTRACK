@@ -43,6 +43,19 @@ export function useFormModal(defaults?: FormValues) {
     setOpen(true);
   }, [defaults]);
 
+  /**
+   * Open a blank form with what the context already knows filled in — pressing
+   * "Add Airport" on the airports tab should not then ask which kind it is.
+   *
+   * Kept separate from openCreate because that one is passed straight to
+   * onClick in a dozen places, and a MouseEvent is not a set of values.
+   */
+  const openCreateWith = useCallback((preset: FormValues) => {
+    setValues({ ...blankFrom(defaults), ...preset });
+    setEditIndex(null);
+    setOpen(true);
+  }, [defaults]);
+
   const openEdit = useCallback((row: FormValues, index: number) => {
     setValues({ ...row });
     setEditIndex(index);
@@ -64,6 +77,7 @@ export function useFormModal(defaults?: FormValues) {
     editIndex,
     isEdit: editIndex !== null,
     openCreate,
+    openCreateWith,
     openEdit,
     close,
     onChange,
