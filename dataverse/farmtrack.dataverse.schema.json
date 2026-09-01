@@ -1831,6 +1831,14 @@
           "description": "Postal address."
         },
         {
+          "schemaName": "bv_Country",
+          "displayName": "Country",
+          "type": "string",
+          "maxLength": 100,
+          "required": false,
+          "description": "Where the customer receives. It decides the currency on their paperwork and, more usefully, which public holidays close their customs hall \u2014 a box landing on one sits on a ramp for the weekend."
+        },
+        {
           "schemaName": "bv_TaxId",
           "displayName": "Tax ID",
           "type": "string",
@@ -6370,6 +6378,14 @@
           "description": "What is actually cut and boxed. One of: L&E, E, Bulbs, Tips."
         },
         {
+          "schemaName": "bv_HSCode",
+          "displayName": "HS code",
+          "type": "string",
+          "maxLength": 12,
+          "required": false,
+          "description": "Customs heading for the export paperwork. Left blank it is derived from what the product is \u2014 unrooted cuttings are 0602.10, rooted 0602.90, bulbs 0601.10 \u2014 and only needs filling in when a broker says otherwise."
+        },
+        {
           "schemaName": "bv_IsActive",
           "displayName": "Active",
           "type": "boolean",
@@ -6509,6 +6525,26 @@
           "type": "string",
           "maxLength": 100,
           "required": false
+        },
+        {
+          "schemaName": "bv_Latitude",
+          "displayName": "Latitude",
+          "type": "decimal",
+          "precision": 6,
+          "minValue": -90,
+          "maxValue": 90,
+          "required": false,
+          "description": "Where the place is. Both sources carry it, and without it a destination is a name the app cannot measure anything against \u2014 how far the freight travels, or what the weather is doing when it lands."
+        },
+        {
+          "schemaName": "bv_Longitude",
+          "displayName": "Longitude",
+          "type": "decimal",
+          "precision": 6,
+          "minValue": -180,
+          "maxValue": 180,
+          "required": false,
+          "description": "See Latitude."
         },
         {
           "schemaName": "bv_IsActive",
@@ -6756,6 +6792,63 @@
           "required": false
         }
       ]
+    },
+    {
+      "schemaName": "bv_Holiday",
+      "displayName": "Holiday",
+      "displayCollectionName": "Holidays",
+      "ownershipType": "UserOwned",
+      "description": "A public holiday, here and at the far end. Two different problems: on a Honduran holiday nobody cuts, packs or drives, and on the destination's holiday customs is shut and the box sits on a ramp. Both are knowable months ahead and neither is anywhere in the app today.\\n\\nLoaded from the Nager.Date public-holiday API for the countries the nursery actually deals with \u2014 see scripts/dataverse/import-holidays.mjs.",
+      "columns": [
+        {
+          "schemaName": "bv_HolidayCode",
+          "displayName": "Holiday ID",
+          "type": "autonumber",
+          "autoNumberFormat": "HOL-{SEQNUM:5}",
+          "maxLength": 40,
+          "required": true,
+          "isPrimaryName": true,
+          "description": "Auto-generated identifier, format HOL-00001."
+        },
+        {
+          "schemaName": "bv_Date",
+          "displayName": "Date",
+          "type": "date",
+          "required": true,
+          "description": "The day itself."
+        },
+        {
+          "schemaName": "bv_HolidayName",
+          "displayName": "Name",
+          "type": "string",
+          "maxLength": 120,
+          "required": false,
+          "description": "What it is called where it is kept \u2014 D\u00eda de Moraz\u00f3n, Koningsdag."
+        },
+        {
+          "schemaName": "bv_CountryCode",
+          "displayName": "Country code",
+          "type": "string",
+          "maxLength": 2,
+          "required": false,
+          "description": "ISO 3166-1 alpha-2. The code rather than the name because the source speaks in codes and names have several spellings."
+        },
+        {
+          "schemaName": "bv_Country",
+          "displayName": "Country",
+          "type": "string",
+          "maxLength": 100,
+          "required": false,
+          "description": "Spelled out, for reading."
+        },
+        {
+          "schemaName": "bv_Notes",
+          "displayName": "Notes",
+          "type": "memo",
+          "required": false
+        }
+      ],
+      "entitySetName": "bv_holidays"
     }
   ]
 }

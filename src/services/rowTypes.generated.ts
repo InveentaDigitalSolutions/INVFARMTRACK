@@ -153,6 +153,7 @@ export interface CustomersRow {
   email?: string;
   phone?: string;
   address?: string;
+  country?: string;
   taxId?: string;
   deliverToName?: string;
   deliverToAddress?: string;
@@ -273,6 +274,17 @@ export interface HarvestRow {
   bed?: string;
   plant?: string;
   primaryName?: string;
+  [key: string]: unknown;
+}
+
+export interface HolidaysRow {
+  id: string;
+  code?: string;
+  date?: string;
+  name?: string;
+  countryCode?: string;
+  country?: string;
+  notes?: string;
   [key: string]: unknown;
 }
 
@@ -448,6 +460,7 @@ export interface PlantSizesRow {
   bundleSize?: number;
   productType?: string;
   cuttingType?: string;
+  hsCode?: string;
   customer?: string;
   port?: string;
   freightMode?: string;
@@ -468,6 +481,8 @@ export interface PortsRow {
   locator?: string;
   kind?: string;
   country?: string;
+  latitude?: number;
+  longitude?: number;
   active?: boolean;
   notes?: string;
   [key: string]: unknown;

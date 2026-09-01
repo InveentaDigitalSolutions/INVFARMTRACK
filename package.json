@@ -23,7 +23,7 @@
     "dataverse:seed-fix": "node scripts/dataverse/fix-autonumber-seeds.mjs",
     "test:math": "tsx scripts/test/invoiceMath.test.mts",
     "test:rules": "tsx scripts/test/infrastructureRules.test.mts",
-    "test": "npm run test:math && npm run test:rules && npm run test:rotation && npm run test:schedule && npm run test:forecast && npm run test:insight && npm run test:availability && npm run test:beds && npm run test:stock && npm run test:variety && npm run test:modules && npm run test:sync && npm run test:payload && npm run test:terrain && npm run test:rate && npm run test:solar && npm run test:light && npm run test:moon && npm run test:mooninsight && npm run test:phenology && npm run test:capacity && npm run test:price && npm run test:growth && npm run test:postlines && npm run test:ports",
+    "test": "npm run test:math && npm run test:rules && npm run test:rotation && npm run test:schedule && npm run test:forecast && npm run test:insight && npm run test:availability && npm run test:beds && npm run test:stock && npm run test:variety && npm run test:modules && npm run test:sync && npm run test:payload && npm run test:terrain && npm run test:rate && npm run test:solar && npm run test:light && npm run test:moon && npm run test:mooninsight && npm run test:phenology && npm run test:capacity && npm run test:price && npm run test:growth && npm run test:postlines && npm run test:ports && npm run test:geo && npm run test:tariff && npm run test:days",
     "dataverse:photos": "node scripts/dataverse/sync-user-photos.mjs",
     "test:rotation": "tsx scripts/test/bedRotation.test.mts",
     "test:schedule": "tsx scripts/test/productionSchedule.test.mts",
@@ -60,7 +60,14 @@
     "test:growth": "tsx scripts/test/growthProgress.test.mts",
     "test:postlines": "tsx scripts/test/postLines.test.mts",
     "test:ports": "tsx scripts/test/portPicker.test.mts",
-    "test:rows": "VITE_DATAVERSE_URL= vite build --mode development && node scripts/test/rowactions.mjs"
+    "test:rows": "VITE_DATAVERSE_URL= vite build --mode development && node scripts/test/rowactions.mjs",
+    "test:geo": "tsx scripts/test/geo.test.mts",
+    "test:tariff": "tsx scripts/test/tariff.test.mts",
+    "dataverse:countries": "node scripts/dataverse/generate-countries.mjs",
+    "test:days": "tsx scripts/test/workingDays.test.mts",
+    "dataverse:holidays": "node scripts/dataverse/import-holidays.mjs",
+    "dataverse:ports": "node scripts/dataverse/import-ports.mjs",
+    "dataverse:plant-names": "node scripts/dataverse/check-plant-names.mjs"
   },
   "dependencies": {
     "@fontsource-variable/playfair-display": "^5.3.0",

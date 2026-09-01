@@ -340,6 +340,9 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       // company's details ended up hardcoded there instead.
       phone: "bv_phone",
       address: "bv_address",
+      // Decides the currency on their paperwork and which public holidays shut
+      // their customs hall — see services/workingDays.ts.
+      country: "bv_country",
       taxId: "bv_taxid",
       deliverToName: "bv_delivertoname",
       deliverToAddress: "bv_delivertoaddress",
@@ -732,6 +735,9 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       bundleSize: "bv_bundlesize",
       productType: "bv_producttype",
       cuttingType: "bv_cuttingtype",
+      // Blank means "whatever this product is" — see services/tariff.ts. Only
+      // filled in when a broker rules differently.
+      hsCode: "bv_hscode",
       // Price lives on the same row. Size existed only to be priced and packed,
       // so two tables meant two screens describing one thing. Customer, port
       // and dates may be blank, meaning any — the most specific row wins, and
@@ -782,6 +788,22 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
     },
   },
   /**
+   * Public holidays here and at the far end. Nothing is cut or driven on a
+   * Honduran holiday; nothing clears customs on the destination's.
+   */
+  holidays: {
+    dataSource: "bv_holidays",
+    primaryKey: "bv_holidayid",
+    fields: {
+      code: "bv_holidaycode",
+      date: "bv_date",
+      name: "bv_holidayname",
+      countryCode: "bv_countrycode",
+      country: "bv_country",
+      notes: "bv_notes",
+    },
+  },
+  /**
    * Where goods can be delivered: airports and seaports both. Price is keyed
    * on them, because the freight is — and the freight mode decides which of
    * the two kinds can even be named.
@@ -797,6 +819,11 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       locator: "bv_code",
       kind: "bv_kind",
       country: "bv_country",
+      // Carried by both source lists. Without them a destination is a name
+      // nothing can be measured against — how far the freight goes, or what
+      // the weather is doing where it lands.
+      latitude: "bv_latitude",
+      longitude: "bv_longitude",
       active: "bv_isactive",
       notes: "bv_notes",
     },
@@ -928,6 +955,7 @@ export const ENABLED_TABLES = new Set<string>([
   "demandForecasts",
   "components",
   "inputComponents",
+  "holidays",
 ]);
 
 /**

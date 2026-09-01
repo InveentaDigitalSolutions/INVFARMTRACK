@@ -16,7 +16,9 @@ import { nextSeasonName, mixedBedKindProblem, allBaskets } from "../services/inf
 import ProductionOverview from "../components/ProductionOverview";
 import { useInputNutrients } from "../hooks/useInputNutrients";
 import { expandBeds, expandPlantLines } from "../services/expandBeds";
-import { portOptions, portLabel, mismatchedPort, type PortRow } from "../services/portPicker";
+import { portOptions, portLabel, mismatchedPort, portDistanceKm, type PortRow } from "../services/portPicker";
+import { formatKm } from "../services/geo";
+import { tariffFor, hsCodeFor } from "../services/tariff";
 import { emptyLine } from "../components/PlantLines";
 import type { FertilizationRow, HarvestRow, IrrigationRow, PlantingsRow, PlantsRow, PruningRow, SeasonsRow, TasksRow, TreatmentsRow } from "../services/rowTypes.generated";
 
@@ -299,6 +301,22 @@ const plantSizeFields = [
       { value: "Bulbs", label: "Bulbs" },
       { value: "Tips", label: "Tips" },
     ] },
+    // The customs heading follows from what the product is, so it is shown
+    // rather than asked for — and can still be overruled, because the broker
+    // at the border is the one who decides.
+    { key: "hsCode", label: "HS code", type: "text" as const,
+      placeholder: "Derived from the product",
+      below: (v: Record<string, unknown>) => {
+        const derived = hsCodeFor(v);
+        if (v.hsCode) {
+          return <p className="mt-1 text-[11px] text-amber-700">
+            Overriding {derived ? `the usual ${derived.code}` : "the derived heading"}.
+          </p>;
+        }
+        return derived
+          ? <p className="mt-1 text-[11px] text-navy-400">{derived.code} — {derived.description}</p>
+          : <p className="mt-1 text-[11px] text-navy-400">Say what the product is and the heading follows.</p>;
+      } },
     { key: "notes", label: "Notes", type: "textarea" as const, span: 2 as const, rows: 2 },
   ]},
 ];
@@ -495,7 +513,12 @@ export default function ProductionPage() {
                 optionsWhen: (v: Record<string, unknown>) => portOptions(ports, v.freightMode),
                 below: (v: Record<string, unknown>) => {
                   const problem = mismatchedPort(ports, v as { port?: unknown; freightMode?: unknown });
-                  return problem ? <p className="mt-1 text-[11px] text-amber-700">{problem}</p> : null;
+                  if (problem) return <p className="mt-1 text-[11px] text-amber-700">{problem}</p>;
+                  // The names are codes, and codes a character apart can be
+                  // continents apart. The distance is the quickest way to see
+                  // that the wrong one was picked.
+                  const km = formatKm(portDistanceKm(ports, v.port));
+                  return km ? <p className="mt-1 text-[11px] text-navy-400">{km} from the nursery</p> : null;
                 },
               }
             : f
@@ -930,6 +953,18 @@ export default function ProductionPage() {
                 { key: "bundleSize", label: "Bundle" },
                 { key: "productType", label: "Type" },
                 { key: "cuttingType", label: "Product" },
+                { key: "hsCode", label: "HS", render: (r) => {
+                  const heading = tariffFor(r as Record<string, unknown>);
+                  return heading ? (
+                    <span
+                      className="font-mono tabular-nums text-navy-600"
+                      title={heading.description}
+                    >
+                      {heading.code}
+                      {!r.hsCode && <span className="text-navy-300"> ·</span>}
+                    </span>
+                  ) : <span className="text-navy-300">—</span>;
+                } },
                 { key: "customer", label: "Customer", render: (r) => (
                   <Badge variant={r.customer ? "blue" : "gray"}>{(r.customer as string) || "Any"}</Badge>
                 ) },

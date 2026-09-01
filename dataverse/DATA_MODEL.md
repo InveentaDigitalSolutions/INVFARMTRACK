@@ -9,8 +9,8 @@
 | Solution | `BrotonVerdeNursery` |
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
-| Tables | 52 |
-| Columns | 628 |
+| Tables | 53 |
+| Columns | 638 |
 | Relationships | 75 |
 
 ## Conventions
@@ -43,7 +43,7 @@
 | [Harvest](#harvest) | `bv_harvest` | `HRV-0001` | 10 | Harvest events tracking yield and quality per bed |
 | [Calendar](#calendar) | `bv_calendar` | `CAL-0001` | 17 | Date dimension table for scheduling and reporting |
 | [Task](#task) | `bv_task` | `TSK-0001` | 11 | Scheduled and assigned nursery tasks |
-| [Customer](#customer) | `bv_customer` | `CUS-0001` | 13 | Nursery customers for orders and invoicing |
+| [Customer](#customer) | `bv_customer` | `CUS-0001` | 14 | Nursery customers for orders and invoicing |
 | [Order](#order) | `bv_order` | `ORD-0001` | 8 | Customer orders |
 | [Order Item](#order-item) | `bv_orderitem` | `OIT-0001` | 12 | One line of an order: a variety, a week, and a quantity. Customers order week by week across a year or more — the 2027 book runs 66 weeks — so the week is part of the key and not a note on the side. |
 | [Packing](#packing) | `bv_packing` | `PCK-0001` | 25 | Per-box packing records — each record is one box with full traceability |
@@ -78,11 +78,12 @@
 | [Stock Movement](#stock-movement) | `bv_stockmovement` | `STK-0001` | 12 | One receipt, issue or correction. Stock on hand is the sum of these rather than a number somebody edits: a stored total drifts silently, and nothing afterwards can say why it changed. Points at a Material or an Input — a sack of fertilizer is stock in the same way a box of fittings is. |
 | [Shipment](#shipment) | `bv_shipment` | `SHP-0001` | 11 | One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed — so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went. |
 | [Solar Radiation](#solar-radiation) | `bv_solarradiation` | `SR-{SEQNUM:5}` | 5 | Measured shortwave radiation for one day at the nursery. Kept as history for the same reason the exchange rate is: the light a planting actually received is a fact about the past, and the weather service only offers a 92-day window. Without this, a crop older than that accumulates on clear-sky assumptions. |
-| [Product](#product) | `bv_plantsize` | `PS-0001` | 17 | A product the nursery sells: a variety at a size, as a type and a condition — and what it costs. Size and price were two tables, which meant two screens describing the same thing. The only reason to record a size at all is to price and pack it, so they are one row.\n\nCustomer, port and the dates may be left blank, meaning any. The most specific row that applies wins, so a general figure is set once and overridden only where something was negotiated — and the box count can live on the general row rather than being repeated. |
-| [Port](#port) | `bv_port` | `PRT-{SEQNUM:3}` | 7 | A place goods can be delivered to: an airport or a seaport. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does — and the mode narrows which of these can even be chosen: nothing flies into Rotterdam's harbour.\n\nLoaded from public reference data (OurAirports and the NGA World Port Index) rather than typed, and cut to the places that can actually receive freight: airports with an IATA code and scheduled service, harbours the World Port Index rates medium or large. |
+| [Product](#product) | `bv_plantsize` | `PS-0001` | 18 | A product the nursery sells: a variety at a size, as a type and a condition — and what it costs. Size and price were two tables, which meant two screens describing the same thing. The only reason to record a size at all is to price and pack it, so they are one row.\n\nCustomer, port and the dates may be left blank, meaning any. The most specific row that applies wins, so a general figure is set once and overridden only where something was negotiated — and the box count can live on the general row rather than being repeated. |
+| [Port](#port) | `bv_port` | `PRT-{SEQNUM:3}` | 9 | A place goods can be delivered to: an airport or a seaport. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does — and the mode narrows which of these can even be chosen: nothing flies into Rotterdam's harbour.\n\nLoaded from public reference data (OurAirports and the NGA World Port Index) rather than typed, and cut to the places that can actually receive freight: airports with an IATA code and scheduled service, harbours the World Port Index rates medium or large. |
 | [Basket Size](#basket-size) | `bv_basketsize` | `BSK-{SEQNUM:3}` | 7 | A size of hanging basket the nursery uses. Kept as a table because the sizes change, and because how many fit on a cable is a fact about the basket rather than about any variety. |
 | [Plant Alias](#plant-alias) | `bv_plantalias` | `ALS-0001` | 6 | Another name for a variety. Customers order by their own trade names — Summer Nights is Hawaiian, Snowy Morning is Marble Queen, Off to Oz is Neon — and breeders use codes like UF-Ea-0317. Without these, every order import is matched by hand and a near-miss like 'Njoy' against 'N'Joy' goes unnoticed. |
 | [Phenology](#phenology) | `bv_phenology` | `PH-0001` | 9 | How long a variety takes and to what stage. One row per variety — the season is not recorded because it is measured: the app knows the light each bed actually received, and a planting in the dark half reaches the same stage later on its own. |
+| [Holiday](#holiday) | `bv_holiday` | `HOL-{SEQNUM:5}` | 6 | A public holiday, here and at the far end. Two different problems: on a Honduran holiday nobody cuts, packs or drives, and on the destination's holiday customs is shut and the box sits on a ramp. Both are knowable months ahead and neither is anywhere in the app today.\n\nLoaded from the Nager.Date public-holiday API for the countries the nursery actually deals with — see scripts/dataverse/import-holidays.mjs. |
 
 ## Relationships
 
@@ -762,6 +763,7 @@ Nursery customers for orders and invoicing
 | `bv_email` | Email | Text(200) |  | Contact email address. |
 | `bv_phone` | Phone | Text(50) |  | Contact telephone number. |
 | `bv_address` | Address | Text area(500) |  | Postal address. |
+| `bv_country` | Country | Text(100) |  | Where the customer receives. It decides the currency on their paperwork and, more usefully, which public holidays close their customs hall — a box landing on one sits on a ramp for the weekend. |
 | `bv_taxid` | Tax ID | Text(50) |  | Short text value. Tax ID for the Customer. |
 | `bv_contactname` | Contact Name | Text(200) |  | Descriptive name, shown wherever the record is listed. |
 | `bv_contactemail` | Contact Email | Text(200) |  | Contact email address. |
@@ -2113,6 +2115,7 @@ A product the nursery sells: a variety at a size, as a type and a condition — 
 | `bv_bundlesize` | Bundle Size | Whole number |  | Cuttings per bundle inside the box. Three throughout the current catalogue. |
 | `bv_producttype` | Type | Choice |  | Unrooted or rooted cutting. One of: URC, RC. |
 | `bv_cuttingtype` | Product | Choice |  | What is actually cut and boxed. One of: L&E, E, Bulbs, Tips. |
+| `bv_hscode` | HS code | Text(12) |  | Customs heading for the export paperwork. Left blank it is derived from what the product is — unrooted cuttings are 0602.10, rooted 0602.90, bulbs 0601.10 — and only needs filling in when a broker says otherwise. |
 | `bv_isactive` | Active | Yes/No |  | Whether this size is currently offered. |
 | `bv_notes` | Notes | Text area(2000) |  |  |
 | `bv_customerid` | Customer | Lookup → [Customer](#customer) |  | If set, this price applies only to this customer. If null, it is the base/default price. |
@@ -2178,6 +2181,8 @@ A place goods can be delivered to: an airport or a seaport. Price depends on it 
 | `bv_code` | Code | Text(12) |  | IATA code for an airport (MIA), UN/LOCODE for a seaport (NLRTM). What appears on the airway bill. |
 | `bv_kind` | Kind | Choice |  | Airport or seaport. Freight mode picks between them: a price by air can only name an airport. |
 | `bv_country` | Country | Text(100) |  |  |
+| `bv_latitude` | Latitude | Decimal(6) |  | Where the place is. Both sources carry it, and without it a destination is a name the app cannot measure anything against — how far the freight travels, or what the weather is doing when it lands. |
+| `bv_longitude` | Longitude | Decimal(6) |  | See Latitude. |
 | `bv_isactive` | Active | Yes/No |  | Whether the nursery currently ships there. |
 | `bv_notes` | Notes | Text area(2000) |  |  |
 
@@ -2272,4 +2277,21 @@ How long a variety takes and to what stage. One row per variety — the season i
 | `bv_harvestweeks` | Harvest every (weeks) | Whole number |  | Weeks between cuts once the plant is at that stage. |
 | `bv_prunetoleaves` | Pruned back to (leaves) | Whole number |  | The leaf count it is cut back to. Two on the current table, but no more fixed than the target. |
 | `bv_pruningweeks` | Recovery after pruning (weeks) | Whole number |  | Weeks to grow back from the pruned stage to the target one. |
+| `bv_notes` | Notes | Text area(2000) |  |  |
+
+## Holiday
+
+`bv_holiday` · User-owned
+
+A public holiday, here and at the far end. Two different problems: on a Honduran holiday nobody cuts, packs or drives, and on the destination's holiday customs is shut and the box sits on a ramp. Both are knowable months ahead and neither is anywhere in the app today.\n\nLoaded from the Nager.Date public-holiday API for the countries the nursery actually deals with — see scripts/dataverse/import-holidays.mjs.
+
+**Record ID:** `bv_holidaycode` — format `HOL-{SEQNUM:5}`, e.g. `HOL-{SEQNUM:5}`.
+
+| Column | Display name | Type | Req. | Description |
+|---|---|---|:--:|---|
+| `bv_holidaycode` 🔑 | Holiday ID | Autonumber | ✓ | Auto-generated identifier, format HOL-00001. |
+| `bv_date` | Date | Date only | ✓ | The day itself. |
+| `bv_holidayname` | Name | Text(120) |  | What it is called where it is kept — Día de Morazón, Koningsdag. |
+| `bv_countrycode` | Country code | Text(2) |  | ISO 3166-1 alpha-2. The code rather than the name because the source speaks in codes and names have several spellings. |
+| `bv_country` | Country | Text(100) |  | Spelled out, for reading. |
 | `bv_notes` | Notes | Text area(2000) |  |  |

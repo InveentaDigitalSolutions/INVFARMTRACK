@@ -166,6 +166,13 @@ export const dataSourcesInfo = {
     "dataSourceType": "Dataverse",
     "apis": {}
   },
+  "bv_holidays": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "bv_holidayid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
+  },
   "bv_inputcomponents": {
     "tableId": "",
     "version": "",

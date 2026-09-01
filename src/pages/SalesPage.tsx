@@ -25,6 +25,9 @@ import { salesSummary } from "../services/salesInsight";
 import ExcelImport from "../components/ExcelImport";
 import { Upload } from "lucide-react";
 import { useInvoiceNumber } from "../hooks/useInvoiceNumber";
+import { COUNTRIES } from "../services/countries.generated";
+import { countryFor } from "../services/tariff";
+import { closuresOn, nextWorkingDay, type HolidayRow } from "../services/workingDays";
 import { toGrid, toRecords, weeksIn, type ForecastRecord, type ForecastRow } from "../services/demandForecast";
 import type { CustomersRow, OrdersRow, PackingRow, ShipmentsRow } from "../services/rowTypes.generated";
 import {
@@ -88,6 +91,17 @@ const customerFields = [
   // address and tax id blank.
   { title: "Billing", columns: 2 as const, fields: [
     { key: "taxId", label: "Tax ID / RTN", type: "text" as const },
+    // Picked from the ISO list rather than typed: it decides the currency on
+    // their paperwork and which public holidays shut their customs hall, and
+    // neither works on "Netherland".
+    { key: "country", label: "Country", type: "select" as const, searchable: true,
+      options: COUNTRIES.map((c) => ({ value: c.name, label: `${c.name} (${c.code})` })),
+      below: (v: Record<string, unknown>) => {
+        const found = countryFor(v.country);
+        return found?.currency
+          ? <p className="mt-1 text-[11px] text-navy-400">Trades in {found.currency}</p>
+          : null;
+      } },
     { key: "address", label: "Billing Address", type: "textarea" as const, span: 2 as const },
     { key: "deliverToName", label: "Deliver To", type: "text" as const },
     { key: "deliverToAddress", label: "Delivery Address", type: "textarea" as const, span: 2 as const },
@@ -153,6 +167,37 @@ export default function SalesPage() {
 
   const [orders, setOrders] = useRecords("orders", initialOrders);
   const [customers, setCustomers] = useRecords("customers", initialCustomers);
+  const [holidays] = useRecords<HolidayRow>("holidays", []);
+
+  /**
+   * What is closed on a date, said plainly under the field.
+   *
+   * The two ends fail differently and are worth separating: the nursery shut
+   * means the shipment does not leave; the destination shut means it lands and
+   * waits, which for unrooted cuttings is the expensive one.
+   */
+  const deliveryNote = (values: Record<string, unknown>, key: string) => {
+    const when = String(values[key] ?? "");
+    if (!when) return null;
+    const buyer = customers.find(
+      (c) => String((c as Record<string, unknown>).name ?? "") === String(values.customer ?? "")
+    ) as Record<string, unknown> | undefined;
+    const { home, away, weekend } = closuresOn(holidays, when, buyer?.country);
+
+    const notes: string[] = [];
+    if (home) notes.push(`${home.name} in Honduras — nobody is cutting or loading`);
+    if (away) notes.push(`${away.name} in ${away.country} — customs is shut`);
+    if (!home && !away && weekend) notes.push("A weekend at both ends");
+    if (notes.length === 0) return null;
+
+    const moved = nextWorkingDay(holidays, when);
+    return (
+      <p className="mt-1 text-[11px] text-amber-700">
+        {notes.join(" · ")}
+        {moved !== when && <span className="text-navy-400"> · next working day is {moved}</span>}
+      </p>
+    );
+  };
   const orderForm = useFormModal({
     number: "",
     customer: "",
@@ -701,11 +746,17 @@ export default function SalesPage() {
               subtitle="Create a customer order"
               groups={[{
                 ...orderFields[0],
-                fields: orderFields[0].fields.map((f) =>
-                  f.key === "customer"
-                    ? { ...f, type: "select" as const, options: customerOptions(customers) }
-                    : f,
-                ),
+                fields: orderFields[0].fields.map((f) => {
+                  if (f.key === "customer") {
+                    return { ...f, type: "select" as const, options: customerOptions(customers) };
+                  }
+                  // A delivery date is a promise, and a promise made for a day
+                  // customs is shut is one the freight cannot keep.
+                  if (f.key === "delivery" || f.key === "date") {
+                    return { ...f, below: (v: Record<string, unknown>) => deliveryNote(v, f.key) };
+                  }
+                  return f;
+                }),
               }]}
               values={orderForm.values}
               onChange={orderForm.onChange}

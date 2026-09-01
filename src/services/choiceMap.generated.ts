@@ -35,6 +35,7 @@ export const ENTITY_SETS: readonly string[] = [
   "bv_fiscalauthorizations",
   "bv_foliaranalysises",
   "bv_harvests",
+  "bv_holidays",
   "bv_inputcomponents",
   "bv_inputs",
   "bv_invoices",
@@ -137,7 +138,8 @@ export const LABEL_COLUMN: Record<string, string> = {
   "bv_tasks": "bv_taskcode",
   "bv_timesheets": "bv_timesheetname",
   "bv_treatments": "bv_treatmentname",
-  "bv_workers": "bv_workername"
+  "bv_workers": "bv_workername",
+  "bv_holidays": "bv_holidayname"
 };
 
 export const LOOKUP_MAP: Record<string, Record<string, { nav: string; targetSet: string }>> = {

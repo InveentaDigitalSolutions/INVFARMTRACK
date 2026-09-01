@@ -77,7 +77,9 @@ for (const b of bindings.sort((a, z) => a.key.localeCompare(z.key))) {
   out.push(`export interface ${name} {`, '  id: string;')
   for (const [app, col] of b.fields) {
     const t = cols?.get(col.toLowerCase())
-    if (!t) missing++
+    // Named, not just counted: "1 column not found" sends you looking through
+    // 50 interfaces for it.
+    if (!t) { missing++; console.log(`  ${b.key}.${app} -> ${col} is not in the schema`) }
     out.push(`  ${/^[a-zA-Z_$][\w$]*$/.test(app) ? app : JSON.stringify(app)}?: ${t ?? 'string'};`)
   }
   // The generic components (DataTable, FormModal) speak in Record<string,

@@ -264,6 +264,11 @@
           "entitySetName": "bv_phenologies",
           "logicalName": "bv_phenology",
           "isHidden": false
+        },
+        "holidays": {
+          "entitySetName": "bv_holidays",
+          "logicalName": "bv_holiday",
+          "isHidden": false
         }
       }
     }

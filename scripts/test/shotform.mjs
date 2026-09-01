@@ -48,7 +48,16 @@ if (process.env.TYPE_INTO) {
   })
   await page.waitForTimeout(500)
 }
-const dlg = page.locator('[role=dialog]').first()
+// A long form is taller than the window, and the half that matters is often
+// the bottom half. The modal scrolls its own overlay, not the page.
+if (process.env.SCROLL) {
+  await page.evaluate(() => {
+    const overlay = document.querySelector('.overflow-y-auto.fixed, .fixed.overflow-y-auto')
+    if (overlay) overlay.scrollTop = overlay.scrollHeight
+  })
+  await page.waitForTimeout(400)
+}
+const dlg = page.locator('form').first()
 await (await dlg.count() ? dlg : page).screenshot({ path: process.argv[2] })
 console.log('errors:', errs.length ? errs.slice(0,3) : 'none')
 await browser.close(); stop()

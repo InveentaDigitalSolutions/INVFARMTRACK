@@ -282,6 +282,10 @@ async function ensureTable(table) {
     SchemaName: table.schemaName,
     DisplayName: label(table.displayName),
     DisplayCollectionName: label(table.displayCollectionName),
+    // Dataverse's own pluraliser made bv_Holiday into "bv_holidaies", and the
+    // name cannot be changed afterwards — the PATCH is refused. Say it here
+    // when the guess would be wrong.
+    ...(table.entitySetName ? { EntitySetName: table.entitySetName } : {}),
     OwnershipType: table.ownershipType || 'UserOwned',
     IsActivity: false,
     HasActivities: false,
