@@ -27,7 +27,7 @@ import { Upload } from "lucide-react";
 import { useInvoiceNumber } from "../hooks/useInvoiceNumber";
 import { COUNTRIES } from "../services/countries.generated";
 import { countryFor } from "../services/tariff";
-import { closuresOn, nextWorkingDay, type HolidayRow } from "../services/workingDays";
+import { closuresInWeek, type HolidayRow } from "../services/workingDays";
 import { portDistanceKm, type PortRow } from "../services/portPicker";
 import { formatKm } from "../services/geo";
 import { toGrid, toRecords, weeksIn, type ForecastRecord, type ForecastRow } from "../services/demandForecast";
@@ -39,8 +39,12 @@ import {
 
 const tabs = [
   { id: "shipments", label: "Shipments" },
-  { id: "forecast", label: "Demand Forecast" },
-  { id: "orders", label: "Orders" },
+  // One module, not two. A demand forecast and an order are the same thing at
+  // this nursery — a customer asking for so many cuttings of a variety in a
+  // given week — and keeping them apart meant an empty Orders tab beside a
+  // book of a million cuttings. The bv_Order table stays for the invoicing
+  // chain to hang off; nobody types into it.
+  { id: "forecast", label: "Orders" },
   { id: "customers", label: "Customers" },
   // Both sit here because price is keyed on the destination and this is where
   // prices are kept. They are one table — a place goods can be delivered to —
@@ -55,26 +59,6 @@ const initialShipments: ShipmentsRow[] = [];
 const initialOrders: OrdersRow[] = [];
 
 const initialCustomers: CustomersRow[] = [];
-
-const orderStatusOptions = [
-  { value: "Draft", label: "Draft" },
-  { value: "In Packing", label: "In Packing" },
-  { value: "Shipped", label: "Shipped" },
-  { value: "Delivered", label: "Delivered" },
-  { value: "Cancelled", label: "Cancelled" },
-];
-
-const orderFields = [
-  { title: "Order Details", columns: 2 as const, fields: [
-    { key: "number", label: "Order Number", type: "text" as const, readOnly: true, placeholder: "ORD-0001 (auto)" },
-    { key: "customer", label: "Customer", type: "text" as const, required: true },
-    { key: "date", label: "Order Date", type: "date" as const, required: true },
-    { key: "delivery", label: "Delivery Date", type: "date" as const, required: true },
-    { key: "items", label: "# Items", type: "number" as const, min: 1, required: true },
-    { key: "total", label: "Total (USD)", type: "text" as const, placeholder: "$0.00" },
-    { key: "status", label: "Status", type: "select" as const, options: orderStatusOptions, required: true },
-  ]},
-];
 
 const termsOptions = [
   { value: "CIF", label: "CIF" }, { value: "FOB", label: "FOB" },
@@ -176,78 +160,19 @@ export default function SalesPage() {
     [shipments, shipmentQuery, shipmentStatus]
   );
   const [showImport, setShowImport] = useState(false);
+  const customerForm = useFormModal(initialCustomers[0]);
   const portForm = useFormModal(initPorts[0]);
   const portConfirm = useConfirmDialog();
   const customerConfirm = useConfirmDialog();
-  const orderConfirm = useConfirmDialog();
   const [ports, setPorts] = useRecords("ports", initPorts);
 
-  const [orders, setOrders] = useRecords("orders", initialOrders);
+  // Kept for the open-orders KPI and the packing screen's lookup; the book
+  // itself lives in the forecast records now.
+  const [orders] = useRecords("orders", initialOrders);
+  const [forecastYear, setForecastYear] = useState<number | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
   const [customers, setCustomers] = useRecords("customers", initialCustomers);
   const [holidays] = useRecords<HolidayRow>("holidays", []);
-
-  /**
-   * What is closed on a date, said plainly under the field.
-   *
-   * The two ends fail differently and are worth separating: the nursery shut
-   * means the shipment does not leave; the destination shut means it lands and
-   * waits, which for unrooted cuttings is the expensive one.
-   */
-  const deliveryNote = (values: Record<string, unknown>, key: string) => {
-    const when = String(values[key] ?? "");
-    if (!when) return null;
-    const buyer = customers.find(
-      (c) => String((c as Record<string, unknown>).name ?? "") === String(values.customer ?? "")
-    ) as Record<string, unknown> | undefined;
-    const { home, away, weekend } = closuresOn(holidays, when, buyer?.country);
-
-    const notes: string[] = [];
-    if (home) notes.push(`${home.name} in Honduras — nobody is cutting or loading`);
-    if (away) notes.push(`${away.name} in ${away.country} — customs is shut`);
-    if (!home && !away && weekend) notes.push("A weekend at both ends");
-    if (notes.length === 0) return null;
-
-    const moved = nextWorkingDay(holidays, when);
-    return (
-      <p className="mt-1 text-[11px] text-amber-700">
-        {notes.join(" · ")}
-        {moved !== when && <span className="text-navy-400"> · next working day is {moved}</span>}
-      </p>
-    );
-  };
-  const orderForm = useFormModal({
-    number: "",
-    customer: "",
-    date: new Date().toISOString().slice(0, 10),
-    delivery: new Date().toISOString().slice(0, 10),
-    items: 1,
-    total: "",
-    status: "Draft",
-  });
-  const customerForm = useFormModal({
-    code: "",
-    name: "",
-    contact: "",
-    email: "",
-    terms: "CIF",
-  });
-
-  /**
-   * Both of these could only ever add.
-   *
-   * A customer's country, terms and invoicing address are the sort of thing
-   * that is filled in later — and three of these customers were created by the
-   * order import with almost nothing on them — so a directory that can only be
-   * added to is a directory that stays wrong.
-   */
-  const handleOrderSave = (values: Record<string, unknown>) => {
-    if (orderForm.isEdit) {
-      setOrders(withEdited(orders, orderForm, values) as typeof initialOrders);
-    } else {
-      setOrders((prev) => [values as typeof initialOrders[0], ...prev]);
-    }
-    orderForm.close();
-  };
 
   const handleCustomerSave = (values: Record<string, unknown>) => {
     if (customerForm.isEdit) {
@@ -287,9 +212,25 @@ export default function SalesPage() {
   // have been filed against nobody.
   const [forecastCustomer, setForecastCustomer] = useState("");
   const activeCustomer = forecastCustomer || String((customers[0] as { name?: string })?.name ?? "");
+
+  /**
+   * Which year's book is on screen.
+   *
+   * Week numbers repeat, so a grid that ignores the year adds 2026 week 38 to
+   * 2027 week 38 and shows a number nobody ordered.
+   */
+  const forecastYears = useMemo(
+    () => [...new Set(forecastRecords.map((r) => r.year).filter(Boolean) as number[])].sort(),
+    [forecastRecords]
+  );
+  const activeYear = forecastYear || forecastYears[0] || new Date().getFullYear();
+  const yearRecords = useMemo(
+    () => forecastRecords.filter((r) => r.year === activeYear),
+    [forecastRecords, activeYear]
+  );
   const forecastData = useMemo(
-    () => toGrid(forecastRecords, activeCustomer || undefined),
-    [forecastRecords, activeCustomer]
+    () => toGrid(yearRecords, activeCustomer || undefined),
+    [yearRecords, activeCustomer]
   );
   const forecastWeeks = useMemo(() => weeksIn(forecastData), [forecastData]);
   const { next: nextInvoice, claim: claimInvoiceNumber } = useInvoiceNumber();
@@ -604,27 +545,58 @@ export default function SalesPage() {
                       <option key={c.name} value={String(c.name)}>{c.name}</option>
                     ))}
                   </select>
+                  <select
+                    value={String(activeYear)}
+                    onChange={(e) => setForecastYear(Number(e.target.value))}
+                    aria-label="Year"
+                    className="px-2 py-1 text-[12px] rounded-lg border border-sand-200 bg-white
+                               text-navy-800 cursor-pointer focus:outline-none
+                               focus:ring-2 focus:ring-lime-400/30"
+                  >
+                    {(forecastYears.length ? forecastYears : [activeYear]).map((y) => (
+                      <option key={y} value={String(y)}>{y}</option>
+                    ))}
+                  </select>
                 </div>
                 <p className="text-[12px] text-navy-400">
                   {forecastData.length} order line{forecastData.length === 1 ? "" : "s"}
                   {forecastWeeks.length > 0 &&
                     ` · weeks ${forecastWeeks[0]}–${forecastWeeks[forecastWeeks.length - 1]}`}
+                  {` · ${forecastData
+                    .reduce((sum, r) => sum + ((r.total as number) || 0), 0)
+                    .toLocaleString()} cuttings`}
                 </p>
               </div>
-              <button
-                onClick={() => setShowImport(true)}
-                className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-navy-900
-                           btn-primary rounded-lg cursor-pointer shadow-sm"
-              >
-                <Upload className="w-4 h-4" />
-                Import Excel
-              </button>
+              <div className="flex items-center gap-2">
+                {/* A customer cannot be removed while its lines point at it, so
+                    the lines have to be removable from where they are read. */}
+                <button
+                  onClick={() => setConfirmClear(true)}
+                  disabled={forecastData.length === 0}
+                  className="px-3 py-2 text-[12px] font-medium rounded-lg border border-red-200
+                             text-red-600 hover:bg-red-50 disabled:opacity-40
+                             disabled:cursor-not-allowed cursor-pointer transition-colors"
+                >
+                  Delete {activeYear} lines
+                </button>
+                <button
+                  onClick={() => setShowImport(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-navy-900
+                             btn-primary rounded-lg cursor-pointer shadow-sm"
+                >
+                  <Upload className="w-4 h-4" />
+                  Import Excel
+                </button>
+              </div>
             </div>
 
             {/* Weekly volume chart */}
             {(() => {
-              const weeks = ["wk14", "wk15", "wk16", "wk17", "wk18"] as const;
-              const labels = ["Wk 14", "Wk 15", "Wk 16", "Wk 17", "Wk 18"];
+              // The columns were fixed at weeks 14–18 whatever was loaded, so
+              // a book running weeks 8 to 44 showed five empty columns and
+              // read as "no data".
+              const weeks = forecastWeeks.map((w) => `wk${w}`);
+              const labels = forecastWeeks.map((w) => `Wk ${w}`);
               const totals = weeks.map((w) =>
                 forecastData.reduce((s, r) => s + ((r[w] as number) || 0), 0),
               );
@@ -663,11 +635,28 @@ export default function SalesPage() {
                       <th className="px-4 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase sticky left-0 bg-sand-50/50 z-10">Variety</th>
                       <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase">Size</th>
                       <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-navy-400 uppercase">Type</th>
-                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 14</th>
-                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 15</th>
-                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 16</th>
-                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 17</th>
-                      <th className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]">Wk 18</th>
+                      {forecastWeeks.map((w) => {
+                        // A week with a holiday in it is a week with fewer
+                        // working days, and the person promising it should see
+                        // that while they are looking at the number.
+                        const shut = closuresInWeek(
+                          holidays, activeYear, w,
+                          (customers.find((c) => String((c as { name?: string }).name) === activeCustomer) as
+                            { country?: string } | undefined)?.country
+                        );
+                        return (
+                          <th
+                            key={w}
+                            title={shut.length ? shut.map((c) => `${c.name} — ${c.country}`).join(" · ") : undefined}
+                            className="px-4 py-2.5 text-center text-[10px] font-semibold text-navy-400 uppercase min-w-[80px]"
+                          >
+                            Wk {w}
+                            {shut.length > 0 && (
+                              <span className="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-amber-400 align-middle" />
+                            )}
+                          </th>
+                        );
+                      })}
                       <th className="px-3 py-2.5 text-center text-[10px] font-semibold text-lime-600 uppercase bg-lime-50/50">Total</th>
                     </tr>
                   </thead>
@@ -679,13 +668,16 @@ export default function SalesPage() {
                         <td className="px-3 py-2">
                           <Badge variant={(row.type as string) === "Current Order" ? "green" : "amber"}>{row.type as string}</Badge>
                         </td>
-                        {["wk14", "wk15", "wk16", "wk17", "wk18"].map((wk) => (
-                          <td key={wk} className={`px-3 py-2 text-center font-mono ${
-                            (row[wk] as number) > 0 ? "text-navy-800 font-medium" : "text-navy-200"
-                          }`}>
-                            {(row[wk] as number) > 0 ? (row[wk] as number).toLocaleString() : "—"}
-                          </td>
-                        ))}
+                        {forecastWeeks.map((w) => {
+                          const wk = `wk${w}`;
+                          return (
+                            <td key={wk} className={`px-3 py-2 text-center font-mono ${
+                              (row[wk] as number) > 0 ? "text-navy-800 font-medium" : "text-navy-200"
+                            }`}>
+                              {(row[wk] as number) > 0 ? (row[wk] as number).toLocaleString() : "—"}
+                            </td>
+                          );
+                        })}
                         <td className="px-3 py-2 text-center font-mono font-bold text-navy-900 bg-lime-50/30">
                           {((row.total as number) || 0).toLocaleString()}
                         </td>
@@ -695,11 +687,14 @@ export default function SalesPage() {
                   <tfoot>
                     <tr className="bg-navy-50/50 border-t-2 border-navy-200">
                       <td colSpan={3} className="px-4 py-2 font-bold text-navy-900 sticky left-0 bg-navy-50/50 z-10">Total</td>
-                      {["wk14", "wk15", "wk16", "wk17", "wk18"].map((wk) => (
-                        <td key={wk} className="px-3 py-2 text-center font-mono font-bold text-navy-900">
-                          {forecastData.reduce((s, r) => s + ((r[wk] as number) || 0), 0).toLocaleString()}
-                        </td>
-                      ))}
+                      {forecastWeeks.map((w) => {
+                        const wk = `wk${w}`;
+                        return (
+                          <td key={wk} className="px-3 py-2 text-center font-mono font-bold text-navy-900">
+                            {forecastData.reduce((s, r) => s + ((r[wk] as number) || 0), 0).toLocaleString()}
+                          </td>
+                        );
+                      })}
                       <td className="px-3 py-2 text-center font-mono font-bold text-lime-700 bg-lime-50/50">
                         {forecastData.reduce((s, r) => s + ((r.total as number) || 0), 0).toLocaleString()}
                       </td>
@@ -708,6 +703,24 @@ export default function SalesPage() {
                 </table>
               </div>
             </div>
+
+            <ConfirmDialog
+              open={confirmClear}
+              onClose={() => setConfirmClear(false)}
+              title={`Delete ${activeYear} lines`}
+              message={`Remove all ${forecastData.length} ${activeCustomer} lines for ${activeYear}? A customer cannot be deleted while any of its lines remain.`}
+              onConfirm={() => {
+                // By identity, and only the lines on screen: the customer's
+                // other years are a different book and stay where they are.
+                const doomed = new Set(
+                  yearRecords
+                    .filter((r) => !activeCustomer || r.customer === activeCustomer)
+                    .map((r) => r.id)
+                );
+                setForecastRecords(forecastRecords.filter((r) => !doomed.has(r.id)));
+                setConfirmClear(false);
+              }}
+            />
 
             {/* Excel import modal */}
             <AnimatePresence>
@@ -750,64 +763,6 @@ export default function SalesPage() {
               )}
             </AnimatePresence>
           </div>
-        );
-
-      case "orders":
-        return (
-          <>
-            <DataTable
-              columns={[
-                { key: "number", label: "Order #" },
-                { key: "customer", label: "Customer" },
-                { key: "date", label: "Date" },
-                { key: "delivery", label: "Delivery" },
-                { key: "items", label: "Items" },
-                { key: "status", label: "Status", render: (r) => statusBadge(r.status as string) },
-                { key: "total", label: "Total" },
-              ]}
-              data={orders}
-              onAdd={orderForm.openCreate}
-              onEdit={(row, i) => orderForm.openEdit(row as never, i)}
-              onDelete={(row, i) => orderConfirm.requestDelete(row, i)}
-              addLabel="New Order"
-              searchPlaceholder="Search orders..."
-            />
-            <FormModal
-              open={orderForm.open}
-              onClose={orderForm.close}
-              title={orderForm.isEdit ? "Edit Order" : "New Order"}
-              subtitle={orderForm.isEdit ? "Change what was agreed" : "Create a customer order"}
-              isEdit={orderForm.isEdit}
-              groups={[{
-                ...orderFields[0],
-                fields: orderFields[0].fields.map((f) => {
-                  if (f.key === "customer") {
-                    return { ...f, type: "select" as const, options: customerOptions(customers) };
-                  }
-                  // A delivery date is a promise, and a promise made for a day
-                  // customs is shut is one the freight cannot keep.
-                  if (f.key === "delivery" || f.key === "date") {
-                    return { ...f, below: (v: Record<string, unknown>) => deliveryNote(v, f.key) };
-                  }
-                  return f;
-                }),
-              }]}
-              values={orderForm.values}
-              onChange={orderForm.onChange}
-              submitLabel={orderForm.isEdit ? "Save" : "Create Order"}
-              onSubmit={handleOrderSave}
-            />
-            <ConfirmDialog
-              open={orderConfirm.open}
-              onClose={orderConfirm.close}
-              title="Delete Order"
-              message="Delete this order?"
-              onConfirm={() => {
-                setOrders(withoutPending(orders, orderConfirm.pending) as typeof initialOrders);
-                orderConfirm.close();
-              }}
-            />
-          </>
         );
 
       case "customers":

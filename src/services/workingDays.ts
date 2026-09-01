@@ -117,3 +117,49 @@ export function nextWorkingDay(rows: HolidayRow[], date: unknown, country: unkno
   }
   return when;
 }
+
+/**
+ * The Monday-to-Sunday dates of an ISO week.
+ *
+ * Orders here are placed by week number, not by date — "12,100 in week 38" —
+ * so anything the calendar knows has to be mapped onto weeks before it can be
+ * said. ISO weeks are defined by their Thursday, which is what makes week 1
+ * the week containing 4 January.
+ */
+export function weekRange(year: number, week: number): string[] {
+  if (!Number.isInteger(year) || !Number.isInteger(week) || week < 1 || week > 53) return [];
+  const fourth = new Date(Date.UTC(year, 0, 4));
+  // getUTCDay: Sunday is 0. ISO counts Monday as 1, so Sunday is day 7.
+  const isoDay = fourth.getUTCDay() === 0 ? 7 : fourth.getUTCDay();
+  const monday = new Date(fourth);
+  monday.setUTCDate(fourth.getUTCDate() - (isoDay - 1) + (week - 1) * 7);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setUTCDate(monday.getUTCDate() + i);
+    return d.toISOString().slice(0, 10);
+  });
+}
+
+/**
+ * Public holidays inside one week, at the nursery and at the destination.
+ *
+ * A week with two holidays in it is a week with three working days, and an
+ * order book that does not show that is a promise nobody checked.
+ */
+export function closuresInWeek(
+  rows: HolidayRow[],
+  year: number,
+  week: number,
+  destination?: unknown
+): Closure[] {
+  const out: Closure[] = [];
+  for (const date of weekRange(year, week)) {
+    const home = holidayOn(rows, date, HOME_COUNTRY);
+    if (home) out.push(home);
+    if (destination && codeFor(destination) !== HOME_COUNTRY) {
+      const away = holidayOn(rows, date, destination);
+      if (away) out.push(away);
+    }
+  }
+  return out;
+}

@@ -109,6 +109,8 @@ export function useRecords<T>(
       });
 
       void (async () => {
+        // Declared out here so the check after the reload can see it.
+        const removed: string[] = [];
         try {
           const current = (await store.getAll()) as unknown as T[];
           const plan = planWrites(
@@ -121,7 +123,7 @@ export function useRecords<T>(
           // block used to run uncaught, so a rejection vanished into an
           // unhandled promise and the row simply disappeared on next load.
           for (const id of plan.remove) {
-            try { await store.delete(id); }
+            try { await store.delete(id); removed.push(id); }
             catch (err) { reportWriteError(table, "delete", err); }
           }
           for (const row of plan.create) {
@@ -146,6 +148,30 @@ export function useRecords<T>(
         // Reload either way: the screen must end up showing what is stored,
         // not what was typed.
         await load();
+
+        /**
+         * And check the delete actually took.
+         *
+         * A row that leaves the screen and comes back on the next read is the
+         * most confusing failure this app has: it looks like the button did
+         * nothing, or worse, like it worked. The store reports what it is told;
+         * this reports what is still there afterwards.
+         */
+        if (removed.length > 0) {
+          try {
+            const after = await store.getAll();
+            const survived = new Set(after.map((r) => String((r as Identified).id)));
+            const back = removed.filter((id) => survived.has(id));
+            if (back.length > 0) {
+              reportWriteError(table, "delete", {
+                message: `${back.length} record${back.length === 1 ? "" : "s"} came back after being deleted. `
+                  + "Dataverse accepted the request and kept the row — check for another record pointing at it.",
+              });
+            }
+          } catch {
+            // The reload already reported its own failure; nothing to add.
+          }
+        }
       })();
     },
     [store, load, table]

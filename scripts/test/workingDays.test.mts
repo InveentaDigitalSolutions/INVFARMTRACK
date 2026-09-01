@@ -3,6 +3,7 @@
  */
 import {
   holidayOn, isWeekend, isWorkingDay, closuresOn, nextWorkingDay, codeFor,
+  weekRange, closuresInWeek,
 } from '../../src/services/workingDays.ts'
 
 let failures = 0
@@ -47,6 +48,21 @@ eq('a working day is its own answer', nextWorkingDay(rows, '2026-09-08', 'HN'), 
 eq('a holiday moves to the next day', nextWorkingDay(rows, '2026-09-15', 'HN'), '2026-09-16')
 // 3 Oct 2026 is a Saturday holiday: Sat, Sun, then Monday.
 eq('a holiday on a weekend runs to Monday', nextWorkingDay(rows, '2026-10-03', 'HN'), '2026-10-05')
+
+// Orders are placed by week number, so the calendar has to be mapped onto
+// weeks before a holiday can be shown against one.
+eq('an ISO week runs Monday to Sunday',
+  [weekRange(2026, 38)[0], weekRange(2026, 38)[6]], ['2026-09-14', '2026-09-20'])
+// ISO week 1 is the week containing 4 January, which in 2026 is a Sunday —
+// so week 1 starts in December.
+eq('week 1 is the week with 4 January in it', weekRange(2026, 1)[0], '2025-12-29')
+eq('a week outside the year is no week at all', weekRange(2026, 60), [])
+
+eq('Independence Day lands in week 38',
+  closuresInWeek(rows, 2026, 38, 'HN').map((c) => c.name), ['Independence Day'])
+eq('and week 39 is clear', closuresInWeek(rows, 2026, 39, 'HN'), [])
+eq('the destination is counted too',
+  closuresInWeek(rows, 2026, 52, 'Netherlands').map((c) => c.countryCode), ['NL'])
 
 console.log(failures ? `\n  ${failures} failed` : '\n  The days work is possible on.')
 process.exit(failures ? 1 : 0)

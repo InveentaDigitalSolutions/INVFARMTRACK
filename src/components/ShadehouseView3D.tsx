@@ -497,7 +497,12 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           shadows="percentage"
           dpr={[1, 2]}
           gl={{ antialias: true, toneMappingExposure: 1.05 }}
-          camera={{ position: [62, 52, 74], fov: 36 }}
+          // Near and far matter twice over: the sky dome and the valley are
+          // kilometres out and were being clipped away entirely, and a
+          // 0.1–2000 range spends most of its depth precision on the first
+          // metre, which is what lets coplanar surfaces flicker. 1–12000 is a
+          // shallower ratio than the default and reaches the horizon.
+          camera={{ position: [62, 52, 74], fov: 36, near: 1, far: 12000 }}
           onPointerMissed={() => setSelectedBedId(null)}
         >
           <ShadehouseScene

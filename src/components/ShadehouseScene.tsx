@@ -412,7 +412,7 @@ function Bed({
   lens,
   nowMs,
   dimmed,
-  faded,
+  faded: _faded,
   selected,
   onSelect,
 }: {
@@ -474,12 +474,12 @@ function Bed({
           color={base}
           emissive={base}
           transparent
-          // Turning the terrain on used to drop the beds to a third opacity
-          // AND stop them writing depth, which put them behind the ground they
-          // stand on: whole rows vanished under the pale plate. They stay
-          // solid enough to see and keep their place in the depth buffer; the
-          // contours read through them rather than over them.
-          opacity={dimmed ? 0.12 : faded ? 0.72 : 1}
+          // The beds are the subject; the ground is context. Fading them for
+          // the terrain layer put the contour wash on top of them and made the
+          // ground look like it was covering the beds — which is exactly what
+          // it was doing. Contours now read in the aisles and around the
+          // fields, where there is nothing to hide.
+          opacity={dimmed ? 0.12 : 1}
           depthWrite={!dimmed}
           roughness={0.62}
           metalness={0.02}
@@ -516,7 +516,7 @@ function BasketLine({
   lens,
   nowMs,
   dimmed,
-  faded,
+  faded: _faded,
   selected,
   onSelect,
 }: {
@@ -589,7 +589,7 @@ function BasketLine({
   });
 
   if (!matrices.length) return null;
-  const opacity = dimmed ? 0.1 : faded ? 0.7 : 1;
+  const opacity = dimmed ? 0.1 : 1;
 
   return (
     <group
@@ -629,8 +629,19 @@ function BasketLine({
         />
       </mesh>
 
-      {/* Terracotta pots hooked along the cable — round or square. */}
-      <instancedMesh ref={potsRef} args={[undefined, undefined, matrices.length]}>
+      {/* Terracotta pots hooked along the cable — round or square.
+
+          frustumCulled off on purpose: an InstancedMesh is culled against the
+          bounding sphere of one instance sitting at the group's origin, not
+          against where the eighty instances actually are. A cable is 36 m
+          long, so whole rows of baskets blinked out as the camera turned —
+          present or missing depending on the angle, which is worse than either.
+          Eighty small instances is one draw call; there is nothing to save. */}
+      <instancedMesh
+        ref={potsRef}
+        args={[undefined, undefined, matrices.length]}
+        frustumCulled={false}
+      >
         {placement.bed.potType === "square" ? (
           // Squared pots in the nursery still have softened corners.
           <cylinderGeometry args={[0.135, 0.1, 0.17, 4, 1]} />
@@ -650,6 +661,7 @@ function BasketLine({
         ref={foliageRef}
         args={[undefined, undefined, matrices.length]}
         position={[0, 0.13, 0]}
+        frustumCulled={false}
       >
         <sphereGeometry args={[0.165, 12, 9]} />
         <meshStandardMaterial
@@ -657,7 +669,7 @@ function BasketLine({
           emissive={foliage}
           emissiveIntensity={selected ? 0.45 : 0}
           transparent
-          opacity={dimmed ? 0.1 : faded ? 0.68 : 0.95}
+          opacity={dimmed ? 0.1 : 0.95}
           roughness={0.9}
         />
       </instancedMesh>
@@ -945,6 +957,58 @@ function Valley({ span, depth }: { span: number; depth: number }) {
       <meshStandardMaterial vertexColors roughness={1} metalness={0} flatShading />
     </mesh>
   );
+}
+
+/**
+ * A sky for the model to sit under.
+ *
+ * Drawn rather than borrowed: three's own scattering sky is built for a
+ * high-dynamic-range pipeline, and under this scene's tone mapping it came out
+ * as white haze — a sky nobody would call a sky. Two colours and a gradient
+ * are honest about what this is, and they can be tuned by looking.
+ *
+ * `toneMapped={false}` keeps the chosen colours the colours that appear, and
+ * BackSide draws the inside of the dome. It is not lit, so it costs nothing.
+ */
+function SkyDome({ sunUp }: { sunUp: number }) {
+  const geometry = useMemo(() => new THREE.SphereGeometry(6000, 24, 16), []);
+
+  const material = useMemo(() => {
+    // Below the horizon the whole dome cools and darkens: dusk, not midnight,
+    // because the light layer still has to be readable at either end of a day.
+    const dusk = Math.max(0, Math.min(1, (0.18 - sunUp) / 0.36));
+    const zenith = new THREE.Color("#5b9bd5").lerp(new THREE.Color("#2c3f63"), dusk);
+    const horizon = new THREE.Color("#dfeaf3").lerp(new THREE.Color("#e8b98a"), dusk);
+
+    return new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      depthWrite: false,
+      toneMapped: false,
+      uniforms: {
+        zenith: { value: zenith },
+        horizon: { value: horizon },
+      },
+      vertexShader: `
+        varying vec3 vWorld;
+        void main() {
+          vWorld = (modelMatrix * vec4(position, 1.0)).xyz;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 zenith;
+        uniform vec3 horizon;
+        varying vec3 vWorld;
+        void main() {
+          // Height up the dome, eased so the horizon band stays narrow.
+          float h = clamp(normalize(vWorld).y, 0.0, 1.0);
+          gl_FragColor = vec4(mix(horizon, zenith, pow(h, 0.55)), 1.0);
+        }
+      `,
+    });
+  }, [sunUp]);
+
+  return <mesh geometry={geometry} material={material} frustumCulled={false} renderOrder={-100} />;
 }
 
 /** Structural context: posts and the shade-cloth roof from the photos. */
@@ -1439,11 +1503,27 @@ export default function ShadehouseScene({
     return [...seen.values()];
   }, [placements]);
 
+  /**
+   * Where to put the sun in the sky dome.
+   *
+   * The same vector the light uses when the sun layer is on, so the sky, the
+   * shadows and the arc all agree; a fixed high sun otherwise, because a
+   * layout view should not look like it is 6pm.
+   */
+  const sunPosition3D = useMemo<[number, number, number]>(() => {
+    const v = sunAt ? sunVector(sunAt, BED_AXIS_BEARING_DEG) : null;
+    // Null below the horizon — at night the dome is lit from just under it,
+    // which is what gives dusk rather than black.
+    if (!v) return sunAt ? [0.2, -0.08, 0.3] : [0.35, 1, 0.25];
+    return v;
+  }, [sunAt]);
+
   return (
     <>
       {/* Sky light stays whatever the sun is doing: even under cloud, and even
           at dusk, the beds are not lit only by the beam. It dims with the sun
           rather than going out. */}
+      <SkyDome sunUp={sunPosition3D[1]} />
       <hemisphereLight args={["#eaf4ff", "#c9c3b4", sunAt ? 0.55 : 1.0]} />
       <ambientLight intensity={sunAt ? 0.26 : 0.42} />
 
