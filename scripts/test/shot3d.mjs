@@ -57,6 +57,25 @@ await page.evaluate(() => {
                     name: `${f}-${String(line).padStart(2, '0')}-${String(level).padStart(2, '0')}`,
                     field: f, fieldName: f, row: line, level, type: 'Basket', status: 'Active',
                     shade: 'Single' })
+  // A little history, so the selection panel can be looked at with something
+  // in it. Empty is the honest default but tells you nothing about the layout.
+  const day = (back) => new Date(Date.now() - back * 86400000).toISOString().slice(0, 10)
+  const withHistory = ['C1-04', 'C1-05', 'E1-05-01', 'E3-10']
+  localStorage.setItem('dni_plantings', JSON.stringify(withHistory.map((bed, i) => ({
+    id: `p${i}`, bed, plant: 'Pothos / Hawaiian', date: day(48 + i), qty: 4200 + i * 100,
+    position: 'Whole bed', purpose: 'Production',
+  }))))
+  localStorage.setItem('dni_irrigation', JSON.stringify(withHistory.map((bed, i) => ({
+    id: `i${i}`, bed, date: day(1), liters: 320 + i * 10, method: 'Drip',
+  }))))
+  localStorage.setItem('dni_fertilization', JSON.stringify(withHistory.map((bed, i) => ({
+    id: `f${i}`, bed, date: day(9), input: 'NPK 20-20-20', qtyKg: 1.4, worker: 'M. Cruz',
+  }))))
+  localStorage.setItem('dni_treatments', JSON.stringify(withHistory.flatMap((bed, i) => [
+    { id: `t${i}a`, bed, date: day(4), type: 'Fungicide', input: 'Copper oxychloride', worker: 'J. Ramos' },
+    { id: `t${i}b`, bed, date: day(17), type: 'Insecticide', input: 'Neem oil', worker: 'M. Cruz' },
+    { id: `t${i}c`, bed, date: day(31), type: 'Foliar', input: 'Seaweed extract', worker: 'J. Ramos' },
+  ])))
   localStorage.setItem('dni_beds', JSON.stringify(beds))
   localStorage.setItem('dni_fields', JSON.stringify(
     fields.map(([n, rows]) => ({ id: n, name: n, fieldName: n, rows, postLines: postLines[n], shadehouse: 'SH-0001' }))))

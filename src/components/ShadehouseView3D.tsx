@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Droplets, Layers, RotateCcw, X, Eye, Tag, Map as MapIcon, Compass, CloudRain, Mountain, Sun, Maximize2, Minimize2 } from "lucide-react";
+import { Droplets, Layers, RotateCcw, Eye, Tag, Map as MapIcon, Compass, CloudRain, Mountain, Sun, Maximize2, Minimize2 } from "lucide-react";
 import { terrainFall } from "../services/terrain";
 import { atLocal, sunPosition, dayArc, localHours, nurseryToday } from "../services/solar";
 import SceneCompass from "./SceneCompass";
 import { useRadiation } from "../hooks/useRadiation";
-import { measuredDayLight, clothTransmission, SHADE_LAYERS } from "../services/bedLight";
 
 /** Decimal local hours as a clock reading: 6.75 -> "06:45". */
 function fmtHour(hours: number): string {
@@ -15,17 +14,17 @@ function fmtHour(hours: number): string {
 }
 import {
   stateColors,
-  potTypeLabels,
-  LEVEL_HEIGHTS_M,
   type BedLevel,
   type ShadehouseBed,
 } from "../services/shadehouseLayout";
+import type { BedActivity } from "../services/bedState";
 import ShadehouseScene, { placeBeds, type LensMode } from "./ShadehouseScene";
 import { useShadehouseBeds } from "../hooks/useShadehouseBeds";
 import { readZone, zoneStatusColors, type ZoneReading } from "../services/irrigation";
 import { buildZones, demoAnomalies, simulateFixes } from "../services/irrigationSim";
 import { useCurrentWeather } from "../hooks/useCurrentWeather";
 import { SceneErrorBoundary, WebglUnavailable, useWebgl } from "./WebglGuard";
+import BedCockpit from "./BedCockpit";
 import { precipitationKind, windDirectionLabel } from "../services/weather";
 
 // Two air levels. The third carries the irrigation line, never a bed.
@@ -66,20 +65,17 @@ const LENS_SCALES: Record<Exclude<LensMode, "state">, { low: string; high: strin
   light: { low: "Triple · 4.3%", high: "Single · 35%", gradient: "linear-gradient(90deg,#26364a,#7d8a6a,#fad652)" },
 };
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3">
-      <span className="text-[10px] text-white/40 uppercase tracking-[0.1em]">{label}</span>
-      <span className="text-[11px] text-white/85 text-right">{value}</span>
-    </div>
-  );
-}
-
 export default function ShadehouseView3D({ className = "" }: { className?: string }) {
   // The stack is the real bed set: ground beds and whatever cable levels have
   // actually been created above them. It used to be generated, which is why
   // the model showed cables the nursery has not strung.
-  const { beds, loading }: { beds: ShadehouseBed[]; loading: boolean } = useShadehouseBeds();
+  const {
+    beds, loading, historyFor,
+  }: {
+    beds: ShadehouseBed[];
+    loading: boolean;
+    historyFor: (bedName: string) => BedActivity[];
+  } = useShadehouseBeds();
   const [visibleLevels, setVisibleLevels] = useState<Set<BedLevel>>(
     () => new Set(ALL_LEVELS)
   );
@@ -628,93 +624,15 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
         {/* Selection readout */}
         {selected && (
-          <div className="absolute left-4 bottom-4 w-72 rounded-lg bg-navy-800/95 backdrop-blur ring-1 ring-white/10 overflow-hidden">
-            <div className="flex items-start justify-between gap-2 px-3.5 pt-3.5">
-              <div>
-                <p className="text-[13px] font-bold text-white">{selected.bedId}</p>
-                <p className="text-[11px] text-white/55 mt-0.5">
-                  {selected.type === "ground"
-                    ? `Ground row · ${selected.widthM.toFixed(2)} × ${selected.lengthM.toFixed(1)} m`
-                    : `Cable line · level ${selected.level} · ${(selected.potCount ?? 0).toLocaleString()} pots`}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedBedId(null)}
-                className="p-1 rounded-md text-white/40 hover:text-white/80 hover:bg-white/10 cursor-pointer transition-colors"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="px-3.5 py-3 space-y-1.5">
-              <div className="flex items-center gap-1.5">
-                <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: stateColors[selected.state].fill }}
-                />
-                <span className="text-[11px] text-white/80">
-                  {stateColors[selected.state].label}
-                </span>
-              </div>
-
-              {selected.shade && (
-                <>
-                  {/* The number that matters for growth. Days in a triple-shade
-                      bed are not the same as days in a single-shade one, and
-                      this is by how much. */}
-                  {(() => {
-                    // Measured where Open-Meteo has a reading for that day,
-                    // clear-sky where it does not — and the label says which,
-                    // because a modelled figure and a measured one are not the
-                    // same claim.
-                    const light = measuredDayLight(sunDate, selected.shade, radiation);
-                    return (
-                      <>
-                        <Row
-                          label={light.measured ? "Light that day" : "Light (clear sky)"}
-                          value={`${light.atBed.toFixed(1)} mol/m²`}
-                        />
-                        {light.measured && (
-                          <Row
-                            label="Cloud"
-                            value={`${(light.clearSkyFraction * 100).toFixed(0)}% of a clear day`}
-                          />
-                        )}
-                      </>
-                    );
-                  })()}
-                  <Row
-                    label="Through cloth"
-                    value={`${(clothTransmission(selected.shade) * 100).toFixed(2)}% · ${
-                      SHADE_LAYERS[selected.shade]} layer${SHADE_LAYERS[selected.shade] > 1 ? "s" : ""} at 65%`}
-                  />
-                </>
-              )}
-              {selected.variety && (
-                <Row label="Variety" value={selected.variety} />
-              )}
-              {selected.plantedDate && (
-                <Row label="Planted" value={selected.plantedDate} />
-              )}
-              {selected.expectedHarvest && (
-                <Row label="Harvest due" value={selected.expectedHarvest} />
-              )}
-              {selected.type === "basket" && selected.potType && (
-                <Row label="Pot type" value={potTypeLabels[selected.potType]} />
-              )}
-              {selected.type === "basket" && (
-                <Row
-                  label="Height"
-                  value={`${LEVEL_HEIGHTS_M[selected.level].toFixed(2)} m`}
-                />
-              )}
-              {selected.notes && (
-                <p className="text-[11px] text-amber-300/90 pt-1">{selected.notes}</p>
-              )}
-            </div>
-
+          <BedCockpit
+            bed={selected}
+            activity={historyFor(selected.bedId)}
+            onDate={sunDate}
+            radiation={radiation}
+            onClose={() => setSelectedBedId(null)}
+          >
             {selectedReading && showIrrigation && (
-              <div className="flex items-center gap-1.5 px-3.5 py-2.5 bg-white/5 border-t border-white/10">
+              <div className="flex items-center gap-1.5 px-4 py-2.5 bg-white/5 border-t border-white/10">
                 <span
                   className="w-2 h-2 rounded-full shrink-0"
                   style={{ backgroundColor: zoneStatusColors[selectedReading.status].fill }}
@@ -731,7 +649,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
                 </span>
               </div>
             )}
-          </div>
+          </BedCockpit>
         )}
 
         {/* Degraded-feed notice — the one thing that must never be silent. */}
