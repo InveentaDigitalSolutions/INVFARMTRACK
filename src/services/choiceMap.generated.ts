@@ -972,6 +972,12 @@ export const CHOICE_MAP: Record<string, Record<string, Record<string, number>>> 
       "Petit": 187500004
     }
   },
+  "bv_ports": {
+    "bv_kind": {
+      "Airport": 187500200,
+      "Seaport": 187500201
+    }
+  },
   "bv_purchaseorders": {
     "bv_currency": {
       "HNL": 187460000,

@@ -781,13 +781,21 @@ export const DATAVERSE_TABLES: Record<string, DataverseBinding> = {
       notes: "bv_notes",
     },
   },
-  /** Destination ports. Price is keyed on them, because the freight is. */
+  /**
+   * Where goods can be delivered: airports and seaports both. Price is keyed
+   * on them, because the freight is — and the freight mode decides which of
+   * the two kinds can even be named.
+   */
   ports: {
     dataSource: "bv_ports",
     primaryKey: "bv_portid",
     fields: {
       code: "bv_portcode",
       name: "bv_portname",
+      // IATA for an airport, UN/LOCODE for a seaport — what the airway bill
+      // carries. Distinct from `code`, which is the row's own PRT-000 number.
+      locator: "bv_code",
+      kind: "bv_kind",
       country: "bv_country",
       active: "bv_isactive",
       notes: "bv_notes",

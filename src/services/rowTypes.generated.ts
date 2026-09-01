@@ -465,6 +465,8 @@ export interface PortsRow {
   id: string;
   code?: string;
   name?: string;
+  locator?: string;
+  kind?: string;
   country?: string;
   active?: boolean;
   notes?: string;

@@ -6458,7 +6458,7 @@
       "displayName": "Port",
       "displayCollectionName": "Ports",
       "ownershipType": "UserOwned",
-      "description": "A destination port. Price depends on it \u2014 the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does. Kept as a table rather than a fixed list so a new one can be added without a schema change.",
+      "description": "A place goods can be delivered to: an airport or a seaport. Price depends on it \u2014 the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does \u2014 and the mode narrows which of these can even be chosen: nothing flies into Rotterdam's harbour.\\n\\nLoaded from public reference data (OurAirports and the NGA World Port Index) rather than typed, and cut to the places that can actually receive freight: airports with an IATA code and scheduled service, harbours the World Port Index rates medium or large.",
       "columns": [
         {
           "schemaName": "bv_PortCode",
@@ -6477,6 +6477,31 @@
           "maxLength": 100,
           "required": true,
           "description": "What the port is called \u2014 Miami, Rotterdam, Amsterdam."
+        },
+        {
+          "schemaName": "bv_Code",
+          "displayName": "Code",
+          "type": "string",
+          "maxLength": 12,
+          "required": false,
+          "description": "IATA code for an airport (MIA), UN/LOCODE for a seaport (NLRTM). What appears on the airway bill."
+        },
+        {
+          "schemaName": "bv_Kind",
+          "displayName": "Kind",
+          "type": "choice",
+          "required": false,
+          "options": [
+            {
+              "value": 187500200,
+              "label": "Airport"
+            },
+            {
+              "value": 187500201,
+              "label": "Seaport"
+            }
+          ],
+          "description": "Airport or seaport. Freight mode picks between them: a price by air can only name an airport."
         },
         {
           "schemaName": "bv_Country",

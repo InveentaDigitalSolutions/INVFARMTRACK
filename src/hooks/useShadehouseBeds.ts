@@ -27,8 +27,16 @@ export function useShadehouseBeds(): {
   historyFor: (bedName: string) => BedActivity[];
   /** True when no bed has been created yet — the screens say so rather than drawing nothing. */
   isEmpty: boolean;
+  /**
+   * True until the beds have been read.
+   *
+   * Distinct from isEmpty on purpose: a view that treats "not read yet" as
+   * "no beds" draws the house at the wrong size for a frame or two and then
+   * snaps, which looks like a different model flashing up.
+   */
+  loading: boolean;
 } {
-  const [bedRows] = useRecords<BedsRow>("beds", []);
+  const [bedRows, , loadingBeds] = useRecords<BedsRow>("beds", []);
   const [plantings] = useRecords<PlantingsRow>("plantings", []);
   const [plants] = useRecords<PlantsRow>("plants", []);
   const [treatments] = useRecords<TreatmentsRow>("treatments", []);
@@ -47,7 +55,13 @@ export function useShadehouseBeds(): {
         const parsed = parseBedName(name);
         // The field on the record is authoritative; the name is the fallback
         // for a bed created before the lookup existed.
-        const fieldId = String(b.field ?? parsed?.field ?? "");
+        // The field on the record is authoritative — but only once it names a
+        // field. Until the lookup index resolves it, it is a GUID, and a GUID
+        // matches no plot: every bed would be laid out as an unknown field, in
+        // the band south of the house, and then jump back.
+        const recorded = String(b.field ?? "");
+        const known = plotConfigs.some((p) => p.id === recorded);
+        const fieldId = known ? recorded : (parsed?.field ?? recorded);
         const geometry = plotConfigs.find((p) => p.id === fieldId);
         const level = (parsed?.level ?? Number(b.level ?? 0)) as BedLevel;
         const s = status.get(name);
@@ -86,5 +100,5 @@ export function useShadehouseBeds(): {
     [plantings, treatments, irrigation, harvest, fertilization, pruning]
   );
 
-  return { beds, historyFor, isEmpty: bedRows.length === 0 };
+  return { beds, historyFor, isEmpty: bedRows.length === 0, loading: loadingBeds };
 }

@@ -24,17 +24,49 @@ import { LookupResolver } from "./lookupResolver";
 type Row = Record<string, unknown>;
 
 /**
+ * Every page, not the first one.
+ *
+ * Dataverse answers a list query one page at a time and hands back a skip
+ * token for the next; a single call therefore returns some of the table and
+ * looks exactly like all of it. That was harmless while the biggest table held
+ * 200 beds. It stopped being harmless when the ports table became 6,591
+ * airports and seaports: a picker missing four thousand destinations, with
+ * nothing on screen to say so.
+ *
+ * The cap is a runaway guard, not a limit anyone should reach — 50 pages is
+ * a quarter of a million rows.
+ */
+async function retrieveAll(
+  client: { retrieveMultipleRecordsAsync: <R>(t: string, o?: Record<string, unknown>) => Promise<IOperationResult<R[]>> },
+  table: string,
+  options: Record<string, unknown> = {}
+): Promise<Row[]> {
+  const rows: Row[] = [];
+  let skipToken: string | undefined;
+  for (let page = 0; page < 50; page++) {
+    const result: IOperationResult<Row[]> = await client.retrieveMultipleRecordsAsync<Row>(table, {
+      ...options,
+      ...(skipToken ? { skipToken } : {}),
+    });
+    if (!result.success) return rows;
+    rows.push(...(result.data ?? []));
+    // A page short of the asked-for size is the last one whatever the token
+    // says, and a token that does not change would loop forever.
+    if (!result.skipToken || result.skipToken === skipToken) break;
+    skipToken = result.skipToken;
+  }
+  return rows;
+}
+
+/**
  * One resolver for the whole app so the bed index is fetched once, not once
  * per screen that references a bed.
  */
 export const dataverseResolver = new LookupResolver(async (entitySet, labelColumns, join) => {
   const client = getClient(dataSourcesInfo);
-  const result = await client.retrieveMultipleRecordsAsync<Row>(entitySet, {
-    select: labelColumns,
-  });
-  if (!result.success) return [];
+  const rows = await retrieveAll(client, entitySet, { select: labelColumns });
   const keyColumn = `${entitySet.replace(/s$/, "")}id`;
-  return result.data.map((row) => ({
+  return rows.map((row) => ({
     id: String(row[keyColumn] ?? ""),
     label: labelColumns
       .map((c) => row[c])
@@ -226,15 +258,20 @@ export class DataverseStore<T extends Identified> implements DataStore<T> {
       );
     }
 
-    const result = await this.client.retrieveMultipleRecordsAsync<Row>(this.dataSourceName, {
+    // `top` asks for a bounded slice, so it is answered in one call; without
+    // it the caller asked for the table, and the table is what it gets.
+    const query = {
       ...(filters.length ? { filter: filters.join(" and ") } : {}),
       ...(options?.orderBy
         ? { orderBy: [options.orderBy.startsWith("-") ? `${options.orderBy.slice(1)} desc` : options.orderBy] }
         : {}),
       ...(options?.top ? { top: options.top } : {}),
-    });
+    };
+    const data = options?.top
+      ? this.unwrap(await this.client.retrieveMultipleRecordsAsync<Row>(this.dataSourceName, query))
+      : await retrieveAll(this.client, this.dataSourceName, query);
 
-    let rows = this.unwrap(result).map((r) => this.toApp(r));
+    let rows = data.map((r) => this.toApp(r));
     await this.resolveLookupLabels(rows);
 
     if (options?.search) {

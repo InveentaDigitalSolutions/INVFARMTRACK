@@ -79,7 +79,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   // The stack is the real bed set: ground beds and whatever cable levels have
   // actually been created above them. It used to be generated, which is why
   // the model showed cables the nursery has not strung.
-  const { beds }: { beds: ShadehouseBed[] } = useShadehouseBeds();
+  const { beds, loading }: { beds: ShadehouseBed[]; loading: boolean } = useShadehouseBeds();
   const [visibleLevels, setVisibleLevels] = useState<Set<BedLevel>>(
     () => new Set(ALL_LEVELS)
   );
@@ -434,7 +434,22 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
       {/* Scene */}
       <div className="relative h-[460px] bg-gradient-to-b from-sand-50 to-sand-100">
-        {!webgl.ok ? (
+        {loading ? (
+          /* The house is drawn to fit the beds, so with none read yet it is
+             built at a default size and then rebuilt — a different model
+             flashing up for a frame. Better to say it is loading. */
+          <div className="h-full flex flex-col items-center justify-center gap-2 text-navy-400">
+            <div className="w-5 h-5 rounded-full border-2 border-navy-200 border-t-navy-500 animate-spin" />
+            <p className="text-[12px]">Reading the beds…</p>
+          </div>
+        ) : beds.length === 0 ? (
+          /* Same reason: with nothing to draw, the house has no size, and what
+             comes out is roads at full width around a floor built for nothing. */
+          <div className="h-full flex flex-col items-center justify-center gap-1 text-navy-400">
+            <p className="text-[13px] font-semibold text-navy-600">No beds recorded yet</p>
+            <p className="text-[12px]">Add them under Infrastructure and the house appears here.</p>
+          </div>
+        ) : !webgl.ok ? (
           <WebglUnavailable report={webgl} />
         ) : (
         <SceneErrorBoundary>

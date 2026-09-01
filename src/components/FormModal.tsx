@@ -102,6 +102,16 @@ interface SelectField extends BaseField {
   optionsWhen?: (values: Record<string, unknown>) => { value: string; label: string }[];
   /** Shown in place of "Select..." when there is nothing to offer. */
   emptyHint?: string;
+  /**
+   * Type to narrow instead of scrolling. For the destination picker, where the
+   * choices are every airport and seaport in the world: a dropdown of 6,591
+   * entries is a list nobody can use, and typing "MIA" is how a person names
+   * one anyway.
+   *
+   * The typed text is only ever a filter — what is stored is still one of the
+   * offered names, and anything else is called out rather than saved.
+   */
+  searchable?: boolean;
 }
 
 interface PlantLinesField extends BaseField {
@@ -315,7 +325,46 @@ function renderField(
         </div>
       );
 
-    case "select":
+    case "select": {
+      // Long lists are typed at, not scrolled through. A datalist keeps the
+      // browser's own matching and keyboard handling — building a bespoke
+      // dropdown here would mean reimplementing both, worse.
+      if (field.searchable) {
+        const choices = optionsFor(field);
+        const listId = `list-${field.key}`;
+        const typed = String(v);
+        const unknown = typed !== "" && !choices.some((o) => o.value === typed);
+        return (
+          <div>
+            <input
+              list={listId}
+              value={typed}
+              onChange={(e) => onChange(field.key, e.target.value)}
+              placeholder={
+                choices.length === 0
+                  ? (field.emptyHint ?? "Nothing to choose yet")
+                  : `Type to search ${choices.length.toLocaleString()}…`
+              }
+              disabled={choices.length === 0}
+              className="w-full px-3 py-2.5 text-[13px] rounded-lg border border-sand-200 bg-white
+                         text-navy-900 placeholder:text-navy-300 disabled:bg-sand-100
+                         focus:outline-none focus:ring-2 focus:ring-lime-400/30 focus:border-lime-400 transition-all"
+            />
+            <datalist id={listId}>
+              {choices.map((o) => (
+                <option key={o.value} value={o.value} />
+              ))}
+            </datalist>
+            {/* Free text saves a lookup that binds to nothing, so say so while
+                it can still be fixed rather than after the record is written. */}
+            {unknown && (
+              <p className="mt-1 text-[11px] text-amber-700">
+                Not in the list — pick one of the offered names, or it will save empty.
+              </p>
+            )}
+          </div>
+        );
+      }
       return (
         <div className="relative">
           <select
@@ -340,6 +389,7 @@ function renderField(
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-navy-300 pointer-events-none" />
         </div>
       );
+    }
 
     case "toggle": {
       const join = field.join ?? " & ";

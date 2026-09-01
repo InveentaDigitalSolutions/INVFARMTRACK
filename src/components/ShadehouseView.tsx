@@ -35,7 +35,7 @@ interface ShadehouseViewProps {
 }
 
 export default function ShadehouseView({ className = "", onBedClick }: ShadehouseViewProps) {
-  const { beds, historyFor, isEmpty } = useShadehouseBeds();
+  const { beds, historyFor, isEmpty, loading } = useShadehouseBeds();
   const [selectedBed, setSelectedBed] = useState<ShadehouseBed | null>(null);
   const [hoveredBed, setHoveredBed] = useState<string | null>(null);
   const [filterState, setFilterState] = useState<string | null>(null);
@@ -125,7 +125,10 @@ export default function ShadehouseView({ className = "", onBedClick }: Shadehous
         <div>
           <h3 className="text-[14px] font-bold text-navy-900">Shadehouse Layout</h3>
           <p className="text-[11px] text-navy-400">
-            {isEmpty
+            {/* "None" and "not read yet" are different things to say. */}
+            {loading
+              ? "Reading the beds…"
+              : isEmpty
               ? "No beds recorded yet — add them under Infrastructure"
               : `${beds.length} beds across ${new Set(beds.map((b) => b.fieldId)).size} fields — click a bed for details, shift+click to multi-select`}
           </p>

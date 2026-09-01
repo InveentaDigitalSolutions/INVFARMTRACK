@@ -10,7 +10,7 @@
 | Publisher prefix | `bv_` |
 | Version | 2.0.0.0 |
 | Tables | 52 |
-| Columns | 626 |
+| Columns | 628 |
 | Relationships | 75 |
 
 ## Conventions
@@ -79,7 +79,7 @@
 | [Shipment](#shipment) | `bv_shipment` | `SHP-0001` | 11 | One consignment to a customer. Boxes are bv_Packing rows pointing here, each already carrying its bed — so a complaint about a box leads back to a bed, a planting and the treatments it had. Sits between the order it fulfils and the invoice raised for what actually went. |
 | [Solar Radiation](#solar-radiation) | `bv_solarradiation` | `SR-{SEQNUM:5}` | 5 | Measured shortwave radiation for one day at the nursery. Kept as history for the same reason the exchange rate is: the light a planting actually received is a fact about the past, and the weather service only offers a 92-day window. Without this, a crop older than that accumulates on clear-sky assumptions. |
 | [Product](#product) | `bv_plantsize` | `PS-0001` | 17 | A product the nursery sells: a variety at a size, as a type and a condition — and what it costs. Size and price were two tables, which meant two screens describing the same thing. The only reason to record a size at all is to price and pack it, so they are one row.\n\nCustomer, port and the dates may be left blank, meaning any. The most specific row that applies wins, so a general figure is set once and overridden only where something was negotiated — and the box count can live on the general row rather than being repeated. |
-| [Port](#port) | `bv_port` | `PRT-{SEQNUM:3}` | 5 | A destination port. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does. Kept as a table rather than a fixed list so a new one can be added without a schema change. |
+| [Port](#port) | `bv_port` | `PRT-{SEQNUM:3}` | 7 | A place goods can be delivered to: an airport or a seaport. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does — and the mode narrows which of these can even be chosen: nothing flies into Rotterdam's harbour.\n\nLoaded from public reference data (OurAirports and the NGA World Port Index) rather than typed, and cut to the places that can actually receive freight: airports with an IATA code and scheduled service, harbours the World Port Index rates medium or large. |
 | [Basket Size](#basket-size) | `bv_basketsize` | `BSK-{SEQNUM:3}` | 7 | A size of hanging basket the nursery uses. Kept as a table because the sizes change, and because how many fit on a cable is a fact about the basket rather than about any variety. |
 | [Plant Alias](#plant-alias) | `bv_plantalias` | `ALS-0001` | 6 | Another name for a variety. Customers order by their own trade names — Summer Nights is Hawaiian, Snowy Morning is Marble Queen, Off to Oz is Neon — and breeders use codes like UF-Ea-0317. Without these, every order import is matched by hand and a near-miss like 'Njoy' against 'N'Joy' goes unnoticed. |
 | [Phenology](#phenology) | `bv_phenology` | `PH-0001` | 9 | How long a variety takes and to what stage. One row per variety — the season is not recorded because it is measured: the app knows the light each bed actually received, and a planting in the dark half reaches the same stage later on its own. |
@@ -2167,7 +2167,7 @@ A product the nursery sells: a variety at a size, as a type and a condition — 
 
 `bv_port` · User-owned
 
-A destination port. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does. Kept as a table rather than a fixed list so a new one can be added without a schema change.
+A place goods can be delivered to: an airport or a seaport. Price depends on it — the same variety to the same customer costs a different amount into Miami than into Rotterdam, because the freight does — and the mode narrows which of these can even be chosen: nothing flies into Rotterdam's harbour.\n\nLoaded from public reference data (OurAirports and the NGA World Port Index) rather than typed, and cut to the places that can actually receive freight: airports with an IATA code and scheduled service, harbours the World Port Index rates medium or large.
 
 **Record ID:** `bv_portcode` — format `PRT-{SEQNUM:3}`, e.g. `PRT-{SEQNUM:3}`.
 
@@ -2175,9 +2175,22 @@ A destination port. Price depends on it — the same variety to the same custome
 |---|---|---|:--:|---|
 | `bv_portcode` 🔑 | Port ID | Autonumber | ✓ | Auto-generated identifier, format PRT-001. |
 | `bv_portname` | Name | Text(100) | ✓ | What the port is called — Miami, Rotterdam, Amsterdam. |
+| `bv_code` | Code | Text(12) |  | IATA code for an airport (MIA), UN/LOCODE for a seaport (NLRTM). What appears on the airway bill. |
+| `bv_kind` | Kind | Choice |  | Airport or seaport. Freight mode picks between them: a price by air can only name an airport. |
 | `bv_country` | Country | Text(100) |  |  |
 | `bv_isactive` | Active | Yes/No |  | Whether the nursery currently ships there. |
 | `bv_notes` | Notes | Text area(2000) |  |  |
+
+<details><summary>Choice values</summary>
+
+**Kind** (`bv_kind`)
+
+| Value | Label |
+|---|---|
+| 187500200 | Airport |
+| 187500201 | Seaport |
+
+</details>
 
 **Referenced by:** Order (`bv_portid`), Product (`bv_portid`)
 

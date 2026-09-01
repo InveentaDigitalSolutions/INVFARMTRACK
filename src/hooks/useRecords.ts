@@ -56,15 +56,25 @@ function storeFor(table: string, seed: Record<string, unknown>[]): DataStore<Ide
  */
 type Updater<T> = T[] | ((prev: T[]) => T[]);
 
+/**
+ * The third element is whether the first read is still in flight.
+ *
+ * An empty array means two very different things — "nothing recorded" and
+ * "not read yet" — and a screen that cannot tell them apart draws a half-built
+ * nursery for the fraction of a second before the rows arrive. The 3D view
+ * showed a shrunken house of posts on an empty floor, which reads as the wrong
+ * model rather than as a loading state.
+ */
 export function useRecords<T>(
   table: string,
   seed: T[]
-): [T[], (next: Updater<T>) => void] {
+): [T[], (next: Updater<T>) => void, boolean] {
   const store = useMemo(
     () => storeFor(table, seed as unknown as Record<string, unknown>[]),
     [table, seed]
   );
   const [rows, setRowsState] = useState<T[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     try {
@@ -77,6 +87,10 @@ export function useRecords<T>(
       console.error(`[data] failed to load "${table}"`, err);
       reportWriteError(table, "read", err);
       setRowsState([]);
+    } finally {
+      // A failed read is still a finished one: the screen has to stop saying
+      // "loading" and start saying what it does know, which is nothing.
+      setLoading(false);
     }
   }, [store, table]);
 
@@ -137,5 +151,5 @@ export function useRecords<T>(
     [store, load, table]
   );
 
-  return [rows, setRows];
+  return [rows, setRows, loading];
 }

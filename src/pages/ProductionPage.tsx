@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Sprout, Leaf, Bug, Droplets, Scissors} from "lucide-react";
 import PageShell from "../components/PageShell";
@@ -16,6 +16,7 @@ import { nextSeasonName, mixedBedKindProblem, allBaskets } from "../services/inf
 import ProductionOverview from "../components/ProductionOverview";
 import { useInputNutrients } from "../hooks/useInputNutrients";
 import { expandBeds, expandPlantLines } from "../services/expandBeds";
+import { portOptions, portLabel, mismatchedPort, type PortRow } from "../services/portPicker";
 import { emptyLine } from "../components/PlantLines";
 import type { FertilizationRow, HarvestRow, IrrigationRow, PlantingsRow, PlantsRow, PruningRow, SeasonsRow, TasksRow, TreatmentsRow } from "../services/rowTypes.generated";
 
@@ -263,7 +264,9 @@ const plantSizeFields = [
     // that fits wins, so a general figure is set once and only overridden where
     // something was actually negotiated.
     { key: "customer", label: "Customer", type: "select" as const, options: [], optionsFrom: "customers" },
-    { key: "port", label: "Port", type: "select" as const, options: [], optionsFrom: "ports" },
+    // Filled in by the component: the destinations depend on the freight mode
+    // chosen a field away, and the list is 6,591 places long.
+    { key: "port", label: "Port or airport", type: "select" as const, searchable: true, options: [] },
     // Freight is most of the difference between one destination's price and
     // another's, and air and sea into the same city are not the same cost.
     // Everything goes by air today; blank means the row covers either.
@@ -468,6 +471,38 @@ export default function ProductionPage() {
   const [plants, setPlants] = useRecords("plants", initPlants);
   const [plantSizes, setPlantSizes] = useRecords("plantSizes", initPlantSizes);
   const [phenology, setPhenology] = useRecords("phenology", initPhenology);
+  // Read for the destination picker, not shown as a screen: 6,591 airports and
+  // seaports, of which the form offers whichever kind the freight mode can
+  // actually reach.
+  const [ports] = useRecords<PortRow>("ports", []);
+
+  /**
+   * The product form with its destination picker filled in.
+   *
+   * The field list is otherwise a module constant, which cannot see the ports
+   * table or the freight mode chosen beside it — and those are exactly what
+   * decide the choices here.
+   */
+  const productFields = useMemo(
+    () =>
+      plantSizeFields.map((group) => ({
+        ...group,
+        fields: group.fields.map((f) =>
+          f.key === "port"
+            ? {
+                ...f,
+                labelWhen: (v: Record<string, unknown>) => portLabel(v.freightMode),
+                optionsWhen: (v: Record<string, unknown>) => portOptions(ports, v.freightMode),
+                below: (v: Record<string, unknown>) => {
+                  const problem = mismatchedPort(ports, v as { port?: unknown; freightMode?: unknown });
+                  return problem ? <p className="mt-1 text-[11px] text-amber-700">{problem}</p> : null;
+                },
+              }
+            : f
+        ),
+      })),
+    [ports]
+  );
 
   /** Names a new season from its start date; an existing one keeps its name. */
   const saveSeason = (values: Record<string, unknown>) => {
@@ -925,7 +960,7 @@ export default function ProductionPage() {
             <FormModal
               open={plantSizeForm.open} onClose={plantSizeForm.close}
               title={plantSizeForm.isEdit ? "Edit Product" : "Add Product"}
-              groups={plantSizeFields} values={plantSizeForm.values}
+              groups={productFields} values={plantSizeForm.values}
               onChange={plantSizeForm.onChange} isEdit={plantSizeForm.isEdit}
               onSubmit={(v) => handleSave(plantSizes, setPlantSizes, plantSizeForm, v)}
             />

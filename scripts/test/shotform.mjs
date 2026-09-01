@@ -15,6 +15,18 @@ const page = await browser.newPage({ viewport: { width: 1500, height: 1100 } })
 page.setDefaultTimeout(10000)
 const errs = []
 page.on('console', m => { if (m.type() === 'error') errs.push(m.text()) })
+// A few real destinations of each kind, so the picker can be looked at: the
+// live list comes from Dataverse, and a preview build has no session.
+await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' })
+await page.evaluate(() => {
+  localStorage.setItem('dni_ports', JSON.stringify([
+    { id: 'p1', name: 'MIA · Miami International Airport, United States', kind: 'Airport', country: 'United States' },
+    { id: 'p2', name: 'AMS · Amsterdam Airport Schiphol, Netherlands', kind: 'Airport', country: 'Netherlands' },
+    { id: 'p3', name: 'SAP · Ramón Villeda Morales International Airport, Honduras', kind: 'Airport', country: 'Honduras' },
+    { id: 'p4', name: 'NLRTM · Rotterdam, Netherlands', kind: 'Seaport', country: 'Netherlands' },
+    { id: 'p5', name: 'HNPCR · Puerto Cortes, Honduras', kind: 'Seaport', country: 'Honduras' },
+  ]))
+})
 await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' })
 await page.getByRole('button', { name: 'Production' }).first().click()
 await page.waitForTimeout(700)
