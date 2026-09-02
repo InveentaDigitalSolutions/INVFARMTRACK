@@ -177,6 +177,15 @@ if (process.env.PICK) {
                          box.y + box.height * Number(process.env.PICKY ?? 0.55))
   await page.waitForTimeout(1600)
 }
+// Open the command palette (and optionally type into it) so it can be seen.
+if (process.env.PALETTE) {
+  await page.keyboard.press('Meta+k')
+  await page.waitForTimeout(600)
+  if (process.env.PALETTE !== '1') {
+    await page.keyboard.type(process.env.PALETTE, { delay: 40 })
+    await page.waitForTimeout(500)
+  }
+}
 const target = process.env.FULL ? page
   : process.env.CLIP ? page.locator('canvas').first().locator('xpath=..')
   : canvas

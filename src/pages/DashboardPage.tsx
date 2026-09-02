@@ -30,6 +30,8 @@ import { useRecords } from "../hooks/useRecords";
 import type { ShipmentsRow } from "../services/rowTypes.generated";
 import RankedBars from "../components/RankedBars";
 import VarietyFulfilment from "../components/VarietyFulfilment";
+import { useFeeds } from "../hooks/useFeeds";
+import { FEED_LOOK } from "../services/feedState";
 
 const container = {
   hidden: {},
@@ -120,7 +122,9 @@ export default function DashboardPage() {
     [shipments]
   );
   const insight = useMemo(() => deriveShadehouseInsight(beds), [beds]);
-  const { rate: exchangeRate, loading: fxLoading, isLive: fxLive, staleDays: fxStaleDays } = useExchangeRate();
+  const { rate: exchangeRate, loading: fxLoading, isLive: fxLive } = useExchangeRate();
+  const feeds = useFeeds();
+  const rateFeed = feeds.find((f) => f.id === "rate");
   // The same rows the rate itself comes from, charted rather than reduced to
   // one number. Open on hover or on click, and reachable from the keyboard.
   const [fxRows] = useRecords<ExchangeRateRow>("exchangeRates", []);
@@ -207,10 +211,11 @@ export default function DashboardPage() {
               </div>
               {exchangeRate && (
                 <span className="flex items-center gap-1.5 pl-2.5 border-l border-white/10">
+                  {/* The same ladder every other feed uses: live, stale,
+                      retrying, down — not a threshold invented here. */}
                   <span
-                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                      !fxLive || fxStaleDays > 4 ? "bg-amber-400" : "bg-green-400"
-                    }`}
+                    className="w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ backgroundColor: FEED_LOOK[rateFeed?.status ?? "idle"].dot }}
                   />
                   {/* The rate's own publication date, not when the app read it.
                       A figure fetched a minute ago can still be a week old, and
@@ -222,7 +227,7 @@ export default function DashboardPage() {
                       month: "short",
                       year: "numeric",
                     })}
-                    {fxStaleDays > 4 ? ` · ${fxStaleDays} days old` : ""}
+                    {rateFeed && rateFeed.status !== "live" ? ` · ${rateFeed.detail}` : ""}
                   </span>
                 </span>
               )}

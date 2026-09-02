@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Settings, User, Bell, Monitor, DatabaseBackup } from "lucide-react";
 import PageShell from "../components/PageShell";
+import FeedBadge from "../components/FeedBadge";
+import { useFeeds } from "../hooks/useFeeds";
 
 const sections = [
   { icon: User, title: "User Profile", description: "Manage your account details, role and preferences" },
@@ -8,6 +10,39 @@ const sections = [
   { icon: Monitor, title: "System Config", description: "App settings, language, timezone and integrations" },
   { icon: DatabaseBackup, title: "Data Export", description: "Export data to CSV, Excel or sync with Dataverse" },
 ];
+
+/**
+ * Every outside source the app leans on, with its health.
+ *
+ * One place to answer "is the app being told the truth right now" — a question
+ * that used to require noticing that a date on a card was three days old.
+ */
+function FeedList() {
+  const feeds = useFeeds();
+  return (
+    <div className="bg-white rounded-xl border border-sand-200 mb-8 overflow-hidden">
+      <div className="px-5 py-3.5 border-b border-sand-100">
+        <h2 className="text-[14px] font-bold text-navy-900">Where the data comes from</h2>
+        <p className="text-[12px] text-navy-500 mt-0.5">
+          Outside sources and how current each one is. A source that was never set
+          up reads as off, not broken.
+        </p>
+      </div>
+      <ul className="divide-y divide-sand-100">
+        {feeds.map((feed) => (
+          <li key={feed.id} className="px-5 py-3">
+            <div className="flex items-baseline justify-between gap-4">
+              <p className="text-[13px] font-semibold text-navy-800">{feed.label}</p>
+              <FeedBadge feed={feed} />
+            </div>
+            <p className="text-[11px] text-navy-400 mt-0.5">{feed.source}</p>
+            <p className="text-[11px] text-navy-500 mt-1">{feed.matters}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   return (
@@ -17,6 +52,10 @@ export default function SettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto"
       >
+        {/* Where the numbers come from, and whether they are current.
+            Everything else on this page is still a preview; this is real. */}
+        <FeedList />
+
         <div className="bg-white rounded-xl border border-sand-200 p-8 text-center mb-8">
           <div className="w-14 h-14 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-4">
             <Settings className="w-7 h-7 text-green-700" />
