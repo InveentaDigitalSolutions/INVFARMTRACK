@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu } from "lucide-react";
 import Sidebar from "./components/Sidebar";
+import { useFeedTopUp } from "./hooks/useFeedTopUp";
 import LoadingScreen from "./components/LoadingScreen";
 import DashboardPage from "./pages/DashboardPage";
 import ProductionPage from "./pages/ProductionPage";
@@ -73,6 +74,22 @@ export default function App() {
     }
   };
   const isMobile = useIsMobile();
+  // Bring the stored sunlight up to date on launch, so the growth figures
+  // stop falling back to clear-sky maths for the days nobody had the app open.
+  useFeedTopUp();
+
+  /**
+   * Put the choice on the document, not only on a wrapper div.
+   *
+   * The class lived on one div inside the layout, which is enough for the
+   * `dark:` variants underneath it and no use to anything that has to *ask* —
+   * the 3D scene picks its own sky, ground and light colours in JavaScript,
+   * and it was reading the root element, finding nothing, and drawing daylight
+   * inside a dark app.
+   */
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
 
   // Track the OS setting, but only act on it while nobody has chosen. This
   // listener used to call setDarkMode directly, which threw away an explicit

@@ -8,8 +8,23 @@
 
 import { FarmTrack_GetWeatherService } from "../generated/services/FarmTrack_GetWeatherService";
 import { radiationSeries, type RadiationByDay } from "./bedLight";
+import { SITE_UTC_OFFSET_H } from "./site";
 
 export const STATION = { lat: 14.97, lng: -87.85, label: "El Olvido, Santa Cruz de Yojoa" };
+
+/**
+ * An instant from a local clock reading at the nursery.
+ *
+ * Open-Meteo returns "YYYY-MM-DDTHH:MM"; seconds and the offset are added
+ * here rather than trusting the engine's idea of "local".
+ */
+export function parseSiteClock(local: string): Date {
+  const text = local.trim();
+  const withSeconds = /T\d{2}:\d{2}$/.test(text) ? `${text}:00` : text;
+  const sign = SITE_UTC_OFFSET_H <= 0 ? "-" : "+";
+  const hours = String(Math.abs(SITE_UTC_OFFSET_H)).padStart(2, "0");
+  return new Date(`${withSeconds}${sign}${hours}:00`);
+}
 
 export interface CurrentConditions {
   temperature: number;
@@ -56,7 +71,13 @@ function toConditions(data: {
     cloudCover: c.cloud_cover,
     weatherCode: c.weather_code,
     isDay: c.is_day === 1,
-    observedAt: new Date(String(c.time)),
+    // Open-Meteo is asked for America/Tegucigalpa, so it answers with the
+    // nursery's own clock and no offset — "2026-09-02T14:00". JavaScript reads
+    // a date-time without an offset as the *browser's* local time, so from
+    // Europe that reading was six hours adrift and every fresh observation
+    // looked eight hours old. Honduras keeps UTC-6 all year, so the offset can
+    // simply be stated.
+    observedAt: parseSiteClock(String(c.time)),
   } as CurrentConditions;
 }
 

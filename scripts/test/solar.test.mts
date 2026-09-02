@@ -112,4 +112,23 @@ console.log(failures ? `\n  ${failures} failed` : '\n  The sun is where the alma
 }
 
 console.log(failures ? `\n  ${failures} failed` : '\n  The sun is where it is.')
+
+
+// Open-Meteo answers in the nursery's own clock with no offset. Reading that
+// as the browser's local time put every observation hours out — eight, from
+// Europe — so a reading taken minutes ago showed as stale.
+{
+  const eq3 = (label: string, got: unknown, want: unknown) => {
+    const pass = JSON.stringify(got) === JSON.stringify(want)
+    if (!pass) failures++
+    console.log(`  ${pass ? 'ok  ' : 'FAIL'} ${label.padEnd(52)} ${JSON.stringify(got)}${pass ? '' : ` want ${JSON.stringify(want)}`}`)
+  }
+  const { parseSiteClock } = await import('../../src/services/weather.ts')
+  eq3('14:00 at the nursery is 20:00 UTC',
+    parseSiteClock('2026-09-02T14:00').toISOString(), '2026-09-02T20:00:00.000Z')
+  eq3('and seconds do not change that',
+    parseSiteClock('2026-09-02T14:00:00').toISOString(), '2026-09-02T20:00:00.000Z')
+}
+
+console.log(failures ? `\n  ${failures} failed` : '\n  Clock readings become instants.')
 process.exit(failures ? 1 : 0)

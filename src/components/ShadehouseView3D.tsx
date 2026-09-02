@@ -26,8 +26,6 @@ import { useCurrentWeather } from "../hooks/useCurrentWeather";
 import { SceneErrorBoundary, WebglUnavailable, useWebgl } from "./WebglGuard";
 import BedCockpit from "./BedCockpit";
 import FeedBadge from "./FeedBadge";
-import CommandPalette from "./CommandPalette";
-import type { AppAction } from "../services/actions";
 import { useFeeds } from "../hooks/useFeeds";
 import { precipitationKind, windDirectionLabel } from "../services/weather";
 
@@ -164,28 +162,6 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
     return () => window.removeEventListener("keydown", onKey);
   }, [expanded]);
 
-  /**
-   * What this view can be asked to do, by name.
-   *
-   * Every bed is an action, which is the point: finding C1-04 among 180 beds
-   * by dragging is the slowest thing in the app, and typing "c104" is the
-   * fastest. Layers, the reset and the light-need question are the same list,
-   * so a keyboard, the palette and — later — a voice command are one build
-   * rather than three.
-   */
-  const [paletteOpen, setPaletteOpen] = useState(false);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setPaletteOpen((v) => !v);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
   const placements = useMemo(() => placeBeds(beds), [beds]);
   const baseZones = useMemo(() => buildZones(beds), [beds]);
   const anomalies = useMemo(() => demoAnomalies(baseZones), [baseZones]);
@@ -238,55 +214,6 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
   const selected = selectedBedId ? beds.find((b) => b.bedId === selectedBedId) : null;
 
-  /** The named list itself. Registered here because this is what owns the scene. */
-  const actions = useMemo<AppAction[]>(() => {
-    const toggle = (id: string, title: string, on: boolean, set: (f: (v: boolean) => boolean) => void): AppAction => ({
-      id, title, group: "Layers", hint: on ? "on" : "off", run: () => set((v) => !v),
-    });
-
-    const layers: AppAction[] = [
-      toggle("layer.shade", "Shade cloth", showShade, setShowShade),
-      toggle("layer.weather", "Weather", showWeather, setShowWeather),
-      toggle("layer.terrain", "Terrain contours", showTopography, setShowTopography),
-      toggle("layer.sun", "Sun and its path", showSun, setShowSun),
-      toggle("layer.irrigation", "Irrigation", showIrrigation, setShowIrrigation),
-      toggle("layer.numbers", "Bed numbers", showBedNumbers, setShowBedNumbers),
-      toggle("layer.fields", "Field labels", showPlotLabels, setShowPlotLabels),
-      toggle("layer.compass", "Compass", showCompass, setShowCompass),
-    ];
-
-    const lenses: AppAction[] = ([
-      ["state", "Status"], ["age", "Plant age"], ["harvest", "Days to harvest"],
-      ["irrigated", "Last irrigated"], ["issues", "Issues"], ["shade", "Shade"], ["light", "Light"],
-    ] as [LensMode, string][]).map(([id, title]) => ({
-      id: `lens.${id}`,
-      title: `Colour by ${title.toLowerCase()}`,
-      group: "View by",
-      hint: lens === id ? "current" : undefined,
-      run: () => setLens(id),
-    }));
-
-    const view: AppAction[] = [
-      { id: "view.reset", title: "Reset the view", group: "View", run: () => setResetKey((k) => k + 1) },
-      { id: "view.expand", title: expanded ? "Back to the page" : "Fill the window", group: "View",
-        run: () => setExpanded((v) => !v) },
-      { id: "view.clear", title: "Clear the selection", group: "View", run: () => setSelectedBedId(null) },
-    ];
-
-    // One per bed. The list is long on purpose — it is a search box, and a
-    // bed you cannot name is a bed you have to hunt for.
-    const bedActions: AppAction[] = beds.map((bed) => ({
-      id: `bed.${bed.bedId}`,
-      title: `Go to ${bed.bedId}`,
-      group: bed.type === "ground" ? "Beds" : "Cable rows",
-      keywords: `${bed.fieldId} ${bed.variety ?? ""} ${bed.state}`,
-      hint: bed.variety || undefined,
-      run: () => setSelectedBedId(bed.bedId),
-    }));
-
-    return [...view, ...lenses, ...layers, ...bedActions];
-  }, [beds, lens, expanded, showShade, showWeather, showTopography, showSun,
-      showIrrigation, showBedNumbers, showPlotLabels, showCompass]);
   const selectedReading = selectedBedId ? readings.get(selectedBedId) : undefined;
 
   const totalFlow = running.reduce((sum, r) => sum + r.flowLpm, 0);
@@ -321,15 +248,6 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           >
             <Droplets className="w-3.5 h-3.5" />
             Irrigation
-          </button>
-          <button
-            onClick={() => setPaletteOpen(true)}
-            title="Commands (⌘K)"
-            aria-label="Open the command palette"
-            className="px-2.5 py-2 rounded-lg bg-sand-100 text-navy-500 hover:bg-sand-200
-                       cursor-pointer transition-colors text-[11px] font-semibold"
-          >
-            ⌘K
           </button>
           <button
             onClick={() => setExpanded((v) => !v)}
@@ -740,12 +658,6 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             )}
           </BedCockpit>
         )}
-
-        <CommandPalette
-          actions={actions}
-          open={paletteOpen}
-          onClose={() => setPaletteOpen(false)}
-        />
 
         {/* Degraded-feed notice — the one thing that must never be silent. */}
         {showIrrigation && degraded.length > 0 && (
