@@ -18,7 +18,7 @@ import {
   type ShadehouseBed,
 } from "../services/shadehouseLayout";
 import type { BedActivity } from "../services/bedState";
-import ShadehouseScene, { placeBeds, type LensMode } from "./ShadehouseScene";
+import ShadehouseScene, { placeBeds, HOME_CAMERA, HOME_TARGET, type LensMode } from "./ShadehouseScene";
 import { useShadehouseBeds } from "../hooks/useShadehouseBeds";
 import { readZone, zoneStatusColors, type ZoneReading } from "../services/irrigation";
 import { buildZones, demoAnomalies, simulateFixes } from "../services/irrigationSim";
@@ -81,7 +81,16 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
   const [visibleLevels, setVisibleLevels] = useState<Set<BedLevel>>(
     () => new Set(ALL_LEVELS)
   );
-  const [showIrrigation, setShowIrrigation] = useState(true);
+  /**
+   * Off, and not switchable, until a controller is connected.
+   *
+   * The zone colours, the flow rates and the "signal lost" states are a
+   * simulation — good for showing what the layer will do, and dishonest on a
+   * screen somebody makes decisions from. The layer chip says unavailable and
+   * this stays false; nothing here is deleted, so connecting a controller is
+   * a matter of feeding it real readings.
+   */
+  const showIrrigation = false;
   const [lens, setLens] = useState<LensMode>("state");
   const [showPlotLabels, setShowPlotLabels] = useState(true);
   // On by default: a bed you cannot name is a bed you cannot go and find.
@@ -220,7 +229,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
   return (
     <div
-      className={`card-surface bg-white border border-sand-200/80 overflow-hidden ${
+      className={`card-surface bg-white dark:bg-d-card border border-sand-200/80 dark:border-white/10 overflow-hidden ${
         expanded
           ? "fixed inset-3 z-50 rounded-xl shadow-2xl overflow-y-auto"
           : `rounded-xl ${className}`
@@ -229,8 +238,8 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-5 pb-3">
         <div>
-          <h3 className="text-[15px] font-bold text-navy-900">Shadehouse — 3D</h3>
-          <p className="text-[11px] text-navy-400">
+          <h3 className="text-[15px] font-bold text-navy-900 dark:text-d-primary">Shadehouse — 3D</h3>
+          <p className="text-[11px] text-navy-400 dark:text-d-secondary">
             {beds.length} beds across {new Set(beds.map((b) => b.fieldId)).size} fields ·
             ground rows plus cable lines above · drag to orbit
           </p>
@@ -239,21 +248,10 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowIrrigation((v) => !v)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-colors ${
-              showIrrigation
-                ? "bg-sky-500 text-white"
-                : "bg-sand-100 text-navy-500 hover:bg-sand-200"
-            }`}
-          >
-            <Droplets className="w-3.5 h-3.5" />
-            Irrigation
-          </button>
-          <button
             onClick={() => setExpanded((v) => !v)}
             title={expanded ? "Back to the page (Esc)" : "Fill the window"}
             aria-label={expanded ? "Shrink the scene" : "Expand the scene"}
-            className="p-2 rounded-lg bg-sand-100 text-navy-500 hover:bg-sand-200 cursor-pointer transition-colors"
+            className="p-2 rounded-lg bg-sand-100 text-navy-500 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10 cursor-pointer transition-colors"
           >
             {expanded
               ? <Minimize2 className="w-3.5 h-3.5" />
@@ -262,7 +260,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           <button
             onClick={() => setResetKey((k) => k + 1)}
             title="Reset view"
-            className="p-2 rounded-lg bg-sand-100 text-navy-500 hover:bg-sand-200 cursor-pointer transition-colors"
+            className="p-2 rounded-lg bg-sand-100 text-navy-500 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10 cursor-pointer transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -271,7 +269,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
       {/* Layer strip */}
       <div className="flex flex-wrap items-center gap-2 px-5 pb-3">
-        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-navy-400 uppercase tracking-[0.12em] mr-1">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-navy-400 dark:text-d-secondary uppercase tracking-[0.12em] mr-1">
           <Layers className="w-3.5 h-3.5" />
           Layers
         </span>
@@ -286,7 +284,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
               className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
                 active
                   ? "chip-selected"
-                  : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+                  : "bg-sand-100 text-navy-400 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10"
               }`}
             >
               {LEVEL_LABELS[level]}
@@ -300,7 +298,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowPlotLabels((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showPlotLabels ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showPlotLabels ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10"
           }`}
         >
           <MapIcon className="w-3 h-3" />
@@ -309,7 +307,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowWeather((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showWeather ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showWeather ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10"
           }`}
         >
           <CloudRain className="w-3 h-3" />
@@ -318,7 +316,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowCompass((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showCompass ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showCompass ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10"
           }`}
         >
           <Compass className="w-3 h-3" />
@@ -327,7 +325,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowShade((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showShade ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showShade ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10"
           }`}
         >
           <Layers className="w-3 h-3" />
@@ -336,7 +334,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowSun((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showSun ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showSun ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10"
           }`}
         >
           <Sun className="w-3 h-3" />
@@ -345,7 +343,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowTopography((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showTopography ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showTopography ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10"
           }`}
         >
           <Mountain className="w-3 h-3" />
@@ -354,12 +352,29 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
         <button
           onClick={() => setShowBedNumbers((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-            showBedNumbers ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+            showBedNumbers ? "chip-selected" : "bg-sand-100 text-navy-400 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10"
           }`}
         >
           <Tag className="w-3 h-3" />
           Bed numbers
         </button>
+
+        {/* Irrigation sits with the other layers because that is what it will
+            be. It is not switchable yet: no controller is connected, and the
+            zone colours elsewhere in this view are a simulation. A layer that
+            says "unavailable" is honest; one that toggles a demonstration and
+            calls it irrigation is not. */}
+        <span
+          title="No controller is connected yet — see Settings, where the data comes from"
+          aria-disabled="true"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold
+                     bg-sand-50 text-navy-300 ring-1 ring-sand-200 cursor-not-allowed
+                     dark:bg-white/[0.03] dark:text-white/25 dark:ring-white/5"
+        >
+          <Droplets className="w-3 h-3" />
+          Irrigation
+          <span className="text-[9px] uppercase tracking-[0.1em] font-bold">unavailable</span>
+        </span>
 
         {showSun && arc && sunNow && (
           <span className="inline-flex items-center gap-2 ml-auto px-2.5 py-1 rounded-md bg-amber-50 ring-1 ring-amber-200/70">
@@ -408,7 +423,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
       {/* Lens strip — same geometry, different question. */}
       <div className="flex flex-wrap items-center gap-2 px-5 pb-3">
-        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-navy-400 uppercase tracking-[0.12em] mr-1">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-navy-400 dark:text-d-secondary uppercase tracking-[0.12em] mr-1">
           <Eye className="w-3.5 h-3.5" />
           View by
         </span>
@@ -419,7 +434,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
               lens === id
                 ? "chip-selected"
-                : "bg-sand-100 text-navy-400 hover:bg-sand-200"
+                : "bg-sand-100 text-navy-400 hover:bg-sand-200 dark:bg-white/5 dark:text-d-secondary dark:hover:bg-white/10"
             }`}
           >
             {label}
@@ -557,7 +572,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
           // 0.1–2000 range spends most of its depth precision on the first
           // metre, which is what lets coplanar surfaces flicker. 1–12000 is a
           // shallower ratio than the default and reaches the horizon.
-          camera={{ position: [62, 52, 74], fov: 36, near: 1, far: 12000 }}
+          camera={{ position: HOME_CAMERA, fov: 36, near: 1, far: 12000 }}
           onPointerMissed={() => setSelectedBedId(null)}
         >
           <ShadehouseScene
@@ -589,7 +604,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
             // could ever pull back far enough to look at it.
             maxDistance={900}
             maxPolarAngle={Math.PI / 2.15}
-            target={[0, 0.8, 0]}
+            target={HOME_TARGET}
           />
         </Canvas>
 
@@ -599,21 +614,21 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
         {/* Live conditions — provenance stated, like the irrigation feed. */}
         {showWeather && (
-          <div className="absolute left-4 top-4 px-3 py-2 rounded-lg bg-white/92 backdrop-blur ring-1 ring-sand-200 shadow-sm">
+          <div className="absolute left-4 top-4 px-3 py-2 rounded-lg bg-white/92 dark:bg-navy-900/85 backdrop-blur ring-1 ring-sand-200 dark:ring-white/10 shadow-sm">
             {weatherLoading && !weather ? (
               <p className="text-[11px] text-navy-400">Loading weather…</p>
             ) : weather ? (
               <>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[17px] font-bold text-navy-900 tabular-nums">
+                  <span className="text-[17px] font-bold text-navy-900 dark:text-d-primary tabular-nums">
                     {weather.temperature.toFixed(1)}°C
                   </span>
-                  <span className="text-[11px] text-navy-500">
+                  <span className="text-[11px] text-navy-500 dark:text-d-secondary">
                     {weather.windSpeed.toFixed(0)} km/h{" "}
                     {windDirectionLabel(weather.windDirection)}
                   </span>
                 </div>
-                <p className="text-[10px] text-navy-400 mt-0.5">
+                <p className="text-[10px] text-navy-400 dark:text-d-secondary mt-0.5">
                   {weather.humidity}% humidity · {weather.cloudCover}% cloud
                   {precipitationKind(weather.weatherCode) !== "none" &&
                     ` · ${weather.precipitation.toFixed(1)} mm`}
@@ -661,7 +676,7 @@ export default function ShadehouseView3D({ className = "" }: { className?: strin
 
         {/* Degraded-feed notice — the one thing that must never be silent. */}
         {showIrrigation && degraded.length > 0 && (
-          <div className="absolute right-4 top-4 px-3 py-2 rounded-lg bg-white/95 backdrop-blur ring-1 ring-sand-200 shadow-sm">
+          <div className="absolute right-4 top-4 px-3 py-2 rounded-lg bg-white/95 dark:bg-navy-900/90 backdrop-blur ring-1 ring-sand-200 dark:ring-white/10 shadow-sm">
             <p className="text-[11px] font-semibold text-navy-800">
               {degraded.length} {degraded.length === 1 ? "zone" : "zones"} not reporting
             </p>

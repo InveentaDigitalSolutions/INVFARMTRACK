@@ -1341,6 +1341,15 @@ function CameraHeading({ onChange }: { onChange: (deg: number) => void }) {
 }
 
 /**
+ * Where the camera sits when nothing is selected.
+ *
+ * The same numbers the Canvas is created with and OrbitControls targets, kept
+ * here so "back to where you started" means exactly that.
+ */
+export const HOME_CAMERA: [number, number, number] = [62, 52, 74];
+export const HOME_TARGET: [number, number, number] = [0, 0.8, 0];
+
+/**
  * Fly the camera to what was just selected.
  *
  * A bed is 1.2 m across in a house 110 m wide. Picking one from a table and
@@ -1375,8 +1384,10 @@ function FocusOnSelection({
     } | null;
 
     if (selectedBedId !== lastId.current) {
+      const hadOne = lastId.current !== null;
       lastId.current = selectedBedId;
       const found = placements.find((p) => p.bed.bedId === selectedBedId);
+
       if (found && orbit?.target) {
         const target = new THREE.Vector3(found.x, found.y + 0.5, found.z);
         // Close enough to read the bed, far enough to keep its neighbours in
@@ -1387,6 +1398,17 @@ function FocusOnSelection({
           to: target.clone().add(back),
           fromTarget: orbit.target.clone(),
           toTarget: target,
+          start: clock.elapsedTime,
+        };
+      } else if (!selectedBedId && hadOne && orbit?.target) {
+        // Closing the panel puts the camera back where it started. Being left
+        // two metres from one bed with nothing selected is disorienting: you
+        // have to find the whole house again before you can pick another.
+        flight.current = {
+          from: camera.position.clone(),
+          to: new THREE.Vector3(...HOME_CAMERA),
+          fromTarget: orbit.target.clone(),
+          toTarget: new THREE.Vector3(...HOME_TARGET),
           start: clock.elapsedTime,
         };
       } else {

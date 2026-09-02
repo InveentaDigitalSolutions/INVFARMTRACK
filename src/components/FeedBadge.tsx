@@ -31,7 +31,9 @@ export default function FeedBadge({
       />
       {showLabel && <span className="font-semibold text-navy-700 dark:text-d-primary">{feed.label}</span>}
       <span className={`font-semibold uppercase tracking-[0.08em] ${look.text}`}>{look.label}</span>
-      <span className="text-navy-400 dark:text-d-secondary normal-case tracking-normal">{feed.detail}</span>
+      {feed.detail.toLowerCase() !== look.label.toLowerCase() && (
+        <span className="text-navy-400 dark:text-d-secondary normal-case tracking-normal">{feed.detail}</span>
+      )}
     </span>
   );
 }
