@@ -15,14 +15,18 @@ import { PLANT_SIZE_OPTIONS } from "../services/plantSizes";
 import BedCountGrid from "../components/BedCountGrid";
 import AvailabilityOverview from "../components/AvailabilityOverview";
 import { expandBeds } from "../services/expandBeds";
-import type { CurveRow, ProjectionsRow, PruningRow } from "../services/rowTypes.generated";
+import type { CurveRow, ProjectionsRow } from "../services/rowTypes.generated";
 
 const tabs = [
   // The question the projections exist to answer, before the table of them.
   { id: "overview", label: "Overview" },
   { id: "projections", label: "Weekly Projections" },
+  // The pruning *curve* belongs here: it is what turns a bed count into an
+  // expected yield, which is what a projection is. The pruning *log* — what
+  // was actually cut, when, by whom — is a record of work done, and work done
+  // is Production's business. It was in both places, which meant two screens
+  // could disagree about the same day.
   { id: "curve", label: "Pruning Curve" },
-  { id: "log", label: "Pruning Log" },
 ];
 
 // --- Weekly Projections data ---
@@ -32,7 +36,6 @@ const initProjections: ProjectionsRow[] = [];
 const initCurve: CurveRow[] = [];
 
 // --- Pruning Log data ---
-const initLog: PruningRow[] = [];
 
 // --- Options ---
 /** No fallback list. These names come from the table the lookup points at;
@@ -41,7 +44,6 @@ const initLog: PruningRow[] = [];
 const plantOptionsFallback: { value: string; label: string }[] = [];
 const sizeOptions = PLANT_SIZE_OPTIONS;
 const seasonOptionsFallback: { value: string; label: string }[] = [];
-const workerOptionsFallback: { value: string; label: string }[] = [];
 
 // --- Form groups ---
 const projectionFields = [
@@ -71,17 +73,6 @@ const curveFields = [
     { key: "actualBeds", label: "Actual Beds", type: "number" as const, min: 0 },
     { key: "plannedCuttings", label: "Planned Cuttings", type: "number" as const, min: 0 },
     { key: "actualCuttings", label: "Actual Cuttings", type: "number" as const, min: 0 },
-  ]},
-];
-
-const logFields = [
-  { title: "Pruning Event", columns: 2 as const, fields: [
-    { key: "date", label: "Date", type: "date" as const, required: true },
-    { key: "bed", label: "Beds", type: "bedselector" as const, required: true, span: 2 as const, multiSelect: true },
-    { key: "week", label: "Week", type: "number" as const, min: 1, max: 52, required: true },
-    // Beds pruned is however many are selected — see expandBeds.
-    { key: "cuttingsEstimated", label: "Cuttings Estimated (per bed)", type: "number" as const, min: 0 },
-    { key: "worker", label: "Worker", type: "select" as const, options: workerOptionsFallback, optionsFrom: "workers" },
   ]},
 ];
 
@@ -162,11 +153,9 @@ export default function AvailabilityPage() {
   // Same records as Production > Crop Care > Pruning. This used the key
   // "log", which is bound to nothing, so everything entered here went to
   // browser storage and was lost on reload.
-  const [log, setLog] = useRecords("pruning", initLog);
 
   const projectionForm = useFormModal(initProjections[0]);
   const curveForm = useFormModal(initCurve[0]);
-  const logForm = useFormModal(initLog[0]);
   const confirm = useConfirmDialog();
 
   const save = (data: any[], setData: (d: any) => void, form: ReturnType<typeof useFormModal>, values: Record<string, unknown>) => {
@@ -294,29 +283,6 @@ export default function AvailabilityPage() {
             />
             <FormModal open={curveForm.open} onClose={curveForm.close} title={curveForm.isEdit ? "Edit Curve Entry" : "Add Curve Entry"} groups={curveFields} values={curveForm.values} onChange={curveForm.onChange} isEdit={curveForm.isEdit} onSubmit={(v) => save(curve, setCurve, curveForm, v)} />
             <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Entry" message="Delete this pruning curve entry?" onConfirm={() => del(curve, setCurve)} />
-          </>
-        );
-      case "log":
-        return (
-          <>
-            <DataTable
-              columns={[
-                { key: "date", label: "Date" },
-                { key: "bed", label: "Bed" },
-                { key: "week", label: "Week" },
-                { key: "bedsPruned", label: "Beds Pruned" },
-                { key: "cuttingsEstimated", label: "Cuttings Est." },
-                { key: "worker", label: "Worker" },
-              ]}
-              data={log}
-              onAdd={logForm.openCreate}
-              onEdit={(row, i) => logForm.openEdit(row as any, i)}
-              onDelete={(row, i) => confirm.requestDelete(row, i)}
-              addLabel="Log Pruning"
-              searchPlaceholder="Search pruning log..."
-            />
-            <FormModal open={logForm.open} onClose={logForm.close} title={logForm.isEdit ? "Edit Pruning Event" : "Log Pruning Event"} groups={logFields} values={logForm.values} onChange={logForm.onChange} isEdit={logForm.isEdit} onSubmit={(v) => save(log, setLog, logForm, v)} />
-            <ConfirmDialog open={confirm.open} onClose={confirm.close} title="Delete Entry" message="Delete this pruning log entry?" onConfirm={() => del(log, setLog)} />
           </>
         );
     }
